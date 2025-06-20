@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      - ENVIRONMENT=${ENVIRONMENT:-development}
+      - DOMAIN=${DOMAIN:-localhost}
+    volumes:
+      - ./main\ site\ reference:/usr/share/nginx/html/:ro
+      - ./public:/usr/share/nginx/html/trips/:ro
+      - ./logs:/var/log/nginx
+    depends_on:
+      - database
+    networks:
+      - wolthers-network
+
+  database:
+    image: mysql:8.0
+    container_name: wolthers_db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME:-wolthers_trips}
+      MYSQL_USER: ${DB_USER:-wolthers_user}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    ports:
+      - "3306:3306"
+    networks:
+      - wolthers-network
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: wolthers_phpmyadmin
+    restart: unless-stopped
+    environment:
+      PMA_HOST: database
+      PMA_PORT: 3306
+      PMA_USER: ${DB_USER:-wolthers_user}
+      PMA_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "8080:80"
+    depends_on:
+      - database
+    networks:
+      - wolthers-network
+
+volumes:
+  mysql_data:
+    driver: local
+
+networks:
+  wolthers-network:
+    driver: bridge 

@@ -1,0 +1,1545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Team - Wolthers & Associates</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Source+Sans+Pro:wght@300;400;600&family=Marcellus&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/team-style.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Marcellus', 'DM Sans', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #2c5530 0%, #4a7c4a 100%);
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Playfair Display', 'Source Sans Pro', serif;
+            text-shadow: none;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* ===== TOP HEADER COMPONENT ===== */
+        .top-header {
+            background: #1a3d1e;
+            padding: 10px 0;
+            color: white;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1002;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .top-header.hidden {
+            opacity: 0;
+            transform: translateY(-100%);
+        }
+
+        .top-header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .search-container {
+            position: relative;
+            flex: 1;
+            max-width: 400px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 8px 40px 8px 15px;
+            border: none;
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .search-input:focus {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .search-btn {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .language-switcher {
+            display: flex;
+            gap: 15px;
+        }
+
+        .lang-btn {
+            background: #1a3d1e;
+            border: 1px solid #1a3d1e;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+
+        .lang-btn.active {
+            background: #d4af37;
+            border-color: #d4af37;
+            color: #1a3d1e;
+        }
+
+        .lang-btn:not(.active):hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* ===== MAIN HEADER COMPONENT ===== */
+        header {
+            background: linear-gradient(135deg, #2c5530 0%, #4a7c4a 100%);
+            color: white;
+            padding: 1.5rem 0; /* Increased from 1rem */
+            position: fixed;
+            width: 100%;
+            top: 40px;
+            z-index: 1001;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: top 0.3s ease;
+        }
+
+        .top-header.hidden + header {
+            top: 0;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            min-height: 60px; /* Ensure minimum height */
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #f4f4f4;
+            padding: 0.5rem 0; /* Added padding */
+        }
+
+        .logo img {
+            height: 50px;
+            width: auto;
+        }
+
+        .logo-text {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #f4f4f4;
+        }
+
+        /* More comprehensive list style reset */
+        nav ul {
+            display: flex;
+            list-style: none;
+            list-style-type: none;
+            list-style-image: none;
+            list-style-position: outside;
+            margin: 0;
+            padding: 0;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        nav ul li {
+            list-style: none;
+            list-style-type: none;
+            list-style-image: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s;
+            padding: 0.5rem 0;
+        }
+
+        nav a:hover {
+            color: #a8d4a8;
+        }
+
+        /* Dropdown Menu */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        /* Also ensure dropdown lists don't show bullets */
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: rgba(44, 85, 48, 0.95);
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1003;
+            border-radius: 5px;
+            top: 100%;
+            left: 0;
+            list-style: none;
+            list-style-type: none;
+            list-style-image: none;
+        }
+
+        .dropdown-content a {
+            color: white;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            transition: background-color 0.3s;
+            list-style: none;
+            list-style-type: none;
+        }
+
+        .dropdown-content a:hover {
+            background-color: rgba(212, 175, 55, 0.2);
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .dropdown:hover > a {
+            color: #a8d4a8;
+        }
+
+        /* Hamburger menu - hidden on desktop */
+        .hamburger-menu {
+            display: none;
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            margin-top: 135px; /* Increased to account for larger header */
+            transition: margin-top 0.3s ease;
+        }
+
+        .top-header.hidden ~ .main-content {
+            margin-top: 95px; /* Adjusted for when top header is hidden */
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('images/team-hero.jpg') no-repeat center center / cover;
+            height: 60vh;
+            min-height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+        }
+
+        .hero-content h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            font-weight: 300;
+        }
+
+        .hero-content p {
+            font-size: 1.2rem;
+            max-width: 600px;
+        }
+
+        /* Team Sections */
+        .team-section {
+            padding: 60px 0;
+        }
+
+        .team-section:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        /* Green background sections with white text */
+        #brazil-aaa {
+            background: linear-gradient(135deg, #2c5530 0%, #4a7c4a 100%);
+        }
+
+        #guatemala {
+            background: linear-gradient(135deg, #2c5530 0%, #4a7c4a 100%);
+        }
+
+        #brazil-aaa .location-title,
+        #guatemala .location-title {
+            color: white;
+        }
+
+        #brazil-aaa .location-subtitle,
+        #guatemala .location-subtitle {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .location-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .location-title {
+            font-size: 2.5rem;
+            color: #2c5530;
+            margin-bottom: 0.5rem;
+        }
+
+        .location-subtitle {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 1rem;
+        }
+
+        .location-info {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 3rem;
+            border-left: 4px solid #d4af37;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            margin-bottom: 3rem;
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .team-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .team-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #d4af37, #2c5530);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .team-card:hover::before {
+            opacity: 1;
+        }
+
+        .team-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+        }
+
+        .team-photo {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin: 0 auto 1.5rem;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #2c5530, #4a7c4a);
+            color: white;
+            font-size: 2.5rem;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .team-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .team-name {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #2c5530;
+            margin-bottom: 0.5rem;
+        }
+
+        .team-position {
+            font-size: 1rem;
+            color: #d4af37;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .team-specialty {
+            font-size: 0.9rem;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+
+        .team-description {
+            font-size: 0.9rem;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        /* Leadership Section */
+        .leadership-section {
+            background: linear-gradient(135deg, #2c5530 0%, #4a7c4a 100%);
+            color: white;
+            padding: 80px 0;
+        }
+
+        .leadership-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .leadership-card .team-name {
+            color: #d4af37;
+        }
+
+        .leadership-card .team-position {
+            color: white;
+        }
+
+        .leadership-card .team-description {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        /* Stats Section */
+        .team-stats {
+            background: #2c5530;
+            color: white;
+            padding: 60px 0;
+            text-align: center;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .stat-item {
+            padding: 1.5rem;
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #d4af37;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        /* ===== CONTACT SECTION COMPONENT ===== */
+        .contact {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #404040 100%);
+            color: white;
+            padding: 80px 0;
+        }
+
+        .contact .section-title {
+            color: white;
+        }
+
+        .contact-form-container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 3rem;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            color: #333;
+            margin: 2rem auto;
+            max-width: 600px;
+        }
+
+        .contact-form-container h3 {
+            color: #d4af37;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .contact-form-container p {
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            color: #555;
+        }
+
+        .contact-form .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .contact-form label.visually-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            margin: -1px;
+            padding: 0;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            border: 0;
+        }
+
+        .contact-form input[type="text"],
+        .contact-form input[type="email"],
+        .contact-form select,
+        .contact-form textarea {
+            width: 100%;
+            padding: 15px 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 1rem;
+            color: #333;
+            background-color: white;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .contact-form select {
+            appearance: none;
+            background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4 5"><path fill="%23333" d="M2 0L0 2h4zm0 5L0 3h4z"/></svg>');
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 12px;
+            cursor: pointer;
+        }
+
+        .contact-form input[type="text"]::placeholder,
+        .contact-form input[type="email"]::placeholder,
+        .contact-form textarea::placeholder {
+            color: #999;
+        }
+
+        .contact-form input[type="text"]:focus,
+        .contact-form input[type="email"]:focus,
+        .contact-form select:focus,
+        .contact-form textarea:focus {
+            border-color: #d4af37;
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.3);
+            outline: none;
+        }
+
+        .contact-form textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .contact-form .submit-btn {
+            width: 100%;
+            padding: 15px 20px;
+            background: #d4af37;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+
+        .contact-form .submit-btn:hover {
+            background: #b8941f;
+            transform: translateY(-2px);
+        }
+
+        .contact-form .submit-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .contact-details-container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 3rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            margin-top: 3rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .contact-details-container h3 {
+            color: white;
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            grid-column: 1 / -1;
+        }
+
+        .contact-info-item {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border-left: 5px solid #d4af37;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .contact-info-item h4 {
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .contact-info-item p {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .contact-info-item a {
+            color: #d4af37;
+            text-decoration: none;
+        }
+
+        .contact-info-item a:hover {
+            color: #f0c649;
+        }
+
+        .contact-info-item h4 {
+            color: #d4af37;
+            font-size: 1.4rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .contact-info-item p {
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .contact-info-item a {
+            color: #d4af37;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .contact-info-item a:hover {
+            color: white;
+            text-decoration: underline;
+        }
+
+        /* ===== FOOTER COMPONENT ===== */
+        .footer {
+            background: #2c5530;
+            color: white;
+            padding: 60px 0 0;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px 40px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+        }
+
+        .footer-section h4 {
+            color: #d4af37;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 10px;
+        }
+
+        .footer-section ul li a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s;
+        }
+
+        .footer-section ul li a:hover {
+            color: white;
+        }
+
+        .footer-search-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .footer-search-input {
+            width: 100%;
+            padding: 8px 40px 8px 15px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .footer-search-input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .footer-search-btn {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .footer-language-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .footer-language-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 80px;
+            justify-content: space-between;
+        }
+
+        .footer-language-dropdown-content {
+            display: none;
+            position: absolute;
+            bottom: 100%;
+            left: 0;
+            background: #1a3d1e;
+            min-width: 100px;
+            box-shadow: 0px -8px 16px 0px rgba(0,0,0,0.2);
+            border-radius: 8px;
+            z-index: 1;
+            margin-bottom: 5px;
+        }
+
+        .footer-language-dropdown-content a {
+            color: white;
+            padding: 10px 16px;
+            text-decoration: none;
+            display: block;
+            font-size: 14px;
+        }
+
+        .footer-language-dropdown:hover .footer-language-dropdown-content {
+            display: block;
+        }
+
+        .dropdown-arrow {
+            font-size: 12px;
+        }
+
+        .footer-bottom {
+            background: #1a3d1e;
+            padding: 20px 0;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+
+        /* Specialty badges */
+        .q-grader { background: #d4af37; }
+        .agronomist { background: #28a745; }
+        .trader { background: #2c5530; }
+        .logistics { background: #17a2b8; }
+        .finance { background: #6f42c1; }
+        .quality { background: #dc3545; }
+        .data { background: #fd7e14; }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .top-header-content {
+                flex-direction: column;
+                gap: 10px;
+                padding: 10px 20px;
+            }
+
+            .search-container {
+                max-width: 100%;
+                display: none;
+            }
+
+            .main-content {
+                margin-top: 140px;
+            }
+
+            .top-header.hidden ~ .main-content {
+                margin-top: 80px;
+            }
+
+            .hero-content h1 {
+                font-size: 2rem;
+            }
+
+            .location-title {
+                font-size: 2rem;
+            }
+
+            .team-grid {
+                grid-template-columns: 1fr;
+            }
+
+            nav ul {
+                display: none;
+            }
+
+            /* Hamburger menu - hidden on desktop */
+            .hamburger-menu {
+                display: flex;
+                position: absolute;
+                top: 50%;
+                right: 20px;
+                transform: translateY(-50%);
+                width: 30px;
+                height: 20px;
+                flex-direction: column;
+                justify-content: space-around;
+                background: transparent;
+                border: none;
+                cursor: pointer;
+                padding: 0;
+                z-index: 1005;
+            }
+
+            .hamburger-menu .bar {
+                width: 100%;
+                height: 3px;
+                background-color: white;
+                border-radius: 10px;
+                transition: all 0.3s ease;
+            }
+
+            .hamburger-menu.active .bar:nth-child(1) {
+                transform: translateY(8px) rotate(45deg);
+            }
+
+            .hamburger-menu.active .bar:nth-child(2) {
+                opacity: 0;
+            }
+
+            .hamburger-menu.active .bar:nth-child(3) {
+                transform: translateY(-8px) rotate(-45deg);
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .nav-links.active {
+                display: flex;
+                flex-direction: column;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100vh;
+                background: rgba(44, 85, 48, 0.95);
+                padding-top: 120px;
+                align-items: center;
+                gap: 1.5rem;
+                z-index: 1000;
+                transform: translateX(100%);
+                transition: transform 0.4s ease-out;
+            }
+
+            .nav-links.active.open {
+                transform: translateX(0);
+            }
+
+            .nav-links.active a {
+                color: white;
+                font-size: 1.3rem;
+            }
+
+            /* Center logo on mobile */
+            .logo {
+                justify-content: center;
+                margin: 0 auto;
+            }
+
+            /* Hide contact subsections on mobile */
+            .contact-sections {
+                display: none;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .contact-sections {
+                grid-template-columns: 1fr;
+            }
+
+            .contact-section {
+                border-right: none;
+                border-bottom: 1px solid #e9ecef;
+            }
+
+            .contact-section:last-child {
+                border-bottom: none;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+            }
+            .footer-search-container {
+                display: none;
+            }
+        }
+
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Header -->
+    <div class="top-header">
+        <div class="container">
+            <div class="top-header-content">
+                <div class="search-container">
+                    <input type="text" class="search-input" placeholder="Search...">
+                    <button class="search-btn">🔍</button>
+                </div>
+                <div class="language-switcher">
+                    <button class="lang-btn active" data-lang="en">EN</button>
+                    <button class="lang-btn" data-lang="pt">PT</button>
+                    <button class="lang-btn" data-lang="es">ES</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Header -->
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">
+                    <img src="images/wolthers-logo-off-white.svg" alt="Wolthers & Associates Logo" class="logo-img">
+                    <span class="logo-text">Wolthers & Associates</span>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="index.html#about">About</a></li>
+                    <li><a href="index.html#services">Services</a></li>
+                    <li><a href="index.html#quality-control">Quality Control</a></li>
+                    <li><a href="index.html#locations">Locations</a></li>
+                    <li class="dropdown">
+                        <a href="#team">Our Team</a>
+                        <div class="dropdown-content">
+                            <a href="#leadership">Leadership</a>
+                            <a href="#brazil">Brazil</a>
+                            <a href="#colombia">Colombia</a>
+                            <a href="#guatemala">Guatemala</a>
+                        </div>
+                    </li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+                <div class="hamburger-menu">
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-content">
+                <h1 data-lang-key="heroTitle">Meet Our Global Team</h1>
+                <p data-lang-key="heroSubtitle">Dedicated professionals across three countries, united by our passion for coffee excellence and commitment to quality</p>
+            </div>
+        </section>
+
+        <!-- Team Stats -->
+        <section class="team-stats">
+            <div class="container">
+                <h2 style="font-size: 2.5rem; margin-bottom: 1rem;" data-lang-key="statsTitle">Our Global Expertise</h2>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-number">30+</div>
+                        <div class="stat-label" data-lang-key="statsTeamMembers">Team Members</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">6</div>
+                        <div class="stat-label" data-lang-key="statsQGraders">Q Graders</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">3</div>
+                        <div class="stat-label" data-lang-key="statsCountries">Countries</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">75+</div>
+                        <div class="stat-label" data-lang-key="statsYearsExperience">Years Experience</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Leadership Section -->
+        <section id="leadership" class="leadership-section">
+            <div class="container">
+                <div class="location-header">
+                    <h2 class="location-title" style="color: white;" data-lang-key="leadershipTitle">Leadership Team</h2>
+                    <p class="location-subtitle" style="color: rgba(255,255,255,0.8);" data-lang-key="leadershipSubtitle">Three generations of coffee expertise guiding our global operations</p>
+                </div>
+                <div class="team-grid">
+                    <div class="team-card leadership-card">
+                        <div class="team-photo">
+                            <img src="images/members/Rasmus_Wolthers.png" alt="Rasmus Wolthers" onerror="this.style.display='none'; this.parentElement.innerHTML='RW';">
+                        </div>
+                        <div class="team-name">Rasmus Wolthers</div>
+                        <div class="team-position" data-lang-key="ceoTitle">Partner &amp; Chief Executive Officer</div>
+                        <div class="team-specialty trader" data-lang-key="generation3rd">3rd Generation Leader</div>
+                        <div class="team-description" data-lang-key="rasmusDescription">Organizes travel programs, leads major negotiations, and structures office operations. Guiding the company's growth in modern coffee trading.</div>
+                    </div>
+                    <div class="team-card leadership-card">
+                        <div class="team-photo">
+                            <img src="images/members/Christian_Wolthers.png" alt="Christian Wolthers" onerror="this.style.display='none'; this.parentElement.innerHTML='CW';">
+                        </div>
+                        <div class="team-name">Christian Wolthers</div>
+                        <div class="team-position" data-lang-key="founderTitle">Chairman</div>
+                        <div class="team-specialty trader" data-lang-key="generation2nd">2nd Generation</div>
+                        <div class="team-description" data-lang-key="christianDescription">Founded W&A in 1990, provides strategic guidance.</div>
+                    </div>
+                    <div class="team-card leadership-card">
+                        <div class="team-photo">
+                            <img src="images/members/Daniel_Wolthers.png" alt="Daniel Wolthers" onerror="this.style.display='none'; this.parentElement.innerHTML='DW';">
+                        </div>
+                        <div class="team-name">Daniel Wolthers</div>
+                        <div class="team-position" data-lang-key="tradingDirectorTitle">Partner &amp; Chief Operating Officer</div>
+                        <div class="team-specialty trader" data-lang-key="generation3rdSimple">3rd Generation</div>
+                        <div class="team-description" data-lang-key="danielDescription">COO overseeing operations and trading. Nespresso Cluster Administrator.</div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- Brazil/Santos Team -->
+        <section id="brazil-santos" class="team-section">
+            <div class="container">
+                <div class="location-header">
+                    <h2 class="location-title" data-lang-key="santosBrazil">Santos, Brazil</h2>
+                    <p class="location-subtitle" data-lang-key="santosSubtitle">Our headquarters and largest operation</p>
+                    <div class="location-info">
+                        <strong>📍 <span data-lang-key="address">Address</span>:</strong> Rua Quinze de Novembro 96, Santos, SP 11010-150, Brasil<br>
+                        <strong>📞 <span data-lang-key="phone">Phone</span>:</strong> +55 (13) 2127-4144<br>
+                        <strong>✉️ <span data-lang-key="email">Email</span>:</strong> trading@wolthers.com | wolthers@wolthers.com
+                    </div>
+                </div>
+                <div class="team-grid">
+                    <div class="team-card">
+                        <div class="team-photo">
+                            <img src="images/members/Svenn_Wolthers.png" alt="Svenn Wolthers" onerror="this.style.display='none'; this.parentElement.innerHTML='SW';">
+                        </div>
+                        <div class="team-name">Svenn Wolthers</div>
+                        <div class="team-position" data-lang-key="labsMarketing">Partner, Labs &amp; Marketing</div>
+                        <div class="team-specialty trader" data-lang-key="generation3rdSimple">3rd Generation</div>
+                        <div class="team-description" data-lang-key="svennDescription">Oversees Guatemala and Colombia labs, supports marketing across Latin America.</div>
+                    </div>
+                    <div class="team-card">
+                        <div class="team-photo">
+                            <img src="images/members/Tom_Sullivan.png" alt="Tom Sullivan" onerror="this.style.display='none'; this.parentElement.innerHTML='TS';">
+                        </div>
+                        <div class="team-name">Tom Sullivan</div>
+                        <div class="team-position" data-lang-key="seniorTrader">Senior Trader</div>
+                        <div class="team-specialty trader" data-lang-key="tradingExpert">Trading Expert</div>
+                        <div class="team-description" data-lang-key="tomDescription">Senior trader managing key international accounts and relationships.</div>
+                    </div>
+                    <div class="team-card">
+                        <div class="team-photo">
+                            <img src="images/members/Edgar_Gomes.png" alt="Edgar André Gomes" onerror="this.style.display='none'; this.parentElement.innerHTML='EG';">
+                        </div>
+                        <div class="team-name">Edgar André Gomes</div>
+                        <div class="team-position">Partner &amp; Quality Control Director</div>
+                        <div class="team-specialty q-grader">Q Grader</div>
+                        <div class="team-description" data-lang-key="edgarGomesDescription">Leading quality control across all operations.</div>
+                    </div>
+                    <div class="team-card">
+                        <div class="team-photo">
+                            <img src="images/members/Anderson_Nunes.png" alt="Anderson Nunes" onerror="this.style.display='none'; this.parentElement.innerHTML='AN';">
+                        </div>
+                        <div class="team-name">Anderson Nunes</div>
+                        <div class="team-position" data-lang-key="labManager">Lab Manager / Quality Analyst</div>
+                        <div class="team-specialty q-grader">Q Grader</div>
+                        <div class="team-description" data-lang-key="andersonDescription">Q Grader specializing in sensory analysis and quality assessment.</div>
+                    </div>
+                    <div class="team-card">
+                        <div class="team-photo">
+                            <img src="images/members/Boeri_Ferrari.png" alt="Boeri Ferrari" onerror="this.style.display='none'; this.parentElement.innerHTML='BF';">
+                        </div>
+                        <div class="team-name">Boeri Ferrari</div>
+                        <div class="team-position" data-lang-key="internalBroker">Internal Market Broker</div>
+                        <div class="team-specialty trader">Market Broker</div>
+                        <div class="team-description" data-lang-key="boeriDescription">Internal market specialist connecting producers with buyers.</div>
+                    </div>
+                    <div class="team-card">
+                        <div class="team-photo">
+                            <img src="images/members/Petter_Anderson.png" alt="Petter Anderson" onerror="this.style.display='none'; this.parentElement.innerHTML='PA';">
+                        </div>
+                        <div class="team-name">Petter Anderson</div>
+                        <div class="team-position" data-lang-key="qualitySupportAnalyst">Quality Support Analyst</div>
+                        <div class="team-specialty quality">Quality Expert</div>
+                        <div class="team-description" data-lang-key="petterDescription">Quality analyst supporting comprehensive quality control processes.</div>
+                    </div>
+                    <div class="team-card">
+                        <div class="team-photo">
+                            <img src="images/members/Victor_DiPaula.png" alt="Victor Di Paula" onerror="this.style.display='none'; this.parentElement.innerHTML='VP';">
+                        </div>
+                        <div class="team-name">Victor Di Paula</div>
+                        <div class="team-position" data-lang-key="qualitySupportAnalyst">Quality Support Analyst</div>
+                        <div class="team-specialty quality">Quality Expert</div>
+                        <div class="team-description" data-lang-key="victorDescription">Quality analyst ensuring consistent standards for coffee evaluations.</div>
+                    </div>
+                    <div class="team-card">
+                        <div class="team-photo">
+                            <img src="images/members/Matheus_Oliveira.png" alt="Matheus Oliveira" onerror="this.style.display='none'; this.parentElement.innerHTML='MO';">
+                        </div>
+                        <div class="team-name">Matheus Oliveira</div>
+                        <div class="team-position">Quality Control Lab Assistant</div>
+                        <div class="team-specialty quality">Quality Control</div>
+                        <div class="team-description" data-lang-key="matheusDescription">Supporting lab operations and quality analysis.</div>
+                    </div>
+                    <div class="team-card">
+                        <div class="team-photo">
+                            <img src="images/members/Natalia_Barletta.png" alt="Natalia Barletta" onerror="this.style.display='none'; this.parentElement.innerHTML='NB';">
+                        </div>
+                        <div class="team-name">Natalia Barletta</div>
+                        <div class="team-position" data-lang-key="headLogisticsTradingSupport">Head of Logistics &amp; Trading Support</div>
+                        <div class="team-specialty logistics" data-lang-key="logisticsStrategist">Logistics Strategist</div>
+                        <div class="team-description" data-lang-key="nataliaDescription">Shipping specialist ensuring timely samples and competitive freight quotes.</div>
+                    </div>
+                    <div class="team-card">
+                        <div class="team-photo">
+                            <img src="images/members/Debora_Sabino.png" alt="Debora Sabino" onerror="this.style.display='none'; this.parentElement.innerHTML='DS';">
+                        </div>
+                        <div class="team-name">Debora Sabino</div>
+                        <div class="team-position" data-lang-key="logistics">Logistics</div>
+                        <div class="team-specialty logistics">Logistics Coordinator</div>
+                        <div class="team-description" data-lang-key="deboraDescription">Coordinating logistics operations for timely shipment movement.</div>
+                    </div>
+                    <div class="team-card">
+                        <div class="team-photo">
+                            <img src="images/members/Caroline_Freitas.png" alt="Caroline Freitas" onerror="this.style.display='none'; this.parentElement.innerHTML='CF';">
+                        </div>
+                        <div class="team-name">Caroline Freitas</div>
+                        <div class="team-position">Contracts & Price Fixations and Logistics</div>
+                        <div class="team-specialty logistics">Logistics & Fixations</div>
+                        <div class="team-description" data-lang-key="carolineDescription">Handles contracts, price fixations and logistics coordination.</div>
+                    </div>
+                    <div class="team-card">
+                        <div class="team-photo">
+                            <img src="images/members/Kauan_Marcelino.png" alt="Kauan Marcelino" onerror="this.style.display='none'; this.parentElement.innerHTML='KM';">
+                        </div>
+                        <div class="team-name">Kauan Marcelino</div>
+                        <div class="team-position">Supporting Logistics Operations</div>
+                        <div class="team-specialty logistics">Logistics Specialist</div>
+                        <div class="team-description" data-lang-key="kauanDescription">Assists logistics team ensuring smooth shipment operations.</div>
+                    </div>
+                    <div class="team-card">
+                        <div class="team-photo">
+                            <img src="images/members/Vinicius_Medeiros.png" alt="Vinicius Medeiros" onerror="this.style.display='none'; this.parentElement.innerHTML='VM';">
+                        </div>
+                        <div class="team-name">Vinicius Medeiros</div>
+                        <div class="team-position">Logistics Support</div>
+                        <div class="team-specialty logistics">Documents Verification</div>
+                        <div class="team-description" data-lang-key="viniciusDescription">Document verification and daily logistics support.</div>
+                    </div>
+                    <div class="team-card">
+                        <div class="team-photo">
+                            <img src="images/members/Patricia_Arakaki.png" alt="Patricia Arakaki" onerror="this.style.display='none'; this.parentElement.innerHTML='PA';">
+                        </div>
+                        <div class="team-name">Patricia Arakaki</div>
+                        <div class="team-position">Finance - Financial Manager</div>
+                        <div class="team-specialty finance">Financial Manager</div>
+                        <div class="team-description" data-lang-key="patriciaDescription">Managing company finances with precision and accurate reporting.</div>
+                    </div>
+                    <div class="team-card">
+                        <div class="team-photo">
+                            <img src="images/members/Michelle_Barbosa.png" alt="Michelle Barbosa" onerror="this.style.display='none'; this.parentElement.innerHTML='MB';">
+                        </div>
+                        <div class="team-name">Michelle Barbosa</div>
+                        <div class="team-position">Finance Dept. Support - AP/AR</div>
+                        <div class="team-specialty finance">Finance Support</div>
+                        <div class="team-description" data-lang-key="michelleDescription">Supporting accounts payable and receivable processes.</div>
+                    </div>
+                    <div class="team-card">
+                        <div class="team-photo">
+                            <img src="images/members/Luiz_Gustavbo.png" alt="Luiz Gustavo" onerror="this.style.display='none'; this.parentElement.innerHTML='LG';">
+                        </div>
+                        <div class="team-name">Luiz Gustavo</div>
+                        <div class="team-position">Data Analyst - IT &amp; Programing</div>
+                        <div class="team-specialty data">Data Expert</div>
+                        <div class="team-description" data-lang-key="luizDescription">Market trends analysis and IT infrastructure programming support.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Brazil AAA Team -->
+        <section id="brazil-aaa" class="team-section">
+            <div class="container">
+                <div class="location-header">
+                    <h2 class="location-title" data-lang-key="aaaTeamTitle">Brazil - Nespresso AAA Team</h2>
+                    <p class="location-subtitle" data-lang-key="aaaTeamSubtitle">Dedicated to sustainable and responsible coffee production in Brazil</p>
+                </div>
+                <div class="team-grid">
+                    <div class="team-card">
+                        <div class="team-photo">
+                            <img src="images/members/Rhafael_Goncalves.png" alt="Rhafael Gonçalves" onerror="this.style.display='none'; this.parentElement.innerHTML='RG';">
+                        </div>
+                        <div class="team-name">Rhafael Gonçalves</div>
+                        <div class="team-position" data-lang-key="aaaAgronomist">Nespresso AAA Field Agronomist</div>
+                        <div class="team-specialty agronomist">Sustainability Expert</div>
+                        <div class="team-description" data-lang-key="rhafaelDescription">Leading sustainable agriculture initiatives across producer networks.</div>
+                    </div>
+                    <div class="team-card">
+                        <div class="team-photo">
+                            <img src="images/members/Caio_Diniz.png" alt="Caio Diniz" onerror="this.style.display='none'; this.parentElement.innerHTML='CD';">
+                        </div>
+                        <div class="team-name">Caio Diniz</div>
+                        <div class="team-position" data-lang-key="aaaFieldCoordinator">Nespresso AAA Field Coordinator</div>
+                        <div class="team-specialty agronomist">Field Specialist</div>
+                        <div class="team-description" data-lang-key="caioDescription">Coordinating field operations and sustainable practices.</div>
+                    </div>
+                    <div class="team-card">
+                        <div class="team-photo">
+                            <img src="images/members/Yara_Melo.png" alt="Yara Melo" onerror="this.style.display='none'; this.parentElement.innerHTML='YM';">
+                        </div>
+                        <div class="team-name">Yara Melo</div>
+                        <div class="team-position" data-lang-key="aaaInclusivePartner">Nespresso Field Code of Conduct Specialist</div>
+                        <div class="team-specialty agronomist">Inclusion Specialist</div>
+                        <div class="team-description" data-lang-key="yaraDescription">Promoting inclusive practices and verifying farm compliance.</div>
+                    </div>
+                    <div class="team-card">
+                        <div class="team-photo">
+                            <img src="images/members/Luciano_Corsi.png" alt="Luciano Corsi" onerror="this.style.display='none'; this.parentElement.innerHTML='LC';">
+                        </div>
+                        <div class="team-name">Luciano Corsi</div>
+                        <div class="team-position" data-lang-key="aaaAgronomist">Nespresso AAA Field Agronomist</div>
+                        <div class="team-specialty agronomist">Agricultural Expert</div>
+                        <div class="team-description" data-lang-key="lucianoDescription">Technical expertise in sustainable agriculture and best practices.</div>
+                    </div>
+                    <div class="team-card">
+                        <div class="team-photo">
+                            <img src="images/members/Gabriel_Oliveira.png" alt="Gabriel Oliveira" onerror="this.style.display='none'; this.parentElement.innerHTML='GO';">
+                        </div>
+                        <div class="team-name">Gabriel Oliveira</div>
+                        <div class="team-position" data-lang-key="aaaAgronomist">Nespresso AAA Field Agronomist</div>
+                        <div class="team-specialty agronomist">Technical Advisor</div>
+                        <div class="team-description" data-lang-key="gabrielDescription">Technical advisor specializing in regenerative agriculture.</div>
+                    </div>
+                    <div class="team-card">
+                        <div class="team-photo">
+                            <img src="images/members/Kamila_Côrtes.png" alt="Kamila Côrtes" onerror="this.style.display='none'; this.parentElement.innerHTML='KC';">
+                        </div>
+                        <div class="team-name">Kamila Côrtes</div>
+                        <div class="team-position" data-lang-key="aaaInclusivePartner">Nespresso Field Code of Conduct Specialist</div>
+                        <div class="team-specialty agronomist">Community Liaison</div>
+                        <div class="team-description" data-lang-key="kamilaDescription">Building inclusive partnerships and community engagement.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Colombia Team -->
+        <section id="colombia" class="team-section">
+            <div class="container">
+                <div class="location-header">
+                    <h2 class="location-title" data-lang-key="buenaventuraColombia">Buenaventura, Colombia</h2>
+                    <p class="location-subtitle" data-lang-key="colombiaSubtitle">We cover Q&A services for Peru and Colombia</p>
+                    <div class="location-info">
+                        <strong>📍 <span data-lang-key="address">Address</span>:</strong> Street 2 #1a-18, Edificio del Cafe Building, Office 1004, Buenaventura, Colombia<br>
+                        <strong>📞 <span data-lang-key="phone">Phone</span>:</strong> +57 032 297-9189
+                    </div>
+                </div>
+                <div class="team-grid">
+                    <div class="team-card">
+                        <div class="team-photo">
+                            <img src="images/members/Hector_Posada.png" alt="Hector Posada" onerror="this.style.display='none'; this.parentElement.innerHTML='HP';">
+                        </div>
+                        <div class="team-name">Hector Posada</div>
+                        <div class="team-position" data-lang-key="qualityDirector">Quality Control Director</div>
+                        <div class="team-specialty q-grader">Q Grader</div>
+                        <div class="team-description" data-lang-key="hectorDescription">Leading Colombian quality control operations with Q Grader expertise.</div>
+                    </div>
+                    <div class="team-card">
+                        <div class="team-photo">
+                            <img src="images/members/Sandra_Bonilla.png" alt="Sandra Bonilla" onerror="this.style.display='none'; this.parentElement.innerHTML='SB';">
+                        </div>
+                        <div class="team-name">Sandra Bonilla</div>
+                        <div class="team-position" data-lang-key="labManager">Lab Manager / Quality Analyst</div>
+                        <div class="team-specialty quality">Lab Expert</div>
+                        <div class="team-description" data-lang-key="sandraDescription">Managing lab operations with Colombian coffee expertise.</div>
+                    </div>
+                    <div class="team-card">
+                        <div class="team-photo">
+                            <img src="images/members/Arishay_Pulgarin.png" alt="Arishay Pulgarin" onerror="this.style.display='none'; this.parentElement.innerHTML='AP';">
+                        </div>
+                        <div class="team-name">Arishay Pulgarin</div>
+                        <div class="team-position" data-lang-key="qualityAnalyst">Quality Analyst</div>
+                        <div class="team-specialty quality">Quality Specialist</div>
+                        <div class="team-description" data-lang-key="arishayDescription">Quality analyst specializing in Colombian coffee evaluation.</div>
+                    </div>
+                    <div class="team-card">
+                        <div class="team-photo">
+                            <img src="images/members/Ana_Molina.png" alt="Ana Maria Molina" onerror="this.style.display='none'; this.parentElement.innerHTML='AM';">
+                        </div>
+                        <div class="team-name">Ana Maria Molina</div>
+                        <div class="team-position" data-lang-key="adminAssistant">Administrative Assistant</div>
+                        <div class="team-specialty logistics">Administrative Support</div>
+                        <div class="team-description" data-lang-key="anaDescription">Administrative support for smooth operations and communication.</div>
+                    </div>
+                    <div class="team-card">
+                        <div class="team-photo">
+                            <img src="images/members/Diana_Saavedra.png" alt="Diana Marcelo" onerror="this.style.display='none'; this.parentElement.innerHTML='DS';">
+                        </div>
+                        <div class="team-name">Diana Marcelo</div>
+                        <div class="team-position" data-lang-key="agronomist">Agronomist Technician</div>
+                        <div class="team-specialty agronomist">Technical Expert</div>
+                        <div class="team-description" data-lang-key="dianaDescription">Supporting coffee producing associations in southern Colombia.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Guatemala Team -->
+        <section id="guatemala" class="team-section">
+            <div class="container">
+                <div class="location-header">
+                    <h2 class="location-title" data-lang-key="guatemalaCity">Guatemala City, Guatemala</h2>
+                    <p class="location-subtitle" data-lang-key="guatemalaSubtitle">We cover Q&A services for Central America (Guatemala, El Salvador, Honduras, Mexico and Nicaragua)</p>
+                    <div class="location-info">
+                        <strong>📍 <span data-lang-key="address">Address</span>:</strong> 12-01 Avenida Reforma, Edificio Reforma Montufar, Oficina 9-01, Guatemala City<br>
+                        <strong>📞 <span data-lang-key="phone">Phone</span>:</strong> +502 4669-0057
+                    </div>
+                </div>
+                <div class="team-grid">
+                    <div class="team-card">
+                        <div class="team-photo">
+                            <img src="images/members/Edgar_Guillen.png" alt="Edgar Guillen" onerror="this.style.display='none'; this.parentElement.innerHTML='EG';">
+                        </div>
+                        <div class="team-name">Edgar Guillen</div>
+                        <div class="team-position">Partner &amp; Admin Director</div>
+                        <div class="team-specialty logistics">Administrative Lead</div>
+                        <div class="team-description" data-lang-key="edgarGuillenDescription">Overseeing administrative operations and team support.</div>
+                    </div>
+                    <div class="team-card">
+                        <div class="team-photo">
+                            <img src="images/members/Wilson_Larias.png" alt="Wilson Larias" onerror="this.style.display='none'; this.parentElement.innerHTML='WL';">
+                        </div>
+                        <div class="team-name">Wilson Larias</div>
+                        <div class="team-position" data-lang-key="labManager">Lab Manager / Quality Analyst</div>
+                        <div class="team-specialty q-grader">Q Grader</div>
+                        <div class="team-description" data-lang-key="wilsonDescription">Managing lab operations and quality analysis with Q Grader credentials.</div>
+                    </div>
+                    <div class="team-card">
+                        <div class="team-photo">
+                            <img src="images/members/Hector_Subuyuj.png" alt="Hector Subuyuj" onerror="this.style.display='none'; this.parentElement.innerHTML='HS';">
+                        </div>
+                        <div class="team-name">Hector Subuyuj</div>
+                        <div class="team-position" data-lang-key="qualityAnalyst">Quality Analyst</div>
+                        <div class="team-specialty quality">Quality Expert</div>
+                        <div class="team-description" data-lang-key="hectorSubuyujDescription">Quality analyst specializing in Guatemalan coffee evaluation.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="contact fade-in">
+            <div class="container">
+
+
+                <!-- Contact Form Container -->
+                <div class="contact-form-container">
+                    <h3 data-lang-key="sendUsMessage">Send Us a Message</h3>
+                    <p data-lang-key="formInstructions">Please fill out the form below and we'll get back to you shortly.</p>
+                    <form class="contact-form" id="contactForm" name="contact" method="POST" action="/?success=true" data-netlify="true" netlify-honeypot="bot-field">
+                        <!-- Hidden honeypot field for spam protection -->
+                        <input type="hidden" name="bot-field">
+                        <!-- Hidden field to capture the selected department email -->
+                        <input type="hidden" name="department-email" id="department-email-hidden">
+
+                        <div class="form-group">
+                            <label for="name" class="visually-hidden">Name</label>
+                            <input type="text" id="name" name="name" placeholder="Your Name" data-lang-key="formNamePlaceholder" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email" class="visually-hidden">Email</label>
+                            <input type="email" id="email" name="email" placeholder="Your Email" data-lang-key="formEmailPlaceholder" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="department" class="visually-hidden">Department</label>
+                            <select id="department" name="department" required>
+                                                    <option value="" data-lang-key="selectDepartment">Select Department</option>
+                    <option value="trading@wolthers.com" data-lang-key="tradingInquiriesOption">Trading Inquiries</option>
+                    <option value="logistics@wolthers.com" data-lang-key="logisticsSupportOption">Logistics Support</option>
+                    <option value="qualitycontrol@wolthers.com" data-lang-key="qualityControlOption">Quality Control Services</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="subject" class="visually-hidden">Subject</label>
+                            <input type="text" id="subject" name="subject" placeholder="Subject" data-lang-key="formSubjectPlaceholder" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="message" class="visually-hidden">Message</label>
+                            <textarea id="message" name="message" rows="5" placeholder="Your Message" data-lang-key="formMessagePlaceholder" required></textarea>
+                        </div>
+                        <button type="submit" class="submit-btn" data-lang-key="formSendButton">Send Message</button>
+                    </form>
+                </div>
+
+                <!-- Contact Details Container (moved below form) -->
+                <div class="contact-details-container">
+                    <h3 data-lang-key="ourContactDetails">Our Contact Details</h3>
+                    <div class="contact-info-item">
+                        <h4 data-lang-key="tradingInquiries">Trading Inquiries</h4>
+                        <p><strong data-lang-key="email">Email:</strong> <a href="mailto:trading@wolthers.com">trading@wolthers.com</a></p>
+                        <p data-lang-key="tradingDesc">For all trading and brokerage related questions, quality control services, and new business opportunities.</p>
+                    </div>
+
+                    <div class="contact-info-item">
+                        <h4 data-lang-key="logisticsSupport">Logistics Support</h4>
+                        <p><strong data-lang-key="email">Email:</strong> <a href="mailto:logistics@wolthers.com">logistics@wolthers.com</a></p>
+                        <p data-lang-key="logisticsDesc">For shipping coordination, sample requests, vessel booking, and logistics assistance.</p>
+                    </div>
+
+                    <div class="contact-info-item">
+                        <h4>Quality Control Services</h4>
+                        <p><strong data-lang-key="email">Email:</strong> <a href="mailto:qualitycontrol@wolthers.com">qualitycontrol@wolthers.com</a></p>
+                        <p>For quality control services and testing across all origins including Brazil, Colombia, and Guatemala.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- ===== FOOTER COMPONENT ===== -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4 data-lang-key="footerSearch">Search</h4>
+                <div class="footer-search-container">
+                    <input type="text" class="footer-search-input" placeholder="Search..." data-lang-key="footerSearchPlaceholder">
+                    <button class="footer-search-btn">🔍</button>
+                </div>
+                
+                <div class="footer-language-switcher">
+                    <button class="lang-btn" data-lang="en">EN</button>
+                    <button class="lang-btn" data-lang="pt">PT</button>
+                    <button class="lang-btn" data-lang="es">ES</button>
+                </div>
+            </div>
+
+            <div class="footer-section">
+                <h4 data-lang-key="footerServices">Our Services</h4>
+                <ul>
+                    <li><a href="index.html#services" data-lang-key="footerFOB">FOB Brokerage</a></li>
+                    <li><a href="index.html#quality" data-lang-key="footerQuality">Quality Control</a></li>
+                    <li><a href="index.html#services" data-lang-key="footerSustainable">Sustainable Trading</a></li>
+                    <li><a href="index.html#services" data-lang-key="footerOrigin">Origin Services</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h4 data-lang-key="footerLocations">Our Locations</h4>
+                <ul>
+                    <li><a href="#santos" data-lang-key="footerSantos">Santos, Brazil</a></li>
+                    <li><a href="#colombia" data-lang-key="footerBuenaventura">Buenaventura, Colombia</a></li>
+                    <li><a href="#guatemala" data-lang-key="footerGuatemala">Guatemala City, Guatemala</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h4 data-lang-key="footerCompany">Company</h4>
+                <ul>
+                    <li><a href="index.html#about" data-lang-key="footerAbout">About Us</a></li>
+                    <li><a href="#leadership" data-lang-key="footerTeam">Our Team</a></li>
+                    <li><a href="index.html#about" data-lang-key="footerSustainability">Sustainability</a></li>
+                    <li><a href="#contact" data-lang-key="footerContact">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <div style="max-width: 1200px; margin: 0 auto; padding: 0 20px;">
+                <p data-lang-key="footerCopyright">© 2024 Wolthers & Associates. Building coffee relationships since 1949.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script src="js/team-main.js"></script>
+    <script src="js/translations.js"></script>
+</body>

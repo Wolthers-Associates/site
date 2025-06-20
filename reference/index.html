@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trip Itineraries - Wolthers & Associates</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Sans+Pro:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --dark-green: #2C5530;
+            --medium-green: #2d5a47;
+            --light-green: #325C36;
+            --light-brown: #d2b48c;
+            --cream: #f5f1e8;
+            --white: #ffffff;
+            --gold: #D4AF37;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Source Sans Pro', sans-serif;
+            background: linear-gradient(135deg, var(--cream) 0%, var(--light-brown) 100%);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* Login Styles */
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .login-box {
+            background: var(--white);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(26, 77, 58, 0.15);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .login-logo {
+            height: 60px;
+            margin-bottom: 30px;
+        }
+
+        .login-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            color: var(--dark-green);
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--dark-green);
+            font-weight: 600;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--medium-green);
+        }
+
+        .login-btn {
+            background: var(--dark-green);
+            color: var(--white);
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .login-btn:hover {
+            background: var(--medium-green);
+            transform: translateY(-1px);
+        }
+
+        .error-message {
+            color: #e74c3c;
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+
+        /* Main Content Styles */
+        .main-container {
+            display: none;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--dark-green) 0%, var(--medium-green) 100%);
+            color: var(--white);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(26, 77, 58, 0.15);
+        }
+
+        .header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .logout-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.2);
+            color: var(--white);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .trips-section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            color: var(--dark-green);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid var(--light-green);
+        }
+
+        .trips-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .trip-card {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(26, 77, 58, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .trip-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(26, 77, 58, 0.2);
+        }
+
+        .trip-card.upcoming::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: var(--gold);
+        }
+
+        .trip-card.past::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: #888;
+        }
+
+        .trip-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem;
+            color: var(--dark-green);
+            margin-bottom: 10px;
+        }
+
+        .trip-date {
+            color: var(--medium-green);
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .trip-description {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        .trip-status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-upcoming {
+            background: rgba(212, 175, 55, 0.2);
+            color: #B8860B;
+        }
+
+        .status-past {
+            background: rgba(136, 136, 136, 0.2);
+            color: #666;
+        }
+
+        .no-trips {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            padding: 40px;
+            background: var(--white);
+            border-radius: 12px;
+        }
+
+        @media (max-width: 768px) {
+            .trips-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .logout-btn {
+                position: static;
+                margin-top: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Form -->
+    <div id="loginContainer" class="login-container">
+        <div class="login-box">
+            <img src="assets/images/wolthers-logo-off-white.svg" alt="Wolthers Logo" class="login-logo" style="filter: brightness(0) saturate(100%) invert(21%) sepia(31%) saturate(1458%) hue-rotate(102deg) brightness(92%) contrast(88%);">
+            <h1 class="login-title">Trip Itineraries</h1>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <button type="submit" class="login-btn">Access Trips</button>
+                <div id="errorMessage" class="error-message"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div id="mainContainer" class="main-container">
+        <div class="header">
+            <button class="logout-btn" onclick="logout()">Logout</button>
+            <h1>Coffee Trip Itineraries</h1>
+            <p>Wolthers & Associates - Internal Access Only</p>
+        </div>
+
+        <div class="trips-section">
+            <h2 class="section-title">Current & Upcoming Trips</h2>
+            <div id="upcomingTrips" class="trips-grid">
+                <!-- Upcoming trips will be populated here -->
+            </div>
+        </div>
+
+        <div class="trips-section">
+            <h2 class="section-title">Past Trips</h2>
+            <div id="pastTrips" class="trips-grid">
+                <!-- Past trips will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const AUTH_URL = 'https://darkcyan-quetzal-641085.hostingersite.com/auth.php'; // Replace with your Hostinger domain
+        const VERIFY_URL = 'https://darkcyan-quetzal-641085.hostingersite.com/verify-token.php';
+
+        // Check if user is already logged in
+        const token = localStorage.getItem('tripToken');
+        if (token) {
+            verifyToken(token);
+        }
+
+        // Login form handler
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const errorDiv = document.getElementById('errorMessage');
+            const loginBtn = this.querySelector('.login-btn');
+            
+            // Show loading state
+            loginBtn.textContent = 'Authenticating...';
+            loginBtn.disabled = true;
+            errorDiv.textContent = '';
+            
+            try {
+                const response = await fetch(AUTH_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    localStorage.setItem('tripToken', data.token);
+                    localStorage.setItem('tripUser', JSON.stringify(data.user));
+                    showMainContent();
+                } else {
+                    errorDiv.textContent = data.message || 'Invalid username or password';
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                errorDiv.textContent = 'Connection error. Please try again.';
+            } finally {
+                loginBtn.textContent = 'Access Trips';
+                loginBtn.disabled = false;
+                document.getElementById('password').value = '';
+            }
+        });
+
+        async function verifyToken(token) {
+            try {
+                const response = await fetch(VERIFY_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    localStorage.setItem('tripUser', JSON.stringify(data.user));
+                    showMainContent();
+                } else {
+                    localStorage.removeItem('tripToken');
+                    localStorage.removeItem('tripUser');
+                }
+            } catch (error) {
+                console.error('Token verification error:', error);
+                localStorage.removeItem('tripToken');
+                localStorage.removeItem('tripUser');
+            }
+        }
+
+        function showMainContent() {
+            document.getElementById('loginContainer').style.display = 'none';
+            document.getElementById('mainContainer').style.display = 'block';
+            
+            // Show user info
+            const user = JSON.parse(localStorage.getItem('tripUser') || '{}');
+            const userInfo = document.querySelector('.header p');
+            userInfo.textContent = `Welcome, ${user.username} | Wolthers & Associates - Internal Access Only`;
+            
+            loadTrips();
+        }
+
+        function logout() {
+            localStorage.removeItem('tripToken');
+            localStorage.removeItem('tripUser');
+            document.getElementById('loginContainer').style.display = 'flex';
+            document.getElementById('mainContainer').style.display = 'none';
+            document.getElementById('loginForm').reset();
+        }
+
+        function loadTrips() {
+            const now = new Date();
+            const upcomingContainer = document.getElementById('upcomingTrips');
+            const pastContainer = document.getElementById('pastTrips');
+            
+            let upcomingTrips = [];
+            let pastTrips = [];
+
+            TRIPS_DATA.forEach(trip => {
+                const tripEndDate = new Date(trip.endDate);
+                if (tripEndDate >= now) {
+                    upcomingTrips.push(trip);
+                } else {
+                    pastTrips.push(trip);
+                }
+            });
+
+            // Sort trips by date
+            upcomingTrips.sort((a, b) => new Date(a.date) - new Date(b.date));
+            pastTrips.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            // Render upcoming trips
+            if (upcomingTrips.length === 0) {
+                upcomingContainer.innerHTML = '<div class="no-trips">No upcoming trips scheduled</div>';
+            } else {
+                upcomingContainer.innerHTML = upcomingTrips.map(trip => createTripCard(trip, 'upcoming')).join('');
+            }
+
+            // Render past trips
+            if (pastTrips.length === 0) {
+                pastContainer.innerHTML = '<div class="no-trips">No past trips recorded</div>';
+            } else {
+                pastContainer.innerHTML = pastTrips.map(trip => createTripCard(trip, 'past')).join('');
+            }
+        }
+
+        function createTripCard(trip, status) {
+            const startDate = new Date(trip.date).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            
+            const endDate = new Date(trip.endDate).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+
+            return `
+                <div class="trip-card ${status}" onclick="openTrip('${trip.path}')">
+                    <div class="trip-title">${trip.title}</div>
+                    <div class="trip-date">${startDate} - ${endDate}</div>
+                    <div class="trip-description">${trip.description}</div>
+                    <div class="trip-status status-${status}">${status === 'upcoming' ? 'Upcoming' : 'Completed'}</div>
+                </div>
+            `;
+        }
+
+        function openTrip(path) {
+            window.open(path, '_blank');
+        }
+
+        // Auto-refresh trips data every 5 minutes
+        setInterval(loadTrips, 5 * 60 * 1000);
+    </script>
+</body>
+</html>

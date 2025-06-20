@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Trip Itineraries Management System - Wolthers & Associates Development Version">
+    <title>Trip Itineraries - Wolthers & Associates [DEV]</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Sans+Pro:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>☕</text></svg>">
+</head>
+<body>
+    <!-- Development Notice -->
+    <div class="dev-notice" role="banner" aria-label="Development environment notice">
+        <div class="dev-notice-content">
+            <span class="dev-icon">🚧</span>
+            <span class="dev-text">Development Version - khaki-raccoon-228009.hostingersite.com</span>
+            <span class="dev-icon">🚧</span>
+        </div>
+    </div>
+
+    <!-- Login Container -->
+    <div id="loginContainer" class="login-container">
+        <div class="login-box">
+            <div class="login-logo">
+                <img src="assets/images/wolthers-logo-green.svg" alt="Wolthers & Associates" class="login-logo-image">
+            </div>
+            <h1 class="login-title">Trip Itineraries</h1>
+            <p class="login-subtitle">Wolthers & Associates - Development Version</p>
+            
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" name="username" placeholder="Enter username or email" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" placeholder="Enter password or access code" required>
+                </div>
+                <button type="submit" class="login-btn">Access Trips</button>
+                <div id="errorMessage" class="error-message"></div>
+            </form>
+            
+            <div class="test-credentials">
+                <p><strong>Development Test Credentials:</strong></p>
+                <p><small>Username: <em>employee</em> | Password: <em>any</em> (Employee Access)</small></p>
+                <p><small>Username: <em>john@company.com</em> | Password: <em>any</em> (Partner Access)</small></p>
+                <p><small>Username: <em>any</em> | Password: <em>BRAZIL2025</em> (Code Access)</small></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div id="mainContainer" class="main-container" style="display: none;">
+        <div class="header">
+            <div class="header-nav">
+                <a href="accounts.html" class="accounts-link" id="accountsLink" style="display: none;">⚙️ Accounts</a>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+            <div class="header-logo">
+                <img src="assets/images/wolthers-logo-off-white.svg" alt="Wolthers & Associates" class="main-logo">
+            </div>
+            <h1>Coffee Trip Itineraries</h1>
+            <p id="userInfo">Wolthers & Associates - Internal Access Only</p>
+        </div>
+
+        <main class="main-content">
+            <section class="trips-section">
+                <div class="section-header">
+                    <div class="section-title-group">
+                        <h2 class="section-title">Current & Upcoming Trips</h2>
+                        <div class="section-subtitle">Active and planned coffee exploration journeys</div>
+                    </div>
+
+                </div>
+                <div id="upcomingTrips" class="trips-grid" role="region" aria-label="Upcoming trips">
+                    <!-- Trips will be loaded here -->
+                </div>
+            </section>
+
+            <section class="trips-section">
+                <div class="section-header">
+                    <div class="section-title-group">
+                        <h2 class="section-title">Past Trips</h2>
+                        <div class="section-subtitle">Completed coffee exploration journeys</div>
+                    </div>
+                </div>
+                <div id="pastTrips" class="trips-grid" role="region" aria-label="Past trips">
+                    <!-- Past trips will be loaded here -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Trip Creation Modal -->
+    <div id="addTripModal" class="modal" style="display: none;" role="dialog" aria-labelledby="modal-title" aria-modal="true">
+        <div class="modal-backdrop" onclick="hideAddTripModal()" aria-label="Close modal"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-title" class="modal-title">Create New Trip</h2>
+                <button class="close-btn" onclick="hideAddTripModal()" aria-label="Close modal">
+                    <span class="close-icon">×</span>
+                </button>
+            </div>
+
+            <form id="addTripForm">
+                <div class="form-section">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="tripTitle">Trip Title:</label>
+                            <input type="text" id="tripTitle" class="form-input" placeholder="e.g., Colombia Coffee Discovery" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="tripDescription">Description:</label>
+                            <input type="text" id="tripDescription" class="form-input" placeholder="Brief trip description">
+                        </div>
+                    </div>
+
+
+
+                    <div class="form-row full">
+                        <div class="form-group">
+                            <label for="guests">Guests:</label>
+                            <input type="text" id="guests" class="form-input" placeholder="e.g., International clients, VIP partners">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="cars">Vehicle(s):</label>
+                            <input type="text" id="cars" class="form-input" placeholder="e.g., Toyota Land Cruiser, Jeep Wrangler">
+                        </div>
+                        <div class="form-group">
+                            <label for="driver">Driver:</label>
+                            <input type="text" id="driver" class="form-input" placeholder="e.g., Carlos Silva">
+                        </div>
+                    </div>
+
+                    <div class="form-row full">
+                        <div class="form-group">
+                            <label for="wolthersStaff">Wolthers Staff Attending:</label>
+                            <select id="wolthersStaff" class="form-input" multiple>
+                                <option>Daniel Wolthers</option>
+                                <option>Svenn Wolthers</option>
+                                <option>Maria Santos</option>
+                                <option>Paulo Veloso Junior</option>
+                                <option>Isabella Vargas</option>
+                                <option>Other...</option>
+                            </select>
+                            <div class="input-help">Hold Ctrl (Windows) or Cmd (Mac) to select multiple</div>
+                        </div>
+                    </div>
+
+                    <div class="form-row full">
+                        <div class="form-group">
+                            <label for="tripMap">Trip Map (Image Upload):</label>
+                            <input type="file" id="tripMap" class="form-input" accept="image/*">
+                            <div class="input-help">Upload a map image (PNG, JPG, SVG)</div>
+                        </div>
+                    </div>
+
+                    <div class="form-row full">
+                        <div class="form-group">
+                            <label for="itineraryLanguage">Itinerary Language:</label>
+                            <select id="itineraryLanguage" class="form-input">
+                                <option value="en">English</option>
+                                <option value="pt">Portuguese</option>
+                            </select>
+                            <div class="input-help">Choose the language of your itinerary input and preview</div>
+                        </div>
+                    </div>
+
+                    <div class="form-row full">
+                        <div class="form-group">
+                            <label for="itineraryText">Itinerary (Paste Text):</label>
+                            <textarea id="itineraryText" class="form-textarea" placeholder="Paste itinerary text here..." rows="6"></textarea>
+                            <div class="input-help">Paste your itinerary text (dates, times, activities, hosts). The system will auto-format and parse it.</div>
+                        </div>
+                    </div>
+
+                    <div class="form-row full">
+                        <div class="form-group">
+                            <label for="itineraryExcel">Or Upload Itinerary (Excel):</label>
+                            <input type="file" id="itineraryExcel" class="form-input" accept=".xlsx,.csv">
+                            <div class="input-help">Upload an Excel or CSV file with your itinerary</div>
+                        </div>
+                    </div>
+
+                    <div class="form-row full">
+                        <div class="form-group">
+                            <label>Itinerary Preview:</label>
+                            <div id="itineraryPreview" class="input-help" style="background:#f8f8f8; min-height:60px; border-radius:8px; padding:10px; margin-top:5px; font-size:0.95rem;"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-row full">
+                        <div class="form-group">
+                            <label for="partnerEmails">Partner/Client Emails (For Future):</label>
+                            <textarea id="partnerEmails" class="form-textarea" placeholder="john@company.com&#10;sarah@business.org&#10;team@partners.net" rows="4"></textarea>
+                            <div class="input-help">These will be used when real authentication is implemented</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="hideAddTripModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <span class="btn-text">Create Trip</span>
+                        <span class="btn-badge">Mock</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Trip Preview Sidebar -->
+    <div id="tripPreviewSidebar" class="trip-preview-sidebar">
+        <div class="trip-preview-content">
+            <button class="trip-preview-close" onclick="ui.hideTripPreview()" aria-label="Close preview">&times;</button>
+            <div id="tripPreviewContent">
+                <!-- Trip preview will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Trip Detail Modal -->
+    <div id="tripDetailModal" class="modal" style="display: none;" role="dialog" aria-labelledby="trip-detail-title" aria-modal="true">
+        <div class="modal-backdrop" onclick="hideTripDetailModal()" aria-label="Close trip details"></div>
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h2 id="trip-detail-title" class="modal-title">Trip Details</h2>
+                <button class="close-btn" onclick="hideTripDetailModal()" aria-label="Close trip details">
+                    <span class="close-icon">×</span>
+                </button>
+            </div>
+            <div id="tripDetailContent" class="trip-detail-content">
+                <!-- Trip details will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div id="loadingSpinner" class="loading-spinner" style="display: none;" role="status" aria-label="Loading">
+        <div class="spinner"></div>
+        <div class="loading-text">Loading...</div>
+    </div>
+
+
+
+    <script src="assets/js/main.js"></script>
+</body>
+</html> 

@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mitsui July 2025</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Sans+Pro:wght@400;600;700&family=Marcellus&family=DM+Sans:wght@400;500;600&family=Version+72:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../assets/css/trip_itinerary.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="../../assets/images/wolthers-logo-off-white.svg" alt="Wolthers Logo" style="height: 60px; margin-bottom: 20px;">
+            <h1>Mitsui July 2025</h1>
+            <p>Visit to main suppliers in South of Minas</p>
+            <div class="guests-info">
+                Guests: Nakaya, and more to be confirmed | Vehicle: to be confirmed
+            </div>
+        </div>
+
+        <div class="calendar-options">
+            <button class="calendar-button" onclick="downloadICal()" id="btnCalendar">Adicionar ao Calendário</button>
+        </div>
+
+        <div class="map-container">
+            <div class="map-header">
+                Mapa do Roteiro - Fazendas no Cerrado
+            </div>
+            <img
+                class="map-embed"
+                src="images/map.png"
+                alt="Mapa do roteiro das fazendas no Cerrado"
+                style="width: 100%; height: 400px; object-fit: cover; display: block;">
+        </div>
+
+        <div class="itinerary" id="itinerary">
+            <div class="day">
+                <div class="day-header">
+                    <div class="day-date">Segunda-feira, 7 de Julho de 2025</div>
+                    <button class="day-calendar-btn" onclick="downloadDayICal('2025-07-07')">+ Adicionar dia</button>
+                </div>
+                <div class="activity">
+                    <div class="activity-time">00:00</div>
+                    <div class="activity-description">Nakaya san arrival in Brazil, overnight in São Paulo City</div>
+                </div>
+            </div>
+
+            <div class="day">
+                <div class="day-header">
+                    <div class="day-date">Terça-feira, 8 de Julho de 2025</div>
+                    <button class="day-calendar-btn" onclick="downloadDayICal('2025-07-08')">+ Adicionar dia</button>
+                </div>
+                <div class="activity travel-day">
+                    <div class="activity-time">07:00</div>
+                    <div class="activity-description">Drive to Varginha (4 hours drive)</div>
+                </div>
+                <div class="activity supplier-visit">
+                    <div class="activity-time">11:00</div>
+                    <div class="activity-description">Visit to Gardingo Trading/ host: Léo Gardingo</div>
+                </div>
+                <div class="activity">
+                    <div class="activity-time">12:30</div>
+                    <div class="activity-description">Lunch with Gardingo</div>
+                </div>
+                <div class="activity supplier-visit">
+                    <div class="activity-time">15:00</div>
+                    <div class="activity-description">Visit to Minasul/ host: Heberson Sastre</div>
+                </div>
+                <div class="activity supplier-visit">
+                    <div class="activity-time">17:00</div>
+                    <div class="activity-description">Visit to Prata Pereira/ host: João Guilherme</div>
+                </div>
+                <div class="activity">
+                    <div class="activity-time">19:00</div>
+                    <div class="activity-description">Dinner at local restaurant and overnight at the Class Hotel in Varginha city.</div>
+                </div>
+            </div>
+
+            <div class="day">
+                <div class="day-header">
+                    <div class="day-date">Quarta-feira, 9 de Julho de 2025</div>
+                    <button class="day-calendar-btn" onclick="downloadDayICal('2025-07-09')">+ Adicionar dia</button>
+                </div>
+                <div class="activity supplier-visit">
+                    <div class="activity-time">08:00</div>
+                    <div class="activity-description">Visit to Louis Dreyfus/ host: Carlos Henrique</div>
+                </div>
+                <div class="activity supplier-visit">
+                    <div class="activity-time">10:00</div>
+                    <div class="activity-description">Visit to Café Três Corações/ host: Rogerio Otaviano</div>
+                </div>
+                <div class="activity">
+                    <div class="activity-time">12:00</div>
+                    <div class="activity-description">Lunch near Café Três Corações</div>
+                </div>
+                <div class="activity supplier-visit">
+                    <div class="activity-time">13:30</div>
+                    <div class="activity-description">Visit to Stonex/ host: Bruno</div>
+                </div>
+                <div class="activity supplier-visit">
+                    <div class="activity-time">16:00</div>
+                    <div class="activity-description">Visit to Exporter Atlantica/ host: Ms. Lais Domingues</div>
+                </div>
+                <div class="activity">
+                    <div class="activity-time">19:00</div>
+                    <div class="activity-description">Dinner at local restaurant</div>
+                </div>
+                <div class="activity">
+                    <div class="activity-time">20:00</div>
+                    <div class="activity-description">Overnight at the Class Hotel in Varginha City</div>
+                </div>
+            </div>
+
+            <div class="day">
+                <div class="day-header">
+                    <div class="day-date">Quinta-feira, 10 de Julho de 2025</div>
+                    <button class="day-calendar-btn" onclick="downloadDayICal('2025-07-10')">+ Adicionar dia</button>
+                </div>
+                <div class="activity supplier-visit">
+                    <div class="activity-time">08:30</div>
+                    <div class="activity-description">Visit to NGG Stockler/ host: Sergio Coelho</div>
+                </div>
+                <div class="activity supplier-visit">
+                    <div class="activity-time">10:00</div>
+                    <div class="activity-description">Visit to the Porto Seco/ host: Matheus Paiva</div>
+                </div>
+                <div class="activity travel-day">
+                    <div class="activity-time">12:00</div>
+                    <div class="activity-description">Departure to visit Cocatrel in Três Pontas (40 minutes drive)</div>
+                </div>
+                <div class="activity">
+                    <div class="activity-time">12:45</div>
+                    <div class="activity-description">Lunch with Cocatrel in Três Pontas/ host: Sidney</div>
+                </div>
+                <div class="activity supplier-visit">
+                    <div class="activity-time">13:30</div>
+                    <div class="activity-description">Visit to Cocatrel/ host: Francisco Pereira</div>
+                </div>
+                <div class="activity travel-day">
+                    <div class="activity-time">18:00</div>
+                    <div class="activity-description">Departure to Guaxupé city (3 hours drive)</div>
+                </div>
+                <div class="activity">
+                    <div class="activity-time">20:00</div>
+                    <div class="activity-description">Dinner at local restaurant and overnight at the Ibis Hotel in Guaxupé city</div>
+                </div>
+            </div>
+
+            <div class="day">
+                <div class="day-header">
+                    <div class="day-date">Quinta-feira, 15 de Maio de 2025</div>
+                    <button class="day-calendar-btn" onclick="downloadDayICal('2025-05-15')">+ Adicionar dia</button>
+                </div>
+                <div class="activity supplier-visit">
+                    <div class="activity-time">09:00</div>
+                    <div class="activity-description">Visit to Cooxupé/ host: Paulo Martins</div>
+                </div>
+                <div class="activity travel-day">
+                    <div class="activity-time">11:00</div>
+                    <div class="activity-description">Departure to São Paulo and Santos City (4-5 hours drive)</div>
+                </div>
+                <div class="activity">
+                    <div class="activity-time">19:00</div>
+                    <div class="activity-description">Dinner in Santos and overnight at the Tarumã flat</div>
+                </div>
+            </div>
+
+            <div class="day">
+                <div class="day-header">
+                    <div class="day-date">Sexta-feira, 16 de Maio de 2025</div>
+                    <button class="day-calendar-btn" onclick="downloadDayICal('2025-05-16')">+ Adicionar dia</button>
+                </div>
+                <div class="activity supplier-visit">
+                    <div class="activity-time">08:30</div>
+                    <div class="activity-description">Visit to Wolthers & Associates office</div>
+                </div>
+                <div class="activity supplier-visit">
+                    <div class="activity-time">12:30</div>
+                    <div class="activity-description">Visit to Exporter EISA/ host: Carlos Santana</div>
+                </div>
+            </div>
+
+            <div class="trip-conclusion">
+                Fim da Viagem / End of Coffee Trip
+            </div>
+        </div>
+    </div>
+
+    <button class="print-button">Imprimir</button>
+
+    <script src="../../assets/js/trip_itinerary.js"></script>
+    <script>
+        // Trip-specific event data for Mitsui July 2025
+        window.eventsByDate = {
+            '2025-07-07': [
+                {
+                    summary: 'Arrival in Brazil',
+                    start: '20250707T000000',
+                    end: '20250707T010000',
+                    description: 'Nakaya san arrival in Brazil, overnight in São Paulo City'
+                }
+            ],
+            '2025-07-08': [
+                {
+                    summary: 'Drive to Varginha',
+                    start: '20250708T070000',
+                    end: '20250708T110000',
+                    description: 'Drive to Varginha (4 hours)'
+                },
+                {
+                    summary: 'Visit to Gardingo Trading',
+                    start: '20250708T110000',
+                    end: '20250708T123000',
+                    description: 'Host: Léo Gardingo'
+                },
+                {
+                    summary: 'Lunch with Gardingo',
+                    start: '20250708T123000',
+                    end: '20250708T140000',
+                    description: 'Lunch with Gardingo'
+                },
+                {
+                    summary: 'Visit to Minasul',
+                    start: '20250708T150000',
+                    end: '20250708T160000',
+                    description: 'Host: Heberson Sastre'
+                },
+                {
+                    summary: 'Visit to Prata Pereira',
+                    start: '20250708T170000',
+                    end: '20250708T180000',
+                    description: 'Host: João Guilherme'
+                },
+                {
+                    summary: 'Dinner and overnight',
+                    start: '20250708T190000',
+                    end: '20250708T210000',
+                    description: 'Dinner at local restaurant and overnight at the Class Hotel in Varginha city'
+                }
+            ],
+            '2025-07-09': [
+                {
+                    summary: 'Visit to Louis Dreyfus',
+                    start: '20250709T080000',
+                    end: '20250709T090000',
+                    description: 'Host: Carlos Henrique'
+                },
+                {
+                    summary: 'Visit to Café Três Corações',
+                    start: '20250709T100000',
+                    end: '20250709T110000',
+                    description: 'Host: Rogerio Otaviano'
+                },
+                {
+                    summary: 'Lunch',
+                    start: '20250709T120000',
+                    end: '20250709T130000',
+                    description: 'Lunch near Café Três Corações'
+                },
+                {
+                    summary: 'Visit to Stonex',
+                    start: '20250709T133000',
+                    end: '20250709T150000',
+                    description: 'Host: Bruno'
+                },
+                {
+                    summary: 'Visit to Exporter Atlantica',
+                    start: '20250709T160000',
+                    end: '20250709T170000',
+                    description: 'Host: Ms. Lais Domingues'
+                },
+                {
+                    summary: 'Dinner',
+                    start: '20250709T190000',
+                    end: '20250709T200000',
+                    description: 'Dinner at local restaurant'
+                },
+                {
+                    summary: 'Overnight in Varginha',
+                    start: '20250709T200000',
+                    end: '20250710T080000',
+                    description: 'Overnight at the Class Hotel in Varginha City'
+                }
+            ],
+            '2025-07-10': [
+                {
+                    summary: 'Visit to NGG Stockler',
+                    start: '20250710T083000',
+                    end: '20250710T093000',
+                    description: 'Host: Sergio Coelho'
+                },
+                {
+                    summary: 'Visit to the Porto Seco',
+                    start: '20250710T100000',
+                    end: '20250710T110000',
+                    description: 'Host: Matheus Paiva'
+                },
+                {
+                    summary: 'Departure to Cocatrel',
+                    start: '20250710T120000',
+                    end: '20250710T124500',
+                    description: 'Drive to Três Pontas'
+                },
+                {
+                    summary: 'Lunch with Cocatrel',
+                    start: '20250710T124500',
+                    end: '20250710T133000',
+                    description: 'Host: Sidney'
+                },
+                {
+                    summary: 'Visit to Cocatrel',
+                    start: '20250710T133000',
+                    end: '20250710T150000',
+                    description: 'Host: Francisco Pereira'
+                },
+                {
+                    summary: 'Departure to Guaxupé',
+                    start: '20250710T180000',
+                    end: '20250710T200000',
+                    description: '3 hours drive to Guaxupé city'
+                },
+                {
+                    summary: 'Dinner and overnight',
+                    start: '20250710T200000',
+                    end: '20250711T080000',
+                    description: 'Dinner at local restaurant and overnight at the Ibis Hotel in Guaxupé city'
+                }
+            ],
+            '2025-05-15': [
+                {
+                    summary: 'Visit to Cooxupé',
+                    start: '20250515T090000',
+                    end: '20250515T100000',
+                    description: 'Host: Paulo Martins'
+                },
+                {
+                    summary: 'Departure to São Paulo and Santos',
+                    start: '20250515T110000',
+                    end: '20250515T150000',
+                    description: 'Drive to São Paulo and Santos City'
+                },
+                {
+                    summary: 'Dinner in Santos',
+                    start: '20250515T190000',
+                    end: '20250515T220000',
+                    description: 'Dinner in Santos and overnight at the Tarumã flat'
+                }
+            ],
+            '2025-05-16': [
+                {
+                    summary: 'Visit to Wolthers & Associates office',
+                    start: '20250516T083000',
+                    end: '20250516T120000',
+                    description: 'Visit to Wolthers & Associates office'
+                },
+                {
+                    summary: 'Visit to Exporter EISA',
+                    start: '20250516T123000',
+                    end: '20250516T133000',
+                    description: 'Host: Carlos Santana'
+                }
+            ]
+        };
+
+        // All events for complete calendar download
+        window.allEvents = [
+            // Day 1
+            { summary: 'Arrival in Brazil', start: '20250707T000000', end: '20250707T010000', description: 'Nakaya san arrival in Brazil, overnight in São Paulo City' },
+
+            // Day 2
+            { summary: 'Drive to Varginha', start: '20250708T070000', end: '20250708T110000', description: 'Drive to Varginha (4 hours)' },
+            { summary: 'Visit to Gardingo Trading', start: '20250708T110000', end: '20250708T123000', description: 'Host: Léo Gardingo' },
+            { summary: 'Lunch with Gardingo', start: '20250708T123000', end: '20250708T140000', description: 'Lunch with Gardingo' },
+            { summary: 'Visit to Minasul', start: '20250708T150000', end: '20250708T160000', description: 'Host: Heberson Sastre' },
+            { summary: 'Visit to Prata Pereira', start: '20250708T170000', end: '20250708T180000', description: 'Host: João Guilherme' },
+            { summary: 'Dinner and overnight', start: '20250708T190000', end: '20250708T210000', description: 'Dinner at local restaurant and overnight at the Class Hotel in Varginha city' },
+
+            // Day 3
+            { summary: 'Visit to Louis Dreyfus', start: '20250709T080000', end: '20250709T090000', description: 'Host: Carlos Henrique' },
+            { summary: 'Visit to Café Três Corações', start: '20250709T100000', end: '20250709T110000', description: 'Host: Rogerio Otaviano' },
+            { summary: 'Lunch', start: '20250709T120000', end: '20250709T130000', description: 'Lunch near Café Três Corações' },
+            { summary: 'Visit to Stonex', start: '20250709T133000', end: '20250709T150000', description: 'Host: Bruno' },
+            { summary: 'Visit to Exporter Atlantica', start: '20250709T160000', end: '20250709T170000', description: 'Host: Ms. Lais Domingues' },
+            { summary: 'Dinner', start: '20250709T190000', end: '20250709T200000', description: 'Dinner at local restaurant' },
+            { summary: 'Overnight in Varginha', start: '20250709T200000', end: '20250710T080000', description: 'Overnight at the Class Hotel in Varginha City' },
+
+            // Day 4
+            { summary: 'Visit to NGG Stockler', start: '20250710T083000', end: '20250710T093000', description: 'Host: Sergio Coelho' },
+            { summary: 'Visit to the Porto Seco', start: '20250710T100000', end: '20250710T110000', description: 'Host: Matheus Paiva' },
+            { summary: 'Departure to Cocatrel', start: '20250710T120000', end: '20250710T124500', description: 'Drive to Três Pontas' },
+            { summary: 'Lunch with Cocatrel', start: '20250710T124500', end: '20250710T133000', description: 'Host: Sidney' },
+            { summary: 'Visit to Cocatrel', start: '20250710T133000', end: '20250710T150000', description: 'Host: Francisco Pereira' },
+            { summary: 'Departure to Guaxupé', start: '20250710T180000', end: '20250710T200000', description: '3 hours drive to Guaxupé city' },
+            { summary: 'Dinner and overnight', start: '20250710T200000', end: '20250711T080000', description: 'Dinner at local restaurant and overnight at the Ibis Hotel in Guaxupé city' },
+
+            // Day 5
+            { summary: 'Visit to Cooxupé', start: '20250515T090000', end: '20250515T100000', description: 'Host: Paulo Martins' },
+            { summary: 'Departure to São Paulo and Santos', start: '20250515T110000', end: '20250515T150000', description: 'Drive to São Paulo and Santos City' },
+            { summary: 'Dinner in Santos', start: '20250515T190000', end: '20250515T220000', description: 'Dinner in Santos and overnight at the Tarumã flat' },
+
+            // Day 6
+            { summary: 'Visit to Wolthers & Associates office', start: '20250516T083000', end: '20250516T120000', description: 'Visit to Wolthers & Associates office' },
+            { summary: 'Visit to Exporter EISA', start: '20250516T123000', end: '20250516T133000', description: 'Host: Carlos Santana' }
+        ];
+    </script>
+</body>
+</html>

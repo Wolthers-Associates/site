@@ -1,0 +1,37 @@
+# Cursor Rules - Temporary Development Version
+
+## Current Setup
+- Temp Domain: khaki-raccoon-228009.hostingersite.com
+- Purpose: Development and testing with mock data
+- Migration Plan: Easy switch to real authentication later
+
+## Technology Stack
+- Frontend: Pure HTML5, CSS3, Vanilla JavaScript ONLY
+- Backend: PHP 7.4+ (minimal for now)
+- Mock Data: Hardcoded in JavaScript
+- NO frameworks, NO build process
+
+## Development Phase Approach
+- Use mock authentication (simple login bypass)
+- Hardcode sample trip data
+- Build full UI/UX
+- Prepare structure for easy real auth integration
+
+## Mock Data Requirements
+- Sample employee login (bypass Office 365 for now)
+- Sample partner access (fake email/code validation)
+- Sample trip data with realistic content
+- Sample partner email lists
+
+## Easy Migration Strategy
+- Keep auth functions separate and swappable
+- Use configuration flags to switch modes
+- Prepare real database schema alongside mock data
+- Structure code for easy credential swap
+
+## Development Guidelines
+- Always use TypeScript strict mode concepts in vanilla JS
+- Prefer functional programming patterns
+- Use semantic HTML elements
+- Follow mobile-first responsive design
+- Write self-documenting code with clear variable names 
