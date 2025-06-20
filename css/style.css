@@ -785,6 +785,61 @@ section {
     font-style: normal;
 }
 
+/* ===== DEVELOPMENT NOTICE ===== */
+.dev-notice {
+    background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+    color: white;
+    padding: 12px 0;
+    position: relative;
+    box-shadow: 0 2px 10px rgba(255, 107, 53, 0.3);
+    margin-top: 140px; /* Account for fixed header */
+    z-index: 100;
+}
+
+.dev-notice-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    text-align: center;
+}
+
+.dev-badge {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.dev-text {
+    font-size: 0.95rem;
+    font-weight: 400;
+    opacity: 0.95;
+}
+
+@media (max-width: 768px) {
+    .dev-notice {
+        margin-top: 120px;
+        padding: 10px 0;
+    }
+    
+    .dev-notice-content {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .dev-badge {
+        font-size: 0.85rem;
+    }
+    
+    .dev-text {
+        font-size: 0.9rem;
+    }
+}
+
 /* Contact Section (Redesigned) */
 .contact {
     background: linear-gradient(135deg, #2c5530 0%, #4a7c4a 100%);
