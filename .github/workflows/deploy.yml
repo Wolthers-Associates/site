@@ -103,38 +103,32 @@ jobs:
         # Install lftp for secure FTP deployment
         sudo apt-get update && sudo apt-get install -y lftp
         
-        # Deploy main site files (index, team, public content)
+        # Deploy main site files (index, team, journal, css, js, images)
         echo "🌐 Deploying main website files..."
         lftp -c "
           set ftp:ssl-allow no;
           set ftp:list-options -a;
           open -u $WOLTHERS_FTP_USER,$WOLTHERS_FTP_PASS $WOLTHERS_FTP_HOST;
-          lcd 'main site reference';
           cd public_html;
-          mirror --reverse --delete --verbose \
-            --exclude-glob .git* \
-            --exclude-glob .env* \
-            --exclude-glob .htaccess \
-            --exclude-glob config.php \
-            --exclude-glob secrets/ \
-            --exclude-glob private/ \
-            --exclude-glob node_modules* \
-            --exclude-glob .DS_Store*
+          put index.html;
+          put team.html;
+          put journal.html;
+          mirror --reverse --delete --verbose css/;
+          mirror --reverse --delete --verbose js/;
+          mirror --reverse --delete --verbose images/;
         "
         
-        # Deploy trips application (public files only)
+        # Deploy trips application
         echo "🧳 Deploying trips application..."
         lftp -c "
           set ftp:ssl-allow no;
           set ftp:list-options -a;
           open -u $WOLTHERS_FTP_USER,$WOLTHERS_FTP_PASS $WOLTHERS_FTP_HOST;
-          lcd public;
           cd public_html/trips;
-          mirror --reverse --delete --verbose \
+          mirror --reverse --delete --verbose trips/ \
             --exclude-glob .git* \
             --exclude-glob .env* \
             --exclude-glob .htaccess \
-            --exclude-glob config.php \
             --exclude-glob api/config.php \
             --exclude-glob secrets/ \
             --exclude-glob private/ \
@@ -212,18 +206,21 @@ jobs:
         lftp -c "
           set ftp:ssl-allow no;
           open -u $WOLTHERS_FTP_USER,$WOLTHERS_FTP_PASS $WOLTHERS_FTP_HOST;
-          lcd 'main site reference';
           cd public_html;
-          mirror --reverse --delete --verbose --exclude-glob .git* --exclude-glob .env*
+          put index.html;
+          put team.html;
+          put journal.html;
+          mirror --reverse --delete --verbose css/;
+          mirror --reverse --delete --verbose js/;
+          mirror --reverse --delete --verbose images/;
         "
         
         # Deploy trips application to wolthers.com/trips
         lftp -c "
           set ftp:ssl-allow no;
           open -u $WOLTHERS_FTP_USER,$WOLTHERS_FTP_PASS $WOLTHERS_FTP_HOST;
-          lcd public;
           cd public_html/trips;
-          mirror --reverse --delete --verbose --exclude-glob .git* --exclude-glob .env*
+          mirror --reverse --delete --verbose trips/ --exclude-glob .git* --exclude-glob .env*
         "
 
     - name: Create environment file

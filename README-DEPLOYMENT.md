@@ -337,3 +337,25 @@ docker-compose exec -T database mysql -u root -p wolthers_trips < backups/latest
 **🎉 Ready for deployment!**
 
 For additional support, please contact the development team or refer to the technical documentation. 
+
+📁 Root/
+├── 📄 index.html          # Main homepage
+├── 📄 team.html           # Team page  
+├── 📄 journal.html        # Coffee journal
+├── 📁 css/                # Main site styles
+├── 📁 js/                 # Main site scripts
+├── 📁 images/             # Main site images
+├── 📁 trips/              # Trips application
+│   ├── 📄 index.html      # Trips homepage
+│   ├── 📄 accounts.html   # Account management
+│   ├── 📁 css/            # Trips styles
+│   ├── 📁 js/             # Trips scripts
+│   ├── 📁 images/         # Trips images
+│   ├── 📁 api/            # Trips API
+│   └── 📁 trip-pages/     # Individual trip pages
+├── 📁 database/           # Database setup
+├── 📁 scripts/            # Deployment scripts
+├── 📁 .github/            # CI/CD workflows
+├── 📁 docker/             # Docker config
+├── 📁 secrets/            # Secret configs
+└── 📄 [deployment docs]   # Documentation 
