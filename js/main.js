@@ -691,51 +691,72 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // --- Contact Form Submission (Netlify Forms) ---
+    // --- Contact Form Submission (JSON to PHP with Office 365) ---
     const contactForm = document.getElementById('contactForm');
     
     if (contactForm) {
-        contactForm.addEventListener('submit', function(event) {
-            const submitBtn = this.querySelector('.submit-btn');
-            const nameField = this.querySelector('#name');
-            const emailField = this.querySelector('#email');
-            const departmentField = this.querySelector('#department');
-            const subjectField = this.querySelector('#subject');
-            const messageField = this.querySelector('#message');
+        contactForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
             
-            // Basic validation
-            if (!nameField.value.trim() || !emailField.value.trim() || 
-                !departmentField.value || !subjectField.value.trim() || 
-                !messageField.value.trim()) {
-                event.preventDefault();
+            // Get form data
+            const formData = new FormData(this);
+            
+            // Convert FormData to JSON object
+            const jsonData = {
+                name: formData.get('name'),
+                email: formData.get('email'),
+                department: formData.get('department'),
+                subject: formData.get('subject'),
+                message: formData.get('message')
+            };
+            
+            // Validate required fields on frontend
+            if (!jsonData.name || !jsonData.email || !jsonData.department || !jsonData.subject || !jsonData.message) {
                 showFormMessage('Please fill in all required fields.', 'error');
                 return;
             }
             
-            // Email validation
+            // Validate email format
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailField.value || !emailRegex.test(emailField.value)) {
-                event.preventDefault();
+            if (!emailRegex.test(jsonData.email)) {
                 showFormMessage('Please enter a valid email address.', 'error');
                 return;
             }
             
             // Show loading state
-            submitBtn.disabled = true;
+            const submitBtn = this.querySelector('.submit-btn');
+            const originalText = submitBtn.textContent;
             submitBtn.textContent = 'Sending...';
+            submitBtn.disabled = true;
             
-            // Let Netlify handle the form submission
+            try {
+                // Send JSON data to PHP
+                const response = await fetch('./contact.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(jsonData)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showFormMessage(result.message, 'success');
+                    contactForm.reset(); // Clear form on success
+                } else {
+                    showFormMessage(result.message || 'An error occurred. Please try again.', 'error');
+                }
+                
+            } catch (error) {
+                console.error('Contact form error:', error);
+                showFormMessage('Network error. Please check your connection and try again.', 'error');
+            } finally {
+                // Reset button state
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            }
         });
-        
-        // Check URL for success parameter
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.has('success')) {
-            showFormMessage('Thank you! Your message has been sent successfully. We will get back to you soon.', 'success');
-            // Reset form
-            contactForm.reset();
-            // Clean up URL
-            window.history.replaceState({}, document.title, window.location.pathname);
-        }
     }
     
     /**
@@ -744,7 +765,7 @@ document.addEventListener('DOMContentLoaded', () => {
      * @param {string} type - 'success' or 'error'
      */
     function showFormMessage(message, type) {
-        // Remove existing messages
+        // Remove any existing messages
         const existingMessage = document.querySelector('.form-message');
         if (existingMessage) {
             existingMessage.remove();
@@ -755,19 +776,34 @@ document.addEventListener('DOMContentLoaded', () => {
         messageDiv.className = `form-message ${type}`;
         messageDiv.textContent = message;
         
-        // Insert at the top of the form
-        const form = document.getElementById('contactForm');
-        form.insertBefore(messageDiv, form.firstChild);
-        
-        // Auto-remove after 5 seconds
-        setTimeout(() => {
-            if (messageDiv.parentNode) {
-                messageDiv.remove();
+        // Style the message
+        messageDiv.style.cssText = `
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 500;
+            ${type === 'success' 
+                ? 'background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb;' 
+                : 'background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb;'
             }
-        }, 5000);
+        `;
         
-        // Scroll to message
-        messageDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        // Insert message after form
+        const contactFormElement = document.getElementById('contactForm');
+        if (contactFormElement) {
+            contactFormElement.parentNode.insertBefore(messageDiv, contactFormElement.nextSibling);
+            
+            // Auto-remove message after 5 seconds
+            setTimeout(() => {
+                if (messageDiv.parentNode) {
+                    messageDiv.remove();
+                }
+            }, 5000);
+            
+            // Scroll to message
+            messageDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
     }
     
     // --- Search Functionality (Basic) ---
