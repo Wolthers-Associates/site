@@ -325,33 +325,9 @@ const utils = {
 const auth = {
     // Initialize authentication system
     init: () => {
-        auth.initializeLoginTabs();
         auth.initializeLoginForms();
         auth.initializeMicrosoftAuth();
         auth.validateExistingSession();
-    },
-
-    // Initialize tab switching functionality
-    initializeLoginTabs: () => {
-        const tabs = document.querySelectorAll('.method-tab');
-        const methods = document.querySelectorAll('.login-method');
-        
-        tabs.forEach(tab => {
-            tab.addEventListener('click', () => {
-                const targetMethod = tab.getAttribute('data-method');
-                
-                // Update active tab
-                tabs.forEach(t => t.classList.remove('active'));
-                tab.classList.add('active');
-                
-                // Update active method
-                methods.forEach(m => m.classList.remove('active'));
-                const targetElement = document.getElementById(targetMethod + 'Login');
-                if (targetElement) {
-                    targetElement.classList.add('active');
-                }
-            });
-        });
     },
 
     // Initialize form handlers
