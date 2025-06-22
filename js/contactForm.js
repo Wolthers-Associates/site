@@ -1,3 +1,7 @@
+// DISABLED - This file conflicts with main.js contact form handler
+// Use main.js instead for JSON-based contact form submission to contact.php
+
+/*
 // --- Contact Form Submission (PHP Backend) ---
 const contactForm = document.getElementById('contactForm');
 
@@ -109,34 +113,47 @@ if (contactForm) {
     });
 }
 
-/**
- * Shows form success/error messages
- * @param {string} message - The message to display
- * @param {string} type - 'success', 'error', or 'info'
- */
 function showFormMessage(message, type) {
-    // Remove existing messages
+    // Remove existing message
     const existingMessage = document.querySelector('.form-message');
     if (existingMessage) {
         existingMessage.remove();
     }
     
-    // Create new message element
+    // Create new message
     const messageDiv = document.createElement('div');
     messageDiv.className = `form-message ${type}`;
     messageDiv.textContent = message;
     
-    // Insert at the top of the form
-    const form = document.getElementById('contactForm');
-    form.insertBefore(messageDiv, form.firstChild);
-    
-    // Auto-remove after 5 seconds
-    setTimeout(() => {
-        if (messageDiv.parentNode) {
-            messageDiv.remove();
+    // Style the message
+    messageDiv.style.cssText = `
+        padding: 15px;
+        margin: 20px 0;
+        border-radius: 5px;
+        font-size: 16px;
+        font-weight: 500;
+        ${type === 'success' 
+            ? 'background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb;' 
+            : type === 'error'
+            ? 'background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb;'
+            : 'background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb;'
         }
-    }, 5000);
+    `;
     
-    // Scroll to message
-    messageDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    // Insert message
+    const form = document.getElementById('contactForm');
+    if (form) {
+        form.parentNode.insertBefore(messageDiv, form);
+        
+        // Auto-remove after 5 seconds
+        setTimeout(() => {
+            if (messageDiv.parentNode) {
+                messageDiv.remove();
+            }
+        }, 5000);
+        
+        // Scroll to message
+        messageDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
 }
+*/

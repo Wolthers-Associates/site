@@ -3,6 +3,11 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => {
         document.body.classList.add('loaded');
     }, 100);
+    
+    // Initialize contact form with delay to ensure it overrides other handlers
+    setTimeout(() => {
+        initializeContactForm();
+    }, 500);
     // --- Translation System ---
     const translations = {
         en: {
@@ -691,84 +696,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // --- Contact Form Submission (JSON to PHP with Office 365) ---
-    const contactForm = document.getElementById('contactForm');
-    
-    if (contactForm) {
-        contactForm.addEventListener('submit', async function(e) {
-            e.preventDefault(); // Prevent default form submission
-            e.stopPropagation(); // Stop any bubbling that might trigger default behavior
-            
-            // Get form data
-            const formData = new FormData(this);
-            
-            // Convert FormData to plain object, then to JSON
-            const jsonData = {
-                name: formData.get('name')?.trim() || '',
-                email: formData.get('email')?.trim() || '',
-                department: formData.get('department') || '',
-                subject: formData.get('subject')?.trim() || '',
-                message: formData.get('message')?.trim() || ''
-            };
-            
-            // Debug logging
-            console.log('Form submission - JSON data:', jsonData);
-            
-            // Validate required fields on frontend
-            if (!jsonData.name || !jsonData.email || !jsonData.department || !jsonData.subject || !jsonData.message) {
-                showFormMessage('Please fill in all required fields.', 'error');
-                return;
-            }
-            
-            // Validate email format
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(jsonData.email)) {
-                showFormMessage('Please enter a valid email address.', 'error');
-                return;
-            }
-            
-            // Show loading state
-            const submitBtn = this.querySelector('.submit-btn');
-            const originalText = submitBtn.textContent;
-            submitBtn.textContent = 'Sending...';
-            submitBtn.disabled = true;
-            
-            try {
-                // Send JSON data to PHP
-                console.log('Sending to PHP:', JSON.stringify(jsonData));
-                
-                const response = await fetch('./contact.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify(jsonData)
-                });
-                
-                console.log('Response status:', response.status);
-                console.log('Response headers:', response.headers.get('content-type'));
-                
-                const result = await response.json();
-                console.log('Response data:', result);
-                
-                if (result.success) {
-                    showFormMessage(result.message, 'success');
-                    contactForm.reset(); // Clear form on success
-                } else {
-                    showFormMessage(result.message || 'An error occurred. Please try again.', 'error');
-                }
-                
-            } catch (error) {
-                console.error('Contact form error:', error);
-                showFormMessage('Network error. Please check your connection and try again.', 'error');
-            } finally {
-                // Reset button state
-                submitBtn.textContent = originalText;
-                submitBtn.disabled = false;
-            }
-        });
-    }
+    // Contact form will be initialized separately with delay
     
     /**
      * Shows form success/error messages
@@ -925,3 +853,106 @@ document.addEventListener('DOMContentLoaded', () => {
     
     console.log('Wolthers & Associates website initialized successfully');
 });
+
+// --- Contact Form Initialization (Separate to override conflicts) ---
+function initializeContactForm() {
+    console.log('Initializing contact form...');
+    
+    const contactForm = document.getElementById('contactForm');
+    
+    if (!contactForm) {
+        console.error('Contact form not found');
+        return;
+    }
+    
+    // Remove any existing event listeners that might conflict
+    contactForm.removeAttribute('action');
+    contactForm.removeAttribute('method');
+    contactForm.removeAttribute('data-netlify');
+    contactForm.removeAttribute('netlify-honeypot');
+    
+    // Remove all existing submit event listeners
+    const newForm = contactForm.cloneNode(true);
+    contactForm.parentNode.replaceChild(newForm, contactForm);
+    
+    console.log('Contact form cleaned, adding JSON handler...');
+    
+    // Add our JSON handler with highest priority
+    newForm.addEventListener('submit', async function(e) {
+        console.log('Form submit event triggered');
+        e.preventDefault(); // Prevent default form submission
+        e.stopPropagation(); // Stop any bubbling that might trigger default behavior
+        e.stopImmediatePropagation(); // Stop all other event handlers
+        
+        // Get form data
+        const formData = new FormData(this);
+        
+        // Convert FormData to plain object, then to JSON
+        const jsonData = {
+            name: formData.get('name')?.trim() || '',
+            email: formData.get('email')?.trim() || '',
+            department: formData.get('department') || '',
+            subject: formData.get('subject')?.trim() || '',
+            message: formData.get('message')?.trim() || ''
+        };
+        
+        // Debug logging
+        console.log('Form submission - JSON data:', jsonData);
+        
+        // Validate required fields on frontend
+        if (!jsonData.name || !jsonData.email || !jsonData.department || !jsonData.subject || !jsonData.message) {
+            showFormMessage('Please fill in all required fields.', 'error');
+            return;
+        }
+        
+        // Validate email format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(jsonData.email)) {
+            showFormMessage('Please enter a valid email address.', 'error');
+            return;
+        }
+        
+        // Show loading state
+        const submitBtn = this.querySelector('.submit-btn');
+        const originalText = submitBtn.textContent;
+        submitBtn.textContent = 'Sending...';
+        submitBtn.disabled = true;
+        
+        try {
+            // Send JSON data to PHP
+            console.log('Sending to PHP:', JSON.stringify(jsonData));
+            
+            const response = await fetch('./contact.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(jsonData)
+            });
+            
+            console.log('Response status:', response.status);
+            console.log('Response headers:', response.headers.get('content-type'));
+            
+            const result = await response.json();
+            console.log('Response data:', result);
+            
+            if (result.success) {
+                showFormMessage(result.message, 'success');
+                newForm.reset(); // Clear form on success
+            } else {
+                showFormMessage(result.message || 'An error occurred. Please try again.', 'error');
+            }
+            
+        } catch (error) {
+            console.error('Contact form error:', error);
+            showFormMessage('Network error. Please check your connection and try again.', 'error');
+        } finally {
+            // Reset button state
+            submitBtn.textContent = originalText;
+            submitBtn.disabled = false;
+        }
+    });
+    
+    console.log('Contact form JSON handler attached successfully');
+}
