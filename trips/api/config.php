@@ -154,6 +154,52 @@ function logActivity($user_id, $action, $details = null) {
     error_log("TRIPS_API: " . json_encode($log_entry));
 }
 
+// Office 365 token validation function
+function validateOffice365Token($accessToken) {
+    if (!$accessToken) return false;
+    
+    try {
+        // Call Microsoft Graph API to get user info
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, 'https://graph.microsoft.com/v1.0/me');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Authorization: Bearer ' . $accessToken,
+            'Content-Type: application/json'
+        ]);
+        
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+        
+        if ($httpCode === 200) {
+            $userInfo = json_decode($response, true);
+            return [
+                'id' => $userInfo['id'],
+                'email' => $userInfo['mail'] ?? $userInfo['userPrincipalName'],
+                'name' => $userInfo['displayName'],
+                'first_name' => $userInfo['givenName'] ?? '',
+                'last_name' => $userInfo['surname'] ?? ''
+            ];
+        }
+    } catch (Exception $e) {
+        if (DEBUG_MODE) {
+            error_log("Office 365 validation error: " . $e->getMessage());
+        }
+    }
+    
+    return false;
+}
+
+// Password hashing and verification functions
+function hashPassword($password) {
+    return password_hash($password, PASSWORD_DEFAULT);
+}
+
+function verifyPassword($password, $hash) {
+    return password_verify($password, $hash);
+}
+
 // Development mode indicators
 if (DEBUG_MODE) {
     header('X-Environment: development');

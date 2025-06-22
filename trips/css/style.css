@@ -180,6 +180,272 @@ body {
     font-family: monospace;
 }
 
+/* Enhanced Login Interface Styles */
+.login-methods {
+    width: 100%;
+}
+
+.method-tabs {
+    display: flex;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #f5f5f5;
+}
+
+.method-tab {
+    flex: 1;
+    padding: 12px 16px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #666;
+}
+
+.method-tab:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.method-tab.active {
+    background: white;
+    color: var(--dark-green);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.tab-icon {
+    font-size: 16px;
+}
+
+.login-method {
+    display: none;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.login-method.active {
+    display: block;
+}
+
+/* Microsoft Login Button */
+.microsoft-login-btn {
+    width: 100%;
+    background: #ffffff;
+    border: 1px solid #8c8c8c;
+    border-radius: 2px;
+    padding: 0;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 20px;
+}
+
+.microsoft-login-btn:hover {
+    background: #f5f5f5;
+    border-color: #666;
+}
+
+.ms-btn-content {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    gap: 12px;
+}
+
+.ms-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 21px;
+    height: 21px;
+}
+
+.ms-btn-text {
+    color: #5e5e5e;
+    font-size: 15px;
+    font-weight: 600;
+    font-family: "Segoe UI", system-ui, sans-serif;
+}
+
+.office365-section {
+    text-align: center;
+}
+
+.method-description {
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.login-divider {
+    margin: 20px 0;
+    position: relative;
+    text-align: center;
+}
+
+.login-divider::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: #ddd;
+}
+
+.login-divider span {
+    background: white;
+    padding: 0 15px;
+    color: #666;
+    font-size: 12px;
+    position: relative;
+}
+
+/* Regular Login Styles */
+.login-options {
+    margin-top: 15px;
+    text-align: center;
+    font-size: 13px;
+}
+
+.login-options a {
+    color: var(--dark-green);
+    text-decoration: none;
+}
+
+.login-options a:hover {
+    text-decoration: underline;
+}
+
+.login-options .divider {
+    margin: 0 10px;
+    color: #ccc;
+}
+
+/* Passcode Login Styles */
+.passcode-section {
+    text-align: center;
+}
+
+.passcode-note {
+    margin-top: 10px;
+    text-align: center;
+}
+
+.passcode-note small {
+    color: #e67e22;
+}
+
+/* Registration Modal Improvements */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 12px;
+    padding: 0;
+    width: 90%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    animation: modalSlideIn 0.3s ease-out;
+}
+
+.modal-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h2 {
+    margin: 0;
+    color: var(--dark-green);
+    font-size: 18px;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #666;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.close-btn:hover {
+    background: #f5f5f5;
+}
+
+.modal form {
+    padding: 20px 24px;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+.cancel-btn, .save-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.cancel-btn {
+    background: #f5f5f5;
+    color: #666;
+}
+
+.cancel-btn:hover {
+    background: #e8e8e8;
+}
+
+.save-btn {
+    background: var(--dark-green);
+    color: white;
+}
+
+.save-btn:hover {
+    background: var(--medium-green);
+}
+
 /* Main Content Styles */
 .main-container {
     display: none;

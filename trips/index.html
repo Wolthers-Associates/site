@@ -30,24 +30,128 @@
             <h1 class="login-title">Trip Itineraries</h1>
             <p class="login-subtitle">Wolthers & Associates - Development Version</p>
             
-            <form id="loginForm">
-                <div class="form-group">
-                    <label for="username">Username:</label>
-                    <input type="text" id="username" name="username" placeholder="Enter username or email" required>
+            <!-- Login Method Selection -->
+            <div class="login-methods">
+                <div class="method-tabs">
+                    <button class="method-tab active" data-method="office365">
+                        <span class="tab-icon">🏢</span>
+                        Office 365
+                    </button>
+                    <button class="method-tab" data-method="regular">
+                        <span class="tab-icon">👤</span>
+                        Account
+                    </button>
+                    <button class="method-tab" data-method="passcode">
+                        <span class="tab-icon">🔑</span>
+                        Trip Code
+                    </button>
                 </div>
-                <div class="form-group">
-                    <label for="password">Password:</label>
-                    <input type="password" id="password" name="password" placeholder="Enter password or access code" required>
+
+                <!-- Office 365 Login -->
+                <div id="office365Login" class="login-method active">
+                    <div class="office365-section">
+                        <p class="method-description">Sign in with your Microsoft work account</p>
+                        <button id="microsoftLoginBtn" class="microsoft-login-btn">
+                            <div class="ms-btn-content">
+                                <div class="ms-logo">
+                                    <svg width="21" height="21" viewBox="0 0 21 21">
+                                        <rect x="1" y="1" width="9" height="9" fill="#f25022"/>
+                                        <rect x="12" y="1" width="9" height="9" fill="#00a4ef"/>
+                                        <rect x="1" y="12" width="9" height="9" fill="#7fba00"/>
+                                        <rect x="12" y="12" width="9" height="9" fill="#ffb900"/>
+                                    </svg>
+                                </div>
+                                <span class="ms-btn-text">Sign in with Microsoft</span>
+                            </div>
+                        </button>
+                        <div class="login-divider">
+                            <span>Or access with:</span>
+                        </div>
+                    </div>
                 </div>
-                <button type="submit" class="login-btn">Access Trips</button>
+
+                <!-- Regular Account Login -->
+                <div id="regularLogin" class="login-method">
+                    <form id="regularLoginForm">
+                        <div class="form-group">
+                            <label for="regularEmail">Email:</label>
+                            <input type="email" id="regularEmail" name="email" placeholder="Enter your email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="regularPassword">Password:</label>
+                            <input type="password" id="regularPassword" name="password" placeholder="Enter your password" required>
+                        </div>
+                        <button type="submit" class="login-btn">Sign In</button>
+                        <div class="login-options">
+                            <a href="#" class="forgot-password">Forgot password?</a>
+                            <span class="divider">|</span>
+                            <a href="#" class="create-account" onclick="showRegisterForm()">Create account</a>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Trip Passcode Login -->
+                <div id="passcodeLogin" class="login-method">
+                    <div class="passcode-section">
+                        <p class="method-description">Enter your trip-specific access code</p>
+                        <form id="passcodeLoginForm">
+                            <div class="form-group">
+                                <label for="tripCode">Trip Code:</label>
+                                <input type="text" id="tripCode" name="trip_code" placeholder="e.g., BRAZIL2025" required style="text-transform: uppercase;">
+                            </div>
+                            <button type="submit" class="login-btn">Access Trip</button>
+                            <div class="passcode-note">
+                                <small>⚠️ Trip codes provide access to one specific trip only</small>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
                 <div id="errorMessage" class="error-message"></div>
-            </form>
-            
-            <div class="test-credentials">
-                <p><strong>Development Test Credentials:</strong></p>
-                <p><small>Username: <em>employee</em> | Password: <em>any</em> (Employee Access)</small></p>
-                <p><small>Username: <em>john@company.com</em> | Password: <em>any</em> (Partner Access)</small></p>
-                <p><small>Username: <em>any</em> | Password: <em>BRAZIL2025</em> (Code Access)</small></p>
+            </div>
+
+            <!-- Registration Modal -->
+            <div id="registerModal" class="modal" style="display: none;">
+                <div class="modal-backdrop" onclick="hideRegisterModal()"></div>
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2>Create Account</h2>
+                        <button class="close-btn" onclick="hideRegisterModal()">×</button>
+                    </div>
+                    <form id="registerForm">
+                        <div class="form-group">
+                            <label for="registerName">Full Name:</label>
+                            <input type="text" id="registerName" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="registerEmail">Email:</label>
+                            <input type="email" id="registerEmail" name="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="registerCompany">Company (Optional):</label>
+                            <input type="text" id="registerCompany" name="company">
+                        </div>
+                        <div class="form-group">
+                            <label for="registerPassword">Password:</label>
+                            <input type="password" id="registerPassword" name="password" required minlength="8">
+                        </div>
+                        <div class="form-group">
+                            <label for="confirmPassword">Confirm Password:</label>
+                            <input type="password" id="confirmPassword" name="confirm_password" required>
+                        </div>
+                        <div class="modal-actions">
+                            <button type="button" class="cancel-btn" onclick="hideRegisterModal()">Cancel</button>
+                            <button type="submit" class="save-btn">Create Account</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="test-credentials" style="margin-top: 20px;">
+                <p><strong>Development Test Access:</strong></p>
+                <p><small>Employee: <em>daniel@wolthers.com</em> | Password: <em>any</em></small></p>
+                <p><small>Test Account: <em>test@example.com</em> | Password: <em>password</em></small></p>
+                <p><small>Trip Code: <em>BRAZIL2025</em> (Brazil Trip Only)</small></p>
             </div>
         </div>
     </div>

@@ -290,6 +290,23 @@ const utils = {
         alert(`${icon} ${message}`);
     },
 
+    // Show error message
+    showError: (message) => {
+        const errorDiv = document.getElementById('errorMessage');
+        if (errorDiv) {
+            errorDiv.textContent = message;
+            errorDiv.classList.add('show');
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                errorDiv.classList.remove('show');
+            }, 5000);
+        } else {
+            // Fallback to alert if error div not found
+            alert(`❌ ${message}`);
+        }
+    },
+
     // Debounce function for search/filtering
     debounce: (func, wait) => {
         let timeout;
@@ -304,108 +321,374 @@ const utils = {
     }
 };
 
-// Authentication Functions
+// Enhanced Authentication Functions
 const auth = {
-    // Handle unified login form
-    handleLogin: (formData) => {
-        const username = formData.get('username') || document.getElementById('username').value;
-        const password = formData.get('password') || document.getElementById('password').value;
-        const errorDiv = document.getElementById('errorMessage');
-        const loginBtn = document.querySelector('.login-btn');
+    // Initialize authentication system
+    init: () => {
+        auth.initializeLoginTabs();
+        auth.initializeLoginForms();
+        auth.initializeMicrosoftAuth();
+        auth.validateExistingSession();
+    },
+
+    // Initialize tab switching functionality
+    initializeLoginTabs: () => {
+        const tabs = document.querySelectorAll('.method-tab');
+        const methods = document.querySelectorAll('.login-method');
         
-        // Show loading state
-        loginBtn.textContent = 'Authenticating...';
-        loginBtn.disabled = true;
-        errorDiv.textContent = '';
-        
-        utils.showLoading();
-        
-        // Simulate authentication delay
-        setTimeout(() => {
-            let isValid = false;
-            let userType = 'unknown';
-            let accessValue = '';
-            
-            // Check for employee login
-            if (username.toLowerCase() === 'employee' || username.toLowerCase().includes('@wolthers')) {
-                isValid = true;
-                userType = 'employee';
-                accessValue = username;
-            }
-            // Check for email login
-            else if (MOCK_CREDENTIALS.emails.includes(username.toLowerCase())) {
-                isValid = true;
-                userType = 'partner';
-                accessValue = username.toLowerCase();
-            }
-            // Check for code login (username can be anything, password is the code)
-            else if (MOCK_CREDENTIALS.codes.includes(password.toUpperCase())) {
-                isValid = true;
-                userType = 'partner';
-                accessValue = password.toUpperCase();
-            }
-            
-            utils.hideLoading();
-            
-            if (isValid) {
-                if (userType === 'employee') {
-                    currentUser = {
-                        name: 'Test Employee',
-                        email: 'test@wolthers.com',
-                        type: 'employee',
-                        canAddTrips: true,
-                        accessMethod: 'employee',
-                        accessValue: accessValue,
-                        loginTime: new Date().toISOString()
-                    };
-                } else {
-                    const isEmailAccess = MOCK_CREDENTIALS.emails.includes(accessValue);
-                    currentUser = {
-                        name: isEmailAccess ? accessValue.split('@')[0] : 'Partner User',
-                        email: isEmailAccess ? accessValue : 'partner@company.com',
-                        type: 'partner',
-                        canAddTrips: false,
-                        accessMethod: isEmailAccess ? 'email' : 'code',
-                        accessValue: accessValue,
-                        loginTime: new Date().toISOString()
-                    };
-                }
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const targetMethod = tab.getAttribute('data-method');
                 
-                sessionStorage.setItem('mockUser', JSON.stringify(currentUser));
-                ui.showMainContent();
-            } else {
-                errorDiv.textContent = 'Invalid credentials. Check the test credentials below.';
-            }
+                // Update active tab
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                // Update active method
+                methods.forEach(m => m.classList.remove('active'));
+                const targetElement = document.getElementById(targetMethod + 'Login');
+                if (targetElement) {
+                    targetElement.classList.add('active');
+                }
+            });
+        });
+    },
+
+    // Initialize form handlers
+    initializeLoginForms: () => {
+        // Regular login form
+        const regularForm = document.getElementById('regularLoginForm');
+        if (regularForm) {
+            regularForm.addEventListener('submit', auth.handleRegularLogin);
+        }
+        
+        // Passcode login form  
+        const passcodeForm = document.getElementById('passcodeLoginForm');
+        if (passcodeForm) {
+            passcodeForm.addEventListener('submit', auth.handlePasscodeLogin);
+        }
+        
+        // Registration form
+        const registerForm = document.getElementById('registerForm');
+        if (registerForm) {
+            registerForm.addEventListener('submit', auth.handleRegistration);
+        }
+    },
+
+    // Initialize Microsoft authentication
+    initializeMicrosoftAuth: () => {
+        const microsoftBtn = document.getElementById('microsoftLoginBtn');
+        if (microsoftBtn) {
+            microsoftBtn.addEventListener('click', auth.handleMicrosoftLogin);
+        }
+    },
+
+    // Handle regular email/password login
+    handleRegularLogin: async (e) => {
+        e.preventDefault();
+        
+        const email = document.getElementById('regularEmail').value.trim();
+        const password = document.getElementById('regularPassword').value.trim();
+        
+        if (!email || !password) {
+            utils.showError('Please enter both email and password');
+            return;
+        }
+        
+        try {
+            const response = await fetch('/trips/api/auth/login.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    login_type: 'regular',
+                    username: email,
+                    password: password
+                })
+            });
             
-            // Reset button
-            loginBtn.textContent = 'Access Trips';
-            loginBtn.disabled = false;
-            document.getElementById('password').value = '';
-        }, 1000);
+            const data = await response.json();
+            
+            if (data.success) {
+                localStorage.setItem('userSession', JSON.stringify(data));
+                auth.handleSuccessfulLogin(data);
+            } else {
+                utils.showError(data.error || 'Login failed');
+            }
+        } catch (error) {
+            // For development, fall back to mock authentication
+            auth.mockRegularLogin(email, password);
+        }
+    },
+
+    // Handle trip passcode login
+    handlePasscodeLogin: async (e) => {
+        e.preventDefault();
+        
+        const tripCode = document.getElementById('tripCode').value.trim().toUpperCase();
+        
+        if (!tripCode) {
+            utils.showError('Please enter a trip code');
+            return;
+        }
+        
+        try {
+            const response = await fetch('/trips/api/auth/login.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    login_type: 'passcode',
+                    trip_code: tripCode
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                localStorage.setItem('userSession', JSON.stringify(data));
+                auth.handleSuccessfulLogin(data);
+            } else {
+                utils.showError(data.error || 'Invalid trip code');
+            }
+        } catch (error) {
+            // For development, fall back to mock authentication
+            auth.mockPasscodeLogin(tripCode);
+        }
+    },
+
+    // Handle Microsoft Office 365 login
+    handleMicrosoftLogin: async () => {
+        try {
+            // This would integrate with Microsoft Authentication Library (MSAL)
+            // For now, show a message that it's not implemented
+            utils.showError('Microsoft Office 365 login will be implemented in the next phase. Please use regular login for now.');
+            
+            // TODO: Implement MSAL integration
+            // const msalInstance = new msal.PublicClientApplication(msalConfig);
+            // const response = await msalInstance.loginPopup(loginRequest);
+            // await authenticateWithOffice365(response.accessToken);
+            
+        } catch (error) {
+            utils.showError('Microsoft login failed. Please try again.');
+            console.error('Microsoft login error:', error);
+        }
+    },
+
+    // Handle user registration
+    handleRegistration: async (e) => {
+        e.preventDefault();
+        
+        const formData = new FormData(e.target);
+        const registrationData = {
+            name: formData.get('name'),
+            email: formData.get('email'),
+            company: formData.get('company'),
+            password: formData.get('password'),
+            confirm_password: formData.get('confirm_password')
+        };
+        
+        if (registrationData.password !== registrationData.confirm_password) {
+            utils.showError('Passwords do not match');
+            return;
+        }
+        
+        try {
+            const response = await fetch('/trips/api/auth/register.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(registrationData)
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                localStorage.setItem('userSession', JSON.stringify(data));
+                auth.hideRegisterModal();
+                auth.handleSuccessfulLogin(data);
+            } else {
+                utils.showError(data.error || 'Registration failed');
+            }
+        } catch (error) {
+            utils.showError('Connection error. Please try again.');
+            console.error('Registration error:', error);
+        }
+    },
+
+    // Handle successful login
+    handleSuccessfulLogin: (data) => {
+        // Update global user state
+        currentUser = {
+            id: data.user.id,
+            name: data.user.name,
+            email: data.user.email,
+            role: data.user.role,
+            type: data.auth_type,
+            canAddTrips: data.auth_type === 'regular' || data.auth_type === 'office365',
+            accessLevel: data.access_level,
+            tripAccess: data.trip_access,
+            restrictions: data.restrictions,
+            loginTime: new Date().toISOString()
+        };
+        
+        // Store in session
+        sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
+        
+        // Show main content
+        ui.showMainContent();
+        
+        // Show access restrictions if applicable
+        if (data.restrictions) {
+            auth.showAccessRestrictions(data.restrictions);
+        }
+    },
+
+    // Mock authentication for development
+    mockRegularLogin: (email, password) => {
+        const mockUsers = [
+            { email: 'daniel@wolthers.com', name: 'Daniel Wolthers', role: 'admin' },
+            { email: 'test@example.com', name: 'Test User', role: 'partner' }
+        ];
+        
+        const user = mockUsers.find(u => u.email === email);
+        if (user && (password === 'any' || password === 'password')) {
+            const mockData = {
+                success: true,
+                user: user,
+                auth_type: 'regular'
+            };
+            auth.handleSuccessfulLogin(mockData);
+        } else {
+            utils.showError('Invalid credentials. Try daniel@wolthers.com with any password.');
+        }
+    },
+
+    // Mock passcode authentication for development
+    mockPasscodeLogin: (tripCode) => {
+        const validCodes = ['BRAZIL2025', 'COLOMBIA2025', 'ETHIOPIA2025'];
+        
+        if (validCodes.includes(tripCode)) {
+            const mockData = {
+                success: true,
+                user: { name: 'Trip Visitor', role: 'visitor' },
+                auth_type: 'passcode',
+                access_level: 'trip_only',
+                trip_access: { trip_id: 1, trip_title: 'Brazil Coffee Origins Tour' },
+                restrictions: {
+                    cannot_access_other_trips: true,
+                    cannot_see_past_trips: true,
+                    read_only_access: true
+                }
+            };
+            auth.handleSuccessfulLogin(mockData);
+        } else {
+            utils.showError('Invalid trip code. Try BRAZIL2025, COLOMBIA2025, or ETHIOPIA2025');
+        }
+    },
+
+    // Validate existing session
+    validateExistingSession: async () => {
+        const session = localStorage.getItem('userSession');
+        const savedUser = sessionStorage.getItem('currentUser');
+        
+        if (savedUser) {
+            currentUser = JSON.parse(savedUser);
+            ui.showMainContent();
+            return;
+        }
+        
+        if (!session) return;
+        
+        try {
+            const response = await fetch('/trips/api/auth/validate.php');
+            const data = await response.json();
+            
+            if (data.success && data.authenticated) {
+                auth.handleSuccessfulLogin(data);
+            } else {
+                localStorage.removeItem('userSession');
+                sessionStorage.removeItem('currentUser');
+            }
+        } catch (error) {
+            localStorage.removeItem('userSession');
+            sessionStorage.removeItem('currentUser');
+            console.error('Session validation error:', error);
+        }
+    },
+
+    // Show register modal
+    showRegisterForm: () => {
+        const modal = document.getElementById('registerModal');
+        if (modal) {
+            modal.style.display = 'flex';
+        }
+    },
+
+    // Hide register modal
+    hideRegisterModal: () => {
+        const modal = document.getElementById('registerModal');
+        if (modal) {
+            modal.style.display = 'none';
+        }
+    },
+
+    // Show access restrictions notice
+    showAccessRestrictions: (restrictions) => {
+        if (restrictions.cannot_access_other_trips) {
+            const notice = document.createElement('div');
+            notice.className = 'access-notice';
+            notice.innerHTML = `
+                <div class="notice-content" style="background: #fff3cd; border: 1px solid #ffeaa7; color: #856404; padding: 10px; border-radius: 6px; margin: 10px 0;">
+                    <span class="notice-icon">ℹ️</span>
+                    <span>You have limited access to this specific trip only.</span>
+                </div>
+            `;
+            const header = document.querySelector('.header');
+            if (header) {
+                header.appendChild(notice);
+            }
+        }
     },
 
     // Check for existing authentication
     checkAuth: () => {
-        const savedUser = sessionStorage.getItem('mockUser');
-        if (savedUser) {
-            currentUser = JSON.parse(savedUser);
-            ui.showMainContent();
-        }
+        auth.validateExistingSession();
     },
 
-    // Logout function
-    logout: () => {
-        sessionStorage.removeItem('mockUser');
+    // Enhanced logout function
+    logout: async () => {
+        try {
+            // Call logout endpoint
+            await fetch('/trips/api/auth/logout.php', { method: 'POST' });
+        } catch (error) {
+            console.error('Logout API error:', error);
+        }
+        
+        // Clear local storage and session
+        localStorage.removeItem('userSession');
+        sessionStorage.removeItem('currentUser');
         currentUser = null;
         currentTrips = [];
         selectedTrip = null;
         
+        // Show login page
         document.getElementById('loginContainer').style.display = 'flex';
         document.getElementById('mainContainer').style.display = 'none';
         
-        // Reset login form
-        document.getElementById('loginForm').reset();
-        document.getElementById('errorMessage').textContent = '';
+        // Reset all forms
+        const forms = ['regularLoginForm', 'passcodeLoginForm', 'registerForm'];
+        forms.forEach(formId => {
+            const form = document.getElementById(formId);
+            if (form) form.reset();
+        });
+        
+        // Clear error messages
+        const errorDiv = document.getElementById('errorMessage');
+        if (errorDiv) errorDiv.textContent = '';
         
         utils.showNotification('Logged out successfully', 'info');
     }
@@ -1086,20 +1369,18 @@ const trips = {
 
 // Event Listeners
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('🚧 Development Mode - Mock Data Active');
-    console.log('🎯 Mock credentials for testing:');
-    console.log('📧 Emails:', MOCK_CREDENTIALS.emails.join(', '));
-    console.log('🔑 Codes:', MOCK_CREDENTIALS.codes.join(', '));
+    console.log('🚧 Development Mode - Enhanced Authentication Active');
+    console.log('🎯 Available authentication methods:');
+    console.log('🏢 Office 365: Will be implemented in next phase');
+    console.log('👤 Regular Login: daniel@wolthers.com / any password');
+    console.log('🔑 Trip Codes: BRAZIL2025, COLOMBIA2025, ETHIOPIA2025');
     
-    // Check for existing authentication
-    auth.checkAuth();
+    // Initialize enhanced authentication system
+    auth.init();
     
-    // Login form handler
-    const loginForm = document.getElementById('loginForm');
-    loginForm?.addEventListener('submit', function(e) {
-        e.preventDefault();
-        auth.handleLogin(new FormData(this));
-    });
+    // Global functions for modal interactions
+    window.showRegisterForm = auth.showRegisterForm;
+    window.hideRegisterModal = auth.hideRegisterModal;
     
     // Trip creation form handler
     const addTripForm = document.getElementById('addTripForm');
