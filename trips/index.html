@@ -16,7 +16,7 @@
     <div class="dev-notice" role="banner" aria-label="Development environment notice">
         <div class="dev-notice-content">
             <span class="dev-icon">🚧</span>
-            <span class="dev-text">Development Version - khaki-raccoon-228009.hostingersite.com</span>
+            <span class="dev-text">Under Development</span>
             <span class="dev-icon">🚧</span>
         </div>
     </div>
@@ -28,117 +28,34 @@
                 <img src="images/wolthers-logo-green.svg" alt="Wolthers & Associates" class="login-logo-image">
             </div>
             <h1 class="login-title">Trip Itineraries</h1>
-            <p class="login-subtitle">Wolthers & Associates - Development Version</p>
+            <p class="login-subtitle">Wolthers & Associates - Under Development</p>
             
-            <!-- Unified Login Interface -->
-            <div class="unified-login">
-                <!-- Main Email/Password Section -->
-                <div class="primary-login-section">
-                    <form id="regularLoginForm">
-                        <div class="form-group">
-                            <label for="regularEmail">Email:</label>
-                            <input type="email" id="regularEmail" name="email" placeholder="Enter your email" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="regularPassword">Password:</label>
-                            <input type="password" id="regularPassword" name="password" placeholder="Enter your password" required>
-                        </div>
-                        <div class="login-actions">
-                            <button type="submit" class="login-btn primary">Sign In</button>
-                            <button type="button" class="create-account-btn" onclick="showRegisterForm()">Create Account</button>
-                        </div>
-                        <div class="login-options">
-                            <a href="#" class="forgot-password">Forgot password?</a>
-                        </div>
-                    </form>
-                </div>
-
-                <!-- Alternative Login Methods -->
-                <div class="alternative-login-divider">
-                    <span>Or sign in with</span>
-                </div>
-
-                <div class="alternative-login-methods">
-                    <!-- Microsoft Login (Left Side) -->
-                    <div class="alt-method microsoft-method">
-                        <div class="method-header">
-                            <span class="method-icon">🏢</span>
-                            <h3>Microsoft Account</h3>
-                        </div>
-                        <p class="method-description">Use your work or school account</p>
-                        <button id="microsoftLoginBtn" class="microsoft-login-btn">
-                            <div class="ms-btn-content">
-                                <div class="ms-logo">
-                                    <svg width="21" height="21" viewBox="0 0 21 21">
-                                        <rect x="1" y="1" width="9" height="9" fill="#f25022"/>
-                                        <rect x="12" y="1" width="9" height="9" fill="#00a4ef"/>
-                                        <rect x="1" y="12" width="9" height="9" fill="#7fba00"/>
-                                        <rect x="12" y="12" width="9" height="9" fill="#ffb900"/>
-                                    </svg>
-                                </div>
-                                <span class="ms-btn-text">Sign in with Microsoft</span>
-                            </div>
+            <!-- Compact Login Interface -->
+            <div class="compact-login">
+                <form id="loginForm">
+                    <!-- Email and Password Fields -->
+                    <div class="login-fields">
+                        <input type="email" id="emailInput" name="email" placeholder="Enter your email" required>
+                        <input type="password" id="passwordInput" name="password" placeholder="Enter your password" required>
+                    </div>
+                    
+                    <!-- Microsoft and Trip Code Section -->
+                    <div class="alternative-section">
+                        <button type="button" id="microsoftLoginBtn" class="microsoft-btn">
+                            <img id="microsoftBtnImg" src="images/ms_signin_light_short.svg" alt="Sign in with Microsoft" class="ms-image">
                         </button>
+                        <div class="divider">|</div>
+                        <input type="text" id="tripCodeInput" name="trip_code" placeholder="Trip access code e.g. TripBrazilNov25" style="text-transform: uppercase;">
                     </div>
-
-                    <!-- Trip Passcode (Right Side) -->
-                    <div class="alt-method passcode-method">
-                        <div class="method-header">
-                            <span class="method-icon">🔑</span>
-                            <h3>Trip Access Code</h3>
-                        </div>
-                        <p class="method-description">Enter your trip-specific code</p>
-                        <form id="passcodeLoginForm">
-                            <div class="form-group">
-                                <input type="text" id="tripCode" name="trip_code" placeholder="e.g., BRAZIL2025" required style="text-transform: uppercase;">
-                            </div>
-                            <button type="submit" class="passcode-btn">Access Trip</button>
-                        </form>
-                        <div class="passcode-note">
-                            <small>⚠️ Limited to specific trip only</small>
-                        </div>
-                    </div>
-                </div>
+                    
+                    <!-- Single Sign In Button -->
+                    <button type="submit" class="sign-in-btn">Sign In</button>
+                </form>
 
                 <div id="errorMessage" class="error-message"></div>
             </div>
 
-            <!-- Registration Modal -->
-            <div id="registerModal" class="modal" style="display: none;">
-                <div class="modal-backdrop" onclick="hideRegisterModal()"></div>
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h2>Create Account</h2>
-                        <button class="close-btn" onclick="hideRegisterModal()">×</button>
-                    </div>
-                    <form id="registerForm">
-                        <div class="form-group">
-                            <label for="registerName">Full Name:</label>
-                            <input type="text" id="registerName" name="name" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="registerEmail">Email:</label>
-                            <input type="email" id="registerEmail" name="email" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="registerCompany">Company (Optional):</label>
-                            <input type="text" id="registerCompany" name="company">
-                        </div>
-                        <div class="form-group">
-                            <label for="registerPassword">Password:</label>
-                            <input type="password" id="registerPassword" name="password" required minlength="8">
-                        </div>
-                        <div class="form-group">
-                            <label for="confirmPassword">Confirm Password:</label>
-                            <input type="password" id="confirmPassword" name="confirm_password" required>
-                        </div>
-                        <div class="modal-actions">
-                            <button type="button" class="cancel-btn" onclick="hideRegisterModal()">Cancel</button>
-                            <button type="submit" class="save-btn">Create Account</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
+
 
             <div class="test-credentials" style="margin-top: 20px;">
                 <p><strong>Development Test Access:</strong></p>

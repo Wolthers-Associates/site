@@ -332,45 +332,69 @@ const auth = {
 
     // Initialize form handlers
     initializeLoginForms: () => {
-        // Regular login form
-        const regularForm = document.getElementById('regularLoginForm');
-        if (regularForm) {
-            regularForm.addEventListener('submit', auth.handleRegularLogin);
+        // Main login form
+        const loginForm = document.getElementById('loginForm');
+        if (loginForm) {
+            loginForm.addEventListener('submit', auth.handleLogin);
         }
         
-        // Passcode login form  
-        const passcodeForm = document.getElementById('passcodeLoginForm');
-        if (passcodeForm) {
-            passcodeForm.addEventListener('submit', auth.handlePasscodeLogin);
-        }
-        
-        // Registration form
-        const registerForm = document.getElementById('registerForm');
-        if (registerForm) {
-            registerForm.addEventListener('submit', auth.handleRegistration);
-        }
+        // Setup dark mode detection for Microsoft button
+        auth.setupDarkModeDetection();
     },
 
     // Initialize Microsoft authentication
     initializeMicrosoftAuth: () => {
         const microsoftBtn = document.getElementById('microsoftLoginBtn');
         if (microsoftBtn) {
-            microsoftBtn.addEventListener('click', auth.handleMicrosoftLogin);
+            microsoftBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                auth.handleMicrosoftLogin();
+            });
         }
     },
 
-    // Handle regular email/password login
-    handleRegularLogin: async (e) => {
+    // Setup dark mode detection for Microsoft button
+    setupDarkModeDetection: () => {
+        const microsoftImg = document.getElementById('microsoftBtnImg');
+        if (microsoftImg) {
+            const updateMicrosoftButton = () => {
+                const isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                microsoftImg.src = isDarkMode ? 'images/ms_signin_dark_short.svg' : 'images/ms_signin_light_short.svg';
+            };
+
+            // Initial setup
+            updateMicrosoftButton();
+
+            // Listen for changes
+            if (window.matchMedia) {
+                window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateMicrosoftButton);
+            }
+        }
+    },
+
+    // Handle unified login form
+    handleLogin: async (e) => {
         e.preventDefault();
         
-        const email = document.getElementById('regularEmail').value.trim();
-        const password = document.getElementById('regularPassword').value.trim();
+        const email = document.getElementById('emailInput').value.trim();
+        const password = document.getElementById('passwordInput').value.trim();
+        const tripCode = document.getElementById('tripCodeInput').value.trim().toUpperCase();
         
-        if (!email || !password) {
-            utils.showError('Please enter both email and password');
+        // Determine login type based on which fields are filled
+        if (tripCode) {
+            // Trip code login
+            await auth.processPasscodeLogin(tripCode);
+        } else if (email && password) {
+            // Regular email/password login
+            await auth.processRegularLogin(email, password);
+        } else {
+            utils.showError('Please enter either email and password, or a trip access code');
             return;
         }
-        
+    },
+
+    // Process regular email/password login
+    processRegularLogin: async (email, password) => {
         try {
             const response = await fetch('/trips/api/auth/login.php', {
                 method: 'POST',
@@ -390,7 +414,8 @@ const auth = {
                 localStorage.setItem('userSession', JSON.stringify(data));
                 auth.handleSuccessfulLogin(data);
             } else {
-                utils.showError(data.error || 'Login failed');
+                // No popup - just redirect to create account/forgot password
+                window.location.href = '#create-account';
             }
         } catch (error) {
             // For development, fall back to mock authentication
@@ -398,17 +423,8 @@ const auth = {
         }
     },
 
-    // Handle trip passcode login
-    handlePasscodeLogin: async (e) => {
-        e.preventDefault();
-        
-        const tripCode = document.getElementById('tripCode').value.trim().toUpperCase();
-        
-        if (!tripCode) {
-            utils.showError('Please enter a trip code');
-            return;
-        }
-        
+    // Process trip passcode login
+    processPasscodeLogin: async (tripCode) => {
         try {
             const response = await fetch('/trips/api/auth/login.php', {
                 method: 'POST',
@@ -427,7 +443,8 @@ const auth = {
                 localStorage.setItem('userSession', JSON.stringify(data));
                 auth.handleSuccessfulLogin(data);
             } else {
-                utils.showError(data.error || 'Invalid trip code');
+                // No popup - just redirect to create account/forgot password
+                window.location.href = '#create-account';
             }
         } catch (error) {
             // For development, fall back to mock authentication
@@ -439,8 +456,22 @@ const auth = {
     handleMicrosoftLogin: async () => {
         try {
             // This would integrate with Microsoft Authentication Library (MSAL)
-            // For now, show a message that it's not implemented
-            utils.showError('Microsoft Office 365 login will be implemented in the next phase. Please use regular login for now.');
+            // For development, show coming soon message and redirect
+            console.log('Microsoft Office 365 login - Coming soon');
+            
+            // For now, simulate the Microsoft login window opening
+            const popup = window.open('about:blank', 'microsoft-login', 'width=500,height=600');
+            popup.document.write(`
+                <html>
+                    <head><title>Microsoft Sign In</title></head>
+                    <body style="font-family: Arial, sans-serif; text-align: center; padding: 50px;">
+                        <h2>Microsoft Sign In</h2>
+                        <p>Coming Soon - Development Phase</p>
+                        <p>This feature will be implemented in the next phase.</p>
+                        <button onclick="window.close()">Close</button>
+                    </body>
+                </html>
+            `);
             
             // TODO: Implement MSAL integration
             // const msalInstance = new msal.PublicClientApplication(msalConfig);
@@ -448,52 +479,11 @@ const auth = {
             // await authenticateWithOffice365(response.accessToken);
             
         } catch (error) {
-            utils.showError('Microsoft login failed. Please try again.');
             console.error('Microsoft login error:', error);
         }
     },
 
-    // Handle user registration
-    handleRegistration: async (e) => {
-        e.preventDefault();
-        
-        const formData = new FormData(e.target);
-        const registrationData = {
-            name: formData.get('name'),
-            email: formData.get('email'),
-            company: formData.get('company'),
-            password: formData.get('password'),
-            confirm_password: formData.get('confirm_password')
-        };
-        
-        if (registrationData.password !== registrationData.confirm_password) {
-            utils.showError('Passwords do not match');
-            return;
-        }
-        
-        try {
-            const response = await fetch('/trips/api/auth/register.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(registrationData)
-            });
-            
-            const data = await response.json();
-            
-            if (data.success) {
-                localStorage.setItem('userSession', JSON.stringify(data));
-                auth.hideRegisterModal();
-                auth.handleSuccessfulLogin(data);
-            } else {
-                utils.showError(data.error || 'Registration failed');
-            }
-        } catch (error) {
-            utils.showError('Connection error. Please try again.');
-            console.error('Registration error:', error);
-        }
-    },
+
 
     // Handle successful login
     handleSuccessfulLogin: (data) => {
@@ -596,21 +586,7 @@ const auth = {
         }
     },
 
-    // Show register modal
-    showRegisterForm: () => {
-        const modal = document.getElementById('registerModal');
-        if (modal) {
-            modal.style.display = 'flex';
-        }
-    },
 
-    // Hide register modal
-    hideRegisterModal: () => {
-        const modal = document.getElementById('registerModal');
-        if (modal) {
-            modal.style.display = 'none';
-        }
-    },
 
     // Show access restrictions notice
     showAccessRestrictions: (restrictions) => {
@@ -655,12 +631,9 @@ const auth = {
         document.getElementById('loginContainer').style.display = 'flex';
         document.getElementById('mainContainer').style.display = 'none';
         
-        // Reset all forms
-        const forms = ['regularLoginForm', 'passcodeLoginForm', 'registerForm'];
-        forms.forEach(formId => {
-            const form = document.getElementById(formId);
-            if (form) form.reset();
-        });
+        // Reset login form
+        const loginForm = document.getElementById('loginForm');
+        if (loginForm) loginForm.reset();
         
         // Clear error messages
         const errorDiv = document.getElementById('errorMessage');
@@ -1355,8 +1328,7 @@ document.addEventListener('DOMContentLoaded', function() {
     auth.init();
     
     // Global functions for modal interactions
-    window.showRegisterForm = auth.showRegisterForm;
-    window.hideRegisterModal = auth.hideRegisterModal;
+    // Registration modal functions removed - using compact login only
     
     // Trip creation form handler
     const addTripForm = document.getElementById('addTripForm');

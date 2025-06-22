@@ -180,146 +180,209 @@ body {
     font-family: monospace;
 }
 
-/* Unified Login Interface Styles */
-.unified-login {
+/* Compact Login Interface Styles */
+.compact-login {
     width: 100%;
 }
 
-/* Primary Login Section (Email/Password) */
-.primary-login-section {
-    margin-bottom: 30px;
-    padding-bottom: 25px;
-    border-bottom: 1px solid #eee;
-}
-
-.login-actions {
+/* Login Fields */
+.login-fields {
     display: flex;
-    gap: 10px;
-    margin-bottom: 15px;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
 }
 
-.login-btn.primary {
-    flex: 2;
+.login-fields input {
+    width: 100%;
+    padding: 14px 16px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: border-color 0.3s ease;
+    background: white;
+}
+
+.login-fields input:focus {
+    outline: none;
+    border-color: var(--dark-green);
+    box-shadow: 0 0 0 3px rgba(44, 85, 48, 0.1);
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    .login-fields input {
+        background: #2d2d2d;
+        border-color: #555;
+        color: white;
+    }
+    
+    .login-fields input:focus {
+        border-color: var(--light-green);
+        box-shadow: 0 0 0 3px rgba(50, 92, 54, 0.3);
+    }
+    
+    .login-fields input::placeholder {
+        color: #aaa;
+    }
+}
+
+/* Alternative Section */
+.alternative-section {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+@media (prefers-color-scheme: dark) {
+    .alternative-section {
+        background: #2d2d2d;
+        border-color: #444;
+    }
+}
+
+/* Microsoft Button */
+.microsoft-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    transition: opacity 0.3s ease;
+}
+
+.microsoft-btn:hover {
+    opacity: 0.8;
+}
+
+.ms-image {
+    height: 41px;
+    width: auto;
+    display: block;
+}
+
+/* Divider */
+.divider {
+    color: #666;
+    font-size: 20px;
+    font-weight: 300;
+    margin: 0 10px;
+}
+
+@media (prefers-color-scheme: dark) {
+    .divider {
+        color: #aaa;
+    }
+}
+
+/* Trip Code Input */
+.alternative-section input[type="text"] {
+    flex: 1;
+    padding: 12px 16px;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    text-align: center;
+    background: white;
+    transition: border-color 0.3s ease;
+}
+
+.alternative-section input[type="text"]:focus {
+    outline: none;
+    border-color: #e67e22;
+    box-shadow: 0 0 0 3px rgba(230, 126, 34, 0.1);
+}
+
+@media (prefers-color-scheme: dark) {
+    .alternative-section input[type="text"] {
+        background: #1a1a1a;
+        border-color: #555;
+        color: white;
+    }
+    
+    .alternative-section input[type="text"]:focus {
+        border-color: #f39c12;
+        box-shadow: 0 0 0 3px rgba(243, 156, 18, 0.3);
+    }
+    
+    .alternative-section input[type="text"]::placeholder {
+        color: #aaa;
+    }
+}
+
+/* Sign In Button */
+.sign-in-btn {
+    width: 100%;
     background: var(--dark-green);
     color: white;
     border: none;
-    padding: 12px 20px;
-    border-radius: 6px;
+    padding: 16px;
+    border-radius: 8px;
     font-size: 16px;
     font-weight: 600;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: all 0.3s ease;
 }
 
-.login-btn.primary:hover {
+.sign-in-btn:hover {
     background: var(--medium-green);
+    transform: translateY(-1px);
 }
 
-.create-account-btn {
-    flex: 1;
-    background: transparent;
-    color: var(--dark-green);
-    border: 2px solid var(--dark-green);
-    padding: 12px 20px;
-    border-radius: 6px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
+.sign-in-btn:active {
+    transform: translateY(0);
 }
 
-.create-account-btn:hover {
-    background: var(--dark-green);
-    color: white;
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+    .alternative-section {
+        flex-direction: column;
+        gap: 20px;
+        text-align: center;
+    }
+    
+    .divider {
+        transform: rotate(90deg);
+        margin: 10px 0;
+    }
+    
+    .alternative-section input[type="text"] {
+        width: 100%;
+        max-width: 300px;
+    }
+    
+    .ms-image {
+        height: 35px;
+    }
+    
+    .login-fields input {
+        font-size: 16px; /* Prevents zoom on iOS */
+    }
 }
 
-.login-options {
-    text-align: center;
-}
-
-.login-options a {
-    color: var(--dark-green);
-    text-decoration: none;
-    font-size: 14px;
-}
-
-.login-options a:hover {
-    text-decoration: underline;
-}
-
-/* Alternative Login Methods Divider */
-.alternative-login-divider {
-    margin: 25px 0;
-    position: relative;
-    text-align: center;
-}
-
-.alternative-login-divider::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: #ddd;
-}
-
-.alternative-login-divider span {
-    background: white;
-    padding: 0 20px;
-    color: #666;
-    font-size: 14px;
-    font-weight: 500;
-    position: relative;
-}
-
-/* Alternative Login Methods Grid */
-.alternative-login-methods {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    margin-top: 25px;
-}
-
-.alt-method {
-    border: 1px solid #e0e0e0;
-    border-radius: 12px;
-    padding: 20px;
-    text-align: center;
-    transition: all 0.3s ease;
-    background: #fafafa;
-}
-
-.alt-method:hover {
-    border-color: #ccc;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    background: white;
-}
-
-.method-header {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    margin-bottom: 8px;
-}
-
-.method-icon {
-    font-size: 20px;
-}
-
-.method-header h3 {
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--dark-green);
-    margin: 0;
-}
-
-.method-description {
-    color: #666;
-    font-size: 13px;
-    margin-bottom: 15px;
-    line-height: 1.4;
+@media (max-width: 480px) {
+    .compact-login {
+        padding: 0 10px;
+    }
+    
+    .login-fields {
+        gap: 10px;
+    }
+    
+    .alternative-section {
+        padding: 12px;
+        gap: 15px;
+    }
+    
+    .sign-in-btn {
+        padding: 14px;
+        font-size: 15px;
+    }
 }
 
 /* Microsoft Login Button (Updated for unified layout) */
