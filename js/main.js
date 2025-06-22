@@ -696,19 +696,23 @@ document.addEventListener('DOMContentLoaded', () => {
     
     if (contactForm) {
         contactForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
+            e.preventDefault(); // Prevent default form submission
+            e.stopPropagation(); // Stop any bubbling that might trigger default behavior
             
             // Get form data
             const formData = new FormData(this);
             
-            // Convert FormData to JSON object
+            // Convert FormData to plain object, then to JSON
             const jsonData = {
-                name: formData.get('name'),
-                email: formData.get('email'),
-                department: formData.get('department'),
-                subject: formData.get('subject'),
-                message: formData.get('message')
+                name: formData.get('name')?.trim() || '',
+                email: formData.get('email')?.trim() || '',
+                department: formData.get('department') || '',
+                subject: formData.get('subject')?.trim() || '',
+                message: formData.get('message')?.trim() || ''
             };
+            
+            // Debug logging
+            console.log('Form submission - JSON data:', jsonData);
             
             // Validate required fields on frontend
             if (!jsonData.name || !jsonData.email || !jsonData.department || !jsonData.subject || !jsonData.message) {
@@ -731,15 +735,22 @@ document.addEventListener('DOMContentLoaded', () => {
             
             try {
                 // Send JSON data to PHP
+                console.log('Sending to PHP:', JSON.stringify(jsonData));
+                
                 const response = await fetch('./contact.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+                        'Accept': 'application/json'
                     },
                     body: JSON.stringify(jsonData)
                 });
                 
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers.get('content-type'));
+                
                 const result = await response.json();
+                console.log('Response data:', result);
                 
                 if (result.success) {
                     showFormMessage(result.message, 'success');

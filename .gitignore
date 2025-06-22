@@ -180,3 +180,9 @@ hostinger-config.php
 TODO.md
 NOTES.md
 scratch/ 
+
+# Contact form with email routing (keep current version, ignore future changes)
+contact.php
+debug_log.txt
+contact_log.txt
+rate_limit.txt 
