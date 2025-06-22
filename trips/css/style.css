@@ -20,6 +20,14 @@ body {
     background: linear-gradient(135deg, var(--cream) 0%, var(--light-brown) 100%);
     min-height: 100vh;
     line-height: 1.6;
+    transition: background 0.3s ease, color 0.3s ease;
+}
+
+@media (prefers-color-scheme: dark) {
+    body {
+        background: linear-gradient(135deg, #0d1117 0%, #161b22 100%);
+        color: #e6edf3;
+    }
 }
 
 /* Development Notice */
@@ -68,8 +76,17 @@ body {
     border-radius: 15px;
     box-shadow: 0 10px 30px rgba(26, 77, 58, 0.15);
     width: 100%;
-    max-width: 400px;
+    max-width: 500px;
     text-align: center;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+@media (prefers-color-scheme: dark) {
+    .login-box {
+        background: #1a1a1a;
+        color: white;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
 }
 
 .login-logo {
@@ -88,10 +105,22 @@ body {
     margin-bottom: 10px;
 }
 
+@media (prefers-color-scheme: dark) {
+    .login-title {
+        color: var(--light-green);
+    }
+}
+
 .login-subtitle {
     color: #666;
     font-size: 0.9rem;
     margin-bottom: 30px;
+}
+
+@media (prefers-color-scheme: dark) {
+    .login-subtitle {
+        color: #aaa;
+    }
 }
 
 .form-group {
@@ -164,6 +193,13 @@ body {
     color: #666;
 }
 
+@media (prefers-color-scheme: dark) {
+    .test-credentials {
+        border-top-color: #333;
+        color: #aaa;
+    }
+}
+
 .test-credentials p {
     margin-bottom: 5px;
 }
@@ -172,12 +208,25 @@ body {
     color: var(--dark-green);
 }
 
+@media (prefers-color-scheme: dark) {
+    .test-credentials strong {
+        color: var(--light-green);
+    }
+}
+
 .test-credentials em {
     background: #f0f0f0;
     padding: 2px 4px;
     border-radius: 3px;
     font-style: normal;
     font-family: monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+    .test-credentials em {
+        background: #333;
+        color: #fff;
+    }
 }
 
 /* Compact Login Interface Styles */
@@ -336,6 +385,17 @@ body {
 
 .sign-in-btn:active {
     transform: translateY(0);
+}
+
+@media (prefers-color-scheme: dark) {
+    .sign-in-btn {
+        background: var(--dark-green);
+        color: white;
+    }
+    
+    .sign-in-btn:hover {
+        background: var(--light-green);
+    }
 }
 
 /* Mobile Responsive Styles */

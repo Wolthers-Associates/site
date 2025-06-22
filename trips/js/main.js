@@ -353,22 +353,31 @@ const auth = {
         }
     },
 
-    // Setup dark mode detection for Microsoft button
+    // Setup dark mode detection for Microsoft button and logo
     setupDarkModeDetection: () => {
         const microsoftImg = document.getElementById('microsoftBtnImg');
-        if (microsoftImg) {
-            const updateMicrosoftButton = () => {
-                const isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const loginLogo = document.querySelector('.login-logo-image');
+        
+        const updateForDarkMode = () => {
+            const isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            // Update Microsoft button
+            if (microsoftImg) {
                 microsoftImg.src = isDarkMode ? 'images/ms_signin_dark_short.svg' : 'images/ms_signin_light_short.svg';
-            };
-
-            // Initial setup
-            updateMicrosoftButton();
-
-            // Listen for changes
-            if (window.matchMedia) {
-                window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateMicrosoftButton);
             }
+            
+            // Update Wolthers logo
+            if (loginLogo) {
+                loginLogo.src = isDarkMode ? 'images/wolthers-logo-off-white.svg' : 'images/wolthers-logo-green.svg';
+            }
+        };
+
+        // Initial setup
+        updateForDarkMode();
+
+        // Listen for changes
+        if (window.matchMedia) {
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateForDarkMode);
         }
     },
 
