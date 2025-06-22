@@ -25,11 +25,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
 }
 
-// Database configuration
-define('DB_HOST', getenv('DB_HOST') ?: 'localhost');
-define('DB_NAME', getenv('DB_NAME') ?: 'wolthers_trips');
-define('DB_USER', getenv('DB_USER') ?: 'wolthers_user');
-define('DB_PASS', getenv('DB_PASSWORD') ?: '');
+// Load secure configuration if available (production)
+if (file_exists(__DIR__ . '/secure-config.php')) {
+    require_once __DIR__ . '/secure-config.php';
+}
+
+// Database configuration - Use secure config if available, otherwise fallback to environment variables or defaults
+if (!defined('DB_HOST')) {
+    define('DB_HOST', getenv('DB_HOST') ?: 'localhost');
+}
+if (!defined('DB_NAME')) {
+    define('DB_NAME', getenv('DB_NAME') ?: 'wolthers_trips');
+}
+if (!defined('DB_USER')) {
+    define('DB_USER', getenv('DB_USER') ?: 'wolthers_user');
+}
+if (!defined('DB_PASS')) {
+    define('DB_PASS', getenv('DB_PASSWORD') ?: '');
+}
 define('DB_CHARSET', 'utf8mb4');
 
 // Application configuration
