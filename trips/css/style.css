@@ -229,219 +229,339 @@ body {
     }
 }
 
-/* Compact Login Interface Styles */
-.compact-login {
+/* Simple Login Interface Styles */
+.simple-login {
     width: 100%;
+    position: relative;
 }
 
-/* Login Fields */
-.login-fields {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin-bottom: 20px;
+/* Login Steps */
+.login-step {
+    display: none;
+    animation: fadeIn 0.3s ease-in-out;
 }
 
-.login-fields input {
-    width: 100%;
-    padding: 14px 16px;
-    border: 2px solid #ddd;
-    border-radius: 8px;
-    font-size: 16px;
-    transition: border-color 0.3s ease;
-    background: white;
-}
-
-.login-fields input:focus {
-    outline: none;
-    border-color: var(--dark-green);
-    box-shadow: 0 0 0 3px rgba(44, 85, 48, 0.1);
-}
-
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-    .login-fields input {
-        background: #2d2d2d;
-        border-color: #555;
-        color: white;
-    }
-    
-    .login-fields input:focus {
-        border-color: var(--light-green);
-        box-shadow: 0 0 0 3px rgba(50, 92, 54, 0.3);
-    }
-    
-    .login-fields input::placeholder {
-        color: #aaa;
-    }
-}
-
-/* Alternative Section */
-.alternative-section {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    margin-bottom: 20px;
-    padding: 15px;
-    background: #f8f9fa;
-    border-radius: 8px;
-    border: 1px solid #e9ecef;
-}
-
-@media (prefers-color-scheme: dark) {
-    .alternative-section {
-        background: #2d2d2d;
-        border-color: #444;
-    }
-}
-
-/* Microsoft Button */
-.microsoft-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 0;
-    transition: opacity 0.3s ease;
-}
-
-.microsoft-btn:hover {
-    opacity: 0.8;
-}
-
-.ms-image {
-    height: 41px;
-    width: auto;
+.login-step.active {
     display: block;
 }
 
-/* Divider */
-.divider {
-    color: #666;
-    font-size: 20px;
-    font-weight: 300;
-    margin: 0 10px;
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
-@media (prefers-color-scheme: dark) {
-    .divider {
-        color: #aaa;
-    }
+/* Input Groups */
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 24px;
 }
 
-/* Trip Code Input */
-.alternative-section input[type="text"] {
-    flex: 1;
-    padding: 12px 16px;
-    border: 2px solid #ddd;
-    border-radius: 6px;
-    font-size: 14px;
-    font-weight: 500;
-    text-align: center;
-    background: white;
-    transition: border-color 0.3s ease;
-}
-
-.alternative-section input[type="text"]:focus {
-    outline: none;
-    border-color: #e67e22;
-    box-shadow: 0 0 0 3px rgba(230, 126, 34, 0.1);
-}
-
-@media (prefers-color-scheme: dark) {
-    .alternative-section input[type="text"] {
-        background: #1a1a1a;
-        border-color: #555;
-        color: white;
-    }
-    
-    .alternative-section input[type="text"]:focus {
-        border-color: #f39c12;
-        box-shadow: 0 0 0 3px rgba(243, 156, 18, 0.3);
-    }
-    
-    .alternative-section input[type="text"]::placeholder {
-        color: #aaa;
-    }
-}
-
-/* Sign In Button */
-.sign-in-btn {
+.input-group input {
     width: 100%;
-    background: var(--dark-green);
-    color: white;
+    padding: 16px 20px;
+    border: 2px solid #e1e5e9;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 400;
+    background: white;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+.input-group input:focus {
+    outline: none;
+    border-color: var(--dark-green);
+    box-shadow: 0 0 0 4px rgba(44, 85, 48, 0.1);
+}
+
+@media (prefers-color-scheme: dark) {
+    .input-group input {
+        background: #21262d;
+        border-color: #30363d;
+        color: #e6edf3;
+    }
+    
+    .input-group input:focus {
+        border-color: var(--light-green);
+        box-shadow: 0 0 0 4px rgba(50, 92, 54, 0.2);
+    }
+    
+    .input-group input::placeholder {
+        color: #7d8590;
+    }
+}
+
+/* Buttons */
+.continue-btn, .sign-in-btn, .create-account-btn, .verify-btn {
+    width: 100%;
+    padding: 16px 24px;
     border: none;
-    padding: 16px;
-    border-radius: 8px;
+    border-radius: 12px;
     font-size: 16px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
+    background: var(--dark-green);
+    color: white;
 }
 
-.sign-in-btn:hover {
+.continue-btn:hover, .sign-in-btn:hover, .create-account-btn:hover, .verify-btn:hover {
     background: var(--medium-green);
     transform: translateY(-1px);
 }
 
-.sign-in-btn:active {
+.continue-btn:active, .sign-in-btn:active, .create-account-btn:active, .verify-btn:active {
     transform: translateY(0);
 }
 
 @media (prefers-color-scheme: dark) {
-    .sign-in-btn {
+    .continue-btn, .sign-in-btn, .create-account-btn, .verify-btn {
         background: var(--dark-green);
-        color: white;
     }
     
-    .sign-in-btn:hover {
+    .continue-btn:hover, .sign-in-btn:hover, .create-account-btn:hover, .verify-btn:hover {
         background: var(--light-green);
+    }
+}
+
+/* Divider Section */
+.divider-section {
+    display: flex;
+    align-items: center;
+    margin: 32px 0;
+    gap: 16px;
+}
+
+.divider-line {
+    flex: 1;
+    height: 1px;
+    background: #e1e5e9;
+}
+
+.divider-text {
+    color: #656d76;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 0 8px;
+}
+
+@media (prefers-color-scheme: dark) {
+    .divider-line {
+        background: #30363d;
+    }
+    
+    .divider-text {
+        color: #7d8590;
+    }
+}
+
+/* Microsoft Sign-in Button */
+.microsoft-signin-btn {
+    width: 100%;
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+}
+
+.microsoft-signin-btn:hover {
+    opacity: 0.8;
+}
+
+.ms-signin-image {
+    width: 100%;
+    height: auto;
+    max-height: 50px;
+    object-fit: contain;
+}
+
+/* Back Button */
+.back-button {
+    color: var(--dark-green);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    margin-bottom: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: color 0.3s ease;
+}
+
+.back-button:hover {
+    color: var(--medium-green);
+}
+
+@media (prefers-color-scheme: dark) {
+    .back-button {
+        color: var(--light-green);
+    }
+    
+    .back-button:hover {
+        color: #58a6ff;
+    }
+}
+
+/* Welcome Message */
+.welcome-message {
+    margin-bottom: 24px;
+    text-align: center;
+}
+
+.welcome-message h3 {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--dark-green);
+    margin-bottom: 8px;
+}
+
+.welcome-message p {
+    color: #656d76;
+    font-size: 16px;
+    margin: 0;
+}
+
+@media (prefers-color-scheme: dark) {
+    .welcome-message h3 {
+        color: var(--light-green);
+    }
+    
+    .welcome-message p {
+        color: #7d8590;
+    }
+}
+
+/* Account Creation Message */
+.account-creation-message, .code-message {
+    margin-bottom: 24px;
+    text-align: center;
+}
+
+.account-creation-message h3, .code-message h3 {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--dark-green);
+    margin-bottom: 8px;
+}
+
+.account-creation-message p, .code-message p {
+    color: #656d76;
+    font-size: 16px;
+    margin: 0;
+}
+
+@media (prefers-color-scheme: dark) {
+    .account-creation-message h3, .code-message h3 {
+        color: var(--light-green);
+    }
+    
+    .account-creation-message p, .code-message p {
+        color: #7d8590;
+    }
+}
+
+/* Auth Options */
+.auth-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+}
+
+.link-btn {
+    background: none;
+    border: none;
+    color: var(--dark-green);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: underline;
+    transition: color 0.3s ease;
+}
+
+.link-btn:hover {
+    color: var(--medium-green);
+}
+
+@media (prefers-color-scheme: dark) {
+    .link-btn {
+        color: var(--light-green);
+    }
+    
+    .link-btn:hover {
+        color: #58a6ff;
     }
 }
 
 /* Mobile Responsive Styles */
 @media (max-width: 768px) {
-    .alternative-section {
-        flex-direction: column;
-        gap: 20px;
-        text-align: center;
+    .login-box {
+        padding: 30px 20px;
+        max-width: 450px;
     }
     
-    .divider {
-        transform: rotate(90deg);
-        margin: 10px 0;
-    }
-    
-    .alternative-section input[type="text"] {
-        width: 100%;
-        max-width: 300px;
-    }
-    
-    .ms-image {
-        height: 35px;
-    }
-    
-    .login-fields input {
+    .input-group input {
         font-size: 16px; /* Prevents zoom on iOS */
+        padding: 14px 18px;
+    }
+    
+    .continue-btn, .sign-in-btn, .create-account-btn, .verify-btn {
+        padding: 14px 20px;
+        font-size: 15px;
+    }
+    
+    .ms-signin-image {
+        max-height: 45px;
+    }
+    
+    .welcome-message h3, .account-creation-message h3, .code-message h3 {
+        font-size: 20px;
+    }
+    
+    .divider-section {
+        margin: 24px 0;
     }
 }
 
 @media (max-width: 480px) {
-    .compact-login {
-        padding: 0 10px;
+    .login-box {
+        padding: 25px 15px;
+        max-width: 400px;
     }
     
-    .login-fields {
+    .input-group {
+        gap: 14px;
+        margin-bottom: 20px;
+    }
+    
+    .input-group input {
+        padding: 12px 16px;
+        font-size: 16px;
+    }
+    
+    .continue-btn, .sign-in-btn, .create-account-btn, .verify-btn {
+        padding: 12px 18px;
+        font-size: 14px;
+    }
+    
+    .welcome-message h3, .account-creation-message h3, .code-message h3 {
+        font-size: 18px;
+    }
+    
+    .back-button {
+        font-size: 13px;
+        margin-bottom: 15px;
+    }
+    
+    .auth-options {
         gap: 10px;
     }
     
-    .alternative-section {
-        padding: 12px;
-        gap: 15px;
-    }
-    
-    .sign-in-btn {
-        padding: 14px;
-        font-size: 15px;
+    .link-btn {
+        font-size: 13px;
     }
 }
 

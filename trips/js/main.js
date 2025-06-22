@@ -332,10 +332,28 @@ const auth = {
 
     // Initialize form handlers
     initializeLoginForms: () => {
-        // Main login form
-        const loginForm = document.getElementById('loginForm');
-        if (loginForm) {
-            loginForm.addEventListener('submit', auth.handleLogin);
+        // Initial form (step 1)
+        const initialForm = document.getElementById('initialForm');
+        if (initialForm) {
+            initialForm.addEventListener('submit', auth.handleInitialInput);
+        }
+        
+        // Password form (step 2)
+        const passwordForm = document.getElementById('passwordForm');
+        if (passwordForm) {
+            passwordForm.addEventListener('submit', auth.handlePasswordLogin);
+        }
+        
+        // Create account form (step 3)
+        const createAccountForm = document.getElementById('createAccountForm');
+        if (createAccountForm) {
+            createAccountForm.addEventListener('submit', auth.handleAccountCreation);
+        }
+        
+        // Code verification form (step 4)
+        const codeForm = document.getElementById('codeForm');
+        if (codeForm) {
+            codeForm.addEventListener('submit', auth.handleCodeVerification);
         }
         
         // Setup dark mode detection for Microsoft button
@@ -381,27 +399,157 @@ const auth = {
         }
     },
 
-    // Handle unified login form
-    handleLogin: async (e) => {
+    // Current user email for multi-step flow
+    currentEmail: null,
+    
+    // Handle initial input (step 1)
+    handleInitialInput: async (e) => {
         e.preventDefault();
         
-        const email = document.getElementById('emailInput').value.trim();
-        const password = document.getElementById('passwordInput').value.trim();
-        const tripCode = document.getElementById('tripCodeInput').value.trim().toUpperCase();
+        const input = document.getElementById('primaryInput').value.trim();
         
-        // Determine login type based on which fields are filled
-        if (tripCode) {
-            // Trip code login
-            await auth.processPasscodeLogin(tripCode);
-        } else if (email && password) {
-            // Regular email/password login
-            await auth.processRegularLogin(email, password);
-        } else {
-            utils.showError('Please enter either email and password, or a trip access code');
+        if (!input) {
+            utils.showError('Please enter your email or trip access code');
             return;
         }
+        
+        // Check if it's an email or trip code
+        if (input.includes('@')) {
+            // It's an email - check if user exists
+            auth.currentEmail = input;
+            await auth.checkUserExists(input);
+        } else {
+            // It's a trip code - process directly
+            await auth.processPasscodeLogin(input.toUpperCase());
+        }
     },
-
+    
+    // Check if user exists
+    checkUserExists: async (email) => {
+        try {
+            const response = await fetch('/trips/api/auth/check-user.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email: email })
+            });
+            
+            const data = await response.json();
+            
+            if (data.exists) {
+                // User exists - show password step
+                auth.showStep2(data.user.name);
+            } else {
+                // User doesn't exist - show account creation step
+                auth.showStep3(email);
+            }
+        } catch (error) {
+            // For development, mock the user check
+            auth.mockUserCheck(email);
+        }
+    },
+    
+    // Handle password login (step 2)
+    handlePasswordLogin: async (e) => {
+        e.preventDefault();
+        
+        const password = document.getElementById('passwordInput').value.trim();
+        
+        if (!password) {
+            utils.showError('Please enter your password');
+            return;
+        }
+        
+        await auth.processRegularLogin(auth.currentEmail, password);
+    },
+    
+    // Handle account creation (step 3)
+    handleAccountCreation: async (e) => {
+        e.preventDefault();
+        
+        const name = document.getElementById('fullNameInput').value.trim();
+        const company = document.getElementById('companyInput').value.trim();
+        
+        if (!name) {
+            utils.showError('Please enter your full name');
+            return;
+        }
+        
+        try {
+            const response = await fetch('/trips/api/auth/register.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    name: name,
+                    email: auth.currentEmail,
+                    company: company
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                utils.showNotification('Account created! Check your email for confirmation.', 'success');
+                auth.goBackToStep1();
+            } else {
+                utils.showError(data.error || 'Failed to create account');
+            }
+        } catch (error) {
+            // For development, mock account creation
+            utils.showNotification('Account created! (Development mode)', 'success');
+            setTimeout(() => auth.goBackToStep1(), 2000);
+        }
+    },
+    
+    // Handle code verification (step 4)
+    handleCodeVerification: async (e) => {
+        e.preventDefault();
+        
+        const code = document.getElementById('codeInput').value.trim();
+        
+        if (!code || code.length !== 6) {
+            utils.showError('Please enter the 6-digit code');
+            return;
+        }
+        
+        try {
+            const response = await fetch('/trips/api/auth/verify-code.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email: auth.currentEmail,
+                    code: code
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                localStorage.setItem('userSession', JSON.stringify(data));
+                auth.handleSuccessfulLogin(data);
+            } else {
+                utils.showError(data.error || 'Invalid code');
+            }
+        } catch (error) {
+            // For development, mock code verification
+            if (code === '123456') {
+                const mockData = {
+                    success: true,
+                    user: { name: 'Test User', email: auth.currentEmail, role: 'partner' },
+                    auth_type: 'one_time_code'
+                };
+                auth.handleSuccessfulLogin(mockData);
+            } else {
+                utils.showError('Invalid code. Try 123456 for development.');
+            }
+        }
+    },
+    
     // Process regular email/password login
     processRegularLogin: async (email, password) => {
         try {
@@ -423,8 +571,7 @@ const auth = {
                 localStorage.setItem('userSession', JSON.stringify(data));
                 auth.handleSuccessfulLogin(data);
             } else {
-                // No popup - just redirect to create account/forgot password
-                window.location.href = '#create-account';
+                utils.showError(data.error || 'Invalid password');
             }
         } catch (error) {
             // For development, fall back to mock authentication
@@ -452,8 +599,7 @@ const auth = {
                 localStorage.setItem('userSession', JSON.stringify(data));
                 auth.handleSuccessfulLogin(data);
             } else {
-                // No popup - just redirect to create account/forgot password
-                window.location.href = '#create-account';
+                utils.showError(data.error || 'Invalid trip code');
             }
         } catch (error) {
             // For development, fall back to mock authentication
@@ -519,6 +665,55 @@ const auth = {
         // Show access restrictions if applicable
         if (data.restrictions) {
             auth.showAccessRestrictions(data.restrictions);
+        }
+    },
+
+    // Step navigation functions
+    showStep2: (userName) => {
+        document.getElementById('step1').classList.remove('active');
+        document.getElementById('step2').classList.add('active');
+        document.getElementById('welcomeMessage').innerHTML = `
+            <h3>Welcome back, ${userName}!</h3>
+            <p>Enter your password to continue</p>
+        `;
+    },
+    
+    showStep3: (email) => {
+        document.getElementById('step1').classList.remove('active');
+        document.getElementById('step3').classList.add('active');
+        document.getElementById('emailToConfirm').textContent = email;
+    },
+    
+    showStep4: (email) => {
+        document.getElementById('step2').classList.remove('active');
+        document.getElementById('step4').classList.add('active');
+        document.getElementById('emailForCode').textContent = email;
+    },
+    
+    goBackToStep1: () => {
+        document.querySelectorAll('.login-step').forEach(step => step.classList.remove('active'));
+        document.getElementById('step1').classList.add('active');
+        document.getElementById('primaryInput').value = '';
+        auth.currentEmail = null;
+    },
+    
+    goBackToStep2: () => {
+        document.getElementById('step4').classList.remove('active');
+        document.getElementById('step2').classList.add('active');
+    },
+    
+    // Mock user check for development
+    mockUserCheck: (email) => {
+        const knownUsers = [
+            { email: 'daniel@wolthers.com', name: 'Daniel Wolthers' },
+            { email: 'test@example.com', name: 'Test User' }
+        ];
+        
+        const user = knownUsers.find(u => u.email === email);
+        if (user) {
+            auth.showStep2(user.name);
+        } else {
+            auth.showStep3(email);
         }
     },
 
@@ -640,9 +835,8 @@ const auth = {
         document.getElementById('loginContainer').style.display = 'flex';
         document.getElementById('mainContainer').style.display = 'none';
         
-        // Reset login form
-        const loginForm = document.getElementById('loginForm');
-        if (loginForm) loginForm.reset();
+        // Reset login forms
+        auth.goBackToStep1();
         
         // Clear error messages
         const errorDiv = document.getElementById('errorMessage');
@@ -1390,6 +1584,26 @@ window.logout = auth.logout;
 window.showAddTripModal = ui.showAddTripModal;
 window.hideAddTripModal = ui.hideAddTripModal;
 window.hideTripDetailModal = ui.hideTripDetailModal;
+
+// Login step navigation functions
+window.goBackToStep1 = auth.goBackToStep1;
+window.goBackToStep2 = auth.goBackToStep2;
+
+// Auth helper functions
+window.sendOneTimeCode = () => {
+    auth.showStep4(auth.currentEmail);
+    // In development, simulate sending code
+    utils.showNotification('One-time code sent! Use 123456 for development.', 'info');
+};
+
+window.forgotPassword = () => {
+    utils.showNotification('Password reset email sent! (Development mode)', 'info');
+    setTimeout(() => auth.goBackToStep1(), 2000);
+};
+
+window.resendCode = () => {
+    utils.showNotification('Code resent! Use 123456 for development.', 'info');
+};
 
 // Development helpers
 window.DEV = {
