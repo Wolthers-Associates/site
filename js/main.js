@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
             navAAABrazil: 'AAA Brazil',
             navColombia: 'Colombia',
             navGuatemala: 'Guatemala',
-            navJournal: 'Coffee Journal',
+
             navContact: 'Contact',
             searchPlaceholder: 'Search our services, locations, or team members...',
             
@@ -166,7 +166,6 @@ document.addEventListener('DOMContentLoaded', () => {
             navAAABrazil: 'AAA Brasil',
             navColombia: 'Colômbia',
             navGuatemala: 'Guatemala',
-            navJournal: 'Revista de Café',
             navContact: 'Contato',
             searchPlaceholder: 'Pesquise nossos serviços, locais ou membros da equipe...',
             
@@ -309,7 +308,6 @@ document.addEventListener('DOMContentLoaded', () => {
             navAAABrazil: 'AAA Brasil',
             navColombia: 'Colombia',
             navGuatemala: 'Guatemala',
-            navJournal: 'Revista de Café',
             navContact: 'Contacto',
             searchPlaceholder: 'Buscar nuestros servicios, ubicaciones o miembros del equipo...',
             
