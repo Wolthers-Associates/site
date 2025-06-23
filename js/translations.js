@@ -92,6 +92,11 @@ const translations = {
         buenaventuraColombia: 'Buenaventura, Colombia',
         guatemalaCity: 'Guatemala City, Guatemala',
         
+        // Journal
+        journalTitle: 'Coffee Journal',
+        journalSubtitle: 'Discover the experiences and insights from our coffee origin trips, shared by travelers and coffee enthusiasts',
+        devNotice: 'This Coffee Journal section is currently being developed. Check back soon for travel stories and experiences!',
+        
         // Contact
         contactTitle: 'Contact Us',
         contactSubtitle: 'Connect with our global team of coffee trading experts. We\'re here to support your business across all origins.',
@@ -240,6 +245,11 @@ const translations = {
         buenaventuraColombia: 'Buenaventura, Colômbia',
         guatemalaCity: 'Cidade da Guatemala, Guatemala',
         
+        // Journal
+        journalTitle: 'Viagens',
+        journalSubtitle: 'Descubra as experiências e insights de nossas viagens às origens do café, compartilhadas por viajantes e entusiastas do café',
+        devNotice: 'Esta seção de Viagens está atualmente em desenvolvimento. Volte em breve para histórias e experiências de viagem!',
+        
         // Contact
         contactTitle: 'Entre em Contato',
         contactSubtitle: 'Conecte-se com nossa equipe global de especialistas em comércio de café. Estamos aqui para apoiar seu negócio em todas as origens.',
@@ -387,6 +397,11 @@ const translations = {
         santosBrazil: 'Santos, Brasil',
         buenaventuraColombia: 'Buenaventura, Colombia',
         guatemalaCity: 'Ciudad de Guatemala, Guatemala',
+        
+        // Journal
+        journalTitle: 'Viajes',
+        journalSubtitle: 'Descubre las experiencias e insights de nuestros viajes a los orígenes del café, compartidos por viajeros y entusiastas del café',
+        devNotice: 'Esta sección de Viajes está actualmente en desarrollo. ¡Vuelve pronto para historias y experiencias de viaje!',
         
         // Contact
         contactTitle: 'Contáctanos',

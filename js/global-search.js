@@ -21,9 +21,9 @@ class GlobalSearch {
             },
             {
                 url: 'journal.html',
-                title: 'Coffee Journal - Wolthers & Associates',
-                description: 'Coffee industry insights and stories',
-                content: 'coffee journal articles blog news updates specialty coffee industry insights stories origin trips market analysis coffee culture sustainability practices quality standards cupping notes farm visits producer profiles'
+                title: 'Coffee Journal / Viagens / Viajes - Wolthers & Associates',
+                description: 'Coffee industry insights and travel stories',
+                content: 'coffee journal viagens viajes articles blog news updates specialty coffee industry insights stories origin trips travel experiences market analysis coffee culture sustainability practices quality standards cupping notes farm visits producer profiles'
             },
             {
                 url: 'trips/index.html',
