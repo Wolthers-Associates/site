@@ -13,6 +13,7 @@ const translations = {
         navAAABrazil: 'AAA Brazil',
         navColombia: 'Colombia',
         navGuatemala: 'Guatemala',
+        navJournal: 'Coffee Journal',
         navContact: 'Contact',
         searchPlaceholder: 'Search our services, locations, or team members...',
         
@@ -101,8 +102,10 @@ const translations = {
         logisticsSupport: 'Logistics Support',
         logisticsDesc: 'For shipping coordination, sample requests, vessel booking, and logistics assistance.',
         headquarters: 'Our Global Headquarters',
-        danielDescription: 'Partner and COO, daily on global trade, overseeing company operations and trading activities with deep knowledge of supply chains and strategic development. Nespresso Cluster Administrator.',
-        svennDescription: 'Oversees our Guatemala and Colombia labs, frequently traveling across Brazil and Latin America while supporting marketing efforts. Svenn is also a great host and experienced inland travel agent.',
+        rasmusDescription: 'Leads major negotiations and structures office operations. Guiding the company\'s growth in modern coffee trading.',
+        christianDescription: 'Founded W&A in 1990, provides strategic guidance.',
+        danielDescription: 'COO overseeing operations and trading. Nespresso Cluster Administrator.',
+        svennDescription: 'Oversees Guatemala and Colombia labs, supports marketing across Latin America.',
 
         // Contact Form
         contactFormTitle: 'Send Us a Message',
@@ -159,6 +162,7 @@ const translations = {
         navAAABrazil: 'AAA Brasil',
         navColombia: 'Colômbia',
         navGuatemala: 'Guatemala',
+        navJournal: 'Revista de Café',
         navContact: 'Contato',
         searchPlaceholder: 'Pesquise nossos serviços, locais ou membros da equipe...',
         
@@ -219,7 +223,7 @@ const translations = {
         
         // Tooltips for Quality Control Table - Portuguese
         tooltipSampleReceived: 'Recepção inicial e catalogação de amostras de café',
-        tooltipInitialAnalysis: 'Avaliação completa de qualidade incluindo inspeção visual e avaliação de sabor',
+        tooltipInitialAnalysis: 'Avaliação completa de qualidade incluyendo inspeção visual e avaliação de sabor',
         tooltipReportClient: 'Relatório detalhado de qualidade entregue ao cliente',
         tooltipThirdPartyCollection: 'Coleta independente de amostras diretamente dos contêineres de embarque',
         tooltipSampleComparison: 'Verificação de que o café embarcado corresponde à amostra pré-embarque aprovada',
@@ -245,10 +249,12 @@ const translations = {
         qualityControl: 'Controle de Qualidade',
         qualityDesc: 'Para serviços de controle de qualidade e testes em todas as origens, incluindo Brasil, Colômbia e Guatemala.',
         logisticsSupport: 'Suporte Logístico',
-        logisticsDesc: 'Para coordenação de envio, solicitações de amostras, reserva de navios e assistência logística.',
+        logisticsDesc: 'Para coordenação de transporte, solicitações de amostras, reserva de navios e assistência logística.',
         headquarters: 'Nossa Sede Global',
-        danielDescription: 'Sócio e COO, diariamente no comércio global, supervisionando as operações da empresa e atividades de trading com profundo conhecimento das cadeias de suprimentos e desenvolvimento estratégico. Administrador do Cluster Nespresso.',
-        svennDescription: 'Supervisiona nossos laboratórios na Guatemala e na Colômbia, viajando frequentemente pelo Brasil e pela América Latina enquanto apoia os esforços de marketing. Svenn também é um ótimo anfitrião e experiente agente de viagens terrestres.',
+        rasmusDescription: 'Lidera grandes negociações e estrutura operações do escritório. Orientando o crescimento da empresa no comércio moderno de café.',
+        christianDescription: 'Fundou a W&A em 1990, fornece orientação estratégica.',
+        danielDescription: 'COO supervisionando operações e negociação. Administrador do Cluster Nespresso.',
+        svennDescription: 'Supervisiona laboratórios da Guatemala e Colômbia, apoia marketing em toda a América Latina.',
 
         // Contact Form
         contactFormTitle: 'Envie-nos uma Mensagem',
@@ -305,6 +311,7 @@ const translations = {
         navAAABrazil: 'AAA Brasil',
         navColombia: 'Colombia',
         navGuatemala: 'Guatemala',
+        navJournal: 'Revista de Café',
         navContact: 'Contacto',
         searchPlaceholder: 'Buscar nuestros servicios, ubicaciones o miembros del equipo...',
         
@@ -389,12 +396,14 @@ const translations = {
         tradingInquiries: 'Consultas de Trading',
         tradingDesc: 'Para todas las preguntas relacionadas con trading y corretaje, servicios de control de calidad y nuevas oportunidades de negocio.',
         qualityControl: 'Control de Calidad',
-        qualityDesc: 'Para servicios de control de calidad y pruebas en todos los orígenes, incluyendo Brasil, Colombia y Guatemala.',
+        qualityDesc: 'Para servicios de control de calidad y pruebas en todos los orígenes, incluidos Brasil, Colombia y Guatemala.',
         logisticsSupport: 'Soporte Logístico',
-        logisticsDesc: 'Para coordinación de envío, solicitudes de muestras, reserva de buques y asistencia logística.',
+        logisticsDesc: 'Para coordinación de envíos, solicitudes de muestras, reserva de buques y asistencia logística.',
         headquarters: 'Nuestra Sede Global',
-        danielDescription: 'Socio y COO, dedicado al comercio global a diario, supervisando las operaciones de la empresa y las actividades de trading con profundo conocimiento de las cadenas de suministro y el desarrollo estratégico. Administrador del Clúster Nespresso.',
-        svennDescription: 'Supervisa nuestros laboratorios en Guatemala y Colombia, viajando con frecuencia por Brasil y América Latina mientras apoya los esfuerzos de marketing. Svenn también es un gran anfitrión y experimentado agente de viajes terrestres.',
+        rasmusDescription: 'Lidera grandes negociaciones y estructura las operaciones de la oficina. Guiando el crecimiento de la empresa en el comercio moderno de café.',
+        christianDescription: 'Fundó W&A en 1990, proporciona orientación estratégica.',
+        danielDescription: 'COO supervisando operaciones y comercio. Administrador del Cluster Nespresso.',
+        svennDescription: 'Supervisa laboratorios de Guatemala y Colombia, apoya marketing en toda América Latina.',
 
         // Contact Form
         contactFormTitle: 'Envíanos un Mensaje',

@@ -23,6 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
             navAAABrazil: 'AAA Brazil',
             navColombia: 'Colombia',
             navGuatemala: 'Guatemala',
+            navJournal: 'Coffee Journal',
             navContact: 'Contact',
             searchPlaceholder: 'Search our services, locations, or team members...',
             
@@ -123,6 +124,10 @@ document.addEventListener('DOMContentLoaded', () => {
             logisticsSupport: 'Logistics Support',
             logisticsDesc: 'For shipping coordination, sample requests, vessel booking, and logistics assistance.',
             headquarters: 'Headquarters',
+            rasmusDescription: 'Leads major negotiations and structures office operations. Guiding the company\'s growth in modern coffee trading.',
+            christianDescription: 'Founded W&A in 1990, provides strategic guidance.',
+            danielDescription: 'COO overseeing operations and trading. Nespresso Cluster Administrator.',
+            svennDescription: 'Oversees Guatemala and Colombia labs, supports marketing across Latin America.',
             
             // Common
             tel: 'Tel',
@@ -161,6 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
             navAAABrazil: 'AAA Brasil',
             navColombia: 'Colômbia',
             navGuatemala: 'Guatemala',
+            navJournal: 'Revista de Café',
             navContact: 'Contato',
             searchPlaceholder: 'Pesquise nossos serviços, locais ou membros da equipe...',
             
@@ -257,10 +263,14 @@ document.addEventListener('DOMContentLoaded', () => {
             formSendButton: 'Enviar Mensagem',
             ourContactDetails: 'Nossos Detalhes de Contato',
             tradingInquiries: 'Consultas de Trading',
-            tradingDesc: 'Para todas as questões relacionadas a trading e corretagem, serviços de controle de qualidade e novas oportunidades de negócios.',
+            tradingDesc: 'Para todas as questões relacionadas ao comércio e corretagem, serviços de controle de qualidade e novas oportunidades de negócios.',
             logisticsSupport: 'Suporte Logístico',
-            logisticsDesc: 'Para coordenação de envio, solicitações de amostras, reserva de navios e assistência logística.',
+            logisticsDesc: 'Para coordenação de transporte, solicitações de amostras, reserva de navios e assistência logística.',
             headquarters: 'Sede',
+            rasmusDescription: 'Lidera grandes negociações e estrutura operações do escritório. Orientando o crescimento da empresa no comércio moderno de café.',
+            christianDescription: 'Fundou a W&A em 1990, fornece orientação estratégica.',
+            danielDescription: 'COO supervisionando operações e negociação. Administrador do Cluster Nespresso.',
+            svennDescription: 'Supervisiona laboratórios da Guatemala e Colômbia, apoia marketing em toda a América Latina.',
             
             // Common
             tel: 'Tel',
@@ -299,6 +309,7 @@ document.addEventListener('DOMContentLoaded', () => {
             navAAABrazil: 'AAA Brasil',
             navColombia: 'Colombia',
             navGuatemala: 'Guatemala',
+            navJournal: 'Revista de Café',
             navContact: 'Contacto',
             searchPlaceholder: 'Buscar nuestros servicios, ubicaciones o miembros del equipo...',
             
@@ -395,10 +406,14 @@ document.addEventListener('DOMContentLoaded', () => {
             formSendButton: 'Enviar Mensaje',
             ourContactDetails: 'Nuestros Datos de Contacto',
             tradingInquiries: 'Consultas de Trading',
-            tradingDesc: 'Para todas las preguntas relacionadas con trading y corretaje, servicios de control de calidad y nuevas oportunidades de negocio.',
+            tradingDesc: 'Para todas las consultas relacionadas con comercio y corretaje, servicios de control de calidad y nuevas oportunidades de negocio.',
             logisticsSupport: 'Soporte Logístico',
             logisticsDesc: 'Para coordinación de envíos, solicitudes de muestras, reserva de buques y asistencia logística.',
-            headquarters: 'Sede',
+            headquarters: 'Sede Central',
+            rasmusDescription: 'Lidera grandes negociaciones y estructura las operaciones de la oficina. Guiando el crecimiento de la empresa en el comercio moderno de café.',
+            christianDescription: 'Fundó W&A en 1990, proporciona orientación estratégica.',
+            danielDescription: 'COO supervisando operaciones y comercio. Administrador del Cluster Nespresso.',
+            svennDescription: 'Supervisa laboratorios de Guatemala y Colombia, apoya marketing en toda América Latina.',
             
             // Common
             tel: 'Tel',
@@ -745,36 +760,306 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    // --- Search Functionality (Basic) ---
+    // --- Global Cross-Site Search Functionality ---
+    const createGlobalSearch = () => {
+        // Define all searchable pages with their content structure
+        const sitePages = [
+            {
+                url: 'index.html',
+                title: 'Home - Wolthers & Associates',
+                sections: [
+                    { type: 'hero', selector: '#home h1, #home p' },
+                    { type: 'about', selector: '#about h2, #about p' },
+                    { type: 'services', selector: '#services h2, #services h3, #services p' },
+                    { type: 'quality', selector: '#quality-control h2, #quality-control h3, #quality-control p, #quality-control td' },
+                    { type: 'locations', selector: '#locations h2, #locations h3, #locations p, #locations address' },
+                    { type: 'contact', selector: '#contact h2, #contact h3, #contact p' }
+                ]
+            },
+            {
+                url: 'team.html',
+                title: 'Our Team - Wolthers & Associates',
+                sections: [
+                    { type: 'team', selector: '.hero h1, .hero p' },
+                    { type: 'leadership', selector: '#leadership h2, #leadership .team-name, #leadership .team-position, #leadership .team-description' },
+                    { type: 'brazil', selector: '#brazil-santos h2, #brazil-santos .team-name, #brazil-santos .team-position, #brazil-santos .team-description' },
+                    { type: 'aaa-team', selector: '#brazil-aaa h2, #brazil-aaa .team-name, #brazil-aaa .team-position, #brazil-aaa .team-description' },
+                    { type: 'colombia', selector: '#buenaventura-colombia h2, #buenaventura-colombia .team-name, #buenaventura-colombia .team-position, #buenaventura-colombia .team-description' },
+                    { type: 'guatemala', selector: '#guatemala-city h2, #guatemala-city .team-name, #guatemala-city .team-position, #guatemala-city .team-description' }
+                ]
+            },
+            {
+                url: 'journal.html',
+                title: 'Coffee Journal - Wolthers & Associates',
+                sections: [
+                    { type: 'journal', selector: 'h1, h2, h3, p, .article-title, .article-content' }
+                ]
+            },
+            {
+                url: 'trips/index.html',
+                title: 'Coffee Origin Trips - Wolthers & Associates',
+                sections: [
+                    { type: 'trips', selector: 'h1, h2, h3, p, .trip-card h3, .trip-card p' }
+                ]
+            },
+            {
+                url: 'trips/accounts.html',
+                title: 'Accounts - Coffee Origin Trips',
+                sections: [
+                    { type: 'accounts', selector: 'h1, h2, h3, p' }
+                ]
+            },
+            {
+                url: 'trips/trip-pages/brazil-coffee-origins-tour.html',
+                title: 'Brazil Coffee Origins Tour',
+                sections: [
+                    { type: 'trip-details', selector: 'h1, h2, h3, p, .itinerary-item h4, .itinerary-item p' }
+                ]
+            }
+        ];
+
+        // Create search index from current page
+        const createSearchIndex = () => {
+            const searchIndex = [];
+            const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+            
+            sitePages.forEach(page => {
+                const isCurrentPage = page.url.endsWith(currentPage) || 
+                    (currentPage === '' && page.url === 'index.html') ||
+                    (window.location.pathname.includes('trips/') && page.url.includes('trips/'));
+                
+                if (isCurrentPage) {
+                    // Index current page content
+                    page.sections.forEach(section => {
+                        const elements = document.querySelectorAll(section.selector);
+                        elements.forEach(element => {
+                            const text = element.textContent.trim();
+                            if (text) {
+                                searchIndex.push({
+                                    url: page.url,
+                                    pageTitle: page.title,
+                                    sectionType: section.type,
+                                    content: text,
+                                    element: element,
+                                    isCurrentPage: true
+                                });
+                            }
+                        });
+                    });
+                } else {
+                    // For other pages, we'll need to fetch content or provide static content
+                    // For now, add basic page info that can be searched
+                    searchIndex.push({
+                        url: page.url,
+                        pageTitle: page.title,
+                        sectionType: 'page',
+                        content: page.title,
+                        element: null,
+                        isCurrentPage: false
+                    });
+                }
+            });
+            
+            return searchIndex;
+        };
+
+        // Enhanced search index with static content for cross-page search
+        const staticSearchContent = {
+            'index.html': [
+                { type: 'hero', content: 'Coffee Trading Excellence Since 1949 Wolthers Associates' },
+                { type: 'about', content: 'John Wolthers Christian Wolthers Rasmus Wolthers heritage coffee trading Brazil Santos' },
+                { type: 'services', content: 'FOB Brokerage Quality Control Sustainable Trading Global Connections Internal Market Origin Services' },
+                { type: 'locations', content: 'Santos Brazil Buenaventura Colombia Guatemala City Central America' },
+                { type: 'quality', content: 'PSS SS Quality Control Laboratory Q Graders testing analysis' }
+            ],
+            'team.html': [
+                { type: 'leadership', content: 'Rasmus Wolthers CEO Christian Wolthers Chairman Daniel Wolthers COO leadership team' },
+                { type: 'brazil', content: 'Svenn Wolthers Tom Sullivan Edgar Gomes Anderson Nunes Boeri Ferrari Santos Brazil team' },
+                { type: 'aaa-team', content: 'Rhafael Gonçalves Caio Diniz Yara Melo Luciano Corsi Gabriel Oliveira Nespresso AAA sustainable' },
+                { type: 'colombia', content: 'Hector Posada Sandra Bonilla Arishay Pulgarin Ana Molina Diana Saavedra Colombia Buenaventura' },
+                { type: 'guatemala', content: 'Edgar Guillen Wilson Larias Hector Subuyuj Guatemala Central America quality control' }
+            ],
+            'journal.html': [
+                { type: 'journal', content: 'coffee journal articles blog news updates specialty coffee industry insights' }
+            ],
+            'trips/index.html': [
+                { type: 'trips', content: 'coffee origin trips Brazil Colombia Guatemala travel experiences farm visits' }
+            ],
+            'trips/accounts.html': [
+                { type: 'accounts', content: 'accounts login partner access trip bookings travel arrangements' }
+            ],
+            'trips/trip-pages/brazil-coffee-origins-tour.html': [
+                { type: 'trip-details', content: 'Brazil coffee origins tour farm visits Santos Sao Paulo coffee production experience' }
+            ]
+        };
+
+        const performGlobalSearch = (query) => {
+            if (!query || query.length < 2) return [];
+            
+            const searchIndex = createSearchIndex();
+            const results = [];
+            const queryLower = query.toLowerCase();
+            
+            // Search current page content (detailed)
+            searchIndex.forEach(item => {
+                if (item.content.toLowerCase().includes(queryLower)) {
+                    results.push({
+                        ...item,
+                        relevance: item.isCurrentPage ? 100 : 50,
+                        matchType: 'exact'
+                    });
+                }
+            });
+
+            // Search static content for other pages
+            Object.entries(staticSearchContent).forEach(([pageUrl, sections]) => {
+                const page = sitePages.find(p => p.url === pageUrl);
+                if (!page) return;
+                
+                const isCurrentPage = window.location.pathname.includes(pageUrl.replace('.html', '')) || 
+                    (pageUrl === 'index.html' && (window.location.pathname === '/' || window.location.pathname.endsWith('index.html')));
+                
+                if (!isCurrentPage) {
+                    sections.forEach(section => {
+                        if (section.content.toLowerCase().includes(queryLower)) {
+                            results.push({
+                                url: pageUrl,
+                                pageTitle: page.title,
+                                sectionType: section.type,
+                                content: section.content,
+                                element: null,
+                                isCurrentPage: false,
+                                relevance: 25,
+                                matchType: 'static'
+                            });
+                        }
+                    });
+                }
+            });
+
+            // Sort by relevance
+            return results.sort((a, b) => b.relevance - a.relevance);
+        };
+
+        const displaySearchResults = (results, query) => {
+            // Remove existing search results
+            document.querySelectorAll('.search-results-overlay').forEach(el => el.remove());
+            
+            if (results.length === 0) {
+                showSearchMessage(`No results found for "${query}"`);
+                return;
+            }
+
+            // Create results overlay
+            const overlay = document.createElement('div');
+            overlay.className = 'search-results-overlay';
+            overlay.innerHTML = `
+                <div class="search-results-container">
+                    <div class="search-results-header">
+                        <h3>Search Results for "${query}" (${results.length} found)</h3>
+                        <button class="close-search-results">&times;</button>
+                    </div>
+                    <div class="search-results-list">
+                        ${results.slice(0, 10).map(result => `
+                            <div class="search-result-item ${result.isCurrentPage ? 'current-page' : 'other-page'}">
+                                <div class="result-page-title">${result.pageTitle}</div>
+                                <div class="result-content">${highlightQuery(result.content, query)}</div>
+                                <div class="result-actions">
+                                    ${result.isCurrentPage ? 
+                                        `<button class="scroll-to-result" data-section="${result.sectionType}">View on this page</button>` :
+                                        `<a href="${result.url}" class="visit-page">Visit page</a>`
+                                    }
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(overlay);
+
+            // Add event listeners
+            overlay.querySelector('.close-search-results').addEventListener('click', () => {
+                overlay.remove();
+                clearSearchHighlights();
+            });
+
+            // Handle scroll to result for current page
+            overlay.querySelectorAll('.scroll-to-result').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const sectionType = e.target.dataset.section;
+                    const result = results.find(r => r.sectionType === sectionType && r.isCurrentPage);
+                    if (result && result.element) {
+                        clearSearchHighlights();
+                        result.element.classList.add('search-highlight');
+                        result.element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        overlay.remove();
+                    }
+                });
+            });
+
+            // Close overlay when clicking outside
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) {
+                    overlay.remove();
+                    clearSearchHighlights();
+                }
+            });
+        };
+
+        const highlightQuery = (text, query) => {
+            const regex = new RegExp(`(${query})`, 'gi');
+            return text.replace(regex, '<mark>$1</mark>');
+        };
+
+        const clearSearchHighlights = () => {
+            document.querySelectorAll('.search-highlight').forEach(el => {
+                el.classList.remove('search-highlight');
+            });
+        };
+
+        const showSearchMessage = (message) => {
+            // Create temporary message overlay
+            const messageEl = document.createElement('div');
+            messageEl.className = 'search-message';
+            messageEl.textContent = message;
+            messageEl.style.cssText = `
+                position: fixed;
+                top: 100px;
+                right: 20px;
+                background: #2c5530;
+                color: white;
+                padding: 10px 20px;
+                border-radius: 5px;
+                z-index: 10000;
+                animation: slideIn 0.3s ease;
+            `;
+            
+            document.body.appendChild(messageEl);
+            
+            setTimeout(() => {
+                messageEl.remove();
+            }, 3000);
+        };
+
+        return { performGlobalSearch, displaySearchResults, clearSearchHighlights };
+    };
+
+    // Initialize global search
+    const globalSearch = createGlobalSearch();
+
     const setupSearch = (searchInput, searchBtn) => {
         if (!searchInput || !searchBtn) return;
         
         const performSearch = () => {
-            const query = searchInput.value.trim().toLowerCase();
-            if (!query) return;
-            
-            // Simple search implementation - highlights matching text
-            const searchableElements = document.querySelectorAll('p, h1, h2, h3, h4, h5, h6, li, td');
-            let hasResults = false;
-            
-            // Remove previous highlights
-            document.querySelectorAll('.search-highlight').forEach(el => {
-                el.classList.remove('search-highlight');
-            });
-            
-            searchableElements.forEach(element => {
-                if (element.textContent.toLowerCase().includes(query)) {
-                    element.classList.add('search-highlight');
-                    if (!hasResults) {
-                        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        hasResults = true;
-                    }
-                }
-            });
-            
-            if (!hasResults) {
-                alert(`No results found for "${query}"`);
+            const query = searchInput.value.trim();
+            if (!query || query.length < 2) {
+                globalSearch.clearSearchHighlights();
+                return;
             }
+            
+            const results = globalSearch.performGlobalSearch(query);
+            globalSearch.displaySearchResults(results, query);
         };
         
         searchBtn.addEventListener('click', performSearch);
@@ -783,74 +1068,204 @@ document.addEventListener('DOMContentLoaded', () => {
                 performSearch();
             }
         });
+
+        // Add real-time search with debounce
+        let searchTimeout;
+        searchInput.addEventListener('input', () => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                const query = searchInput.value.trim();
+                if (query.length >= 3) {
+                    const results = globalSearch.performGlobalSearch(query);
+                    if (results.length > 0) {
+                        // Show subtle indicator that results are available
+                        searchInput.style.borderColor = '#d4af37';
+                    } else {
+                        searchInput.style.borderColor = '';
+                    }
+                } else {
+                    searchInput.style.borderColor = '';
+                    globalSearch.clearSearchHighlights();
+                }
+            }, 300);
+        });
     };
-    
+
     // Setup search for both header and footer
     setupSearch(
         document.querySelector('.search-input'),
         document.querySelector('.search-btn')
     );
-    
+
     setupSearch(
         document.querySelector('.footer-search-input'),
         document.querySelector('.footer-search-btn')
     );
-    
-    // Add CSS for search highlighting
+
+    // Add CSS for search functionality
     const searchStyle = document.createElement('style');
     searchStyle.textContent = `
         .search-highlight {
-            background-color: rgba(212, 175, 55, 0.3);
+            background-color: rgba(212, 175, 55, 0.3) !important;
             padding: 2px 4px;
             border-radius: 3px;
             transition: background-color 0.3s ease;
         }
+
+        .search-results-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 10000;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding-top: 100px;
+            overflow-y: auto;
+        }
+
+        .search-results-container {
+            background: white;
+            border-radius: 10px;
+            max-width: 800px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .search-results-header {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #2c5530;
+            color: white;
+            border-radius: 10px 10px 0 0;
+        }
+
+        .search-results-header h3 {
+            margin: 0;
+            font-size: 1.2rem;
+        }
+
+        .close-search-results {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .close-search-results:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .search-results-list {
+            padding: 0;
+        }
+
+        .search-result-item {
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            transition: background-color 0.2s ease;
+        }
+
+        .search-result-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .search-result-item.current-page {
+            border-left: 4px solid #d4af37;
+        }
+
+        .search-result-item.other-page {
+            border-left: 4px solid #2c5530;
+        }
+
+        .result-page-title {
+            font-weight: bold;
+            color: #2c5530;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+
+        .result-content {
+            color: #333;
+            line-height: 1.4;
+            margin-bottom: 10px;
+        }
+
+        .result-content mark {
+            background-color: rgba(212, 175, 55, 0.4);
+            padding: 1px 2px;
+            border-radius: 2px;
+        }
+
+        .result-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .scroll-to-result,
+        .visit-page {
+            background: #2c5530;
+            color: white;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .scroll-to-result:hover,
+        .visit-page:hover {
+            background: #1a3d1e;
+        }
+
+        .visit-page {
+            display: inline-block;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+
+        @media (max-width: 768px) {
+            .search-results-overlay {
+                padding-top: 80px;
+            }
+            
+            .search-results-container {
+                width: 95%;
+                max-height: 85vh;
+            }
+            
+            .search-results-header {
+                padding: 15px;
+            }
+            
+            .search-result-item {
+                padding: 12px 15px;
+            }
+        }
     `;
     document.head.appendChild(searchStyle);
-    
-    // --- Performance Optimizations ---
-    
-    // Debounce function for resize events
-    function debounce(func, wait) {
-        let timeout;
-        return function executedFunction(...args) {
-            const later = () => {
-                clearTimeout(timeout);
-                func(...args);
-            };
-            clearTimeout(timeout);
-            timeout = setTimeout(later, wait);
-        };
-    }
-    
-    // Optimized resize handler
-    const debouncedResizeHandler = debounce(() => {
-        topHeaderHeight = topHeader.offsetHeight;
-        mainHeaderHeight = mainHeader.offsetHeight;
-        adjustMainContentMargin();
-    }, 100);
-    
-    window.addEventListener('resize', debouncedResizeHandler);
-    
-    // Preload critical images on interaction
-    const preloadImages = () => {
-        const criticalImages = [
-            'images/hero-coffee-bg.png',
-            'images/John_Coffee.jpg',
-            'images/Latam-with-ocean.png'
-        ];
-        
-        criticalImages.forEach(src => {
-            const img = new Image();
-            img.src = src;
-        });
-    };
-    
-    // Preload on first user interaction
-    ['click', 'scroll', 'keydown'].forEach(event => {
-        document.addEventListener(event, preloadImages, { once: true });
-    });
-    
+
     console.log('Wolthers & Associates website initialized successfully');
 });
 

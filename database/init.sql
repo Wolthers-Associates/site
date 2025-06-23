@@ -7,9 +7,7 @@ SET AUTOCOMMIT = 0;
 START TRANSACTION;
 SET time_zone = "+00:00";
 
--- Create database if not exists
-CREATE DATABASE IF NOT EXISTS `wolthers_trips` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE `wolthers_trips`;
+
 
 -- --------------------------------------------------------
 -- Table structure for users (employees and admins)
