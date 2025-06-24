@@ -959,7 +959,7 @@ const ui = {
                 <div class="trip-description">${trip.description}</div>
                 
                 <div class="trip-meta">
-                    ${trip.guests ? `<div class="trip-guests">👤 ${trip.guests}</div>` : ''}
+                    ${trip.guests ? `<div class="trip-guests"><img src="images/user.svg" alt="User" style="height:18px;vertical-align:middle;margin-right:6px;"> ${trip.guests}</div>` : ''}
                     ${trip.cars ? `
                         <div class="trip-cars">
                             <img src="images/disco-icon.png" alt="Vehicle" class="disco-icon-card">
@@ -1109,7 +1109,7 @@ const ui = {
             <div class="trip-preview-info">
                 ${trip.guests ? `
                 <div class="preview-info-item">
-                    <span class="preview-info-icon">👤</span>
+                    <img src="images/user.svg" alt="User" style="height:18px;vertical-align:middle;margin-right:6px;">
                     <span>${trip.guests}</span>
                 </div>
                 ` : ''}
@@ -1220,14 +1220,14 @@ const ui = {
                 <div class="trip-info-bar">
                     ${trip.guests ? `
                     <div class="trip-info-item">
-                        <span class="trip-info-icon">👥</span>
+                        <img src="images/user.svg" alt="User" style="height:18px;vertical-align:middle;margin-right:6px;">
                         <span>${trip.guests}</span>
                     </div>
                     ` : ''}
                     
                     ${trip.cars ? `
                     <div class="trip-info-item">
-                        <span class="trip-info-icon">🚗</span>
+                        <img src="images/disco-icon.png" alt="Car" style="height:18px;vertical-align:middle;margin-right:6px;">
                         <span>${trip.cars}</span>
                     </div>
                     ` : ''}

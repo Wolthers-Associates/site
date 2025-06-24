@@ -2164,28 +2164,30 @@ body {
     }
     .trip-preview-highlights {
         background: #2d3136;
-        color: #fff;
+        color: #D4AF37;
         border: none;
         box-shadow: none;
     }
-    .preview-day-number {
-        background: #D4AF37 !important;
-        color: #fff !important;
+    .trip-preview-title {
+        color: #D4AF37;
     }
-    .trip-preview-body {
-        background: #23272b;
+    .trip-preview-info, .preview-info-item {
+        background: transparent;
         border: none;
         box-shadow: none;
+        color: #D4AF37;
     }
     .daily-itinerary .day-item {
         background: #2d3136;
         border: none;
-        box-shadow: none;
+        border-radius: 0;
+        color: #D4AF37;
     }
     .day-title, .day-date {
-        color: #fff;
+        color: #D4AF37;
     }
     .day-summary-text, .activity-description {
-        color: #b0b8c1;
+        color: #fff;
+        opacity: 0.85;
     }
 } 
