@@ -2248,6 +2248,9 @@ body {
 }
 
 @media (prefers-color-scheme: dark) {
+    .header {
+        color: #E3D6C0;
+    }
     .trip-preview-header {
         background: #23272b;
         color: #e6edf3;
