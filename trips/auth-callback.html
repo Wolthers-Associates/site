@@ -137,15 +137,23 @@
                     showSuccess(`Welcome ${result.user.name}!`);
                     
                     // Store session info for the main app
-                    sessionStorage.setItem('wolthers_auth', JSON.stringify({
+                    const authData = {
                         user: result.user,
                         auth_type: result.auth_type,
                         session_id: result.session_id,
                         timestamp: Date.now()
-                    }));
+                    };
+                    
+                    console.log('💾 Storing auth data:', authData);
+                    sessionStorage.setItem('wolthers_auth', JSON.stringify(authData));
+                    
+                    // Verify it was stored
+                    const stored = sessionStorage.getItem('wolthers_auth');
+                    console.log('✅ Verified stored data:', stored ? 'Success' : 'Failed');
                     
                     // Close popup - the parent window will handle redirect
                     setTimeout(() => {
+                        console.log('🚪 Closing popup window');
                         window.close();
                     }, 1500);
                 } else {
@@ -160,7 +168,7 @@
         function showSuccess(message) {
             const status = document.getElementById('status');
             status.className = 'status success';
-            status.innerHTML = `<strong>✓ Success!</strong><br>${message}<br><small>Redirecting to trips...</small>`;
+            status.innerHTML = `<strong>✓ Success!</strong><br>${message}<br><small>Closing popup...</small>`;
         }
         
         function showError(message) {

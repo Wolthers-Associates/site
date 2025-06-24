@@ -85,13 +85,26 @@ class MicrosoftAuth {
                 if (popup.closed) {
                     clearInterval(checkClosed);
                     
-                    // Check for stored auth result
-                    const authResult = sessionStorage.getItem('wolthers_auth');
-                    if (authResult) {
-                        resolve(JSON.parse(authResult));
-                    } else {
-                        reject(new Error('Authentication was cancelled or failed'));
-                    }
+                    // Give a small delay to ensure session data is stored
+                    setTimeout(() => {
+                        // Check for stored auth result
+                        const authResult = sessionStorage.getItem('wolthers_auth');
+                        console.log('🔍 Popup closed, checking for auth result:', authResult ? 'Found' : 'Not found');
+                        
+                        if (authResult) {
+                            try {
+                                const parsed = JSON.parse(authResult);
+                                console.log('✅ Auth result parsed successfully:', parsed);
+                                resolve(parsed);
+                            } catch (error) {
+                                console.error('❌ Failed to parse auth result:', error);
+                                reject(new Error('Failed to parse authentication result'));
+                            }
+                        } else {
+                            console.warn('⚠️ No auth result found in sessionStorage');
+                            reject(new Error('Authentication was cancelled or failed'));
+                        }
+                    }, 100); // Small delay to ensure session storage is updated
                 }
             }, 1000);
 
