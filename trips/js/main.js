@@ -15,6 +15,100 @@ const MOCK_CREDENTIALS = {
     codes: []
 };
 
+// User Database - Integrated from accounts.js
+let USER_DATABASE = [];
+
+// Initialize user database
+function initializeUserDatabase() {
+    const savedUsers = localStorage.getItem('wolthers_users_database');
+    if (savedUsers) {
+        try {
+            USER_DATABASE = JSON.parse(savedUsers);
+            console.log(`Loaded ${USER_DATABASE.length} users from database`);
+        } catch (e) {
+            console.error('Error loading user database:', e);
+            USER_DATABASE = getDefaultWolthersTeam();
+            saveUserDatabase();
+        }
+    } else {
+        USER_DATABASE = getDefaultWolthersTeam();
+        saveUserDatabase();
+        console.log('Initialized user database with Wolthers team');
+    }
+    
+    // Make globally accessible for compatibility
+    window.USER_DATABASE = USER_DATABASE;
+    window.MOCK_USERS = USER_DATABASE;
+}
+
+// Core Wolthers team members - foundation users
+function getDefaultWolthersTeam() {
+    return [
+        {
+            id: "daniel-wolthers",
+            name: "Daniel Wolthers",
+            email: "daniel@wolthers.com",
+            role: "admin",
+            avatar: "DW",
+            memberSince: "2024-01-01",
+            tripPermissions: [],
+            isCreator: true,
+            lastActive: new Date().toISOString(),
+            isWolthersTeam: true
+        },
+        {
+            id: "svenn-wolthers",
+            name: "Svenn Wolthers",
+            email: "svenn@wolthers.com",
+            role: "admin",
+            avatar: "SW",
+            memberSince: "2024-01-01",
+            tripPermissions: [],
+            isCreator: true,
+            lastActive: new Date().toISOString(),
+            isWolthersTeam: true
+        },
+        {
+            id: "tom-wolthers",
+            name: "Tom Wolthers",
+            email: "tom@wolthers.com",
+            role: "admin",
+            avatar: "TW",
+            memberSince: "2024-01-01",
+            tripPermissions: [],
+            isCreator: true,
+            lastActive: new Date().toISOString(),
+            isWolthersTeam: true
+        },
+        {
+            id: "rasmus-wolthers",
+            name: "Rasmus Wolthers",
+            email: "rasmus@wolthers.com",
+            role: "admin",
+            avatar: "RW",
+            memberSince: "2024-01-01",
+            tripPermissions: [],
+            isCreator: true,
+            lastActive: new Date().toISOString(),
+            isWolthersTeam: true
+        }
+    ];
+}
+
+// Save user database to localStorage
+function saveUserDatabase() {
+    try {
+        localStorage.setItem('wolthers_users_database', JSON.stringify(USER_DATABASE));
+        localStorage.setItem('wolthers_users_last_updated', new Date().toISOString());
+        
+        // Update global references
+        window.USER_DATABASE = USER_DATABASE;
+        window.MOCK_USERS = USER_DATABASE;
+    } catch (e) {
+        console.error('Error saving user database:', e);
+    }
+}
+
 // Global Application State
 let currentUser = null;
 let currentTrips = [];
@@ -1372,6 +1466,9 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('📧 Email + One-time Code: Functional with backend');
             console.log('👤 Regular Login: Wolthers team emails (daniel@wolthers.com, svenn@wolthers.com, tom@wolthers.com, rasmus@wolthers.com) / any password');
     console.log('🔑 Trip Codes: BRAZIL2025, COLOMBIA2025, ETHIOPIA2025');
+    
+    // Initialize user database first (required for user management)
+    initializeUserDatabase();
     
     // Initialize enhanced authentication system
     auth.init().catch(error => {
