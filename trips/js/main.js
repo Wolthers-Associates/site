@@ -1599,40 +1599,77 @@ function loadModalUsersList() {
     const usersList = document.getElementById('modalUsersList');
     if (!usersList) return;
     
-    // Get users from the global MOCK_USERS array (shared between files)
+    // Get users from the global USER_DATABASE array
     const users = getUsersFromDatabase();
     
-    usersList.innerHTML = users.map(user => `
-        <div class="user-item modern-user-card">
-            <div class="user-info">
-                <div class="user-avatar modern-avatar" style="background: ${getUserAvatarColor(user.role)}">
-                    ${user.avatar || user.name?.charAt(0) || '?'}
-                </div>
-                <div class="user-details">
-                    <div class="user-name">${user.name}</div>
-                    <div class="user-email">${user.email}</div>
-                    <div class="user-role">
-                        <span class="role-badge modern-badge ${user.role}">${user.role === 'admin' ? 'Administrator' : 'User'}</span>
-                        <span class="user-meta">Member since ${formatMemberSince(user.memberSince)}</span>
-                    </div>
-                </div>
-            </div>
-            <div class="user-actions modern-actions">
-                <button class="btn-icon" onclick="editUser('${user.id}')" title="Edit user">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
-                    </svg>
-                </button>
-                ${user.id !== currentUser?.id ? `
-                    <button class="btn-icon btn-danger" onclick="deleteUser('${user.id}')" title="Delete user">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
-                        </svg>
-                    </button>
-                ` : ''}
-            </div>
+    // Create table structure
+    const tableHTML = `
+        <div class="users-table-container">
+            <table class="users-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Company</th>
+                        <th>User Type</th>
+                        <th>Member Since</th>
+                        <th># of Trips</th>
+                        <th>Last Trip Date</th>
+                        <th>Last Trip</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${users.map((user, index) => {
+                        const userTrips = getUserTripsData(user);
+                        const lastTrip = userTrips.lastTrip;
+                        const isEven = index % 2 === 1; // Using 1 for even-numbered rows (0-based index)
+                        
+                        return `
+                            <tr class="user-row ${isEven ? 'even-row' : 'odd-row'}">
+                                <td class="user-name-cell">
+                                    <div class="user-name-container">
+                                        <div class="user-avatar table-avatar" style="background: ${getUserAvatarColor(user.role)}">
+                                            ${user.avatar || user.name?.charAt(0) || '?'}
+                                        </div>
+                                        <span class="user-name">${user.name}</span>
+                                    </div>
+                                </td>
+                                <td class="user-email">${user.email}</td>
+                                <td class="user-company">${getUserCompany(user)}</td>
+                                <td class="user-type">
+                                    <span class="role-badge table-badge ${user.role}">${user.role === 'admin' ? 'Administrator' : 'User'}</span>
+                                    ${user.isWolthersTeam ? '<span class="team-badge table-team-badge">Team</span>' : ''}
+                                </td>
+                                <td class="member-since">${formatTableDate(user.memberSince)}</td>
+                                <td class="trip-count">${userTrips.count}</td>
+                                <td class="last-trip-date">${lastTrip ? formatTableDate(lastTrip.date) : '-'}</td>
+                                <td class="last-trip-link">
+                                    ${lastTrip ? `<a href="#" onclick="openTrip('${lastTrip.id}')" class="trip-link">${lastTrip.title}</a>` : '-'}
+                                </td>
+                                <td class="user-actions table-actions">
+                                    <button class="btn-icon table-btn" onclick="editUser('${user.id}')" title="Edit user">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                                        </svg>
+                                    </button>
+                                    ${!user.isWolthersTeam ? `
+                                        <button class="btn-icon table-btn btn-danger" onclick="deleteUser('${user.id}')" title="Delete user">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                                <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                                            </svg>
+                                        </button>
+                                    ` : ''}
+                                </td>
+                            </tr>
+                        `;
+                    }).join('')}
+                </tbody>
+            </table>
         </div>
-    `).join('');
+    `;
+    
+    usersList.innerHTML = tableHTML;
 }
 
 function loadModalTripAdminList() {
@@ -1767,5 +1804,78 @@ function formatMemberSince(dateString) {
         return `${months} month${months === 1 ? '' : 's'} ago`;
     } else {
         return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
+    }
+}
+
+function formatTableDate(dateString) {
+    if (!dateString) return '-';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'short', 
+        day: 'numeric' 
+    });
+}
+
+function getUserCompany(user) {
+    if (user.isWolthersTeam) {
+        return 'Wolthers & Associates';
+    }
+    
+    // Extract company from email domain
+    const emailDomain = user.email.split('@')[1];
+    if (emailDomain) {
+        // Common company domain mappings
+        const domainToCompany = {
+            'gmail.com': 'Personal',
+            'yahoo.com': 'Personal',
+            'hotmail.com': 'Personal',
+            'outlook.com': 'Personal',
+            'wolthers.com': 'Wolthers & Associates'
+        };
+        
+        if (domainToCompany[emailDomain]) {
+            return domainToCompany[emailDomain];
+        }
+        
+        // Convert domain to company name (e.g., company.com -> Company)
+        return emailDomain.split('.')[0].charAt(0).toUpperCase() + emailDomain.split('.')[0].slice(1);
+    }
+    
+    return 'Unknown';
+}
+
+function getUserTripsData(user) {
+    // Get trips where user has permissions or is creator
+    const userTrips = MOCK_TRIPS.filter(trip => 
+        user.tripPermissions.includes(trip.id) || 
+        trip.createdBy === user.email ||
+        trip.createdBy === user.name
+    );
+    
+    // Find most recent trip
+    let lastTrip = null;
+    if (userTrips.length > 0) {
+        lastTrip = userTrips.reduce((latest, current) => {
+            const currentDate = new Date(current.date);
+            const latestDate = new Date(latest.date);
+            return currentDate > latestDate ? current : latest;
+        });
+    }
+    
+    return {
+        count: userTrips.length,
+        lastTrip: lastTrip
+    };
+}
+
+function openTrip(tripId) {
+    // Find and open the trip
+    const trip = MOCK_TRIPS.find(t => t.id === tripId);
+    if (trip) {
+        // Close user management modal
+        hideUserManagementModal();
+        // Open trip preview
+        showTripPreview(trip);
     }
 } 

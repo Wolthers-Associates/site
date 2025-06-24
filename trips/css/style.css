@@ -2660,6 +2660,182 @@ body {
     border: 1px solid rgba(34, 197, 94, 0.2);
 }
 
+/* Users Table Styles */
+.users-table-container {
+    overflow-x: auto;
+    border-radius: 12px;
+    border: 1px solid #e1e5e9;
+    background: #ffffff;
+}
+
+.users-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.users-table thead {
+    background: #f8f9fa;
+    border-bottom: 2px solid #e1e5e9;
+}
+
+.users-table th {
+    padding: 12px 16px;
+    text-align: left;
+    font-weight: 600;
+    color: #374151;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid #e1e5e9;
+}
+
+.users-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid #f3f4f6;
+    vertical-align: middle;
+}
+
+.user-row.even-row {
+    background: #f9fafb;
+}
+
+.user-row.odd-row {
+    background: #ffffff;
+}
+
+.user-row:hover {
+    background: #f0f9ff !important;
+}
+
+.user-name-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.table-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    flex-shrink: 0;
+}
+
+.user-name {
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.user-email {
+    color: #6b7280;
+    font-size: 0.85rem;
+}
+
+.user-company {
+    color: #374151;
+    font-weight: 500;
+}
+
+.user-type {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.table-badge {
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.table-badge.admin {
+    background: rgba(218, 165, 32, 0.1);
+    color: #DAA520;
+    border: 1px solid rgba(218, 165, 32, 0.2);
+}
+
+.table-badge.user {
+    background: rgba(108, 117, 125, 0.1);
+    color: #6c757d;
+    border: 1px solid rgba(108, 117, 125, 0.2);
+}
+
+.table-team-badge {
+    padding: 2px 6px;
+    border-radius: 8px;
+    font-size: 0.65rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: rgba(34, 197, 94, 0.1);
+    color: #16a34a;
+    border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.member-since, .last-trip-date {
+    color: #6b7280;
+    font-size: 0.85rem;
+}
+
+.trip-count {
+    font-weight: 600;
+    color: #374151;
+    text-align: center;
+}
+
+.trip-link {
+    color: #DAA520;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.85rem;
+}
+
+.trip-link:hover {
+    text-decoration: underline;
+    color: #B8860B;
+}
+
+.table-actions {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+}
+
+.table-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    background: #f3f4f6;
+    color: #6b7280;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.table-btn:hover {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+.table-btn.btn-danger:hover {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
 @media (prefers-color-scheme: dark) {
     .header {
         background: linear-gradient(135deg, #181C1F 0%, #23272B 100%);
@@ -2927,6 +3103,87 @@ body {
             background: rgba(34, 197, 94, 0.15);
             color: #4ade80;
             border-color: rgba(34, 197, 94, 0.3);
+        }
+        
+        /* Users Table Dark Mode */
+        .users-table-container {
+            background: #23272b;
+            border-color: #2d3136;
+        }
+        
+        .users-table thead {
+            background: #2d3136;
+            border-bottom-color: #373e47;
+        }
+        
+        .users-table th {
+            color: #DAA520;
+            border-bottom-color: #373e47;
+        }
+        
+        .users-table td {
+            border-bottom-color: #2d3136;
+        }
+        
+        .user-row.even-row {
+            background: #2a2e33;
+        }
+        
+        .user-row.odd-row {
+            background: #23272b;
+        }
+        
+        .user-row:hover {
+            background: #2d3136 !important;
+        }
+        
+        .user-name {
+            color: #ffffff;
+        }
+        
+        .user-email {
+            color: #b0b8c1;
+        }
+        
+        .user-company {
+            color: #e6edf3;
+        }
+        
+        .member-since, .last-trip-date {
+            color: #b0b8c1;
+        }
+        
+        .trip-count {
+            color: #ffffff;
+        }
+        
+        .trip-link {
+            color: #DAA520;
+        }
+        
+        .trip-link:hover {
+            color: #B8860B;
+        }
+        
+        .table-team-badge {
+            background: rgba(34, 197, 94, 0.15);
+            color: #4ade80;
+            border-color: rgba(34, 197, 94, 0.3);
+        }
+        
+        .table-btn {
+            background: #2d3136;
+            color: #b0b8c1;
+        }
+        
+        .table-btn:hover {
+            background: #373e47;
+            color: #ffffff;
+        }
+        
+        .table-btn.btn-danger:hover {
+            background: rgba(248, 81, 73, 0.15);
+            color: #f85149;
         }
     }
 } 
