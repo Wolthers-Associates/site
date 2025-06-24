@@ -1,166 +1,21 @@
-// Configuration (compatible with existing system)
+// Development Configuration
 const CONFIG = {
-    API_BASE_URL: '', // Empty for now, will be set when real API is ready
-    VERSION: '1.0.0'
+    DEVELOPMENT_MODE: true,
+    TEMP_DOMAIN: 'khaki-raccoon-228009.hostingersite.com',
+    FUTURE_DOMAIN: 'wolthers.com',
+    VERSION: '1.0.0-dev'
 };
 
-// Enhanced User Management API (compatible with existing system)
-const UserAPI = {
-    // Cache for user data
-    cache: new Map(),
-    cacheTimestamp: null,
-    cacheDuration: 5 * 60 * 1000, // 5 minutes
-    
-    // Generic API call with error handling
-    async apiCall(endpoint, options = {}) {
-        // Fallback to existing user data if API not available
-        if (endpoint === '/users' && !this.isApiAvailable()) {
-            return this.getFallbackUsers();
-        }
-        
-        const url = `${CONFIG.API_BASE_URL}${endpoint}`;
-        
-        try {
-            const response = await fetch(url, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${this.getAuthToken()}`,
-                    ...options.headers
-                },
-                ...options
-            });
-            
-            if (!response.ok) {
-                throw new Error(`API Error: ${response.status} ${response.statusText}`);
-            }
-            
-            return await response.json();
-        } catch (error) {
-            // Fallback to existing system if API fails
-            if (endpoint === '/users') {
-                return this.getFallbackUsers();
-            }
-            throw new Error(`Failed to ${options.method || 'GET'} ${endpoint}: ${error.message}`);
-        }
-    },
-    
-    // Check if API is available
-    isApiAvailable() {
-        // Simple check - you can make this more sophisticated
-        return CONFIG.API_BASE_URL && CONFIG.API_BASE_URL !== '/api';
-    },
-    
-    // Fallback to existing user system
-    getFallbackUsers() {
-        if (typeof window.USER_DATABASE !== 'undefined' && window.USER_DATABASE.length > 0) {
-            return window.USER_DATABASE;
-        }
-        if (typeof window.MOCK_USERS !== 'undefined' && window.MOCK_USERS.length > 0) {
-            return window.MOCK_USERS;
-        }
-        // Create basic user from current user
-        return currentUser ? [currentUser] : [];
-    },
-    
-    // Get authentication token
-    getAuthToken() {
-        return localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token');
-    },
-    
-    // Get all users with caching
-    async getUsers(forceRefresh = false) {
-        const now = Date.now();
-        
-        if (!forceRefresh && this.cache.has('users') && 
-            this.cacheTimestamp && (now - this.cacheTimestamp) < this.cacheDuration) {
-            return this.cache.get('users');
-        }
-        
-        const users = await this.apiCall('/users');
-        this.cache.set('users', users);
-        this.cacheTimestamp = now;
-        
-        return users;
-    },
-    
-    // Get single user
-    async getUser(userId) {
-        return await this.apiCall(`/users/${userId}`);
-    },
-    
-    // Create new user
-    async createUser(userData) {
-        const user = await this.apiCall('/users', {
-            method: 'POST',
-            body: JSON.stringify(userData)
-        });
-        
-        this.invalidateCache();
-        return user;
-    },
-    
-    // Update user
-    async updateUser(userId, userData) {
-        const user = await this.apiCall(`/users/${userId}`, {
-            method: 'PUT',
-            body: JSON.stringify(userData)
-        });
-        
-        this.invalidateCache();
-        return user;
-    },
-    
-    // Delete user
-    async deleteUser(userId) {
-        await this.apiCall(`/users/${userId}`, {
-            method: 'DELETE'
-        });
-        
-        this.invalidateCache();
-        return true;
-    },
-    
-    // Bulk operations
-    async bulkUpdateUsers(userIds, updates) {
-        const result = await this.apiCall('/users/bulk', {
-            method: 'PATCH',
-            body: JSON.stringify({ userIds, updates })
-        });
-        
-        this.invalidateCache();
-        return result;
-    },
-    
-    // Search users
-    async searchUsers(query, filters = {}) {
-        const params = new URLSearchParams({
-            q: query,
-            ...filters
-        });
-        
-        return await this.apiCall(`/users/search?${params}`);
-    },
-    
-    // Get user statistics
-    async getUserStats() {
-        return await this.apiCall('/users/stats');
-    },
-    
-    // Get user profile picture from Microsoft Graph
-    async getUserProfilePicture(userId) {
-        try {
-            return await this.apiCall(`/users/${userId}/photo`);
-        } catch (error) {
-            return null; // Fallback to initials
-        }
-    },
-    
-    // Invalidate cache
-    invalidateCache() {
-        this.cache.clear();
-        this.cacheTimestamp = null;
-    }
+// Mock Data - Coffee Trip Itineraries - Reset for fresh start
+const MOCK_TRIPS = [];
+
+// Mock Credentials for Testing - Reset for fresh start
+const MOCK_CREDENTIALS = {
+    emails: [],
+    codes: []
 };
+
+// Keep the enhanced user management but make it completely optional
 
 // Global Application State
 let currentUser = null;
@@ -1513,10 +1368,17 @@ const trips = {
 
 // Event Listeners
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize user database first (required for authentication)
+    console.log('🚧 Development Mode - Enhanced Authentication Active');
+    console.log('🎯 Available authentication methods:');
+    console.log('🏢 Microsoft/Office 365: Ready (configure Azure AD credentials)');
+    console.log('📧 Email + One-time Code: Functional with backend');
+    console.log('👤 Regular Login: Wolthers team emails (daniel@wolthers.com, svenn@wolthers.com, tom@wolthers.com, rasmus@wolthers.com) / any password');
+    console.log('🔑 Trip Codes: BRAZIL2025, COLOMBIA2025, ETHIOPIA2025');
+    
+    // Initialize user database first (required for user management)
     initializeUserDatabase();
     
-    // Initialize enhanced authentication system (keeping original flow)
+    // Initialize enhanced authentication system
     auth.init().catch(error => {
         console.error('Failed to initialize authentication:', error);
     });
@@ -1776,83 +1638,78 @@ function updateCurrentUserProfile(user) {
     }
 }
 
-async function loadModalUsersList() {
+function loadModalUsersList() {
     const usersList = document.getElementById('modalUsersList');
-    if (!usersList) return;
+    if (!usersList) {
+        console.log('modalUsersList element not found');
+        return;
+    }
     
-    try {
-        // Get users from enhanced API or fallback to existing system
-        const users = await UserAPI.getUsers();
+    // Get users from the global USER_DATABASE array
+    const users = getUsersFromDatabase();
+    console.log('loadModalUsersList: Found', users.length, 'users:', users.map(u => u.name));
+    
+    // Update pagination info
+    const paginationInfo = document.getElementById('paginationInfo');
+    if (paginationInfo) {
+        paginationInfo.textContent = `Showing 1-${users.length} of ${users.length} users`;
+    }
+    
+    // Create table rows using Fluent Design styling
+    const tableRows = users.map((user, index) => {
+        const userTrips = getUserTripsData(user);
+        const lastTrip = userTrips.lastTrip;
         
-        // Update pagination info
-        const paginationInfo = document.getElementById('paginationInfo');
-        if (paginationInfo) {
-            paginationInfo.textContent = `Showing 1-${users.length} of ${users.length} users`;
-        }
-        
-        // Create table rows
-        const tableRows = users.map((user) => {
-            const lastActive = formatRelativeTime(user.lastActive);
-            const status = getUserStatus(user);
-            
-            return `
-                <tr data-user-id="${user.id}">
-                    <td class="fluent-th-checkbox">
-                        <input type="checkbox" class="fluent-checkbox user-checkbox" data-user-id="${user.id}">
-                    </td>
-                    <td>
-                        <div class="fluent-user-cell">
-                            <div class="fluent-user-avatar" style="background: ${getUserAvatarColor(user.role)}">
-                                ${user.avatar || user.name?.charAt(0) || '?'}
-                            </div>
-                            <div class="fluent-user-info">
-                                <h4>${escapeHtml(user.name)}</h4>
-                            </div>
+        return `
+            <tr>
+                <td class="fluent-th-checkbox">
+                    <input type="checkbox" class="fluent-checkbox user-checkbox" data-user-id="${user.id}">
+                </td>
+                <td>
+                    <div class="fluent-user-cell">
+                        <div class="fluent-user-avatar" style="background: ${getUserAvatarColor(user.role)}">
+                            ${user.avatar || user.name?.charAt(0) || '?'}
                         </div>
-                    </td>
-                    <td class="fluent-user-email">${escapeHtml(user.email)}</td>
-                    <td class="fluent-user-company">${escapeHtml(user.company || '-')}</td>
-                    <td>
-                        <span class="fluent-badge-table ${user.role}">${getRoleDisplayName(user.role)}</span>
-                    </td>
-                    <td class="fluent-member-since">${formatTableDate(user.memberSince)}</td>
-                    <td class="fluent-last-active">${lastActive}</td>
-                    <td class="fluent-status">
-                        <span class="fluent-status-${status.type}">
-                            <span class="fluent-status-dot"></span>
-                            ${status.text}
-                        </span>
-                    </td>
-                    <td class="fluent-actions">
-                        <div class="fluent-action-buttons">
-                            <button class="fluent-action-btn" onclick="editUser('${user.id}')" title="Edit user">
+                        <div class="fluent-user-info">
+                            <h4>${user.name}</h4>
+                        </div>
+                    </div>
+                </td>
+                <td class="fluent-user-email">${user.email}</td>
+                <td class="fluent-user-company">${getUserCompany(user)}</td>
+                <td>
+                    <span class="fluent-badge-table ${user.role}">${user.role === 'admin' ? 'Administrator' : user.role === 'editor' ? 'Editor' : user.role === 'guest' ? 'Guest' : 'User'}</span>
+                    ${user.isWolthersTeam ? '<br><span class="fluent-badge-table team" style="background: var(--medium-green); color: white; margin-top: 4px;">Team</span>' : ''}
+                </td>
+                <td class="fluent-member-since">${formatTableDate(user.memberSince)}</td>
+                <td class="fluent-last-active">${formatRelativeTime(user.lastActive)}</td>
+                <td class="fluent-status">
+                    <span class="fluent-status-active">
+                        <span class="fluent-status-dot"></span>
+                        Active
+                    </span>
+                </td>
+                <td class="fluent-actions">
+                    <div class="fluent-action-buttons">
+                        <button class="fluent-action-btn" onclick="editUser('${user.id}')" title="Edit user">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                                <path d="M11.013 1.427a1.75 1.75 0 012.474 0l1.086 1.086a1.75 1.75 0 010 2.474l-8.61 8.61c-.21.21-.47.364-.756.445l-3.251.93a.75.75 0 01-.927-.928l.929-3.25a1.75 1.75 0 01.445-.758l8.61-8.61z"/>
+                            </svg>
+                        </button>
+                        ${!user.isWolthersTeam ? `
+                            <button class="fluent-action-btn danger" onclick="deleteUser('${user.id}')" title="Delete user">
                                 <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                                    <path d="M11.013 1.427a1.75 1.75 0 012.474 0l1.086 1.086a1.75 1.75 0 010 2.474l-8.61 8.61c-.21.21-.47.364-.756.445l-3.251.93a.75.75 0 01-.927-.928l.929-3.25a1.75 1.75 0 01.445-.758l8.61-8.61z"/>
+                                    <path d="M6.5 1h3a.5.5 0 01.5.5v1H6v-1a.5.5 0 01.5-.5zM11 2.5v-1A1.5 1.5 0 009.5 0h-3A1.5 1.5 0 005 1.5v1H2.5a.5.5 0 000 1h.538l.853 10.66A2 2 0 005.885 16h4.23a2 2 0 001.994-1.84L12.962 3.5h.538a.5.5 0 000-1H11z"/>
                                 </svg>
                             </button>
-                            ${!user.isWolthersTeam ? `
-                                <button class="fluent-action-btn danger" onclick="deleteUser('${user.id}')" title="Delete user">
-                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                                        <path d="M6.5 1h3a.5.5 0 01.5.5v1H6v-1a.5.5 0 01.5-.5zM11 2.5v-1A1.5 1.5 0 009.5 0h-3A1.5 1.5 0 005 1.5v1H2.5a.5.5 0 000 1h.538l.853 10.66A2 2 0 005.885 16h4.23a2 2 0 001.994-1.84L12.962 3.5h.538a.5.5 0 000-1H11z"/>
-                                    </svg>
-                                </button>
-                            ` : ''}
-                        </div>
-                    </td>
-                </tr>
-            `;
-        });
-        
-        usersList.innerHTML = tableRows.join('');
-        
-        // Re-attach event listeners for checkboxes
-        attachCheckboxListeners();
-        
-    } catch (error) {
-        console.error('Failed to load users:', error);
-        // Fallback to show empty state instead of error
-        usersList.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:#666;">No users found</td></tr>';
-    }
+                        ` : ''}
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join('');
+    
+    usersList.innerHTML = tableRows;
 }
 
 // Production-ready user management - trip admin functionality removed
@@ -1893,52 +1750,20 @@ function clearFormErrors() {
     });
 }
 
-async function editUser(userId) {
-    try {
-        // Find user in existing database
-        const user = USER_DATABASE.find(u => u.id === userId);
-        if (!user) {
-            if (showToast) showToast('User not found', 'error');
-            return;
-        }
-        
-        // For now, show simple notification - can be expanded later
-        if (showToast) showToast('Edit user functionality will be available in the next update', 'info');
-        
-    } catch (error) {
-        if (showToast) showToast('Failed to load user for editing', 'error');
-    }
+function editUser(userId) {
+    utils.showNotification('Edit user feature coming soon', 'info');
 }
 
-async function deleteUser(userId) {
-    try {
-        // Find user in existing database
-        const user = USER_DATABASE.find(u => u.id === userId);
-        if (!user) {
-            if (showToast) showToast('User not found', 'error');
-            return;
+function deleteUser(userId) {
+    const user = getUsersFromDatabase().find(u => u.id === userId);
+    if (!user) return;
+    
+    if (confirm(`Are you sure you want to delete ${user.name}? This action cannot be undone.`)) {
+        if (removeUserFromDatabase(userId)) {
+            utils.showNotification(`User ${user.name} has been deleted successfully`, 'success');
+        } else {
+            utils.showNotification('Failed to delete user', 'error');
         }
-        
-        // Don't allow deleting Wolthers team members
-        if (user.isWolthersTeam) {
-            if (showToast) showToast('Cannot delete Wolthers team members', 'error');
-            return;
-        }
-        
-        const confirmed = confirm(`Are you sure you want to delete ${user.name}? This action cannot be undone.`);
-        if (!confirmed) return;
-        
-        // Remove from database
-        const index = USER_DATABASE.findIndex(u => u.id === userId);
-        if (index !== -1) {
-            USER_DATABASE.splice(index, 1);
-            saveUserDatabase();
-            await loadModalUsersList();
-            if (showToast) showToast(`User ${user.name} deleted successfully`, 'success');
-        }
-        
-    } catch (error) {
-        if (showToast) showToast(error.message || 'Failed to delete user', 'error');
     }
 }
 
