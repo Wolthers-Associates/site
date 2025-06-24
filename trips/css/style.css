@@ -2294,4 +2294,64 @@ body {
         color: #fff;
         opacity: 0.85;
     }
+    .modal-content {
+        background: #181c1f;
+        border: 1px solid #23272b;
+    }
+    .modal-header {
+        border-bottom-color: #23272b;
+    }
+    .modal-title {
+        color: #FFE082;
+    }
+    .close-btn {
+        color: #b0b8c1;
+    }
+    .close-btn:hover {
+        background: #23272b;
+        color: #ffffff;
+    }
+    .form-section {
+        background: #181c1f;
+    }
+    .form-input,
+    .form-textarea {
+        background: #23272b;
+        border-color: #2d3136;
+        color: #ffffff;
+    }
+    .form-input:focus,
+    .form-textarea:focus {
+        border-color: #FFE082;
+    }
+    .form-input::placeholder,
+    .form-textarea::placeholder {
+        color: #b0b8c1;
+    }
+    .form-group label {
+        color: #ffffff;
+    }
+    .input-help {
+        color: #b0b8c1;
+    }
+    .modal-actions {
+        border-top-color: #23272b;
+        background: #181c1f;
+    }
+    .btn-primary {
+        background: #FFE082;
+        color: #181c1f;
+    }
+    .btn-primary:hover {
+        background: #ffd54f;
+    }
+    .btn-secondary {
+        background: #23272b;
+        color: #ffffff;
+        border-color: #2d3136;
+    }
+    .btn-secondary:hover {
+        background: #2d3136;
+        border-color: #FFE082;
+    }
 } 
