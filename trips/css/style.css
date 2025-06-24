@@ -2323,8 +2323,8 @@ body {
     }
     .form-input:focus,
     .form-textarea:focus {
-        border-color: #FFE082;
-        box-shadow: 0 0 0 2px rgba(255, 224, 130, 0.2);
+        border-color: #FFE082 !important;
+        box-shadow: 0 0 0 2px rgba(255, 224, 130, 0.2) !important;
     }
     .form-input::placeholder,
     .form-textarea::placeholder {
