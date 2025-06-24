@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Microsoft Authentication - Wolthers Trips</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .logo {
+            color: #2c5530;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .status {
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        .loading {
+            background-color: #e3f2fd;
+            color: #1976d2;
+        }
+        .success {
+            background-color: #e8f5e8;
+            color: #2e7d32;
+        }
+        .error {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #2c5530;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">Wolthers & Associates</div>
+        <h2>Microsoft Authentication</h2>
+        
+        <div id="status" class="status loading">
+            <div class="spinner"></div>
+            <div>Processing Microsoft authentication...</div>
+        </div>
+        
+        <div id="details" style="display: none;"></div>
+    </div>
+
+    <script>
+        async function handleMicrosoftAuth() {
+            try {
+                // Get the access token from URL fragment
+                const urlParams = new URLSearchParams(window.location.hash.substring(1));
+                const accessToken = urlParams.get('access_token');
+                const error = urlParams.get('error');
+                const errorDescription = urlParams.get('error_description');
+                
+                if (error) {
+                    showError(`Authentication failed: ${errorDescription || error}`);
+                    return;
+                }
+                
+                if (!accessToken) {
+                    showError('No access token received from Microsoft');
+                    return;
+                }
+                
+                // Send token to backend for validation and login
+                const response = await fetch('/trips/api/auth/login.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        login_type: 'office365',
+                        access_token: accessToken
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showSuccess(`Welcome ${result.user.name}!`);
+                    
+                    // Store session info for the main app
+                    sessionStorage.setItem('wolthers_auth', JSON.stringify({
+                        user: result.user,
+                        auth_type: result.auth_type,
+                        session_id: result.session_id,
+                        timestamp: Date.now()
+                    }));
+                    
+                    // Redirect to main app
+                    setTimeout(() => {
+                        window.location.href = '/trips/';
+                    }, 2000);
+                } else {
+                    showError(result.error || 'Authentication failed');
+                }
+                
+            } catch (error) {
+                showError('Network error: ' + error.message);
+            }
+        }
+        
+        function showSuccess(message) {
+            const status = document.getElementById('status');
+            status.className = 'status success';
+            status.innerHTML = `<strong>✓ Success!</strong><br>${message}<br><small>Redirecting to trips...</small>`;
+        }
+        
+        function showError(message) {
+            const status = document.getElementById('status');
+            status.className = 'status error';
+            status.innerHTML = `<strong>✗ Error</strong><br>${message}<br><small>You can close this window and try again.</small>`;
+        }
+        
+        // Start authentication process when page loads
+        window.addEventListener('load', handleMicrosoftAuth);
+    </script>
+</body>
+</html> 

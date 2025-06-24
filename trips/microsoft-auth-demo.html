@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Microsoft Authentication Demo - Wolthers Trips</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1, h2 {
+            color: #2c5530;
+        }
+        .auth-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .user-info {
+            background-color: #e8f5e8;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .error {
+            background-color: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        button {
+            background-color: #2c5530;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #1e3a21;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .config-section {
+            background-color: #fff3cd;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px 0;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Microsoft Authentication Demo</h1>
+    <p>Test the Microsoft/Office 365 authentication integration</p>
+
+    <!-- Configuration Section -->
+    <div class="container">
+        <h2>1. Configuration</h2>
+        <div class="config-section">
+            <p><strong>⚠️ Setup Required:</strong> You need to configure your Azure AD credentials first.</p>
+            
+            <label>Client ID (from Azure AD):</label>
+            <input type="text" id="clientId" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
+            
+            <label>Tenant ID (optional, defaults to 'common'):</label>
+            <input type="text" id="tenantId" placeholder="common or your-tenant-id">
+            
+            <button onclick="saveConfig()">Save Configuration</button>
+        </div>
+    </div>
+
+    <!-- Authentication Status -->
+    <div class="container">
+        <h2>2. Authentication Status</h2>
+        <div id="authStatus" class="auth-section">
+            <p>Checking authentication status...</p>
+        </div>
+    </div>
+
+    <!-- Sign-In Section -->
+    <div class="container">
+        <h2>3. Microsoft Sign-In</h2>
+        <div class="auth-section">
+            <p>Click the button below to test Microsoft authentication:</p>
+            <div id="microsoftSignIn"></div>
+            <br>
+            <button onclick="testDirectSignIn()" id="directSignInBtn">Test Direct Sign-In</button>
+            <button onclick="signOut()" id="signOutBtn" style="display: none;">Sign Out</button>
+        </div>
+    </div>
+
+    <!-- User Information -->
+    <div class="container">
+        <h2>4. User Information</h2>
+        <div id="userInfo" class="auth-section">
+            <p>No user signed in</p>
+        </div>
+    </div>
+
+    <!-- Testing Tools -->
+    <div class="container">
+        <h2>5. Testing Tools</h2>
+        <div class="auth-section">
+            <button onclick="clearSession()">Clear Session</button>
+            <button onclick="testBackendConnection()">Test Backend</button>
+            <button onclick="showDebugInfo()">Show Debug Info</button>
+        </div>
+        <div id="debugInfo" style="display: none;"></div>
+    </div>
+
+    <!-- Include Microsoft Auth Module -->
+    <script src="js/microsoft-auth.js"></script>
+    
+    <script>
+        let msAuth = null;
+        let msSignInButton = null;
+
+        // Load saved configuration
+        function loadConfig() {
+            const savedClientId = localStorage.getItem('ms_client_id');
+            const savedTenantId = localStorage.getItem('ms_tenant_id');
+            
+            if (savedClientId) {
+                document.getElementById('clientId').value = savedClientId;
+            }
+            if (savedTenantId) {
+                document.getElementById('tenantId').value = savedTenantId;
+            }
+            
+            if (savedClientId) {
+                initializeAuth(savedClientId, savedTenantId || 'common');
+            }
+        }
+
+        // Save configuration
+        function saveConfig() {
+            const clientId = document.getElementById('clientId').value.trim();
+            const tenantId = document.getElementById('tenantId').value.trim() || 'common';
+            
+            if (!clientId) {
+                alert('Please enter a Client ID');
+                return;
+            }
+            
+            localStorage.setItem('ms_client_id', clientId);
+            localStorage.setItem('ms_tenant_id', tenantId);
+            
+            initializeAuth(clientId, tenantId);
+            alert('Configuration saved!');
+        }
+
+        // Initialize Microsoft Auth
+        function initializeAuth(clientId, tenantId) {
+            try {
+                msAuth = new MicrosoftAuth(clientId, tenantId);
+                
+                // Clear existing button
+                document.getElementById('microsoftSignIn').innerHTML = '';
+                
+                // Create new sign-in button
+                msSignInButton = new MicrosoftSignInButton('microsoftSignIn', {
+                    clientId: clientId,
+                    tenantId: tenantId,
+                    theme: 'dark',
+                    size: 'large',
+                    onSuccess: (result) => {
+                        console.log('Sign-in successful:', result);
+                        updateUI();
+                    },
+                    onError: (error) => {
+                        console.error('Sign-in error:', error);
+                        showError('Sign-in failed: ' + error.message);
+                    }
+                });
+                
+                updateUI();
+            } catch (error) {
+                showError('Failed to initialize Microsoft Auth: ' + error.message);
+            }
+        }
+
+        // Update UI based on authentication status
+        function updateUI() {
+            const statusDiv = document.getElementById('authStatus');
+            const userInfoDiv = document.getElementById('userInfo');
+            const signOutBtn = document.getElementById('signOutBtn');
+            const directSignInBtn = document.getElementById('directSignInBtn');
+            
+            if (msAuth && msAuth.isAuthenticated()) {
+                const user = msAuth.getCurrentUser();
+                
+                statusDiv.innerHTML = '<div class="user-info"><strong>✓ Authenticated</strong><br>Signed in via Microsoft</div>';
+                
+                userInfoDiv.innerHTML = `
+                    <div class="user-info">
+                        <strong>User Information:</strong><br>
+                        <strong>Name:</strong> ${user.name}<br>
+                        <strong>Email:</strong> ${user.email}<br>
+                        <strong>Role:</strong> ${user.role}<br>
+                        <strong>ID:</strong> ${user.id}
+                    </div>
+                `;
+                
+                signOutBtn.style.display = 'inline-block';
+                directSignInBtn.style.display = 'none';
+            } else {
+                statusDiv.innerHTML = '<p><strong>Not authenticated</strong><br>Please sign in with Microsoft</p>';
+                userInfoDiv.innerHTML = '<p>No user signed in</p>';
+                signOutBtn.style.display = 'none';
+                directSignInBtn.style.display = 'inline-block';
+            }
+        }
+
+        // Test direct sign-in
+        async function testDirectSignIn() {
+            if (!msAuth) {
+                alert('Please configure your Azure AD credentials first');
+                return;
+            }
+            
+            try {
+                const result = await msAuth.signIn();
+                console.log('Direct sign-in result:', result);
+                updateUI();
+            } catch (error) {
+                showError('Direct sign-in failed: ' + error.message);
+            }
+        }
+
+        // Sign out
+        async function signOut() {
+            if (msAuth) {
+                await msAuth.signOut();
+                updateUI();
+            }
+        }
+
+        // Clear session for testing
+        function clearSession() {
+            sessionStorage.removeItem('wolthers_auth');
+            updateUI();
+            alert('Session cleared');
+        }
+
+        // Test backend connection
+        async function testBackendConnection() {
+            try {
+                const response = await fetch('/trips/api/auth/login.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        login_type: 'office365',
+                        access_token: 'test-token'
+                    })
+                });
+                
+                const result = await response.json();
+                console.log('Backend test result:', result);
+                
+                if (result.error) {
+                    alert('Backend connection successful (expected error: ' + result.error + ')');
+                } else {
+                    alert('Backend connection successful');
+                }
+            } catch (error) {
+                showError('Backend connection failed: ' + error.message);
+            }
+        }
+
+        // Show debug information
+        function showDebugInfo() {
+            const debugDiv = document.getElementById('debugInfo');
+            const clientId = localStorage.getItem('ms_client_id');
+            const authData = sessionStorage.getItem('wolthers_auth');
+            
+            const debugInfo = {
+                clientId: clientId,
+                redirectUri: window.location.origin + '/trips/auth-callback.html',
+                currentUrl: window.location.href,
+                authData: authData ? JSON.parse(authData) : null,
+                msAuthInitialized: !!msAuth
+            };
+            
+            debugDiv.style.display = 'block';
+            debugDiv.innerHTML = `
+                <h3>Debug Information:</h3>
+                <pre style="background: #f5f5f5; padding: 10px; border-radius: 4px; overflow-x: auto;">
+${JSON.stringify(debugInfo, null, 2)}
+                </pre>
+            `;
+        }
+
+        // Show error message
+        function showError(message) {
+            const statusDiv = document.getElementById('authStatus');
+            statusDiv.innerHTML = `<div class="error"><strong>Error:</strong> ${message}</div>`;
+        }
+
+        // Initialize on page load
+        window.addEventListener('load', () => {
+            loadConfig();
+            updateUI();
+        });
+    </script>
+</body>
+</html> 
