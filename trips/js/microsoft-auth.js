@@ -88,7 +88,7 @@ class MicrosoftAuth {
                     // Give a small delay to ensure session data is stored
                     setTimeout(() => {
                         // Check for stored auth result
-                        const authResult = sessionStorage.getItem('wolthers_auth');
+                        const authResult = localStorage.getItem('wolthers_auth');
                         console.log('🔍 Popup closed, checking for auth result:', authResult ? 'Found' : 'Not found');
                         
                         if (authResult) {
@@ -101,7 +101,7 @@ class MicrosoftAuth {
                                 reject(new Error('Failed to parse authentication result'));
                             }
                         } else {
-                            console.warn('⚠️ No auth result found in sessionStorage');
+                            console.warn('⚠️ No auth result found in localStorage');
                             reject(new Error('Authentication was cancelled or failed'));
                         }
                     }, 100); // Small delay to ensure session storage is updated
@@ -123,7 +123,7 @@ class MicrosoftAuth {
      * Check if user is currently authenticated
      */
     isAuthenticated() {
-        const authData = sessionStorage.getItem('wolthers_auth');
+        const authData = localStorage.getItem('wolthers_auth');
         if (!authData) return false;
 
         try {
@@ -131,7 +131,7 @@ class MicrosoftAuth {
             const isExpired = Date.now() - parsed.timestamp > 3600000; // 1 hour
             
             if (isExpired) {
-                sessionStorage.removeItem('wolthers_auth');
+                localStorage.removeItem('wolthers_auth');
                 return false;
             }
             
@@ -148,7 +148,7 @@ class MicrosoftAuth {
         if (!this.isAuthenticated()) return null;
         
         try {
-            const authData = JSON.parse(sessionStorage.getItem('wolthers_auth'));
+            const authData = JSON.parse(localStorage.getItem('wolthers_auth'));
             return authData.user;
         } catch {
             return null;
@@ -172,7 +172,7 @@ class MicrosoftAuth {
         }
 
         // Clear local session data
-        sessionStorage.removeItem('wolthers_auth');
+        localStorage.removeItem('wolthers_auth');
         
         // Redirect to Microsoft logout
         const logoutUrl = `https://login.microsoftonline.com/${this.tenantId}/oauth2/v2.0/logout?post_logout_redirect_uri=${encodeURIComponent(window.location.origin + '/trips/')}`;

@@ -145,10 +145,10 @@
                     };
                     
                     console.log('💾 Storing auth data:', authData);
-                    sessionStorage.setItem('wolthers_auth', JSON.stringify(authData));
+                    localStorage.setItem('wolthers_auth', JSON.stringify(authData));
                     
                     // Verify it was stored
-                    const stored = sessionStorage.getItem('wolthers_auth');
+                    const stored = localStorage.getItem('wolthers_auth');
                     console.log('✅ Verified stored data:', stored ? 'Success' : 'Failed');
                     
                     // Close popup - the parent window will handle redirect
