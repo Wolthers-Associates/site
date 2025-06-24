@@ -1371,7 +1371,7 @@ body {
 
 .trip-preview-content {
     background: var(--white);
-    border-radius: 0;
+    border-radius: 12px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
     max-width: 500px;
     width: 100%;
@@ -1402,7 +1402,7 @@ body {
     background: linear-gradient(135deg, var(--dark-green) 0%, var(--medium-green) 100%);
     color: var(--white);
     padding: 25px;
-    border-radius: 0;
+    border-radius: 12px 12px 0 0;
 }
 
 .trip-preview-title {
@@ -1507,9 +1507,9 @@ body {
     color: #222;
     border: none;
     box-shadow: none;
-    border-radius: 0;
+    border-radius: 8px;
     margin-bottom: 18px;
-    padding: 8px 0 8px 0;
+    padding: 12px;
     display: flex;
     flex-direction: column;
     gap: 6px;
@@ -1543,6 +1543,15 @@ body {
 
 .trip-preview-highlights {
     margin-bottom: 18px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 12px;
+}
+
+@media (prefers-color-scheme: dark) {
+    .trip-preview-highlights {
+        background: #2a2e33;
+    }
 }
 
 .preview-section-title {
@@ -1584,11 +1593,19 @@ body {
 .preview-day-item {
     background: var(--white);
     border: none;
-    border-radius: 0;
-    padding: 10px;
-    margin-bottom: 6px;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 8px;
     border-left: 3px solid var(--gold);
     transition: all 0.2s ease;
+}
+
+.preview-day-item:nth-child(odd) {
+    background: #f8f9fa;
+}
+
+.preview-day-item:nth-child(even) {
+    background: #ffffff;
 }
 
 .preview-day-item:hover {
@@ -1598,10 +1615,15 @@ body {
 
 @media (prefers-color-scheme: dark) {
     .preview-day-item {
-        background: #2d3136;
         border: none;
-        border-radius: 0;
+        border-radius: 8px;
         border-left: 3px solid var(--gold);
+    }
+    .preview-day-item:nth-child(odd) {
+        background: #2a2e33;
+    }
+    .preview-day-item:nth-child(even) {
+        background: #323740;
     }
     .preview-day-item:hover {
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
@@ -2216,7 +2238,7 @@ body {
     .trip-preview-header {
         background: #23272b;
         color: #e6edf3;
-        border-radius: 0;
+        border-radius: 12px 12px 0 0;
     }
     .trip-preview-highlights {
         background: #2d3136;
