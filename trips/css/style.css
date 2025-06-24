@@ -2256,6 +2256,10 @@ body {
     .header p {
         color: #ffffff;
     }
+    .trip-date,
+    .trip-total-days {
+        color: #ffffff;
+    }
     .trip-preview-header {
         background: #23272b;
         color: #e6edf3;
