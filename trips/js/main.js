@@ -669,32 +669,24 @@ const auth = {
 
     // Handle Microsoft Office 365 login
     handleMicrosoftLogin: async () => {
+        if (!auth.msAuth) {
+            utils.showError('Microsoft authentication not initialized. Please configure your Azure AD credentials.');
+            return;
+        }
+
         try {
-            // This would integrate with Microsoft Authentication Library (MSAL)
-            // For development, show coming soon message and redirect
-            console.log('Microsoft Office 365 login - Coming soon');
+            console.log('🚀 Starting Microsoft authentication...');
+            const result = await auth.msAuth.signIn();
+            console.log('✅ Microsoft sign-in successful:', result);
             
-            // For now, simulate the Microsoft login window opening
-            const popup = window.open('about:blank', 'microsoft-login', 'width=500,height=600');
-            popup.document.write(`
-                <html>
-                    <head><title>Microsoft Sign In</title></head>
-                    <body style="font-family: Arial, sans-serif; text-align: center; padding: 50px;">
-                        <h2>Microsoft Sign In</h2>
-                        <p>Coming Soon - Development Phase</p>
-                        <p>This feature will be implemented in the next phase.</p>
-                        <button onclick="window.close()">Close</button>
-                    </body>
-                </html>
-            `);
-            
-            // TODO: Implement MSAL integration
-            // const msalInstance = new msal.PublicClientApplication(msalConfig);
-            // const response = await msalInstance.loginPopup(loginRequest);
-            // await authenticateWithOffice365(response.accessToken);
-            
+            // The Microsoft auth callback will handle the login
+            // This is just a fallback for direct usage
+            if (result && result.user) {
+                auth.handleSuccessfulLogin(result);
+            }
         } catch (error) {
-            console.error('Microsoft login error:', error);
+            console.error('❌ Microsoft sign-in error:', error);
+            utils.showError('Microsoft sign-in failed: ' + error.message);
         }
     },
 
