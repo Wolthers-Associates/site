@@ -1583,11 +1583,30 @@ function hideUserManagementModal() {
 }
 
 function loadUserManagementData() {
-    // Load current user profile
+    // Load current user profile for the Fluent Design interface
     if (currentUser) {
-        document.getElementById('modalProfileName').textContent = currentUser.name || 'Unknown User';
-        document.getElementById('modalProfileEmail').textContent = currentUser.email || 'No email';
-        document.getElementById('modalProfileRole').textContent = currentUser.role === 'admin' ? 'Administrator' : 'User';
+        // Update profile name
+        const profileName = document.getElementById('modalProfileName');
+        if (profileName) profileName.textContent = currentUser.name || 'Unknown User';
+        
+        // Update profile email
+        const profileEmail = document.getElementById('modalProfileEmail');
+        if (profileEmail) profileEmail.textContent = currentUser.email || 'No email';
+        
+        // Update profile role badge
+        const profileRole = document.getElementById('modalProfileRole');
+        if (profileRole) {
+            profileRole.textContent = currentUser.role === 'admin' ? 'Administrator' : 
+                                    currentUser.role === 'editor' ? 'Editor' :
+                                    currentUser.role === 'guest' ? 'Guest' : 'User';
+            profileRole.className = `fluent-badge fluent-badge-${currentUser.role}`;
+        }
+        
+        // Update profile avatar
+        const profileAvatar = document.getElementById('modalProfileAvatar');
+        if (profileAvatar) {
+            profileAvatar.textContent = currentUser.avatar || currentUser.name?.charAt(0) || '?';
+        }
     }
     
     // Debug: Check what users we have
@@ -1596,7 +1615,9 @@ function loadUserManagementData() {
     
     // Load users list from database
     loadModalUsersList();
-    loadModalTripAdminList();
+    
+    // Setup search and filter functionality
+    setupUserManagementInteractions();
 }
 
 function loadModalUsersList() {
@@ -1610,74 +1631,62 @@ function loadModalUsersList() {
     const users = getUsersFromDatabase();
     console.log('loadModalUsersList: Found', users.length, 'users:', users.map(u => u.name));
     
-    // Create table structure
-    const tableHTML = `
-        <div class="users-table-container">
-            <table class="users-table">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Company</th>
-                        <th>User Type</th>
-                        <th>Member Since</th>
-                        <th># of Trips</th>
-                        <th>Last Trip Date</th>
-                        <th>Last Trip</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${users.map((user, index) => {
-                        const userTrips = getUserTripsData(user);
-                        const lastTrip = userTrips.lastTrip;
-                        const isEven = index % 2 === 1; // Using 1 for even-numbered rows (0-based index)
-                        
-                        return `
-                            <tr class="user-row ${isEven ? 'even-row' : 'odd-row'}">
-                                <td class="user-name-cell">
-                                    <div class="user-name-container">
-                                        <div class="user-avatar table-avatar" style="background: ${getUserAvatarColor(user.role)}">
-                                            ${user.avatar || user.name?.charAt(0) || '?'}
-                                        </div>
-                                        <span class="user-name">${user.name}</span>
-                                    </div>
-                                </td>
-                                <td class="user-email">${user.email}</td>
-                                <td class="user-company">${getUserCompany(user)}</td>
-                                <td class="user-type">
-                                    <span class="role-badge table-badge ${user.role}">${user.role === 'admin' ? 'Administrator' : 'User'}</span>
-                                    ${user.isWolthersTeam ? '<span class="team-badge table-team-badge">Team</span>' : ''}
-                                </td>
-                                <td class="member-since">${formatTableDate(user.memberSince)}</td>
-                                <td class="trip-count">${userTrips.count}</td>
-                                <td class="last-trip-date">${lastTrip ? formatTableDate(lastTrip.date) : '-'}</td>
-                                <td class="last-trip-link">
-                                    ${lastTrip ? `<a href="#" onclick="openTrip('${lastTrip.id}')" class="trip-link">${lastTrip.title}</a>` : '-'}
-                                </td>
-                                <td class="user-actions table-actions">
-                                    <button class="btn-icon table-btn" onclick="editUser('${user.id}')" title="Edit user">
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                                            <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
-                                        </svg>
-                                    </button>
-                                    ${!user.isWolthersTeam ? `
-                                        <button class="btn-icon table-btn btn-danger" onclick="deleteUser('${user.id}')" title="Delete user">
-                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                                                <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
-                                            </svg>
-                                        </button>
-                                    ` : ''}
-                                </td>
-                            </tr>
-                        `;
-                    }).join('')}
-                </tbody>
-            </table>
-        </div>
-    `;
+    // Update pagination info
+    const paginationInfo = document.getElementById('paginationInfo');
+    if (paginationInfo) {
+        paginationInfo.textContent = `Showing 1-${users.length} of ${users.length} users`;
+    }
     
-    usersList.innerHTML = tableHTML;
+    // Create table rows using Fluent Design styling
+    const tableRows = users.map((user, index) => {
+        const userTrips = getUserTripsData(user);
+        const lastTrip = userTrips.lastTrip;
+        
+        return `
+            <tr>
+                <td class="fluent-th-checkbox">
+                    <input type="checkbox" class="fluent-checkbox" data-user-id="${user.id}">
+                </td>
+                <td>
+                    <div class="fluent-user-cell">
+                        <div class="fluent-user-avatar" style="background: ${getUserAvatarColor(user.role)}">
+                            ${user.avatar || user.name?.charAt(0) || '?'}
+                        </div>
+                        <div class="fluent-user-info">
+                            <h4>${user.name}</h4>
+                        </div>
+                    </div>
+                </td>
+                <td class="fluent-user-email">${user.email}</td>
+                <td class="fluent-user-company">${getUserCompany(user)}</td>
+                <td>
+                    <span class="fluent-badge-table ${user.role}">${user.role === 'admin' ? 'Administrator' : user.role === 'editor' ? 'Editor' : user.role === 'guest' ? 'Guest' : 'User'}</span>
+                    ${user.isWolthersTeam ? '<br><span class="fluent-badge-table team" style="background: var(--medium-green); color: white; margin-top: 4px;">Team</span>' : ''}
+                </td>
+                <td class="fluent-member-since">${formatTableDate(user.memberSince)}</td>
+                <td class="fluent-trip-count">${userTrips.count}</td>
+                <td class="fluent-last-trip-date">${lastTrip ? formatTableDate(lastTrip.date) : '-'}</td>
+                <td class="fluent-actions">
+                    <div class="fluent-action-buttons">
+                        <button class="fluent-action-btn" onclick="editUser('${user.id}')" title="Edit user">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                                <path d="M11.013 1.427a1.75 1.75 0 012.474 0l1.086 1.086a1.75 1.75 0 010 2.474l-8.61 8.61c-.21.21-.47.364-.756.445l-3.251.93a.75.75 0 01-.927-.928l.929-3.25a1.75 1.75 0 01.445-.758l8.61-8.61z"/>
+                            </svg>
+                        </button>
+                        ${!user.isWolthersTeam ? `
+                            <button class="fluent-action-btn danger" onclick="deleteUser('${user.id}')" title="Delete user">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                                    <path d="M6.5 1h3a.5.5 0 01.5.5v1H6v-1a.5.5 0 01.5-.5zM11 2.5v-1A1.5 1.5 0 009.5 0h-3A1.5 1.5 0 005 1.5v1H2.5a.5.5 0 000 1h.538l.853 10.66A2 2 0 005.885 16h4.23a2 2 0 001.994-1.84L12.962 3.5h.538a.5.5 0 000-1H11z"/>
+                                </svg>
+                            </button>
+                        ` : ''}
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join('');
+    
+    usersList.innerHTML = tableRows;
 }
 
 function loadModalTripAdminList() {
@@ -1904,4 +1913,228 @@ function openTrip(tripId) {
         // Open trip preview
         showTripPreview(trip);
     }
+}
+
+// Setup User Management Interactive Features
+function setupUserManagementInteractions() {
+    // Search functionality
+    const searchInput = document.getElementById('userSearchInput');
+    if (searchInput) {
+        searchInput.addEventListener('input', utils.debounce(filterUsers, 300));
+    }
+    
+    // Role filter functionality
+    const roleFilter = document.getElementById('userRoleFilter');
+    if (roleFilter) {
+        roleFilter.addEventListener('change', filterUsers);
+    }
+    
+    // Select all checkbox functionality
+    const selectAllCheckbox = document.getElementById('selectAllUsers');
+    if (selectAllCheckbox) {
+        selectAllCheckbox.addEventListener('change', toggleSelectAllUsers);
+    }
+    
+    // Table sorting functionality
+    const sortableHeaders = document.querySelectorAll('.fluent-th-sortable');
+    sortableHeaders.forEach(header => {
+        header.addEventListener('click', () => sortUserTable(header.dataset.sort));
+    });
+}
+
+// Filter users based on search and role filter
+function filterUsers() {
+    const searchTerm = document.getElementById('userSearchInput')?.value.toLowerCase() || '';
+    const roleFilter = document.getElementById('userRoleFilter')?.value || '';
+    const users = getUsersFromDatabase();
+    
+    const filteredUsers = users.filter(user => {
+        const matchesSearch = !searchTerm || 
+            user.name.toLowerCase().includes(searchTerm) ||
+            user.email.toLowerCase().includes(searchTerm) ||
+            getUserCompany(user).toLowerCase().includes(searchTerm);
+            
+        const matchesRole = !roleFilter || user.role === roleFilter;
+        
+        return matchesSearch && matchesRole;
+    });
+    
+    // Update the table with filtered users
+    renderFilteredUsers(filteredUsers);
+    
+    // Update pagination info
+    const paginationInfo = document.getElementById('paginationInfo');
+    if (paginationInfo) {
+        paginationInfo.textContent = `Showing 1-${filteredUsers.length} of ${filteredUsers.length} users`;
+    }
+}
+
+// Render filtered users in the table
+function renderFilteredUsers(users) {
+    const usersList = document.getElementById('modalUsersList');
+    if (!usersList) return;
+    
+    const tableRows = users.map((user, index) => {
+        const userTrips = getUserTripsData(user);
+        const lastTrip = userTrips.lastTrip;
+        
+        return `
+            <tr>
+                <td class="fluent-th-checkbox">
+                    <input type="checkbox" class="fluent-checkbox user-checkbox" data-user-id="${user.id}">
+                </td>
+                <td>
+                    <div class="fluent-user-cell">
+                        <div class="fluent-user-avatar" style="background: ${getUserAvatarColor(user.role)}">
+                            ${user.avatar || user.name?.charAt(0) || '?'}
+                        </div>
+                        <div class="fluent-user-info">
+                            <h4>${user.name}</h4>
+                        </div>
+                    </div>
+                </td>
+                <td class="fluent-user-email">${user.email}</td>
+                <td class="fluent-user-company">${getUserCompany(user)}</td>
+                <td>
+                    <span class="fluent-badge-table ${user.role}">${user.role === 'admin' ? 'Administrator' : user.role === 'editor' ? 'Editor' : user.role === 'guest' ? 'Guest' : 'User'}</span>
+                    ${user.isWolthersTeam ? '<br><span class="fluent-badge-table team" style="background: var(--medium-green); color: white; margin-top: 4px;">Team</span>' : ''}
+                </td>
+                <td class="fluent-member-since">${formatTableDate(user.memberSince)}</td>
+                <td class="fluent-trip-count">${userTrips.count}</td>
+                <td class="fluent-last-trip-date">${lastTrip ? formatTableDate(lastTrip.date) : '-'}</td>
+                <td class="fluent-actions">
+                    <div class="fluent-action-buttons">
+                        <button class="fluent-action-btn" onclick="editUser('${user.id}')" title="Edit user">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                                <path d="M11.013 1.427a1.75 1.75 0 012.474 0l1.086 1.086a1.75 1.75 0 010 2.474l-8.61 8.61c-.21.21-.47.364-.756.445l-3.251.93a.75.75 0 01-.927-.928l.929-3.25a1.75 1.75 0 01.445-.758l8.61-8.61z"/>
+                            </svg>
+                        </button>
+                        ${!user.isWolthersTeam ? `
+                            <button class="fluent-action-btn danger" onclick="deleteUser('${user.id}')" title="Delete user">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                                    <path d="M6.5 1h3a.5.5 0 01.5.5v1H6v-1a.5.5 0 01.5-.5zM11 2.5v-1A1.5 1.5 0 009.5 0h-3A1.5 1.5 0 005 1.5v1H2.5a.5.5 0 000 1h.538l.853 10.66A2 2 0 005.885 16h4.23a2 2 0 001.994-1.84L12.962 3.5h.538a.5.5 0 000-1H11z"/>
+                                </svg>
+                            </button>
+                        ` : ''}
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join('');
+    
+    usersList.innerHTML = tableRows;
+    
+    // Re-attach event listeners for checkboxes
+    attachCheckboxListeners();
+}
+
+// Toggle select all users
+function toggleSelectAllUsers() {
+    const selectAllCheckbox = document.getElementById('selectAllUsers');
+    const userCheckboxes = document.querySelectorAll('.user-checkbox');
+    
+    userCheckboxes.forEach(checkbox => {
+        checkbox.checked = selectAllCheckbox.checked;
+    });
+}
+
+// Attach event listeners to user checkboxes
+function attachCheckboxListeners() {
+    const userCheckboxes = document.querySelectorAll('.user-checkbox');
+    userCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', updateSelectAllState);
+    });
+}
+
+// Update select all checkbox state
+function updateSelectAllState() {
+    const selectAllCheckbox = document.getElementById('selectAllUsers');
+    const userCheckboxes = document.querySelectorAll('.user-checkbox');
+    const checkedBoxes = document.querySelectorAll('.user-checkbox:checked');
+    
+    if (checkedBoxes.length === userCheckboxes.length) {
+        selectAllCheckbox.checked = true;
+        selectAllCheckbox.indeterminate = false;
+    } else if (checkedBoxes.length > 0) {
+        selectAllCheckbox.checked = false;
+        selectAllCheckbox.indeterminate = true;
+    } else {
+        selectAllCheckbox.checked = false;
+        selectAllCheckbox.indeterminate = false;
+    }
+}
+
+// Sort user table by column
+let currentSortColumn = null;
+let currentSortDirection = 'asc';
+
+function sortUserTable(column) {
+    const users = getUsersFromDatabase();
+    
+    // Toggle sort direction if clicking the same column
+    if (currentSortColumn === column) {
+        currentSortDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+        currentSortColumn = column;
+        currentSortDirection = 'asc';
+    }
+    
+    // Sort users based on column
+    const sortedUsers = [...users].sort((a, b) => {
+        let aValue, bValue;
+        
+        switch (column) {
+            case 'name':
+                aValue = a.name.toLowerCase();
+                bValue = b.name.toLowerCase();
+                break;
+            case 'email':
+                aValue = a.email.toLowerCase();
+                bValue = b.email.toLowerCase();
+                break;
+            case 'role':
+                const roleOrder = { admin: 4, editor: 3, user: 2, guest: 1 };
+                aValue = roleOrder[a.role] || 0;
+                bValue = roleOrder[b.role] || 0;
+                break;
+            case 'memberSince':
+                aValue = new Date(a.memberSince);
+                bValue = new Date(b.memberSince);
+                break;
+            default:
+                return 0;
+        }
+        
+        if (aValue < bValue) return currentSortDirection === 'asc' ? -1 : 1;
+        if (aValue > bValue) return currentSortDirection === 'asc' ? 1 : -1;
+        return 0;
+    });
+    
+    // Update sort icons
+    updateSortIcons(column, currentSortDirection);
+    
+    // Render sorted users
+    renderFilteredUsers(sortedUsers);
+}
+
+// Update sort icons in table headers
+function updateSortIcons(activeColumn, direction) {
+    const sortableHeaders = document.querySelectorAll('.fluent-th-sortable');
+    
+    sortableHeaders.forEach(header => {
+        const icon = header.querySelector('.fluent-sort-icon');
+        const column = header.dataset.sort;
+        
+        if (column === activeColumn) {
+            icon.style.opacity = '1';
+            if (direction === 'desc') {
+                icon.style.transform = 'rotate(180deg)';
+            } else {
+                icon.style.transform = 'rotate(0deg)';
+            }
+        } else {
+            icon.style.opacity = '0.5';
+            icon.style.transform = 'rotate(0deg)';
+        }
+    });
 } 

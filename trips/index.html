@@ -362,58 +362,144 @@
         </div>
     </div>
 
-    <!-- User Management Modal -->
-    <div id="userManagementModal" class="modal" style="display: none;" role="dialog" aria-labelledby="user-management-title" aria-modal="true">
+    <!-- Microsoft-Style User Management Modal -->
+    <div id="userManagementModal" class="modal fluent-modal" style="display: none;" role="dialog" aria-labelledby="user-management-title" aria-modal="true">
         <div class="modal-backdrop" onclick="hideUserManagementModal()" aria-label="Close user management"></div>
-        <div class="modal-content large">
-            <div class="modal-header">
-                <h2 id="user-management-title" class="modal-title">User Management</h2>
-                <button class="close-btn" onclick="hideUserManagementModal()" aria-label="Close user management">
-                    <span class="close-icon">×</span>
+        <div class="modal-content fluent-modal-content">
+            <div class="fluent-modal-header">
+                <div class="fluent-header-content">
+                    <h1 id="user-management-title" class="fluent-modal-title">People</h1>
+                    <p class="fluent-modal-subtitle">Manage users and permissions for your organization</p>
+                </div>
+                <button class="fluent-close-btn" onclick="hideUserManagementModal()" aria-label="Close user management">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M11.41 10l4.3-4.29a1 1 0 10-1.42-1.42L10 8.59l-4.29-4.3a1 1 0 00-1.42 1.42L8.59 10l-4.3 4.29a1 1 0 001.42 1.42L10 11.41l4.29 4.3a1 1 0 001.42-1.42L11.41 10z"/>
+                    </svg>
                 </button>
             </div>
             
-            <div class="user-management-content">
-                <!-- Current User Section -->
-                <section class="user-profile-section">
-                    <div class="section-header">
-                        <h3>Your Profile</h3>
-                    </div>
-                    <div class="user-profile-card">
-                        <div class="profile-info">
-                            <div class="profile-avatar">
-                                <img src="images/user-LM.svg" alt="Profile" class="profile-avatar-icon">
+            <div class="fluent-modal-body">
+                <!-- Profile Section (30%) -->
+                <section class="fluent-profile-section">
+                    <div class="fluent-profile-card">
+                        <div class="fluent-profile-info">
+                            <div class="fluent-profile-avatar">
+                                <div class="fluent-avatar-circle" id="modalProfileAvatar">DW</div>
                             </div>
-                            <div class="profile-details">
-                                <h4 id="modalProfileName">Daniel Wolthers</h4>
-                                <p id="modalProfileEmail">daniel@wolthers.com</p>
-                                <p id="modalProfileRole" class="role-badge admin">Administrator</p>
-                                <p class="profile-meta">Member since: January 2024</p>
+                            <div class="fluent-profile-details">
+                                <h3 id="modalProfileName" class="fluent-profile-name">Daniel Wolthers</h3>
+                                <p id="modalProfileEmail" class="fluent-profile-email">daniel@wolthers.com</p>
+                                <div class="fluent-profile-badges">
+                                    <span id="modalProfileRole" class="fluent-badge fluent-badge-admin">Administrator</span>
+                                    <span class="fluent-badge fluent-badge-team">Wolthers Team</span>
+                                </div>
+                                <p class="fluent-profile-meta">Member since January 2024</p>
                             </div>
                         </div>
-                        <button class="btn btn-secondary" onclick="editProfile()">Edit Profile</button>
+                        <button class="fluent-btn fluent-btn-secondary" onclick="editProfile()">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                                <path d="M11.013 1.427a1.75 1.75 0 012.474 0l1.086 1.086a1.75 1.75 0 010 2.474l-8.61 8.61c-.21.21-.47.364-.756.445l-3.251.93a.75.75 0 01-.927-.928l.929-3.25a1.75 1.75 0 01.445-.758l8.61-8.61zm1.414 1.06a.25.25 0 00-.354 0L10.811 3.75l1.439 1.44 1.263-1.263a.25.25 0 000-.354L12.427 2.487zM12.25 6.25L10.811 4.81 9.53 6.091a.25.25 0 00-.064.108l-.85 2.972 2.972-.85a.25.25 0 00.108-.064L12.25 6.25z"/>
+                            </svg>
+                            Edit profile
+                        </button>
                     </div>
                 </section>
 
-                <!-- User Management -->
-                <section class="admin-section">
-                    <div class="section-header">
-                        <h3>All Users</h3>
-                        <button class="btn btn-primary btn-compact" onclick="showAddUserModal()">+ Add User</button>
+                <!-- Users Management Section (70%) -->
+                <section class="fluent-users-section">
+                    <div class="fluent-section-header">
+                        <div class="fluent-header-group">
+                            <h2 class="fluent-section-title">All users</h2>
+                            <div class="fluent-section-controls">
+                                <div class="fluent-search-box">
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" class="fluent-search-icon">
+                                        <path d="M11.742 10.344a6.5 6.5 0 10-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 001.415-1.414l-3.85-3.85a1.007 1.007 0 00-.115-.1zM12 6.5a5.5 5.5 0 11-11 0 5.5 5.5 0 0111 0z"/>
+                                    </svg>
+                                    <input type="text" id="userSearchInput" placeholder="Search users" class="fluent-search-input">
+                                </div>
+                                <div class="fluent-filter-dropdown">
+                                    <select id="userRoleFilter" class="fluent-select">
+                                        <option value="">All roles</option>
+                                        <option value="admin">Administrator</option>
+                                        <option value="editor">Editor</option>
+                                        <option value="user">User</option>
+                                        <option value="guest">Guest</option>
+                                    </select>
+                                </div>
+                                <button class="fluent-btn fluent-btn-primary" onclick="showAddUserModal()">
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                                        <path d="M8.75 3.75a.75.75 0 00-1.5 0v3.5h-3.5a.75.75 0 000 1.5h3.5v3.5a.75.75 0 001.5 0v-3.5h3.5a.75.75 0 000-1.5h-3.5v-3.5z"/>
+                                    </svg>
+                                    Add person
+                                </button>
+                            </div>
+                        </div>
                     </div>
-                    <div class="users-list" id="modalUsersList">
-                        <!-- Users will be loaded here -->
+                    
+                    <!-- Users Table -->
+                    <div class="fluent-table-container">
+                        <table class="fluent-table" id="modalUsersTable">
+                            <thead>
+                                <tr>
+                                    <th class="fluent-th-checkbox">
+                                        <input type="checkbox" class="fluent-checkbox" id="selectAllUsers">
+                                    </th>
+                                    <th class="fluent-th-sortable" data-sort="name">
+                                        <span>Name</span>
+                                        <svg width="12" height="12" viewBox="0 0 12 12" class="fluent-sort-icon">
+                                            <path d="M6 2L4.5 3.5h3L6 2zM6 10l1.5-1.5h-3L6 10z"/>
+                                        </svg>
+                                    </th>
+                                    <th class="fluent-th-sortable" data-sort="email">
+                                        <span>Email</span>
+                                        <svg width="12" height="12" viewBox="0 0 12 12" class="fluent-sort-icon">
+                                            <path d="M6 2L4.5 3.5h3L6 2zM6 10l1.5-1.5h-3L6 10z"/>
+                                        </svg>
+                                    </th>
+                                    <th>Company</th>
+                                    <th class="fluent-th-sortable" data-sort="role">
+                                        <span>User type</span>
+                                        <svg width="12" height="12" viewBox="0 0 12 12" class="fluent-sort-icon">
+                                            <path d="M6 2L4.5 3.5h3L6 2zM6 10l1.5-1.5h-3L6 10z"/>
+                                        </svg>
+                                    </th>
+                                    <th class="fluent-th-sortable" data-sort="memberSince">
+                                        <span>Member since</span>
+                                        <svg width="12" height="12" viewBox="0 0 12 12" class="fluent-sort-icon">
+                                            <path d="M6 2L4.5 3.5h3L6 2zM6 10l1.5-1.5h-3L6 10z"/>
+                                        </svg>
+                                    </th>
+                                    <th># of trips</th>
+                                    <th>Last trip date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="modalUsersList">
+                                <!-- Users will be loaded here -->
+                            </tbody>
+                        </table>
                     </div>
-                </section>
-
-                <!-- Trip Permissions -->
-                <section class="admin-section">
-                    <div class="section-header">
-                        <h3>Trip Administrator Assignments</h3>
-                        <p class="section-description">Assign users as administrators for specific trips</p>
-                    </div>
-                    <div class="trip-admin-list" id="modalTripAdminList">
-                        <!-- Trip admin assignments will be loaded here -->
+                    
+                    <!-- Pagination -->
+                    <div class="fluent-pagination">
+                        <div class="fluent-pagination-info">
+                            <span id="paginationInfo">Showing 1-20 of 4 users</span>
+                        </div>
+                        <div class="fluent-pagination-controls">
+                            <button class="fluent-pagination-btn" id="prevPageBtn" disabled>
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                                    <path d="M9.78 12.78a.75.75 0 01-1.06 0L4.47 8.53a.75.75 0 010-1.06l4.25-4.25a.75.75 0 011.06 1.06L6.06 8l3.72 3.72a.75.75 0 010 1.06z"/>
+                                </svg>
+                            </button>
+                            <span class="fluent-page-numbers">
+                                <button class="fluent-page-btn fluent-page-active">1</button>
+                            </span>
+                            <button class="fluent-pagination-btn" id="nextPageBtn" disabled>
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                                    <path d="M6.22 3.22a.75.75 0 011.06 0l4.25 4.25a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06-1.06L9.94 8 6.22 4.28a.75.75 0 010-1.06z"/>
+                                </svg>
+                            </button>
+                        </div>
                     </div>
                 </section>
             </div>
@@ -471,6 +557,7 @@
 
 
 
+    <script src="js/accounts.js"></script>
     <script src="js/main.js"></script>
 </body>
 </html> 

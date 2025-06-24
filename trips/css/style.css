@@ -3241,4 +3241,818 @@ body {
             color: #f85149;
         }
     }
+}
+
+/* Microsoft Fluent Design User Management Styles */
+.fluent-modal {
+    z-index: 2000;
+}
+
+.fluent-modal-content {
+    width: 95vw;
+    max-width: 1200px;
+    max-height: 90vh;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 32px 64px rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--dark-border);
+}
+
+.fluent-modal-header {
+    background: var(--white);
+    border-bottom: 1px solid #e5e5e5;
+    padding: 24px 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+@media (prefers-color-scheme: dark) {
+    .fluent-modal-header {
+        background: var(--dark-bg);
+        border-bottom: 1px solid var(--dark-border);
+    }
+}
+
+.fluent-header-content h1.fluent-modal-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--dark-green);
+    margin: 0 0 4px 0;
+}
+
+.fluent-modal-subtitle {
+    color: #666;
+    font-size: 0.95rem;
+    margin: 0;
+    font-weight: 400;
+}
+
+@media (prefers-color-scheme: dark) {
+    .fluent-header-content h1.fluent-modal-title {
+        color: var(--dark-accent);
+    }
+    
+    .fluent-modal-subtitle {
+        color: var(--dark-text-secondary);
+    }
+}
+
+.fluent-close-btn {
+    background: none;
+    border: none;
+    padding: 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    color: #666;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.fluent-close-btn:hover {
+    background: #f3f2f1;
+    color: var(--dark-green);
+}
+
+@media (prefers-color-scheme: dark) {
+    .fluent-close-btn {
+        color: var(--dark-text-secondary);
+    }
+    
+    .fluent-close-btn:hover {
+        background: var(--dark-border);
+        color: var(--dark-accent);
+    }
+}
+
+.fluent-modal-body {
+    display: flex;
+    flex-direction: column;
+    height: calc(90vh - 120px);
+    background: var(--white);
+}
+
+@media (prefers-color-scheme: dark) {
+    .fluent-modal-body {
+        background: var(--dark-bg);
+    }
+}
+
+/* Profile Section (30%) */
+.fluent-profile-section {
+    flex: 0 0 auto;
+    background: #fafafa;
+    border-bottom: 1px solid #e5e5e5;
+    padding: 24px 32px;
+}
+
+@media (prefers-color-scheme: dark) {
+    .fluent-profile-section {
+        background: var(--dark-bg-secondary);
+        border-bottom: 1px solid var(--dark-border);
+    }
+}
+
+.fluent-profile-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 100%;
+}
+
+.fluent-profile-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex: 1;
+}
+
+.fluent-profile-avatar {
+    flex-shrink: 0;
+}
+
+.fluent-avatar-circle {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: var(--dark-green);
+    color: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 1.5rem;
+    border: 3px solid var(--white);
+    box-shadow: 0 4px 12px rgba(44, 85, 48, 0.2);
+}
+
+@media (prefers-color-scheme: dark) {
+    .fluent-avatar-circle {
+        background: var(--dark-accent);
+        border-color: var(--dark-bg);
+        box-shadow: 0 4px 12px rgba(212, 175, 55, 0.2);
+    }
+}
+
+.fluent-profile-details {
+    min-width: 0;
+    flex: 1;
+}
+
+.fluent-profile-name {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--dark-green);
+    margin: 0 0 4px 0;
+}
+
+.fluent-profile-email {
+    color: #666;
+    font-size: 0.95rem;
+    margin: 0 0 8px 0;
+}
+
+.fluent-profile-badges {
+    display: flex;
+    gap: 8px;
+    margin: 0 0 8px 0;
+}
+
+.fluent-badge {
+    padding: 4px 12px;
+    border-radius: 16px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-transform: capitalize;
+}
+
+.fluent-badge-admin {
+    background: var(--gold);
+    color: var(--white);
+}
+
+.fluent-badge-team {
+    background: var(--medium-green);
+    color: var(--white);
+}
+
+.fluent-profile-meta {
+    color: #999;
+    font-size: 0.85rem;
+    margin: 0;
+}
+
+@media (prefers-color-scheme: dark) {
+    .fluent-profile-name {
+        color: var(--dark-text);
+    }
+    
+    .fluent-profile-email {
+        color: var(--dark-text-secondary);
+    }
+    
+    .fluent-profile-meta {
+        color: #8b949e;
+    }
+    
+    .fluent-badge-admin {
+        background: var(--dark-accent);
+        color: var(--dark-bg);
+    }
+    
+    .fluent-badge-team {
+        background: var(--medium-green);
+        color: var(--white);
+    }
+}
+
+/* Buttons */
+.fluent-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    background: none;
+}
+
+.fluent-btn-primary {
+    background: var(--dark-green);
+    color: var(--white);
+    border-color: var(--dark-green);
+}
+
+.fluent-btn-primary:hover {
+    background: var(--medium-green);
+    border-color: var(--medium-green);
+    transform: translateY(-1px);
+}
+
+.fluent-btn-secondary {
+    background: transparent;
+    color: var(--dark-green);
+    border-color: #d1d1d1;
+}
+
+.fluent-btn-secondary:hover {
+    background: #f3f2f1;
+    border-color: var(--medium-green);
+    color: var(--medium-green);
+}
+
+@media (prefers-color-scheme: dark) {
+    .fluent-btn-primary {
+        background: var(--dark-accent);
+        color: var(--dark-bg);
+        border-color: var(--dark-accent);
+    }
+    
+    .fluent-btn-primary:hover {
+        background: #f0c040;
+        border-color: #f0c040;
+    }
+    
+    .fluent-btn-secondary {
+        color: var(--dark-text);
+        border-color: var(--dark-border);
+    }
+    
+    .fluent-btn-secondary:hover {
+        background: var(--dark-border);
+        border-color: var(--dark-accent);
+        color: var(--dark-accent);
+    }
+}
+
+/* Users Section (70%) */
+.fluent-users-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 24px 32px;
+    overflow: hidden;
+}
+
+.fluent-section-header {
+    margin-bottom: 24px;
+}
+
+.fluent-header-group {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+}
+
+.fluent-section-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--dark-green);
+    margin: 0;
+}
+
+@media (prefers-color-scheme: dark) {
+    .fluent-section-title {
+        color: var(--dark-text);
+    }
+}
+
+.fluent-section-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.fluent-search-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.fluent-search-icon {
+    position: absolute;
+    left: 12px;
+    color: #666;
+    pointer-events: none;
+}
+
+.fluent-search-input {
+    padding: 8px 12px 8px 36px;
+    border: 1px solid #d1d1d1;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    width: 250px;
+    background: var(--white);
+    color: var(--dark-green);
+}
+
+.fluent-search-input:focus {
+    outline: none;
+    border-color: var(--medium-green);
+    box-shadow: 0 0 0 2px rgba(45, 90, 71, 0.1);
+}
+
+.fluent-select {
+    padding: 8px 12px;
+    border: 1px solid #d1d1d1;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    background: var(--white);
+    color: var(--dark-green);
+    cursor: pointer;
+}
+
+.fluent-select:focus {
+    outline: none;
+    border-color: var(--medium-green);
+    box-shadow: 0 0 0 2px rgba(45, 90, 71, 0.1);
+}
+
+@media (prefers-color-scheme: dark) {
+    .fluent-search-icon {
+        color: var(--dark-text-secondary);
+    }
+    
+    .fluent-search-input {
+        background: var(--dark-bg-secondary);
+        border-color: var(--dark-border);
+        color: var(--dark-text);
+    }
+    
+    .fluent-search-input:focus {
+        border-color: var(--dark-accent);
+        box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.1);
+    }
+    
+    .fluent-select {
+        background: var(--dark-bg-secondary);
+        border-color: var(--dark-border);
+        color: var(--dark-text);
+    }
+    
+    .fluent-select:focus {
+        border-color: var(--dark-accent);
+        box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.1);
+    }
+}
+
+/* Table Styles */
+.fluent-table-container {
+    flex: 1;
+    overflow: auto;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    background: var(--white);
+}
+
+@media (prefers-color-scheme: dark) {
+    .fluent-table-container {
+        border-color: var(--dark-border);
+        background: var(--dark-bg);
+    }
+}
+
+.fluent-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.fluent-table thead {
+    background: #f8f9fa;
+    border-bottom: 1px solid #e5e5e5;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.fluent-table th {
+    padding: 12px 16px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: #666;
+    white-space: nowrap;
+}
+
+.fluent-table td {
+    padding: 16px;
+    border-bottom: 1px solid #f1f1f1;
+    vertical-align: middle;
+}
+
+.fluent-table tbody tr:hover {
+    background: #f8f9fa;
+}
+
+@media (prefers-color-scheme: dark) {
+    .fluent-table thead {
+        background: var(--dark-bg-secondary);
+        border-bottom-color: var(--dark-border);
+    }
+    
+    .fluent-table th {
+        color: var(--dark-text-secondary);
+    }
+    
+    .fluent-table td {
+        border-bottom-color: var(--dark-border);
+        color: var(--dark-text);
+    }
+    
+    .fluent-table tbody tr:hover {
+        background: var(--dark-bg-secondary);
+    }
+}
+
+.fluent-th-sortable {
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+}
+
+.fluent-th-sortable:hover {
+    background: #f0f0f0;
+}
+
+@media (prefers-color-scheme: dark) {
+    .fluent-th-sortable:hover {
+        background: var(--dark-border);
+    }
+}
+
+.fluent-sort-icon {
+    margin-left: 4px;
+    opacity: 0.5;
+}
+
+.fluent-th-checkbox {
+    width: 40px;
+    text-align: center;
+}
+
+.fluent-checkbox {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--dark-green);
+}
+
+@media (prefers-color-scheme: dark) {
+    .fluent-checkbox {
+        accent-color: var(--dark-accent);
+    }
+}
+
+/* Table Cell Styles */
+.fluent-user-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.fluent-user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--light-green);
+    color: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.8rem;
+    flex-shrink: 0;
+}
+
+.fluent-user-info h4 {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--dark-green);
+}
+
+.fluent-user-info p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #666;
+}
+
+@media (prefers-color-scheme: dark) {
+    .fluent-user-info h4 {
+        color: var(--dark-text);
+    }
+    
+    .fluent-user-info p {
+        color: var(--dark-text-secondary);
+    }
+}
+
+.fluent-badge-table {
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: capitalize;
+}
+
+.fluent-badge-table.admin {
+    background: var(--gold);
+    color: var(--white);
+}
+
+.fluent-badge-table.editor {
+    background: var(--medium-green);
+    color: var(--white);
+}
+
+.fluent-badge-table.user {
+    background: #6c757d;
+    color: var(--white);
+}
+
+.fluent-badge-table.guest {
+    background: var(--light-brown);
+    color: var(--dark-green);
+}
+
+.fluent-action-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.fluent-action-btn {
+    padding: 6px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    background: none;
+    cursor: pointer;
+    color: #666;
+    transition: all 0.2s ease;
+}
+
+.fluent-action-btn:hover {
+    background: #f3f2f1;
+    color: var(--dark-green);
+}
+
+.fluent-action-btn.danger:hover {
+    background: #fdf2f2;
+    color: #dc3545;
+}
+
+@media (prefers-color-scheme: dark) {
+    .fluent-action-btn:hover {
+        background: var(--dark-border);
+        color: var(--dark-accent);
+    }
+    
+    .fluent-action-btn.danger:hover {
+        background: rgba(220, 53, 69, 0.1);
+        color: #ff6b7d;
+    }
+}
+
+/* Pagination */
+.fluent-pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 0;
+    margin-top: 16px;
+    border-top: 1px solid #e5e5e5;
+}
+
+@media (prefers-color-scheme: dark) {
+    .fluent-pagination {
+        border-top-color: var(--dark-border);
+    }
+}
+
+.fluent-pagination-info {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+@media (prefers-color-scheme: dark) {
+    .fluent-pagination-info {
+        color: var(--dark-text-secondary);
+    }
+}
+
+.fluent-pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.fluent-pagination-btn {
+    padding: 8px;
+    border: 1px solid #d1d1d1;
+    border-radius: 4px;
+    background: var(--white);
+    cursor: pointer;
+    color: var(--dark-green);
+    transition: all 0.2s ease;
+}
+
+.fluent-pagination-btn:hover:not(:disabled) {
+    background: #f3f2f1;
+    border-color: var(--medium-green);
+}
+
+.fluent-pagination-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.fluent-page-btn {
+    padding: 8px 12px;
+    border: 1px solid #d1d1d1;
+    border-radius: 4px;
+    background: var(--white);
+    cursor: pointer;
+    color: var(--dark-green);
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+.fluent-page-btn:hover {
+    background: #f3f2f1;
+    border-color: var(--medium-green);
+}
+
+.fluent-page-active {
+    background: var(--dark-green);
+    color: var(--white);
+    border-color: var(--dark-green);
+}
+
+@media (prefers-color-scheme: dark) {
+    .fluent-pagination-btn {
+        background: var(--dark-bg-secondary);
+        border-color: var(--dark-border);
+        color: var(--dark-text);
+    }
+    
+    .fluent-pagination-btn:hover:not(:disabled) {
+        background: var(--dark-border);
+        border-color: var(--dark-accent);
+    }
+    
+    .fluent-page-btn {
+        background: var(--dark-bg-secondary);
+        border-color: var(--dark-border);
+        color: var(--dark-text);
+    }
+    
+    .fluent-page-btn:hover {
+        background: var(--dark-border);
+        border-color: var(--dark-accent);
+    }
+    
+    .fluent-page-active {
+        background: var(--dark-accent);
+        color: var(--dark-bg);
+        border-color: var(--dark-accent);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .fluent-modal-content {
+        width: 98vw;
+        max-height: 95vh;
+    }
+    
+    .fluent-modal-header {
+        padding: 20px 24px;
+    }
+    
+    .fluent-users-section {
+        padding: 20px 24px;
+    }
+    
+    .fluent-profile-section {
+        padding: 20px 24px;
+    }
+    
+    .fluent-search-input {
+        width: 200px;
+    }
+}
+
+@media (max-width: 768px) {
+    .fluent-header-group {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 16px;
+    }
+    
+    .fluent-section-controls {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    
+    .fluent-search-input {
+        width: 100%;
+        min-width: 200px;
+    }
+    
+    .fluent-profile-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+    
+    .fluent-table-container {
+        overflow-x: auto;
+    }
+    
+    .fluent-table {
+        min-width: 800px;
+    }
+    
+    .fluent-pagination {
+        flex-direction: column;
+        gap: 16px;
+        align-items: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .fluent-modal-content {
+        border-radius: 0;
+        height: 100vh;
+        max-height: 100vh;
+    }
+    
+    .fluent-modal-header {
+        padding: 16px 20px;
+    }
+    
+    .fluent-header-content h1.fluent-modal-title {
+        font-size: 1.5rem;
+    }
+    
+    .fluent-profile-section {
+        padding: 16px 20px;
+    }
+    
+    .fluent-users-section {
+        padding: 16px 20px;
+    }
+    
+    .fluent-avatar-circle {
+        width: 48px;
+        height: 48px;
+        font-size: 1.2rem;
+    }
 } 
