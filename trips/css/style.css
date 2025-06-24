@@ -1215,7 +1215,8 @@ body {
 }
 
 .modal-content.large {
-    max-width: 800px;
+    max-width: 1200px;
+    width: 95vw;
 }
 
 @keyframes slideUp {
@@ -1360,6 +1361,13 @@ body {
     border-radius: 12px;
     font-size: 0.75rem;
     font-weight: 600;
+}
+
+.btn-compact {
+    padding: 8px 16px !important;
+    font-size: 0.85rem !important;
+    font-weight: 500 !important;
+    min-width: auto !important;
 }
 
 /* Trip Preview Modal */
@@ -2227,6 +2235,29 @@ body {
     
     .trip-detail-grid {
         grid-template-columns: 1fr;
+    }
+    
+    /* Large Modal Responsive */
+    .modal-content.large {
+        width: 98vw;
+        max-width: none;
+        margin: 5px;
+        padding: 15px;
+    }
+    
+    .users-table-container {
+        font-size: 0.8rem;
+    }
+    
+    .users-table th,
+    .users-table td {
+        padding: 8px 6px;
+    }
+    
+    .table-avatar {
+        width: 28px;
+        height: 28px;
+        font-size: 0.7rem;
     }
 }
 
