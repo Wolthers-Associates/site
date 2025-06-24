@@ -2153,4 +2153,23 @@ body {
     font-size: 0.95em;
     color: #888;
     margin-top: 2px;
+}
+
+@media (prefers-color-scheme: dark) {
+    .trip-preview-header {
+        background: #23272b;
+        color: #e6edf3;
+        border-top-left-radius: 18px;
+        border-top-right-radius: 18px;
+    }
+    .trip-preview-highlights {
+        background: #2d3136;
+        color: #fff;
+        border-radius: 12px;
+        padding: 8px 0 8px 0;
+    }
+    .preview-day-number {
+        background: #D4AF37 !important;
+        color: #fff !important;
+    }
 } 
