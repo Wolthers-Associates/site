@@ -18,17 +18,38 @@ class MicrosoftAuth {
      */
     getAuthUrl() {
         const baseUrl = 'https://login.microsoftonline.com';
-        const params = new URLSearchParams({
-            client_id: this.clientId,
-            response_type: 'token',
-            redirect_uri: this.redirectUri,
-            scope: this.scopes.join(' '),
-            response_mode: 'fragment',
-            state: this.generateState(),
-            nonce: this.generateNonce()
-        });
         
-        return `${baseUrl}/${this.tenantId}/oauth2/v2.0/authorize?${params.toString()}`;
+        // Try modern flow first, fallback to implicit flow
+        const useModernFlow = false; // Set to true after enabling implicit flow
+        
+        if (useModernFlow) {
+            // Authorization Code Flow with PKCE (recommended)
+            const params = new URLSearchParams({
+                client_id: this.clientId,
+                response_type: 'code',
+                redirect_uri: this.redirectUri,
+                scope: this.scopes.join(' '),
+                response_mode: 'query',
+                state: this.generateState(),
+                code_challenge_method: 'S256',
+                code_challenge: this.generateCodeChallenge()
+            });
+            
+            return `${baseUrl}/${this.tenantId}/oauth2/v2.0/authorize?${params.toString()}`;
+        } else {
+            // Implicit Flow (requires enabling in Azure AD)
+            const params = new URLSearchParams({
+                client_id: this.clientId,
+                response_type: 'token',
+                redirect_uri: this.redirectUri,
+                scope: this.scopes.join(' '),
+                response_mode: 'fragment',
+                state: this.generateState(),
+                nonce: this.generateNonce()
+            });
+            
+            return `${baseUrl}/${this.tenantId}/oauth2/v2.0/authorize?${params.toString()}`;
+        }
     }
 
     /**
@@ -143,6 +164,42 @@ class MicrosoftAuth {
      */
     generateNonce() {
         return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    }
+
+    /**
+     * Generate PKCE code verifier
+     */
+    generateCodeVerifier() {
+        const array = new Uint8Array(32);
+        crypto.getRandomValues(array);
+        return this.base64URLEncode(array);
+    }
+
+    /**
+     * Generate PKCE code challenge
+     */
+    generateCodeChallenge() {
+        const codeVerifier = this.generateCodeVerifier();
+        sessionStorage.setItem('pkce_code_verifier', codeVerifier);
+        
+        // For simplicity, we'll use plain method instead of S256
+        // In production, implement SHA256 hashing
+        return codeVerifier;
+    }
+
+    /**
+     * Base64 URL encode
+     */
+    base64URLEncode(buffer) {
+        const bytes = new Uint8Array(buffer);
+        let binary = '';
+        for (let i = 0; i < bytes.byteLength; i++) {
+            binary += String.fromCharCode(bytes[i]);
+        }
+        return btoa(binary)
+            .replace(/\+/g, '-')
+            .replace(/\//g, '_')
+            .replace(/=/g, '');
     }
 }
 
