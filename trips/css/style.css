@@ -2504,6 +2504,162 @@ body {
     margin: 0;
 }
 
+/* Modern User Management Styles */
+.modern-user-card {
+    background: #ffffff;
+    border: 1px solid #e1e5e9;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 8px;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.modern-user-card:hover {
+    border-color: #DAA520;
+    box-shadow: 0 2px 8px rgba(218, 165, 32, 0.15);
+    transform: translateY(-1px);
+}
+
+.modern-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.user-name {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0 0 2px 0;
+}
+
+.user-email {
+    font-size: 0.85rem;
+    color: #6b7280;
+    margin: 0 0 4px 0;
+}
+
+.user-role {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.modern-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.modern-badge.admin {
+    background: rgba(218, 165, 32, 0.1);
+    color: #DAA520;
+    border: 1px solid rgba(218, 165, 32, 0.2);
+}
+
+.modern-badge.user {
+    background: rgba(108, 117, 125, 0.1);
+    color: #6c757d;
+    border: 1px solid rgba(108, 117, 125, 0.2);
+}
+
+.user-meta {
+    font-size: 0.75rem;
+    color: #9ca3af;
+}
+
+.modern-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.btn-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 8px;
+    background: #f3f4f6;
+    color: #6b7280;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-icon:hover {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+.btn-icon.btn-danger:hover {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.btn-icon svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* Database Info Styles */
+.database-info {
+    background: #f8f9fa;
+    border: 1px solid #e1e5e9;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+}
+
+.database-info h4 {
+    margin: 0 0 4px 0;
+    color: #1f2937;
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.database-info p {
+    margin: 0;
+    color: #6b7280;
+    font-size: 0.8rem;
+}
+
+.user-badges {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.team-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-size: 0.7rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: rgba(34, 197, 94, 0.1);
+    color: #16a34a;
+    border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
 @media (prefers-color-scheme: dark) {
     .header {
         background: linear-gradient(135deg, #181C1F 0%, #23272B 100%);
@@ -2712,6 +2868,65 @@ body {
             background: #23272b;
             border-color: #2d3136;
             color: #ffffff;
+        }
+        
+        /* Modern User Management Dark Mode */
+        .modern-user-card {
+            background: #23272b;
+            border-color: #2d3136;
+            color: #e6edf3;
+        }
+        
+        .modern-user-card:hover {
+            border-color: #DAA520;
+            box-shadow: 0 2px 8px rgba(218, 165, 32, 0.25);
+        }
+        
+        .user-name {
+            color: #ffffff;
+        }
+        
+        .user-email {
+            color: #b0b8c1;
+        }
+        
+        .user-meta {
+            color: #7d8590;
+        }
+        
+        .btn-icon {
+            background: #2d3136;
+            color: #b0b8c1;
+        }
+        
+        .btn-icon:hover {
+            background: #373e47;
+            color: #ffffff;
+        }
+        
+        .btn-icon.btn-danger:hover {
+            background: rgba(248, 81, 73, 0.15);
+            color: #f85149;
+        }
+        
+        /* Database Info Dark Mode */
+        .database-info {
+            background: #2d3136;
+            border-color: #373e47;
+        }
+        
+        .database-info h4 {
+            color: #DAA520;
+        }
+        
+        .database-info p {
+            color: #b0b8c1;
+        }
+        
+        .team-badge {
+            background: rgba(34, 197, 94, 0.15);
+            color: #4ade80;
+            border-color: rgba(34, 197, 94, 0.3);
         }
     }
 } 

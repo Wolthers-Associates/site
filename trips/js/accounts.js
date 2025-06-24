@@ -1,48 +1,94 @@
 // Accounts Management JavaScript
 
-// Core Wolthers team members - only these exist initially
-const MOCK_USERS = [
-    {
-        id: "daniel-wolthers",
-        name: "Daniel Wolthers",
-        email: "daniel@wolthers.com",
-        role: "admin",
-        avatar: "DW",
-        memberSince: "2024-01-01",
-        tripPermissions: [],
-        isCreator: true
-    },
-    {
-        id: "svenn-wolthers",
-        name: "Svenn Wolthers",
-        email: "svenn@wolthers.com",
-        role: "admin",
-        avatar: "SW",
-        memberSince: "2024-01-01",
-        tripPermissions: [],
-        isCreator: true
-    },
-    {
-        id: "tom-wolthers",
-        name: "Tom Wolthers",
-        email: "tom@wolthers.com",
-        role: "admin",
-        avatar: "TW",
-        memberSince: "2024-01-01",
-        tripPermissions: [],
-        isCreator: true
-    },
-    {
-        id: "rasmus-wolthers",
-        name: "Rasmus Wolthers",
-        email: "rasmus@wolthers.com",
-        role: "admin",
-        avatar: "RW",
-        memberSince: "2024-01-01",
-        tripPermissions: [],
-        isCreator: true
+// User Database - Persistent storage with localStorage backup
+let USER_DATABASE = [];
+
+// Initialize user database from localStorage or defaults
+function initializeUserDatabase() {
+    const savedUsers = localStorage.getItem('wolthers_users_database');
+    if (savedUsers) {
+        try {
+            USER_DATABASE = JSON.parse(savedUsers);
+            console.log(`Loaded ${USER_DATABASE.length} users from database`);
+        } catch (e) {
+            console.error('Error loading user database:', e);
+            USER_DATABASE = getDefaultWolthersTeam();
+            saveUserDatabase();
+        }
+    } else {
+        USER_DATABASE = getDefaultWolthersTeam();
+        saveUserDatabase();
+        console.log('Initialized user database with Wolthers team');
     }
-];
+}
+
+// Core Wolthers team members - foundation users
+function getDefaultWolthersTeam() {
+    return [
+        {
+            id: "daniel-wolthers",
+            name: "Daniel Wolthers",
+            email: "daniel@wolthers.com",
+            role: "admin",
+            avatar: "DW",
+            memberSince: "2024-01-01",
+            tripPermissions: [],
+            isCreator: true,
+            lastActive: new Date().toISOString(),
+            isWolthersTeam: true
+        },
+        {
+            id: "svenn-wolthers",
+            name: "Svenn Wolthers",
+            email: "svenn@wolthers.com",
+            role: "admin",
+            avatar: "SW",
+            memberSince: "2024-01-01",
+            tripPermissions: [],
+            isCreator: true,
+            lastActive: new Date().toISOString(),
+            isWolthersTeam: true
+        },
+        {
+            id: "tom-wolthers",
+            name: "Tom Wolthers",
+            email: "tom@wolthers.com",
+            role: "admin",
+            avatar: "TW",
+            memberSince: "2024-01-01",
+            tripPermissions: [],
+            isCreator: true,
+            lastActive: new Date().toISOString(),
+            isWolthersTeam: true
+        },
+        {
+            id: "rasmus-wolthers",
+            name: "Rasmus Wolthers",
+            email: "rasmus@wolthers.com",
+            role: "admin",
+            avatar: "RW",
+            memberSince: "2024-01-01",
+            tripPermissions: [],
+            isCreator: true,
+            lastActive: new Date().toISOString(),
+            isWolthersTeam: true
+        }
+    ];
+}
+
+// Save user database to localStorage
+function saveUserDatabase() {
+    try {
+        localStorage.setItem('wolthers_users_database', JSON.stringify(USER_DATABASE));
+        // Also save timestamp of last update
+        localStorage.setItem('wolthers_users_last_updated', new Date().toISOString());
+    } catch (e) {
+        console.error('Error saving user database:', e);
+    }
+}
+
+// Compatibility - MOCK_USERS points to real database
+const MOCK_USERS = USER_DATABASE;
 
 // Mock trips data - reset to empty for fresh start
 const MOCK_TRIPS_ACCOUNTS = [];
@@ -57,6 +103,7 @@ let currentUser = {
 
 // Initialize accounts page
 document.addEventListener('DOMContentLoaded', function() {
+    initializeUserDatabase();
     initializeAccountsPage();
 });
 
@@ -103,7 +150,15 @@ function loadUsersList() {
     
     if (!usersList) return;
     
-    usersList.innerHTML = MOCK_USERS.map(user => `
+    // Add database info header
+    const dbInfo = `
+        <div class="database-info">
+            <h4>User Database (${USER_DATABASE.length} users)</h4>
+            <p>Last updated: ${localStorage.getItem('wolthers_users_last_updated') ? new Date(localStorage.getItem('wolthers_users_last_updated')).toLocaleString() : 'Never'}</p>
+        </div>
+    `;
+    
+    usersList.innerHTML = dbInfo + USER_DATABASE.map(user => `
         <div class="user-item" data-user-id="${user.id}">
             <div class="user-info">
                 <div class="user-avatar" style="background: ${getUserAvatarColor(user.role)}">
@@ -112,12 +167,15 @@ function loadUsersList() {
                 <div class="user-details">
                     <h4>${user.name}</h4>
                     <p>${user.email}</p>
-                    <p class="role-badge ${user.role}">${user.role}</p>
+                    <div class="user-badges">
+                        <span class="role-badge ${user.role}">${user.role}</span>
+                        ${user.isWolthersTeam ? '<span class="team-badge">Wolthers Team</span>' : ''}
+                    </div>
                 </div>
             </div>
             <div class="user-actions">
                 <button class="btn-small btn-edit" onclick="editUser('${user.id}')">Edit</button>
-                ${user.id !== currentUser.id ? `<button class="btn-small btn-delete" onclick="deleteUser('${user.id}')">Delete</button>` : ''}
+                ${!user.isWolthersTeam ? `<button class="btn-small btn-delete" onclick="deleteUser('${user.id}')">Delete</button>` : ''}
             </div>
         </div>
     `).join('');
@@ -263,14 +321,31 @@ function handleAddUser(event) {
         avatar: generateUserAvatar(formData.get('newUserName')),
         memberSince: new Date().toISOString().split('T')[0],
         tripPermissions: selectedTrips,
-        isCreator: false
+        isCreator: false,
+        lastActive: new Date().toISOString(),
+        isWolthersTeam: false
     };
     
-    MOCK_USERS.push(newUser);
+    // Check for duplicate email
+    if (USER_DATABASE.find(user => user.email === newUser.email)) {
+        showNotification(`A user with email ${newUser.email} already exists!`, 'error');
+        return;
+    }
+    
+    USER_DATABASE.push(newUser);
+    saveUserDatabase();
     loadUsersList();
+    
+    // Refresh the modal user list if it's open
+    if (typeof loadModalUsersList === 'function') {
+        loadModalUsersList();
+    }
+    
     sendUserWelcomeEmail(newUser);
     hideAddUserModal();
     showNotification(`User ${newUser.name} has been added successfully!`, 'success');
+    
+    console.log(`New user added: ${newUser.name} (${newUser.email})`);
 }
 
 function handleEditProfile(event) {
@@ -359,15 +434,29 @@ function editUser(userId) {
 }
 
 function deleteUser(userId) {
-    const user = MOCK_USERS.find(u => u.id === userId);
+    const user = USER_DATABASE.find(u => u.id === userId);
     if (!user) return;
     
-    if (confirm(`Are you sure you want to delete user: ${user.name}?`)) {
-        const userIndex = MOCK_USERS.findIndex(u => u.id === userId);
+    // Prevent deletion of Wolthers team members
+    if (user.isWolthersTeam) {
+        showNotification(`Cannot delete Wolthers team member: ${user.name}`, 'error');
+        return;
+    }
+    
+    if (confirm(`Are you sure you want to delete user: ${user.name}?\n\nThis action cannot be undone.`)) {
+        const userIndex = USER_DATABASE.findIndex(u => u.id === userId);
         if (userIndex !== -1) {
-            MOCK_USERS.splice(userIndex, 1);
+            USER_DATABASE.splice(userIndex, 1);
+            saveUserDatabase();
             loadUsersList();
-            showNotification(`User ${user.name} has been deleted.`, 'warning');
+            
+            // Refresh the modal user list if it's open
+            if (typeof loadModalUsersList === 'function') {
+                loadModalUsersList();
+            }
+            
+            showNotification(`User ${user.name} has been deleted.`, 'success');
+            console.log(`User deleted: ${user.name} (${user.email})`);
         }
     }
 }

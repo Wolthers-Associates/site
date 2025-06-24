@@ -1599,22 +1599,37 @@ function loadModalUsersList() {
     const usersList = document.getElementById('modalUsersList');
     if (!usersList) return;
     
-    // Use the MOCK_USERS from accounts.js if available, otherwise show current user
-    const users = window.MOCK_USERS || [currentUser];
+    // Get users from the global MOCK_USERS array (shared between files)
+    const users = getUsersFromDatabase();
     
     usersList.innerHTML = users.map(user => `
-        <div class="user-item">
+        <div class="user-item modern-user-card">
             <div class="user-info">
-                <div class="user-avatar">${user.avatar || user.name?.charAt(0) || '?'}</div>
+                <div class="user-avatar modern-avatar" style="background: ${getUserAvatarColor(user.role)}">
+                    ${user.avatar || user.name?.charAt(0) || '?'}
+                </div>
                 <div class="user-details">
-                    <h5>${user.name}</h5>
-                    <p>${user.email}</p>
-                    <p class="role-badge ${user.role}">${user.role === 'admin' ? 'Administrator' : 'User'}</p>
+                    <div class="user-name">${user.name}</div>
+                    <div class="user-email">${user.email}</div>
+                    <div class="user-role">
+                        <span class="role-badge modern-badge ${user.role}">${user.role === 'admin' ? 'Administrator' : 'User'}</span>
+                        <span class="user-meta">Member since ${formatMemberSince(user.memberSince)}</span>
+                    </div>
                 </div>
             </div>
-            <div class="user-actions">
-                <button class="btn btn-secondary" onclick="editUser('${user.id}')">Edit</button>
-                ${user.role !== 'admin' ? `<button class="btn btn-secondary" onclick="deleteUser('${user.id}')">Delete</button>` : ''}
+            <div class="user-actions modern-actions">
+                <button class="btn-icon" onclick="editUser('${user.id}')" title="Edit user">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                    </svg>
+                </button>
+                ${user.id !== currentUser?.id ? `
+                    <button class="btn-icon btn-danger" onclick="deleteUser('${user.id}')" title="Delete user">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                        </svg>
+                    </button>
+                ` : ''}
             </div>
         </div>
     `).join('');
@@ -1677,8 +1692,15 @@ function editUser(userId) {
 }
 
 function deleteUser(userId) {
-    if (confirm('Are you sure you want to delete this user?')) {
-        utils.showNotification('Delete user feature coming soon', 'info');
+    const user = getUsersFromDatabase().find(u => u.id === userId);
+    if (!user) return;
+    
+    if (confirm(`Are you sure you want to delete ${user.name}? This action cannot be undone.`)) {
+        if (removeUserFromDatabase(userId)) {
+            utils.showNotification(`User ${user.name} has been deleted successfully`, 'success');
+        } else {
+            utils.showNotification('Failed to delete user', 'error');
+        }
     }
 }
 
@@ -1688,4 +1710,62 @@ function manageTripAdmins(tripId) {
 
 function editProfile() {
     utils.showNotification('Edit profile feature coming soon', 'info');
+}
+
+// User Database Functions
+function getUsersFromDatabase() {
+    // Access the MOCK_USERS from accounts.js
+    if (typeof MOCK_USERS !== 'undefined') {
+        return MOCK_USERS;
+    }
+    // Fallback to current user if MOCK_USERS not available
+    return currentUser ? [currentUser] : [];
+}
+
+function addUserToDatabase(user) {
+    if (typeof MOCK_USERS !== 'undefined') {
+        MOCK_USERS.push(user);
+        // Refresh the user list in the modal
+        loadModalUsersList();
+        return true;
+    }
+    return false;
+}
+
+function removeUserFromDatabase(userId) {
+    if (typeof MOCK_USERS !== 'undefined') {
+        const index = MOCK_USERS.findIndex(user => user.id === userId);
+        if (index !== -1) {
+            MOCK_USERS.splice(index, 1);
+            loadModalUsersList();
+            return true;
+        }
+    }
+    return false;
+}
+
+function getUserAvatarColor(role) {
+    const colors = {
+        admin: '#DAA520',
+        editor: '#2d5a47', 
+        user: '#6c757d',
+        guest: '#d2b48c'
+    };
+    return colors[role] || '#6c757d';
+}
+
+function formatMemberSince(dateString) {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffTime = Math.abs(now - date);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays < 30) {
+        return `${diffDays} day${diffDays === 1 ? '' : 's'} ago`;
+    } else if (diffDays < 365) {
+        const months = Math.floor(diffDays / 30);
+        return `${months} month${months === 1 ? '' : 's'} ago`;
+    } else {
+        return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
+    }
 } 
