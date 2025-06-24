@@ -20,7 +20,7 @@
     --dark-border: #2d3136;
     --dark-text: #ffffff;
     --dark-text-secondary: #e6edf3;
-    --dark-accent: #FFE082;
+    --dark-accent: #DAA520;
 }
 
 body {
@@ -294,7 +294,7 @@ body {
     
     .input-group input:focus {
         border-color: var(--dark-accent) !important;
-        box-shadow: 0 0 0 4px rgba(255, 224, 130, 0.2) !important;
+        box-shadow: 0 0 0 4px rgba(218, 165, 32, 0.2) !important;
     }
     
     .input-group input::placeholder {
@@ -333,7 +333,7 @@ body {
     }
     
     .continue-btn:hover, .sign-in-btn:hover, .create-account-btn:hover, .verify-btn:hover {
-        background: #f4d03f;
+        background: #B8860B;
         color: var(--dark-bg);
     }
 }
@@ -413,7 +413,7 @@ body {
     }
     
     .back-button:hover {
-        color: #f4d03f;
+        color: #B8860B;
     }
 }
 
@@ -504,7 +504,7 @@ body {
     }
     
     .link-btn:hover {
-        color: #f4d03f;
+        color: #B8860B;
     }
 }
 
