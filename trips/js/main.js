@@ -702,8 +702,6 @@ const auth = {
         }
     },
 
-
-
     // Handle successful login
     handleSuccessfulLogin: (data) => {
         // Update global user state
@@ -854,8 +852,6 @@ const auth = {
         }
     },
 
-
-
     // Show access restrictions notice
     showAccessRestrictions: (restrictions) => {
         if (restrictions.cannot_access_other_trips) {
@@ -941,6 +937,9 @@ const ui = {
         const startDate = utils.formatDate(trip.date);
         const endDate = utils.formatDate(trip.endDate);
         const duration = utils.getTripDuration(trip.date, trip.endDate);
+        const daysUntilStart = getDaysUntilStart(trip.date);
+        const daysLeft = getDaysLeft(trip.endDate);
+        const totalDays = getTotalDays(trip.date, trip.endDate);
         
         // Get Wolthers staff attending
         const wolthersStaff = trip.wolthersGuide || trip.createdBy || 'Daniel Wolthers';
@@ -952,7 +951,7 @@ const ui = {
             <div class="trip-card ${status}" onclick="trips.openTrip('${trip.id}')" role="button" tabindex="0" onkeypress="if(event.key==='Enter') trips.openTrip('${trip.id}')">
                 <div class="trip-card-header">
                     <div class="trip-title">${trip.title}</div>
-                    <div class="trip-date">${startDate} - ${endDate}</div>
+                    <div class="trip-date">${startDate} - ${endDate} <span style="color:#888;font-size:0.95em;">(${totalDays} days)</span></div>
                 </div>
                 
                 <div class="trip-description">${trip.description}</div>
@@ -973,7 +972,7 @@ const ui = {
                 </div>
                 
                 <div class="trip-status status-${status}">
-                    ${status === 'upcoming' ? `Upcoming (${duration} days)` : 'Completed'}
+                    ${status === 'upcoming' ? `UPCOMING (${daysUntilStart > 0 ? daysUntilStart + ' days left' : 'Starts today'})` : status === 'completed' ? 'COMPLETED' : 'IN PROGRESS'}
                 </div>
                 
                 <div class="trip-footer">
@@ -1077,6 +1076,9 @@ const ui = {
         
         const duration = utils.getTripDuration(trip.date, trip.endDate);
         const dateRange = utils.formatDateRange(trip.date, trip.endDate);
+        const daysUntilStart = getDaysUntilStart(trip.date);
+        const daysLeft = getDaysLeft(trip.endDate);
+        const totalDays = getTotalDays(trip.date, trip.endDate);
         
         let daysHTML = '';
         if (trip.itinerary && trip.itinerary.length > 0) {
@@ -1097,10 +1099,35 @@ const ui = {
             `;
         }
         
+        let overviewHTML = `
+            <div class="trip-preview-info">
+              ${trip.guests ? `
+              <div class="preview-info-item">
+                <span class="preview-info-icon">👤</span>
+                <span>${trip.guests}</span>
+              </div>
+              ` : ''}
+              ${trip.cars ? `
+              <div class="preview-info-item">
+                <img src="images/disco-icon.png" alt="Car" style="height:18px;vertical-align:middle;margin-right:6px;">
+                <span>${trip.cars}</span>
+              </div>
+              ` : ''}
+              <div class="preview-info-item">
+                <span class="preview-info-icon">📅</span>
+                <span>${daysUntilStart > 0 ? `Starts in ${daysUntilStart} days` : daysLeft > 0 ? `In progress (${daysLeft} days left)` : 'Completed'}</span>
+              </div>
+              <div class="preview-info-item">
+                <span class="preview-info-icon">✨</span>
+                <span>${trip.status === 'upcoming' ? 'Upcoming' : 'Completed'}</span>
+              </div>
+            </div>
+        `;
+        
         content.innerHTML = `
             <div class="trip-preview-header">
                 <h3 class="trip-preview-title">${trip.title}</h3>
-                <div class="trip-preview-dates">${dateRange}</div>
+                <div class="trip-preview-dates">${dateRange} <span style="color:#888;font-size:0.95em;">(${totalDays} days)</span></div>
                 ${trip.wolthersGuide ? `<div class="trip-preview-guide">Guided by: ${trip.wolthersGuide}</div>` : ''}
                 <div class="trip-preview-description">${trip.description}</div>
                 
@@ -1111,43 +1138,18 @@ const ui = {
             </div>
             
             <div class="trip-preview-body">
-            
-            <div class="trip-preview-info">
-                ${trip.guests ? `
-                <div class="preview-info-item">
-                    <span class="preview-info-icon">👤</span>
-                    <span>${trip.guests}</span>
+                ${overviewHTML}
+                
+                ${trip.highlights && trip.highlights.length > 0 ? `
+                <div class="trip-preview-highlights">
+                    <h4 class="preview-section-title">Highlights</h4>
+                    ${trip.highlights.map(highlight => `
+                        <div class="preview-highlight-item">${highlight}</div>
+                    `).join('')}
                 </div>
                 ` : ''}
                 
-                ${trip.cars ? `
-                <div class="preview-info-item">
-                    <span class="preview-info-icon">🚗</span>
-                    <span>${trip.cars}</span>
-                </div>
-                ` : ''}
-                
-                <div class="preview-info-item">
-                    <span class="preview-info-icon">📅</span>
-                    <span>${duration} days</span>
-                </div>
-                
-                <div class="preview-info-item">
-                    <span class="preview-info-icon">✨</span>
-                    <span>${trip.status === 'upcoming' ? 'Upcoming' : 'Completed'}</span>
-                </div>
-            </div>
-            
-            ${trip.highlights && trip.highlights.length > 0 ? `
-            <div class="trip-preview-highlights">
-                <h4 class="preview-section-title">Highlights</h4>
-                ${trip.highlights.map(highlight => `
-                    <div class="preview-highlight-item">${highlight}</div>
-                `).join('')}
-            </div>
-            ` : ''}
-            
-            ${daysHTML}
+                ${daysHTML}
             </div>
         `;
         
@@ -1686,4 +1688,25 @@ window.DEV = {
 };
 
 console.log('✅ Trip Management System loaded successfully');
-console.log('🔧 Development tools available in window.DEV'); 
+console.log('🔧 Development tools available in window.DEV');
+
+// Helper to get days until start
+function getDaysUntilStart(startDate) {
+  const today = new Date();
+  const start = new Date(startDate);
+  const diff = Math.ceil((start - today) / (1000 * 60 * 60 * 24));
+  return diff;
+}
+// Helper to get days left (for upcoming)
+function getDaysLeft(endDate) {
+  const today = new Date();
+  const end = new Date(endDate);
+  const diff = Math.ceil((end - today) / (1000 * 60 * 60 * 24));
+  return diff;
+}
+// Helper to get total days
+function getTotalDays(startDate, endDate) {
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  return Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
+} 
