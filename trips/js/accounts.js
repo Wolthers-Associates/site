@@ -1,6 +1,6 @@
 // Accounts Management JavaScript
 
-// Mock user data for development
+// Core Wolthers team members - only these exist initially
 const MOCK_USERS = [
     {
         id: "daniel-wolthers",
@@ -9,7 +9,7 @@ const MOCK_USERS = [
         role: "admin",
         avatar: "DW",
         memberSince: "2024-01-01",
-        tripPermissions: ["brazil-coffee-origins-2025", "ethiopia-birthplace-2025"],
+        tripPermissions: [],
         isCreator: true
     },
     {
@@ -19,62 +19,33 @@ const MOCK_USERS = [
         role: "admin",
         avatar: "SW",
         memberSince: "2024-01-01",
-        tripPermissions: ["colombia-highlands-2025"],
+        tripPermissions: [],
         isCreator: true
     },
     {
-        id: "maria-santos",
-        name: "Maria Santos",
-        email: "maria@wolthers.com",
-        role: "editor",
-        avatar: "MS",
-        memberSince: "2024-02-15",
-        tripPermissions: ["brazil-coffee-origins-2025", "colombia-highlands-2025"],
-        isCreator: false
+        id: "tom-wolthers",
+        name: "Tom Wolthers",
+        email: "tom@wolthers.com",
+        role: "admin",
+        avatar: "TW",
+        memberSince: "2024-01-01",
+        tripPermissions: [],
+        isCreator: true
     },
     {
-        id: "john-client",
-        name: "John Anderson",
-        email: "john@company.com",
-        role: "guest",
-        avatar: "JA",
-        memberSince: "2024-03-01",
-        tripPermissions: ["brazil-coffee-origins-2025"],
-        isCreator: false
-    },
-    {
-        id: "sarah-partner",
-        name: "Sarah Wilson",
-        email: "sarah@business.org",
-        role: "guest",
-        avatar: "SW",
-        memberSince: "2024-03-10",
-        tripPermissions: ["brazil-coffee-origins-2025", "ethiopia-birthplace-2025"],
-        isCreator: false
+        id: "rasmus-wolthers",
+        name: "Rasmus Wolthers",
+        email: "rasmus@wolthers.com",
+        role: "admin",
+        avatar: "RW",
+        memberSince: "2024-01-01",
+        tripPermissions: [],
+        isCreator: true
     }
 ];
 
-// Mock trips data
-const MOCK_TRIPS_ACCOUNTS = [
-    {
-        id: "brazil-coffee-origins-2025",
-        title: "Brazil Coffee Origins Tour",
-        date: "2025-07-01",
-        creator: "daniel-wolthers"
-    },
-    {
-        id: "colombia-highlands-2025",
-        title: "Colombian Highland Discovery",
-        date: "2025-08-10",
-        creator: "svenn-wolthers"
-    },
-    {
-        id: "ethiopia-birthplace-2025",
-        title: "Ethiopia: Coffee's Birthplace",
-        date: "2025-09-05",
-        creator: "daniel-wolthers"
-    }
-];
+// Mock trips data - reset to empty for fresh start
+const MOCK_TRIPS_ACCOUNTS = [];
 
 // Current user data
 let currentUser = {
