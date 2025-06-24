@@ -23,7 +23,6 @@
                 <img src="images/wolthers-logo-green.svg" alt="Wolthers & Associates" class="login-logo-image">
             </div>
             <h1 class="login-title">Trip Itineraries</h1>
-            <p class="login-subtitle">Wolthers & Associates</p>
             
             <!-- Simple Login Interface -->
             <div class="simple-login">
@@ -119,8 +118,12 @@
         <div class="header">
             <div class="header-nav">
                 <div class="admin-settings" id="adminSettings" style="display: none;">
-                    <button class="admin-btn" onclick="showAdminPanel()">⚙️ Admin Settings</button>
-                    <a href="accounts.html" class="accounts-link">👥 User Management</a>
+                    <button class="admin-icon-btn" onclick="showAdminPanel()" title="Admin Settings">
+                        <img src="images/gear.svg" alt="Admin Settings" class="admin-icon">
+                    </button>
+                    <button class="admin-icon-btn" onclick="showUserManagementModal()" title="User Management">
+                        <img src="images/user-LM.svg" alt="User Management" class="admin-icon">
+                    </button>
                 </div>
                 <button class="logout-btn" onclick="logout()">Logout</button>
             </div>
@@ -328,7 +331,7 @@
                 <div class="admin-section">
                     <h3>User & Access Management</h3>
                     <div class="admin-actions">
-                        <button class="btn btn-primary" onclick="window.location.href='accounts.html'">👥 User Management</button>
+                        <button class="btn btn-primary" onclick="showUserManagementModal()">👥 User Management</button>
                         <button class="btn btn-secondary" onclick="viewAccessLogs()">📊 Access Logs</button>
                         <button class="btn btn-secondary" onclick="managePermissions()">🔐 Permissions</button>
                     </div>
@@ -352,6 +355,107 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- User Management Modal -->
+    <div id="userManagementModal" class="modal" style="display: none;" role="dialog" aria-labelledby="user-management-title" aria-modal="true">
+        <div class="modal-backdrop" onclick="hideUserManagementModal()" aria-label="Close user management"></div>
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h2 id="user-management-title" class="modal-title">User Management</h2>
+                <button class="close-btn" onclick="hideUserManagementModal()" aria-label="Close user management">
+                    <span class="close-icon">×</span>
+                </button>
+            </div>
+            
+            <div class="user-management-content">
+                <!-- Current User Section -->
+                <section class="user-profile-section">
+                    <div class="section-header">
+                        <h3>Your Profile</h3>
+                    </div>
+                    <div class="user-profile-card">
+                        <div class="profile-info">
+                            <div class="profile-avatar">
+                                <span class="avatar-icon">👤</span>
+                            </div>
+                            <div class="profile-details">
+                                <h4 id="modalProfileName">Daniel Wolthers</h4>
+                                <p id="modalProfileEmail">daniel@wolthers.com</p>
+                                <p id="modalProfileRole" class="role-badge admin">Administrator</p>
+                                <p class="profile-meta">Member since: January 2024</p>
+                            </div>
+                        </div>
+                        <button class="btn btn-secondary" onclick="editProfile()">Edit Profile</button>
+                    </div>
+                </section>
+
+                <!-- User Management -->
+                <section class="admin-section">
+                    <div class="section-header">
+                        <h3>All Users</h3>
+                        <button class="btn btn-primary" onclick="showAddUserModal()">+ Add User</button>
+                    </div>
+                    <div class="users-list" id="modalUsersList">
+                        <!-- Users will be loaded here -->
+                    </div>
+                </section>
+
+                <!-- Trip Permissions -->
+                <section class="admin-section">
+                    <div class="section-header">
+                        <h3>Trip Administrator Assignments</h3>
+                        <p class="section-description">Assign users as administrators for specific trips</p>
+                    </div>
+                    <div class="trip-admin-list" id="modalTripAdminList">
+                        <!-- Trip admin assignments will be loaded here -->
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add User Modal -->
+    <div id="addUserModal" class="modal" style="display: none;" role="dialog" aria-labelledby="add-user-title" aria-modal="true">
+        <div class="modal-backdrop" onclick="hideAddUserModal()"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="add-user-title" class="modal-title">Add New User</h2>
+                <button class="close-btn" onclick="hideAddUserModal()">
+                    <span class="close-icon">×</span>
+                </button>
+            </div>
+            <form id="addUserForm">
+                <div class="form-section">
+                    <div class="form-group">
+                        <label for="newUserName">Full Name:</label>
+                        <input type="text" id="newUserName" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="newUserEmail">Email Address:</label>
+                        <input type="email" id="newUserEmail" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="newUserRole">Role:</label>
+                        <select id="newUserRole" class="form-input">
+                            <option value="guest">Guest</option>
+                            <option value="editor">Trip Editor</option>
+                            <option value="admin">Administrator</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="newUserTrips">Assign to Trips:</label>
+                        <div class="trips-checklist" id="newUserTrips">
+                            <!-- Trip checkboxes will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="hideAddUserModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add User</button>
+                </div>
+            </form>
         </div>
     </div>
 

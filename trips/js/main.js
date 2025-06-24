@@ -1568,4 +1568,124 @@ function authenticationSettings() {
 
 function systemConfiguration() {
     utils.showNotification('System configuration feature coming soon', 'info');
+}
+
+// User Management Modal Functions
+function showUserManagementModal() {
+    document.getElementById('userManagementModal').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    loadUserManagementData();
+}
+
+function hideUserManagementModal() {
+    document.getElementById('userManagementModal').style.display = 'none';
+    document.body.style.overflow = 'auto';
+}
+
+function loadUserManagementData() {
+    // Load current user profile
+    if (currentUser) {
+        document.getElementById('modalProfileName').textContent = currentUser.name || 'Unknown User';
+        document.getElementById('modalProfileEmail').textContent = currentUser.email || 'No email';
+        document.getElementById('modalProfileRole').textContent = currentUser.role === 'admin' ? 'Administrator' : 'User';
+    }
+    
+    // Load users list from accounts.js MOCK_USERS
+    loadModalUsersList();
+    loadModalTripAdminList();
+}
+
+function loadModalUsersList() {
+    const usersList = document.getElementById('modalUsersList');
+    if (!usersList) return;
+    
+    // Use the MOCK_USERS from accounts.js if available, otherwise show current user
+    const users = window.MOCK_USERS || [currentUser];
+    
+    usersList.innerHTML = users.map(user => `
+        <div class="user-item">
+            <div class="user-info">
+                <div class="user-avatar">${user.avatar || user.name?.charAt(0) || '?'}</div>
+                <div class="user-details">
+                    <h5>${user.name}</h5>
+                    <p>${user.email}</p>
+                    <p class="role-badge ${user.role}">${user.role === 'admin' ? 'Administrator' : 'User'}</p>
+                </div>
+            </div>
+            <div class="user-actions">
+                <button class="btn btn-secondary" onclick="editUser('${user.id}')">Edit</button>
+                ${user.role !== 'admin' ? `<button class="btn btn-secondary" onclick="deleteUser('${user.id}')">Delete</button>` : ''}
+            </div>
+        </div>
+    `).join('');
+}
+
+function loadModalTripAdminList() {
+    const tripAdminList = document.getElementById('modalTripAdminList');
+    if (!tripAdminList) return;
+    
+    if (MOCK_TRIPS.length === 0) {
+        tripAdminList.innerHTML = '<p style="color: #666; font-style: italic;">No trips available. Create some trips to assign administrators.</p>';
+        return;
+    }
+    
+    tripAdminList.innerHTML = MOCK_TRIPS.map(trip => `
+        <div class="user-item">
+            <div class="user-info">
+                <div class="user-details">
+                    <h5>${trip.title}</h5>
+                    <p>Created by: ${trip.createdBy}</p>
+                    <p>Date: ${utils.formatDate(trip.date)}</p>
+                </div>
+            </div>
+            <div class="user-actions">
+                <button class="btn btn-secondary" onclick="manageTripAdmins('${trip.id}')">Manage Admins</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function showAddUserModal() {
+    document.getElementById('addUserModal').style.display = 'flex';
+    loadTripCheckboxes();
+}
+
+function hideAddUserModal() {
+    document.getElementById('addUserModal').style.display = 'none';
+    document.getElementById('addUserForm').reset();
+}
+
+function loadTripCheckboxes() {
+    const container = document.getElementById('newUserTrips');
+    if (!container) return;
+    
+    if (MOCK_TRIPS.length === 0) {
+        container.innerHTML = '<p style="color: #666; font-style: italic;">No trips available</p>';
+        return;
+    }
+    
+    container.innerHTML = MOCK_TRIPS.map(trip => `
+        <div class="trip-checkbox">
+            <input type="checkbox" id="trip-${trip.id}" value="${trip.id}">
+            <label for="trip-${trip.id}">${trip.title}</label>
+        </div>
+    `).join('');
+}
+
+function editUser(userId) {
+    utils.showNotification('Edit user feature coming soon', 'info');
+}
+
+function deleteUser(userId) {
+    if (confirm('Are you sure you want to delete this user?')) {
+        utils.showNotification('Delete user feature coming soon', 'info');
+    }
+}
+
+function manageTripAdmins(tripId) {
+    utils.showNotification('Manage trip administrators feature coming soon', 'info');
+}
+
+function editProfile() {
+    utils.showNotification('Edit profile feature coming soon', 'info');
 } 

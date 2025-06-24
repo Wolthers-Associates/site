@@ -2254,20 +2254,27 @@ body {
     gap: 15px;
 }
 
-.admin-btn {
-    background: var(--medium-green);
-    color: white;
+.admin-icon-btn {
+    background: rgba(255, 255, 255, 0.1);
     border: none;
-    padding: 8px 16px;
+    padding: 8px;
     border-radius: 6px;
-    font-size: 0.9rem;
     cursor: pointer;
     transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.admin-btn:hover {
-    background: var(--dark-green);
+.admin-icon-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
     transform: translateY(-1px);
+}
+
+.admin-icon {
+    width: 20px;
+    height: 20px;
+    filter: brightness(0) invert(1);
 }
 
 .admin-panel-content {
@@ -2304,6 +2311,169 @@ body {
     padding: 12px 16px;
     text-align: left;
     font-size: 0.9rem;
+}
+
+/* User Management Modal */
+.user-management-content {
+    padding: 20px;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.user-profile-section {
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.section-header h3 {
+    color: var(--dark-green);
+    font-size: 1.1rem;
+    margin: 0;
+    font-weight: 600;
+}
+
+.section-description {
+    color: #666;
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.user-profile-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+}
+
+.profile-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.profile-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: var(--medium-green);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.2rem;
+}
+
+.profile-details h4 {
+    margin: 0 0 5px 0;
+    color: var(--dark-green);
+    font-size: 1.1rem;
+}
+
+.profile-details p {
+    margin: 2px 0;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.role-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.role-badge.admin {
+    background: #d4edda;
+    color: #155724;
+}
+
+.users-list {
+    display: grid;
+    gap: 10px;
+}
+
+.user-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    border: 1px solid #e0e0e0;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.user-avatar {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background: var(--medium-green);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 0.9rem;
+}
+
+.user-details h5 {
+    margin: 0 0 3px 0;
+    color: var(--dark-green);
+    font-size: 0.95rem;
+}
+
+.user-details p {
+    margin: 0;
+    color: #666;
+    font-size: 0.8rem;
+}
+
+.user-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.user-actions .btn {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+}
+
+.trips-checklist {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.trip-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    background: #f8f9fa;
+    border-radius: 4px;
+    border: 1px solid #e0e0e0;
+}
+
+.trip-checkbox input[type="checkbox"] {
+    margin: 0;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -2471,12 +2641,52 @@ body {
         .admin-section h3 {
             color: #FFE082;
         }
-        .admin-btn {
-            background: #FFE082;
-            color: #181c1f;
+        .admin-icon-btn {
+            background: rgba(255, 255, 255, 0.1);
         }
-        .admin-btn:hover {
-            background: #ffd54f;
+        .admin-icon-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .admin-icon {
+            filter: brightness(0) invert(1);
+        }
+        .user-profile-section {
+            border-bottom-color: #23272b;
+        }
+        .section-header h3 {
+            color: #FFE082;
+        }
+        .section-description {
+            color: #b0b8c1;
+        }
+        .user-profile-card {
+            background: #23272b;
+            border-color: #2d3136;
+        }
+        .profile-details h4 {
+            color: #FFE082;
+        }
+        .profile-details p {
+            color: #b0b8c1;
+        }
+        .role-badge.admin {
+            background: rgba(255, 224, 130, 0.2);
+            color: #FFE082;
+        }
+        .user-item {
+            background: #23272b;
+            border-color: #2d3136;
+        }
+        .user-details h5 {
+            color: #FFE082;
+        }
+        .user-details p {
+            color: #b0b8c1;
+        }
+        .trip-checkbox {
+            background: #23272b;
+            border-color: #2d3136;
+            color: #ffffff;
         }
     }
 } 
