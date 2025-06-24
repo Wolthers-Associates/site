@@ -2243,7 +2243,7 @@ body {
 
 .trip-total-days {
     font-size: 0.95em;
-    color: #fff;
+    color: var(--medium-green);
     margin-top: 2px;
 }
 
