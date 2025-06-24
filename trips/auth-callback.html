@@ -73,11 +73,34 @@
     <script>
         async function handleMicrosoftAuth() {
             try {
-                // Get the access token from URL fragment
-                const urlParams = new URLSearchParams(window.location.hash.substring(1));
-                const accessToken = urlParams.get('access_token');
-                const error = urlParams.get('error');
-                const errorDescription = urlParams.get('error_description');
+                // Debug: Log the full URL
+                console.log('Full URL:', window.location.href);
+                console.log('Hash:', window.location.hash);
+                console.log('Search:', window.location.search);
+                
+                // Try both hash (implicit flow) and query parameters (auth code flow)
+                let urlParams, accessToken, error, errorDescription;
+                
+                if (window.location.hash) {
+                    // Implicit flow - token in fragment
+                    urlParams = new URLSearchParams(window.location.hash.substring(1));
+                    accessToken = urlParams.get('access_token');
+                    error = urlParams.get('error');
+                    errorDescription = urlParams.get('error_description');
+                    console.log('Checking hash params:', Object.fromEntries(urlParams));
+                } else if (window.location.search) {
+                    // Auth code flow - code in query params
+                    urlParams = new URLSearchParams(window.location.search);
+                    const authCode = urlParams.get('code');
+                    error = urlParams.get('error');
+                    errorDescription = urlParams.get('error_description');
+                    console.log('Checking query params:', Object.fromEntries(urlParams));
+                    
+                    if (authCode) {
+                        showError('Authorization code flow detected, but not implemented. Please use implicit flow.');
+                        return;
+                    }
+                }
                 
                 if (error) {
                     showError(`Authentication failed: ${errorDescription || error}`);
@@ -85,7 +108,14 @@
                 }
                 
                 if (!accessToken) {
-                    showError('No access token received from Microsoft');
+                    // Show debug info
+                    const debugInfo = {
+                        hash: window.location.hash,
+                        search: window.location.search,
+                        hashParams: window.location.hash ? Object.fromEntries(new URLSearchParams(window.location.hash.substring(1))) : null,
+                        queryParams: window.location.search ? Object.fromEntries(new URLSearchParams(window.location.search)) : null
+                    };
+                    showError(`No access token received from Microsoft<br><br><strong>Debug Info:</strong><br><pre style="text-align: left; font-size: 10px;">${JSON.stringify(debugInfo, null, 2)}</pre>`);
                     return;
                 }
                 

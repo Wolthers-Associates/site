@@ -6,10 +6,24 @@
  */
 
 class MicrosoftAuth {
-    constructor(clientId, tenantId = 'common') {
+    constructor(clientId, tenantId = 'common', redirectUri = null) {
         this.clientId = clientId;
         this.tenantId = tenantId;
-        this.redirectUri = `${window.location.origin}/trips/auth-callback.html`;
+        
+        // Auto-detect correct redirect URI based on domain
+        if (redirectUri) {
+            this.redirectUri = redirectUri;
+        } else {
+            const host = window.location.host;
+            if (host.startsWith('trips.')) {
+                // trips.wolthers.com subdomain
+                this.redirectUri = `${window.location.origin}/auth-callback.html`;
+            } else {
+                // wolthers.com/trips subdirectory
+                this.redirectUri = `${window.location.origin}/trips/auth-callback.html`;
+            }
+        }
+        
         this.scopes = ['openid', 'profile', 'email', 'User.Read'];
     }
 
