@@ -144,10 +144,10 @@
                         timestamp: Date.now()
                     }));
                     
-                    // Redirect to main app
+                    // Close popup - the parent window will handle redirect
                     setTimeout(() => {
-                        window.location.href = '/trips/';
-                    }, 2000);
+                        window.close();
+                    }, 1500);
                 } else {
                     showError(result.error || 'Authentication failed');
                 }

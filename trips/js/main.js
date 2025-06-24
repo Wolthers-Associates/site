@@ -679,10 +679,22 @@ const auth = {
             const result = await auth.msAuth.signIn();
             console.log('✅ Microsoft sign-in successful:', result);
             
-            // The Microsoft auth callback will handle the login
-            // This is just a fallback for direct usage
+            // Convert the session data to the expected format for handleSuccessfulLogin
             if (result && result.user) {
-                auth.handleSuccessfulLogin(result);
+                const loginData = {
+                    success: true,
+                    user: result.user,
+                    auth_type: result.auth_type || 'office365',
+                    session_id: result.session_id,
+                    access_level: 'full', // Office 365 users get full access by default
+                    restrictions: null
+                };
+                
+                // Store session for backend validation
+                localStorage.setItem('userSession', JSON.stringify(loginData));
+                
+                // Handle the successful login (this will redirect to main content)
+                auth.handleSuccessfulLogin(loginData);
             }
         } catch (error) {
             console.error('❌ Microsoft sign-in error:', error);
