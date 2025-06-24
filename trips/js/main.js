@@ -485,7 +485,7 @@ const auth = {
             email: data.user.email,
             role: data.user.role,
             type: data.auth_type,
-            canAddTrips: data.auth_type === 'regular' || data.auth_type === 'office365',
+            canAddTrips: data.auth_type === 'regular' || data.auth_type === 'office365' || (data.user.email && data.user.email.endsWith('@wolthers.com')),
             accessLevel: data.access_level,
             tripAccess: data.trip_access,
             restrictions: data.restrictions,
@@ -542,7 +542,9 @@ const auth = {
     mockUserCheck: (email) => {
         const knownUsers = [
             { email: 'daniel@wolthers.com', name: 'Daniel Wolthers' },
-            { email: 'test@example.com', name: 'Test User' }
+            { email: 'svenn@wolthers.com', name: 'Svenn Wolthers' },
+            { email: 'tom@wolthers.com', name: 'Tom Wolthers' },
+            { email: 'rasmus@wolthers.com', name: 'Rasmus Wolthers' }
         ];
         
         const user = knownUsers.find(u => u.email === email);
@@ -557,7 +559,9 @@ const auth = {
     mockRegularLogin: (email, password) => {
         const mockUsers = [
             { email: 'daniel@wolthers.com', name: 'Daniel Wolthers', role: 'admin' },
-            { email: 'test@example.com', name: 'Test User', role: 'partner' }
+            { email: 'svenn@wolthers.com', name: 'Svenn Wolthers', role: 'admin' },
+            { email: 'tom@wolthers.com', name: 'Tom Wolthers', role: 'admin' },
+            { email: 'rasmus@wolthers.com', name: 'Rasmus Wolthers', role: 'admin' }
         ];
         
         const user = mockUsers.find(u => u.email === email);
@@ -569,7 +573,7 @@ const auth = {
             };
             auth.handleSuccessfulLogin(mockData);
         } else {
-            utils.showError('Invalid credentials. Try daniel@wolthers.com with any password.');
+            utils.showError('Invalid credentials. Try one of the Wolthers team emails (daniel@wolthers.com, svenn@wolthers.com, tom@wolthers.com, rasmus@wolthers.com) with any password.');
         }
     },
 
@@ -694,11 +698,12 @@ const ui = {
     // Show add trip button for employees (handled in renderTrips now)
     console.log('✅ User can add trips:', currentUser.canAddTrips);
     
-    // Show accounts link for admin users (employees can access admin features)
-    if (currentUser.type === 'employee') {
-        const accountsLink = document.getElementById('accountsLink');
-        if (accountsLink) {
-            accountsLink.style.display = 'flex';
+    // Show admin settings for admin users (Wolthers team members are admins)
+    const isWolthersAdmin = currentUser.email && currentUser.email.endsWith('@wolthers.com');
+    if (isWolthersAdmin || currentUser.role === 'admin') {
+        const adminSettings = document.getElementById('adminSettings');
+        if (adminSettings) {
+            adminSettings.style.display = 'flex';
         }
     }
     
@@ -809,7 +814,8 @@ const ui = {
         let html = '';
         
         // Add the "Add Trip" button as first card for upcoming trips if user can add trips
-        if (containerId === 'upcomingTrips' && currentUser && currentUser.canAddTrips) {
+        const isWolthersAdmin = currentUser && currentUser.email && currentUser.email.endsWith('@wolthers.com');
+        if (containerId === 'upcomingTrips' && currentUser && (currentUser.canAddTrips || isWolthersAdmin)) {
             html += ui.createAddTripCard();
         }
         
@@ -818,7 +824,7 @@ const ui = {
             return;
         }
         
-        if (tripList.length === 0 && containerId === 'upcomingTrips' && currentUser && currentUser.canAddTrips) {
+        if (tripList.length === 0 && containerId === 'upcomingTrips' && currentUser && (currentUser.canAddTrips || isWolthersAdmin)) {
             // Show only the add trip card
             container.innerHTML = html;
             return;
@@ -1072,7 +1078,7 @@ const ui = {
                             <div class="trip-detail-value">${trip.createdBy}</div>
                         </div>
                         
-                        ${currentUser.type === 'employee' ? `
+                        ${(currentUser.email && currentUser.email.endsWith('@wolthers.com')) || currentUser.role === 'admin' ? `
                         <div class="trip-detail-item">
                             <div class="trip-detail-label">Access Information</div>
                             <div class="trip-detail-value">
@@ -1364,7 +1370,7 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('🎯 Available authentication methods:');
     console.log('🏢 Microsoft/Office 365: Ready (configure Azure AD credentials)');
     console.log('📧 Email + One-time Code: Functional with backend');
-    console.log('👤 Regular Login: daniel@wolthers.com / any password');
+            console.log('👤 Regular Login: Wolthers team emails (daniel@wolthers.com, svenn@wolthers.com, tom@wolthers.com, rasmus@wolthers.com) / any password');
     console.log('🔑 Trip Codes: BRAZIL2025, COLOMBIA2025, ETHIOPIA2025');
     
     // Initialize enhanced authentication system
@@ -1489,4 +1495,77 @@ function isOngoing(startDate, endDate) {
   const start = new Date(startDate);
   const end = new Date(endDate);
   return today >= start && today <= end;
+}
+
+// Admin Panel Functions
+function showAdminPanel() {
+    document.getElementById('adminPanelModal').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+
+function hideAdminPanel() {
+    document.getElementById('adminPanelModal').style.display = 'none';
+    document.body.style.overflow = 'auto';
+}
+
+// Admin Panel Action Functions
+function exportAllData() {
+    const data = {
+        trips: MOCK_TRIPS,
+        users: currentUser ? [currentUser] : [],
+        exportDate: new Date().toISOString(),
+        version: '1.0'
+    };
+    
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `wolthers-trips-export-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+    
+    utils.showNotification('Data exported successfully', 'success');
+}
+
+function viewSystemLogs() {
+    utils.showNotification('System logs feature coming soon', 'info');
+}
+
+function manageBackups() {
+    utils.showNotification('Backup management feature coming soon', 'info');
+}
+
+function viewAccessLogs() {
+    utils.showNotification('Access logs feature coming soon', 'info');
+}
+
+function managePermissions() {
+    utils.showNotification('Permission management feature coming soon', 'info');
+}
+
+function bulkTripOperations() {
+    utils.showNotification('Bulk operations feature coming soon', 'info');
+}
+
+function tripTemplates() {
+    utils.showNotification('Trip templates feature coming soon', 'info');
+}
+
+function partnerCodeManagement() {
+    utils.showNotification('Partner code management feature coming soon', 'info');
+}
+
+function emailSettings() {
+    utils.showNotification('Email configuration feature coming soon', 'info');
+}
+
+function authenticationSettings() {
+    utils.showNotification('Authentication settings feature coming soon', 'info');
+}
+
+function systemConfiguration() {
+    utils.showNotification('System configuration feature coming soon', 'info');
 } 

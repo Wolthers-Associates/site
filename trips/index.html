@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Trip Itineraries Management System - Wolthers & Associates Development Version">
-    <title>Trip Itineraries - Wolthers & Associates [DEV]</title>
+    <meta name="description" content="Trip Itineraries Management System - Wolthers & Associates">
+    <title>Trip Itineraries - Wolthers & Associates</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,14 +14,7 @@
     <script src="js/microsoft-auth.js"></script>
 </head>
 <body>
-    <!-- Development Notice -->
-    <div class="dev-notice" role="banner" aria-label="Development environment notice">
-        <div class="dev-notice-content">
-            <span class="dev-icon">🚧</span>
-            <span class="dev-text">Under Development</span>
-            <span class="dev-icon">🚧</span>
-        </div>
-    </div>
+
 
     <!-- Login Container -->
     <div id="loginContainer" class="login-container">
@@ -30,7 +23,7 @@
                 <img src="images/wolthers-logo-green.svg" alt="Wolthers & Associates" class="login-logo-image">
             </div>
             <h1 class="login-title">Trip Itineraries</h1>
-            <p class="login-subtitle">Wolthers & Associates - Under Development</p>
+            <p class="login-subtitle">Wolthers & Associates</p>
             
             <!-- Simple Login Interface -->
             <div class="simple-login">
@@ -117,12 +110,7 @@
 
 
 
-            <div class="test-credentials" style="margin-top: 20px;">
-                <p><strong>Development Test Access:</strong></p>
-                <p><small>Employee: <em>daniel@wolthers.com</em> | Password: <em>any</em></small></p>
-                <p><small>Test Account: <em>test@example.com</em> | Password: <em>password</em></small></p>
-                <p><small>Trip Code: <em>BRAZIL2025</em> (Brazil Trip Only)</small></p>
-            </div>
+
         </div>
     </div>
 
@@ -130,7 +118,10 @@
     <div id="mainContainer" class="main-container" style="display: none;">
         <div class="header">
             <div class="header-nav">
-                <a href="accounts.html" class="accounts-link" id="accountsLink" style="display: none;">⚙️ Accounts</a>
+                <div class="admin-settings" id="adminSettings" style="display: none;">
+                    <button class="admin-btn" onclick="showAdminPanel()">⚙️ Admin Settings</button>
+                    <a href="accounts.html" class="accounts-link">👥 User Management</a>
+                </div>
                 <button class="logout-btn" onclick="logout()">Logout</button>
             </div>
             <div class="header-logo">
@@ -309,6 +300,57 @@
             </div>
             <div id="tripDetailContent" class="trip-detail-content">
                 <!-- Trip details will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Panel Modal -->
+    <div id="adminPanelModal" class="modal" style="display: none;" role="dialog" aria-labelledby="admin-panel-title" aria-modal="true">
+        <div class="modal-backdrop" onclick="hideAdminPanel()" aria-label="Close admin panel"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="admin-panel-title" class="modal-title">Admin Settings</h2>
+                <button class="close-btn" onclick="hideAdminPanel()" aria-label="Close admin panel">
+                    <span class="close-icon">×</span>
+                </button>
+            </div>
+            
+            <div class="admin-panel-content">
+                <div class="admin-section">
+                    <h3>System Management</h3>
+                    <div class="admin-actions">
+                        <button class="btn btn-secondary" onclick="exportAllData()">📥 Export All Data</button>
+                        <button class="btn btn-secondary" onclick="viewSystemLogs()">📋 View System Logs</button>
+                        <button class="btn btn-secondary" onclick="manageBackups()">💾 Manage Backups</button>
+                    </div>
+                </div>
+                
+                <div class="admin-section">
+                    <h3>User & Access Management</h3>
+                    <div class="admin-actions">
+                        <button class="btn btn-primary" onclick="window.location.href='accounts.html'">👥 User Management</button>
+                        <button class="btn btn-secondary" onclick="viewAccessLogs()">📊 Access Logs</button>
+                        <button class="btn btn-secondary" onclick="managePermissions()">🔐 Permissions</button>
+                    </div>
+                </div>
+                
+                <div class="admin-section">
+                    <h3>Trip Management</h3>
+                    <div class="admin-actions">
+                        <button class="btn btn-secondary" onclick="bulkTripOperations()">📦 Bulk Operations</button>
+                        <button class="btn btn-secondary" onclick="tripTemplates()">📋 Trip Templates</button>
+                        <button class="btn btn-secondary" onclick="partnerCodeManagement()">🔑 Partner Codes</button>
+                    </div>
+                </div>
+                
+                <div class="admin-section">
+                    <h3>System Settings</h3>
+                    <div class="admin-actions">
+                        <button class="btn btn-secondary" onclick="emailSettings()">📧 Email Configuration</button>
+                        <button class="btn btn-secondary" onclick="authenticationSettings()">🔒 Authentication</button>
+                        <button class="btn btn-secondary" onclick="systemConfiguration()">⚙️ System Config</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

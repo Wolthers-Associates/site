@@ -2247,6 +2247,65 @@ body {
     margin-top: 2px;
 }
 
+/* Admin Settings */
+.admin-settings {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.admin-btn {
+    background: var(--medium-green);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.admin-btn:hover {
+    background: var(--dark-green);
+    transform: translateY(-1px);
+}
+
+.admin-panel-content {
+    padding: 20px;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.admin-section {
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.admin-section:last-child {
+    border-bottom: none;
+}
+
+.admin-section h3 {
+    color: var(--dark-green);
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+.admin-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+}
+
+.admin-actions .btn {
+    justify-content: flex-start;
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 0.9rem;
+}
+
 @media (prefers-color-scheme: dark) {
     .header {
         background: linear-gradient(135deg, #181C1F 0%, #23272B 100%);
@@ -2355,5 +2414,69 @@ body {
     .btn-secondary:hover {
         background: #2d3136;
         border-color: #FFE082;
+    }
+    .admin-settings {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+    .admin-btn {
+        background: #FFE082;
+        color: #181c1f;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    .admin-btn:hover {
+        background: #ffd54f;
+        transform: translateY(-1px);
+    }
+    .admin-panel-content {
+        padding: 20px;
+        max-height: 70vh;
+        overflow-y: auto;
+    }
+    .admin-section {
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #e0e0e0;
+    }
+    .admin-section:last-child {
+        border-bottom: none;
+    }
+    .admin-section h3 {
+        color: #2C573B;
+        font-size: 1.1rem;
+        margin-bottom: 15px;
+        font-weight: 600;
+    }
+    .admin-actions {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 12px;
+    }
+    .admin-actions .btn {
+        justify-content: flex-start;
+        padding: 12px 16px;
+        text-align: left;
+        font-size: 0.9rem;
+    }
+    @media (prefers-color-scheme: dark) {
+        .admin-section {
+            border-bottom-color: #23272b;
+        }
+        .admin-section h3 {
+            color: #FFE082;
+        }
+        .admin-btn {
+            background: #FFE082;
+            color: #181c1f;
+        }
+        .admin-btn:hover {
+            background: #ffd54f;
+        }
     }
 } 
