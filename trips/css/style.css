@@ -1582,11 +1582,11 @@ body {
 }
 
 .preview-highlight-item:nth-child(odd) {
-    background: #fafafa;
+    background: #fff9ea;
 }
 
 .preview-highlight-item:nth-child(even) {
-    background: #fff9ea;
+    background: transparent;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -1615,11 +1615,11 @@ body {
 }
 
 .preview-day-item:nth-child(odd) {
-    background: #fafafa;
+    background: #fff9ea;
 }
 
 .preview-day-item:nth-child(even) {
-    background: #fff9ea;
+    background: transparent;
 }
 
 .preview-day-item:hover {
@@ -2243,9 +2243,8 @@ body {
 
 .trip-total-days {
     font-size: 0.95em;
-    color: #fff;
+    color: #888;
     margin-top: 2px;
-    opacity: 0.9;
 }
 
 @media (prefers-color-scheme: dark) {
