@@ -324,9 +324,9 @@ const utils = {
 // Enhanced Authentication Functions
 const auth = {
     // Initialize authentication system
-    init: () => {
+    init: async () => {
         auth.initializeLoginForms();
-        auth.initializeMicrosoftAuth();
+        await auth.initializeMicrosoftAuth();
         auth.validateExistingSession();
     },
 
@@ -360,14 +360,74 @@ const auth = {
         auth.setupDarkModeDetection();
     },
 
+    // Microsoft Auth instance
+    msAuth: null,
+
     // Initialize Microsoft authentication
-    initializeMicrosoftAuth: () => {
-        const microsoftBtn = document.getElementById('microsoftLoginBtn');
-        if (microsoftBtn) {
-            microsoftBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                auth.handleMicrosoftLogin();
-            });
+    initializeMicrosoftAuth: async () => {
+        try {
+            // Load Azure AD configuration from backend
+            const config = await auth.loadMicrosoftConfig();
+            
+            if (!config.clientId) {
+                console.warn('Microsoft authentication not configured. Client ID missing.');
+                return;
+            }
+            
+            // Initialize Microsoft Auth
+            auth.msAuth = new MicrosoftAuth(config.clientId, config.tenantId || 'common');
+            
+            const microsoftBtn = document.getElementById('microsoftLoginBtn');
+            if (microsoftBtn) {
+                microsoftBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    auth.handleMicrosoftLogin();
+                });
+            }
+        } catch (error) {
+            console.error('Failed to initialize Microsoft authentication:', error);
+        }
+    },
+
+    // Load Microsoft configuration from backend
+    loadMicrosoftConfig: async () => {
+        try {
+            const response = await fetch('/trips/api/auth/microsoft-config.php');
+            if (response.ok) {
+                const data = await response.json();
+                return data.config;
+            }
+            throw new Error('Failed to load Microsoft configuration');
+        } catch (error) {
+            console.error('Error loading Microsoft config:', error);
+            // Fallback to hardcoded values for development
+            console.warn('Using fallback Microsoft configuration. Update secure-config.php with your Azure AD credentials.');
+            return { 
+                clientId: null, // Set to null to disable Microsoft auth until configured
+                tenantId: 'common' 
+            };
+        }
+    },
+
+    // Handle Microsoft login
+    handleMicrosoftLogin: async () => {
+        if (!auth.msAuth) {
+            utils.showError('Microsoft authentication not initialized. Please configure your Azure AD credentials.');
+            return;
+        }
+
+        try {
+            const result = await auth.msAuth.signIn();
+            console.log('Microsoft sign-in successful:', result);
+            
+            // The Microsoft auth callback will handle the login
+            // This is just a fallback for direct usage
+            if (result && result.user) {
+                auth.handleSuccessfulLogin(result);
+            }
+        } catch (error) {
+            console.error('Microsoft sign-in error:', error);
+            utils.showError('Microsoft sign-in failed: ' + error.message);
         }
     },
 
@@ -1523,12 +1583,15 @@ const trips = {
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🚧 Development Mode - Enhanced Authentication Active');
     console.log('🎯 Available authentication methods:');
-    console.log('🏢 Office 365: Will be implemented in next phase');
+    console.log('🏢 Microsoft/Office 365: Ready (configure Azure AD credentials)');
+    console.log('📧 Email + One-time Code: Functional with backend');
     console.log('👤 Regular Login: daniel@wolthers.com / any password');
     console.log('🔑 Trip Codes: BRAZIL2025, COLOMBIA2025, ETHIOPIA2025');
     
     // Initialize enhanced authentication system
-    auth.init();
+    auth.init().catch(error => {
+        console.error('Failed to initialize authentication:', error);
+    });
     
     // Global functions for modal interactions
     // Registration modal functions removed - using compact login only
