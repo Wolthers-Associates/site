@@ -19,8 +19,8 @@ class MicrosoftAuth {
     getAuthUrl() {
         const baseUrl = 'https://login.microsoftonline.com';
         
-        // Try modern flow first, fallback to implicit flow
-        const useModernFlow = false; // Set to true after enabling implicit flow
+        // Implicit flow is now enabled in Azure AD
+        const useModernFlow = false; // Implicit flow works and is simpler for this setup
         
         if (useModernFlow) {
             // Authorization Code Flow with PKCE (recommended)
