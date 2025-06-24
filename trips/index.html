@@ -463,15 +463,20 @@
                                             <path d="M6 2L4.5 3.5h3L6 2zM6 10l1.5-1.5h-3L6 10z"/>
                                         </svg>
                                     </th>
-                                    <th class="fluent-th-sortable" data-sort="memberSince">
-                                        <span>Member since</span>
-                                        <svg width="12" height="12" viewBox="0 0 12 12" class="fluent-sort-icon">
-                                            <path d="M6 2L4.5 3.5h3L6 2zM6 10l1.5-1.5h-3L6 10z"/>
-                                        </svg>
-                                    </th>
-                                    <th># of trips</th>
-                                    <th>Last trip date</th>
-                                    <th>Actions</th>
+                                                                         <th class="fluent-th-sortable" data-sort="memberSince">
+                                         <span>Member since</span>
+                                         <svg width="12" height="12" viewBox="0 0 12 12" class="fluent-sort-icon">
+                                             <path d="M6 2L4.5 3.5h3L6 2zM6 10l1.5-1.5h-3L6 10z"/>
+                                         </svg>
+                                     </th>
+                                     <th class="fluent-th-sortable" data-sort="lastActive">
+                                         <span>Last active</span>
+                                         <svg width="12" height="12" viewBox="0 0 12 12" class="fluent-sort-icon">
+                                             <path d="M6 2L4.5 3.5h3L6 2zM6 10l1.5-1.5h-3L6 10z"/>
+                                         </svg>
+                                     </th>
+                                     <th>Status</th>
+                                     <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="modalUsersList">
@@ -507,45 +512,84 @@
     </div>
 
     <!-- Add User Modal -->
-    <div id="addUserModal" class="modal" style="display: none;" role="dialog" aria-labelledby="add-user-title" aria-modal="true">
+    <div id="addUserModal" class="modal fluent-modal" style="display: none;" role="dialog" aria-labelledby="add-user-title" aria-modal="true">
         <div class="modal-backdrop" onclick="hideAddUserModal()"></div>
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="add-user-title" class="modal-title">Add New User</h2>
-                <button class="close-btn" onclick="hideAddUserModal()">
-                    <span class="close-icon">×</span>
+        <div class="modal-content fluent-modal-content-small">
+            <div class="fluent-modal-header">
+                <div class="fluent-header-content">
+                    <h1 id="add-user-title" class="fluent-modal-title">Add new person</h1>
+                    <p class="fluent-modal-subtitle">Invite someone to join your organization</p>
+                </div>
+                <button class="fluent-close-btn" onclick="hideAddUserModal()">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M11.41 10l4.3-4.29a1 1 0 10-1.42-1.42L10 8.59l-4.29-4.3a1 1 0 00-1.42 1.42L8.59 10l-4.3 4.29a1 1 0 001.42 1.42L10 11.41l4.29 4.3a1 1 0 001.42-1.42L11.41 10z"/>
+                    </svg>
                 </button>
             </div>
-            <form id="addUserForm">
-                <div class="form-section">
-                    <div class="form-group">
-                        <label for="newUserName">Full Name:</label>
-                        <input type="text" id="newUserName" class="form-input" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="newUserEmail">Email Address:</label>
-                        <input type="email" id="newUserEmail" class="form-input" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="newUserRole">Role:</label>
-                        <select id="newUserRole" class="form-input">
-                            <option value="guest">Guest</option>
-                            <option value="editor">Trip Editor</option>
-                            <option value="admin">Administrator</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="newUserTrips">Assign to Trips:</label>
-                        <div class="trips-checklist" id="newUserTrips">
-                            <!-- Trip checkboxes will be loaded here -->
+            
+            <div class="fluent-modal-body-form">
+                <form id="addUserForm" class="fluent-form">
+                    <div class="fluent-form-section">
+                        <div class="fluent-form-row">
+                            <div class="fluent-form-group">
+                                <label for="newUserName" class="fluent-label">Full name *</label>
+                                <input type="text" id="newUserName" class="fluent-input" placeholder="Enter full name" required>
+                            </div>
+                        </div>
+                        
+                        <div class="fluent-form-row">
+                            <div class="fluent-form-group">
+                                <label for="newUserEmail" class="fluent-label">Email address *</label>
+                                <input type="email" id="newUserEmail" class="fluent-input" placeholder="Enter email address" required>
+                            </div>
+                        </div>
+                        
+                        <div class="fluent-form-row">
+                            <div class="fluent-form-group">
+                                <label for="newUserCompany" class="fluent-label">Company</label>
+                                <input type="text" id="newUserCompany" class="fluent-input" placeholder="Enter company name">
+                            </div>
+                        </div>
+                        
+                        <div class="fluent-form-row">
+                            <div class="fluent-form-group">
+                                <label for="newUserRole" class="fluent-label">User type *</label>
+                                <select id="newUserRole" class="fluent-select" required>
+                                    <option value="">Select user type</option>
+                                    <option value="guest">Guest - View only access</option>
+                                    <option value="user">User - Standard access</option>
+                                    <option value="editor">Editor - Can modify content</option>
+                                    <option value="admin">Administrator - Full access</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="fluent-form-row">
+                            <div class="fluent-form-group">
+                                <label class="fluent-label">Options</label>
+                                <div class="fluent-checkbox-group">
+                                    <label class="fluent-checkbox-label">
+                                        <input type="checkbox" id="sendWelcomeEmail" class="fluent-checkbox" checked>
+                                        <span>Send welcome email to new user</span>
+                                    </label>
+                                    <label class="fluent-checkbox-label">
+                                        <input type="checkbox" id="requirePasswordReset" class="fluent-checkbox">
+                                        <span>Require password reset on first login</span>
+                                    </label>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="modal-actions">
-                    <button type="button" class="btn btn-secondary" onclick="hideAddUserModal()">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Add User</button>
-                </div>
-            </form>
+                    
+                    <div class="fluent-form-actions">
+                        <button type="button" class="fluent-btn fluent-btn-secondary" onclick="hideAddUserModal()">Cancel</button>
+                        <button type="submit" class="fluent-btn fluent-btn-primary" id="addUserSubmitBtn">
+                            <span class="btn-text">Add person</span>
+                            <div class="fluent-spinner" style="display: none;"></div>
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 
