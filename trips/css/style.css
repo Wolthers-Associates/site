@@ -1503,8 +1503,8 @@ body {
 }
 
 .trip-preview-info {
-    background: #faf7ef;
-    color: #222;
+    background: #2C573B;
+    color: #fff;
     border: none;
     box-shadow: none;
     border-radius: 8px;
@@ -1520,7 +1520,7 @@ body {
     align-items: center;
     font-size: 1em;
     padding: 0.5em 1em;
-    color: inherit;
+    color: #fff;
     background: none;
     border: none;
     box-shadow: none;
@@ -1543,7 +1543,7 @@ body {
 
 .trip-preview-highlights {
     margin-bottom: 18px;
-    background: #f8f9fa;
+    background: #ffffff;
     border-radius: 8px;
     padding: 12px;
 }
@@ -1581,11 +1581,11 @@ body {
 }
 
 .preview-highlight-item:nth-child(odd) {
-    background: #f8f9fa;
+    background: #ffffff;
 }
 
 .preview-highlight-item:nth-child(even) {
-    background: #e9ecef;
+    background: #f4ecd7;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -1614,11 +1614,11 @@ body {
 }
 
 .preview-day-item:nth-child(odd) {
-    background: #f8f9fa;
+    background: #ffffff;
 }
 
 .preview-day-item:nth-child(even) {
-    background: #e9ecef;
+    background: #f4ecd7;
 }
 
 .preview-day-item:hover {
