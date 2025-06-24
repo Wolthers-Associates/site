@@ -1105,11 +1105,16 @@ const ui = {
         }
         
         let statusText = daysUntilStart > 0 ? `Starts in ${daysUntilStart} days` : ongoing ? 'Ongoing' : 'Completed';
+        
+        // Detect color scheme for appropriate user icon
+        const isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const userIcon = isDarkMode ? 'images/user.svg' : 'images/user-LM.svg';
+        
         let overviewHTML = `
             <div class="trip-preview-info">
                 ${trip.guests ? `
                 <div class="preview-info-item">
-                    <img src="images/user.svg" alt="User" style="height:18px;vertical-align:middle;margin-right:6px;">
+                    <img src="${userIcon}" alt="User" style="height:18px;vertical-align:middle;margin-right:6px;">
                     <span>${trip.guests}</span>
                 </div>
                 ` : ''}
