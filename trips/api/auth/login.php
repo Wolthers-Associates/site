@@ -44,15 +44,6 @@ try {
     if ($loginType === 'office365') {
         $userInfo = validateOffice365Token($accessToken);
         if ($userInfo) {
-            // Restrict to corporate domain only
-            $allowedDomains = ['wolthers.com', 'wolthersassociates.com']; // Add your corporate domains
-            $userDomain = substr(strrchr($userInfo['email'], '@'), 1);
-            
-            if (!in_array($userDomain, $allowedDomains)) {
-                sendError('Access restricted to Wolthers & Associates corporate accounts only', 403);
-                return;
-            }
-            
             // Check if user exists in our system
             $stmt = $pdo->prepare("SELECT id, name, email, role FROM users WHERE email = ? AND status = 'active'");
             $stmt->execute([$userInfo['email']]);
