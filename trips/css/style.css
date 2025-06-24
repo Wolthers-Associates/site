@@ -2260,6 +2260,10 @@ body {
     .trip-total-days {
         color: #ffffff;
     }
+    .section-title {
+        color: #ffffff;
+        border-bottom-color: #ffffff;
+    }
     .trip-preview-header {
         background: #23272b;
         color: #e6edf3;
