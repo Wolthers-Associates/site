@@ -148,7 +148,7 @@ class MicrosoftAuth {
     async signOut() {
         try {
             // Call logout endpoint
-            await fetch('/trips/api/auth/logout.php', {
+                            await fetch('/api/auth/logout.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

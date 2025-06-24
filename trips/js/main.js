@@ -392,7 +392,7 @@ const auth = {
     // Load Microsoft configuration from backend
     loadMicrosoftConfig: async () => {
         try {
-            const response = await fetch('/trips/api/auth/microsoft-config.php');
+            const response = await fetch('/api/auth/microsoft-config.php');
             if (response.ok) {
                 const data = await response.json();
                 return data.config;
@@ -487,7 +487,7 @@ const auth = {
     // Check if user exists
     checkUserExists: async (email) => {
         try {
-            const response = await fetch('/trips/api/auth/check-user.php', {
+            const response = await fetch('/api/auth/check-user.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -537,7 +537,7 @@ const auth = {
         }
         
         try {
-            const response = await fetch('/trips/api/auth/register.php', {
+            const response = await fetch('/api/auth/register.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -576,7 +576,7 @@ const auth = {
         }
         
         try {
-            const response = await fetch('/trips/api/auth/verify-code.php', {
+            const response = await fetch('/api/auth/verify-code.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -613,7 +613,7 @@ const auth = {
     // Process regular email/password login
     processRegularLogin: async (email, password) => {
         try {
-            const response = await fetch('/trips/api/auth/login.php', {
+            const response = await fetch('/api/auth/login.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -642,7 +642,7 @@ const auth = {
     // Process trip passcode login
     processPasscodeLogin: async (tripCode) => {
         try {
-            const response = await fetch('/trips/api/auth/login.php', {
+            const response = await fetch('/api/auth/login.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -826,7 +826,7 @@ const auth = {
         if (!session) return;
         
         try {
-            const response = await fetch('/trips/api/auth/validate.php');
+            const response = await fetch('/api/auth/validate.php');
             const data = await response.json();
             
             if (data.success && data.authenticated) {
@@ -871,7 +871,7 @@ const auth = {
     logout: async () => {
         try {
             // Call logout endpoint
-            await fetch('/trips/api/auth/logout.php', { method: 'POST' });
+            await fetch('/api/auth/logout.php', { method: 'POST' });
         } catch (error) {
             console.error('Logout API error:', error);
         }
