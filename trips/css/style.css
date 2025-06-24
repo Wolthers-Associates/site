@@ -2255,7 +2255,7 @@ body {
 }
 
 .admin-icon-btn {
-    background: rgba(255, 255, 255, 0.1);
+    background: transparent;
     border: none;
     padding: 8px;
     border-radius: 6px;
@@ -2267,7 +2267,6 @@ body {
 }
 
 .admin-icon-btn:hover {
-    background: rgba(255, 255, 255, 0.2);
     transform: translateY(-1px);
 }
 
@@ -2275,6 +2274,23 @@ body {
     width: 20px;
     height: 20px;
     filter: brightness(0) invert(1);
+    transition: transform 0.3s ease;
+}
+
+/* Gear rotation on hover */
+.admin-icon-btn:hover .admin-icon[alt="Admin Settings"] {
+    transform: rotate(90deg);
+}
+
+/* User icon shake on hover */
+.admin-icon-btn:hover .admin-icon[alt="User Management"] {
+    animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-2px); }
+    75% { transform: translateX(2px); }
 }
 
 .admin-panel-content {
@@ -2642,10 +2658,7 @@ body {
             color: #FFE082;
         }
         .admin-icon-btn {
-            background: rgba(255, 255, 255, 0.1);
-        }
-        .admin-icon-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
+            background: transparent;
         }
         .admin-icon {
             filter: brightness(0) invert(1);
