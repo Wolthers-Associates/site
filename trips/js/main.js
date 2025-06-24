@@ -940,6 +940,7 @@ const ui = {
         const daysUntilStart = getDaysUntilStart(trip.date);
         const daysLeft = getDaysLeft(trip.endDate);
         const totalDays = getTotalDays(trip.date, trip.endDate);
+        const ongoing = isOngoing(trip.date, trip.endDate);
         
         // Get Wolthers staff attending
         const wolthersStaff = trip.wolthersGuide || trip.createdBy || 'Daniel Wolthers';
@@ -972,7 +973,9 @@ const ui = {
                 </div>
                 
                 <div class="trip-status status-${status}">
-                    ${status === 'upcoming' ? `UPCOMING (${daysUntilStart > 0 ? daysUntilStart + ' days left' : 'Starts today'})` : status === 'completed' ? 'COMPLETED' : 'IN PROGRESS'}
+                    ${status === 'upcoming' ? (
+                      daysUntilStart > 0 ? `UPCOMING (${daysUntilStart} days to go)` : ongoing ? 'ONGOING' : 'UPCOMING (Starts today)'
+                    ) : status === 'completed' ? 'COMPLETED' : ongoing ? 'ONGOING' : 'COMPLETED'}
                 </div>
                 
                 <div class="trip-footer">
@@ -1079,6 +1082,7 @@ const ui = {
         const daysUntilStart = getDaysUntilStart(trip.date);
         const daysLeft = getDaysLeft(trip.endDate);
         const totalDays = getTotalDays(trip.date, trip.endDate);
+        const ongoing = isOngoing(trip.date, trip.endDate);
         
         let daysHTML = '';
         if (trip.itinerary && trip.itinerary.length > 0) {
@@ -1115,11 +1119,11 @@ const ui = {
               ` : ''}
               <div class="preview-info-item">
                 <span class="preview-info-icon">📅</span>
-                <span>${daysUntilStart > 0 ? `Starts in ${daysUntilStart} days` : daysLeft > 0 ? `In progress (${daysLeft} days left)` : 'Completed'}</span>
+                <span>${daysUntilStart > 0 ? `Starts in ${daysUntilStart} days` : ongoing ? 'Ongoing' : 'Completed'}</span>
               </div>
               <div class="preview-info-item">
                 <span class="preview-info-icon">✨</span>
-                <span>${trip.status === 'upcoming' ? 'Upcoming' : 'Completed'}</span>
+                <span>${daysUntilStart > 0 ? 'Upcoming' : ongoing ? 'Ongoing' : 'Completed'}</span>
               </div>
             </div>
         `;
@@ -1709,4 +1713,11 @@ function getTotalDays(startDate, endDate) {
   const start = new Date(startDate);
   const end = new Date(endDate);
   return Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
+}
+
+function isOngoing(startDate, endDate) {
+  const today = new Date();
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  return today >= start && today <= end;
 } 
