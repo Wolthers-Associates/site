@@ -2252,6 +2252,10 @@ body {
         background: linear-gradient(135deg, #181C1F 0%, #23272B 100%);
         color: #E3D6C0;
     }
+    .header h1,
+    .header p {
+        color: #FFE082;
+    }
     .trip-preview-header {
         background: #23272b;
         color: #e6edf3;
