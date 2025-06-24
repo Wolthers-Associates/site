@@ -1,1 +1,389 @@
- 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wolthers Trips API - Endpoint Testing</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1, h2 {
+            color: #2c5530;
+        }
+        .endpoint {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .method {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            color: white;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        .post { background-color: #28a745; }
+        .get { background-color: #17a2b8; }
+        input, textarea, select {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #2c5530;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #1e3a21;
+        }
+        .response {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 10px;
+            margin-top: 10px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .error {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+        .success {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .test-button {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 1000;
+            background-color: #007bff;
+        }
+    </style>
+</head>
+<body>
+    <button class="test-button" onclick="fillTestData()">Fill Test Data</button>
+    
+    <h1>Wolthers Trips API - Endpoint Testing</h1>
+    <p><strong>Development Environment</strong> - Use this interface to test the new authentication endpoints.</p>
+
+    <!-- User Check Endpoint -->
+    <div class="container">
+        <h2>1. User Check Endpoint</h2>
+        <div class="endpoint">
+            <div>
+                <span class="method post">POST</span>
+                <strong>/trips/api/auth/check-user.php</strong>
+            </div>
+            <p>Check if a user exists and get their basic information.</p>
+            
+            <div class="form-group">
+                <label>Email:</label>
+                <input type="email" id="checkEmail" placeholder="user@example.com">
+            </div>
+            
+            <div class="form-group">
+                <label>Check Type:</label>
+                <select id="checkType">
+                    <option value="existence">Existence Check</option>
+                    <option value="registration">Registration Check</option>
+                    <option value="login_prep">Login Preparation</option>
+                </select>
+            </div>
+            
+            <button onclick="checkUser()">Check User</button>
+            <div id="checkUserResponse" class="response" style="display: none;"></div>
+        </div>
+    </div>
+
+    <!-- Send Code Endpoint -->
+    <div class="container">
+        <h2>2. Send Code Endpoint</h2>
+        <div class="endpoint">
+            <div>
+                <span class="method post">POST</span>
+                <strong>/trips/api/auth/send-code.php</strong>
+            </div>
+            <p>Send a 6-digit verification code to an email address.</p>
+            
+            <div class="form-group">
+                <label>Email:</label>
+                <input type="email" id="sendCodeEmail" placeholder="user@example.com">
+            </div>
+            
+            <div class="form-group">
+                <label>Purpose:</label>
+                <select id="sendCodePurpose">
+                    <option value="login">Login</option>
+                    <option value="registration">Registration</option>
+                    <option value="password_reset">Password Reset</option>
+                    <option value="email_verification">Email Verification</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>User Name (optional):</label>
+                <input type="text" id="sendCodeName" placeholder="John Doe">
+            </div>
+            
+            <button onclick="sendCode()">Send Code</button>
+            <div id="sendCodeResponse" class="response" style="display: none;"></div>
+        </div>
+    </div>
+
+    <!-- Verify Code Endpoint -->
+    <div class="container">
+        <h2>3. Verify Code Endpoint</h2>
+        <div class="endpoint">
+            <div>
+                <span class="method post">POST</span>
+                <strong>/trips/api/auth/verify-code.php</strong>
+            </div>
+            <p>Verify a 6-digit code and authenticate user.</p>
+            
+            <div class="form-group">
+                <label>Email:</label>
+                <input type="email" id="verifyEmail" placeholder="user@example.com">
+            </div>
+            
+            <div class="form-group">
+                <label>Code:</label>
+                <input type="text" id="verifyCode" placeholder="123456" maxlength="6">
+            </div>
+            
+            <div class="form-group">
+                <label>Purpose:</label>
+                <select id="verifyPurpose">
+                    <option value="login">Login</option>
+                    <option value="registration">Registration</option>
+                    <option value="password_reset">Password Reset</option>
+                    <option value="email_verification">Email Verification</option>
+                </select>
+            </div>
+            
+            <button onclick="verifyCode()">Verify Code</button>
+            <div id="verifyCodeResponse" class="response" style="display: none;"></div>
+        </div>
+    </div>
+
+    <!-- Enhanced Registration Endpoint -->
+    <div class="container">
+        <h2>4. Enhanced Registration Endpoint</h2>
+        <div class="endpoint">
+            <div>
+                <span class="method post">POST</span>
+                <strong>/trips/api/auth/register.php</strong>
+            </div>
+            <p>Create a new user account with enhanced features.</p>
+            
+            <div class="form-group">
+                <label>Name:</label>
+                <input type="text" id="regName" placeholder="John Doe">
+            </div>
+            
+            <div class="form-group">
+                <label>Email:</label>
+                <input type="email" id="regEmail" placeholder="user@example.com">
+            </div>
+            
+            <div class="form-group">
+                <label>Password:</label>
+                <input type="password" id="regPassword" placeholder="Secure123!">
+            </div>
+            
+            <div class="form-group">
+                <label>Confirm Password:</label>
+                <input type="password" id="regConfirmPassword" placeholder="Secure123!">
+            </div>
+            
+            <div class="form-group">
+                <label>Company:</label>
+                <input type="text" id="regCompany" placeholder="Your Company">
+            </div>
+            
+            <div class="form-group">
+                <label>Phone (optional):</label>
+                <input type="tel" id="regPhone" placeholder="+1234567890">
+            </div>
+            
+            <div class="form-group">
+                <label>Verification Code (if you have one):</label>
+                <input type="text" id="regVerificationCode" placeholder="123456" maxlength="6">
+            </div>
+            
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="regSkipVerification"> 
+                    Skip Email Verification (Development Only)
+                </label>
+            </div>
+            
+            <button onclick="registerUser()">Register User</button>
+            <div id="registerResponse" class="response" style="display: none;"></div>
+        </div>
+    </div>
+
+    <!-- API Documentation -->
+    <div class="container">
+        <h2>API Documentation Summary</h2>
+        <div class="endpoint">
+            <h3>Authentication Flow Examples:</h3>
+            <ol>
+                <li><strong>New User Registration:</strong>
+                    <ol>
+                        <li>Check if email exists (check-user.php)</li>
+                        <li>Send verification code (send-code.php with purpose='registration')</li>
+                        <li>User enters code and completes registration (register.php)</li>
+                    </ol>
+                </li>
+                <li><strong>Login with Email Code:</strong>
+                    <ol>
+                        <li>Check user exists (check-user.php)</li>
+                        <li>Send login code (send-code.php with purpose='login')</li>
+                        <li>Verify code and login (verify-code.php)</li>
+                    </ol>
+                </li>
+                <li><strong>Password Reset:</strong>
+                    <ol>
+                        <li>Send reset code (send-code.php with purpose='password_reset')</li>
+                        <li>Verify code (verify-code.php)</li>
+                        <li>Reset password with returned token</li>
+                    </ol>
+                </li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/trips/api/auth/';
+
+        async function makeRequest(endpoint, data) {
+            try {
+                const response = await fetch(API_BASE + endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                return {
+                    status: response.status,
+                    data: result
+                };
+            } catch (error) {
+                return {
+                    status: 0,
+                    data: { error: 'Network error: ' + error.message }
+                };
+            }
+        }
+
+        function displayResponse(elementId, response) {
+            const element = document.getElementById(elementId);
+            element.style.display = 'block';
+            element.className = `response ${response.status < 400 ? 'success' : 'error'}`;
+            element.textContent = JSON.stringify(response.data, null, 2);
+        }
+
+        async function checkUser() {
+            const data = {
+                email: document.getElementById('checkEmail').value,
+                check_type: document.getElementById('checkType').value
+            };
+            
+            const response = await makeRequest('check-user.php', data);
+            displayResponse('checkUserResponse', response);
+        }
+
+        async function sendCode() {
+            const data = {
+                email: document.getElementById('sendCodeEmail').value,
+                purpose: document.getElementById('sendCodePurpose').value,
+                user_name: document.getElementById('sendCodeName').value
+            };
+            
+            const response = await makeRequest('send-code.php', data);
+            displayResponse('sendCodeResponse', response);
+        }
+
+        async function verifyCode() {
+            const data = {
+                email: document.getElementById('verifyEmail').value,
+                code: document.getElementById('verifyCode').value,
+                purpose: document.getElementById('verifyPurpose').value
+            };
+            
+            const response = await makeRequest('verify-code.php', data);
+            displayResponse('verifyCodeResponse', response);
+        }
+
+        async function registerUser() {
+            const data = {
+                name: document.getElementById('regName').value,
+                email: document.getElementById('regEmail').value,
+                password: document.getElementById('regPassword').value,
+                confirm_password: document.getElementById('regConfirmPassword').value,
+                company: document.getElementById('regCompany').value,
+                phone: document.getElementById('regPhone').value,
+                verification_code: document.getElementById('regVerificationCode').value,
+                skip_email_verification: document.getElementById('regSkipVerification').checked
+            };
+            
+            const response = await makeRequest('register.php', data);
+            displayResponse('registerResponse', response);
+        }
+
+        function fillTestData() {
+            document.getElementById('checkEmail').value = 'test@example.com';
+            document.getElementById('sendCodeEmail').value = 'test@example.com';
+            document.getElementById('sendCodeName').value = 'Test User';
+            document.getElementById('verifyEmail').value = 'test@example.com';
+            document.getElementById('regName').value = 'Test User';
+            document.getElementById('regEmail').value = 'test@example.com';
+            document.getElementById('regPassword').value = 'Test123!';
+            document.getElementById('regConfirmPassword').value = 'Test123!';
+            document.getElementById('regCompany').value = 'Test Company';
+            document.getElementById('regPhone').value = '+1234567890';
+            
+            alert('Test data filled! You can now test the endpoints.');
+        }
+    </script>
+</body>
+</html> 

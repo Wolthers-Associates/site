@@ -256,14 +256,38 @@ function generateVerificationEmail($code, $name) {
     ";
 }
 
-// Simple email sending function (placeholder for production implementation)
+// Email sending function with proper SMTP support
 function sendEmail($to, $subject, $htmlBody) {
     if (ENVIRONMENT === 'development') {
         return true; // Always succeed in development
     }
     
-    // TODO: Implement actual email sending using SMTP or service like SendGrid
-    // For now, return true for production deployment
-    return true;
+    try {
+        // Use PHP's mail function with proper headers
+        $headers = [
+            'MIME-Version: 1.0',
+            'Content-type: text/html; charset=UTF-8',
+            'From: Wolthers Trips <' . SMTP_USER . '>',
+            'Reply-To: ' . SMTP_USER,
+            'X-Mailer: PHP/' . phpversion(),
+            'X-Priority: 1',
+            'X-MSMail-Priority: High'
+        ];
+        
+        // Additional parameters for better delivery
+        $additional_params = '-f' . SMTP_USER;
+        
+        $result = mail($to, $subject, $htmlBody, implode("\r\n", $headers), $additional_params);
+        
+        if (!$result) {
+            error_log("Mail function returned false for: $to");
+        }
+        
+        return $result;
+        
+    } catch (Exception $e) {
+        error_log("Email sending failed: " . $e->getMessage());
+        return false;
+    }
 }
 ?> 

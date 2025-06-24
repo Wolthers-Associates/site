@@ -292,7 +292,7 @@ After successful deployment:
 1. **Upload all files** to your hosting
 2. **Run database migrations** using the commands above
 3. **Set your database password** in hosting environment variables or `secure-config.php`
-4. **Test the API** using: `https://yourdomain.com/trips/api/test-endpoints.html`
+4. **Test the API** using: `https://wolthers.com/trips/api/test-endpoints.html`
 
 ### Environment Variable Setup:
 In your hosting control panel, set:
