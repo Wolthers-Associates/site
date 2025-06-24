@@ -961,7 +961,7 @@ const ui = {
                     ${trip.guests ? `<div class="trip-guests">👤 ${trip.guests}</div>` : ''}
                     ${trip.cars ? `
                         <div class="trip-cars">
-                            <img src="assets/images/disco-icon.png" alt="Vehicle" class="disco-icon-card">
+                            <img src="images/disco-icon.png" alt="Vehicle" class="disco-icon-card">
                             ${trip.cars}
                         </div>
                         ${trip.driver ? `

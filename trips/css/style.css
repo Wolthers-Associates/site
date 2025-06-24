@@ -924,10 +924,6 @@ body {
     transform: translateX(-50%);
 }
 
-
-
-
-
 /* Trips Grid */
 .trips-grid {
     display: flex;
@@ -1114,6 +1110,54 @@ body {
     font-size: 0.75rem;
     color: #999;
     margin-top: 8px;
+}
+
+@media (prefers-color-scheme: dark) {
+    .trip-card {
+        background: #181c1f;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+        border: 1px solid #23272b;
+    }
+    .trip-card-header {
+        border-bottom: 1px solid #23272b;
+    }
+    .trip-title {
+        color: #e6edf3;
+    }
+    .trip-date {
+        color: #b5d6c3;
+    }
+    .trip-description {
+        color: #b0b8c1;
+    }
+    .trip-guests,
+    .trip-cars,
+    .trip-driver {
+        color: #b0b8c1;
+    }
+    .trip-footer {
+        border-top: 1px solid #23272b;
+    }
+    .trip-wolthers-staff {
+        color: #b0b8c1;
+    }
+    .trip-wolthers-staff strong {
+        color: #b5d6c3;
+    }
+    .trip-codes {
+        color: #b0b8c1;
+    }
+    .trip-codes strong {
+        color: #b5d6c3;
+    }
+    .status-upcoming {
+        background: rgba(212, 175, 55, 0.12);
+        color: #ffe082;
+    }
+    .status-past {
+        background: rgba(136, 136, 136, 0.12);
+        color: #b0b8c1;
+    }
 }
 
 /* Modal Styles */
