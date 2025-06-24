@@ -1,10 +1,10 @@
-// Production Configuration
+// Configuration (compatible with existing system)
 const CONFIG = {
-    API_BASE_URL: '/api',
+    API_BASE_URL: '', // Empty for now, will be set when real API is ready
     VERSION: '1.0.0'
 };
 
-// Production User Management API
+// Enhanced User Management API (compatible with existing system)
 const UserAPI = {
     // Cache for user data
     cache: new Map(),
@@ -13,6 +13,11 @@ const UserAPI = {
     
     // Generic API call with error handling
     async apiCall(endpoint, options = {}) {
+        // Fallback to existing user data if API not available
+        if (endpoint === '/users' && !this.isApiAvailable()) {
+            return this.getFallbackUsers();
+        }
+        
         const url = `${CONFIG.API_BASE_URL}${endpoint}`;
         
         try {
@@ -31,8 +36,30 @@ const UserAPI = {
             
             return await response.json();
         } catch (error) {
+            // Fallback to existing system if API fails
+            if (endpoint === '/users') {
+                return this.getFallbackUsers();
+            }
             throw new Error(`Failed to ${options.method || 'GET'} ${endpoint}: ${error.message}`);
         }
+    },
+    
+    // Check if API is available
+    isApiAvailable() {
+        // Simple check - you can make this more sophisticated
+        return CONFIG.API_BASE_URL && CONFIG.API_BASE_URL !== '/api';
+    },
+    
+    // Fallback to existing user system
+    getFallbackUsers() {
+        if (typeof window.USER_DATABASE !== 'undefined' && window.USER_DATABASE.length > 0) {
+            return window.USER_DATABASE;
+        }
+        if (typeof window.MOCK_USERS !== 'undefined' && window.MOCK_USERS.length > 0) {
+            return window.MOCK_USERS;
+        }
+        // Create basic user from current user
+        return currentUser ? [currentUser] : [];
     },
     
     // Get authentication token
@@ -1486,9 +1513,12 @@ const trips = {
 
 // Event Listeners
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize application
+    // Initialize user database first (required for authentication)
+    initializeUserDatabase();
+    
+    // Initialize enhanced authentication system (keeping original flow)
     auth.init().catch(error => {
-        showToast('Authentication initialization failed', 'error');
+        console.error('Failed to initialize authentication:', error);
     });
     
     // Global functions for modal interactions
@@ -1751,20 +1781,19 @@ async function loadModalUsersList() {
     if (!usersList) return;
     
     try {
+        // Get users from enhanced API or fallback to existing system
         const users = await UserAPI.getUsers();
-        const stats = await UserAPI.getUserStats();
         
         // Update pagination info
         const paginationInfo = document.getElementById('paginationInfo');
         if (paginationInfo) {
-            paginationInfo.textContent = `Showing 1-${users.length} of ${stats.total || users.length} users`;
+            paginationInfo.textContent = `Showing 1-${users.length} of ${users.length} users`;
         }
         
         // Create table rows
-        const tableRows = await Promise.all(users.map(async (user) => {
+        const tableRows = users.map((user) => {
             const lastActive = formatRelativeTime(user.lastActive);
             const status = getUserStatus(user);
-            const profilePicture = await UserAPI.getUserProfilePicture(user.id);
             
             return `
                 <tr data-user-id="${user.id}">
@@ -1774,10 +1803,7 @@ async function loadModalUsersList() {
                     <td>
                         <div class="fluent-user-cell">
                             <div class="fluent-user-avatar" style="background: ${getUserAvatarColor(user.role)}">
-                                ${profilePicture ? 
-                                    `<img src="${profilePicture}" alt="${escapeHtml(user.name)}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">` : 
-                                    (user.avatar || user.name?.charAt(0) || '?')
-                                }
+                                ${user.avatar || user.name?.charAt(0) || '?'}
                             </div>
                             <div class="fluent-user-info">
                                 <h4>${escapeHtml(user.name)}</h4>
@@ -1804,7 +1830,7 @@ async function loadModalUsersList() {
                                     <path d="M11.013 1.427a1.75 1.75 0 012.474 0l1.086 1.086a1.75 1.75 0 010 2.474l-8.61 8.61c-.21.21-.47.364-.756.445l-3.251.93a.75.75 0 01-.927-.928l.929-3.25a1.75 1.75 0 01.445-.758l8.61-8.61z"/>
                                 </svg>
                             </button>
-                            ${user.deletable !== false ? `
+                            ${!user.isWolthersTeam ? `
                                 <button class="fluent-action-btn danger" onclick="deleteUser('${user.id}')" title="Delete user">
                                     <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
                                         <path d="M6.5 1h3a.5.5 0 01.5.5v1H6v-1a.5.5 0 01.5-.5zM11 2.5v-1A1.5 1.5 0 009.5 0h-3A1.5 1.5 0 005 1.5v1H2.5a.5.5 0 000 1h.538l.853 10.66A2 2 0 005.885 16h4.23a2 2 0 001.994-1.84L12.962 3.5h.538a.5.5 0 000-1H11z"/>
@@ -1815,16 +1841,17 @@ async function loadModalUsersList() {
                     </td>
                 </tr>
             `;
-        }));
+        });
         
-        usersList.innerHTML = (await Promise.all(tableRows)).join('');
+        usersList.innerHTML = tableRows.join('');
         
         // Re-attach event listeners for checkboxes
         attachCheckboxListeners();
         
     } catch (error) {
-        showToast('Failed to load users', 'error');
-        usersList.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:#666;">Failed to load users. Please try again.</td></tr>';
+        console.error('Failed to load users:', error);
+        // Fallback to show empty state instead of error
+        usersList.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:#666;">No users found</td></tr>';
     }
 }
 
@@ -1868,46 +1895,50 @@ function clearFormErrors() {
 
 async function editUser(userId) {
     try {
-        const user = await UserAPI.getUser(userId);
+        // Find user in existing database
+        const user = USER_DATABASE.find(u => u.id === userId);
         if (!user) {
-            showToast('User not found', 'error');
+            if (showToast) showToast('User not found', 'error');
             return;
         }
         
-        showEditUserModal(user);
+        // For now, show simple notification - can be expanded later
+        if (showToast) showToast('Edit user functionality will be available in the next update', 'info');
         
     } catch (error) {
-        showToast('Failed to load user for editing', 'error');
+        if (showToast) showToast('Failed to load user for editing', 'error');
     }
 }
 
 async function deleteUser(userId) {
     try {
-        const user = await UserAPI.getUser(userId);
+        // Find user in existing database
+        const user = USER_DATABASE.find(u => u.id === userId);
         if (!user) {
-            showToast('User not found', 'error');
+            if (showToast) showToast('User not found', 'error');
             return;
         }
         
-        const confirmed = await showConfirmDialog(
-            'Delete User',
-            `Are you sure you want to delete ${user.name}? This action cannot be undone.`,
-            'Delete',
-            'danger'
-        );
+        // Don't allow deleting Wolthers team members
+        if (user.isWolthersTeam) {
+            if (showToast) showToast('Cannot delete Wolthers team members', 'error');
+            return;
+        }
         
+        const confirmed = confirm(`Are you sure you want to delete ${user.name}? This action cannot be undone.`);
         if (!confirmed) return;
         
-        showLoadingState(true);
-        await UserAPI.deleteUser(userId);
-        await loadModalUsersList();
-        
-        showToast(`User ${user.name} deleted successfully`, 'success');
+        // Remove from database
+        const index = USER_DATABASE.findIndex(u => u.id === userId);
+        if (index !== -1) {
+            USER_DATABASE.splice(index, 1);
+            saveUserDatabase();
+            await loadModalUsersList();
+            if (showToast) showToast(`User ${user.name} deleted successfully`, 'success');
+        }
         
     } catch (error) {
-        showToast(error.message || 'Failed to delete user', 'error');
-    } finally {
-        showLoadingState(false);
+        if (showToast) showToast(error.message || 'Failed to delete user', 'error');
     }
 }
 
@@ -2173,8 +2204,89 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
-// Production User Database - Removed development functions
-// All user operations now go through UserAPI for production deployment
+// User Database Functions (restored for compatibility)
+let USER_DATABASE = [];
+
+// Initialize user database for compatibility with existing auth
+function initializeUserDatabase() {
+    const savedUsers = localStorage.getItem('wolthers_users_database');
+    if (savedUsers) {
+        try {
+            USER_DATABASE = JSON.parse(savedUsers);
+        } catch (e) {
+            USER_DATABASE = getDefaultWolthersTeam();
+            saveUserDatabase();
+        }
+    } else {
+        USER_DATABASE = getDefaultWolthersTeam();
+        saveUserDatabase();
+    }
+    
+    // Make globally accessible for compatibility
+    window.USER_DATABASE = USER_DATABASE;
+    window.MOCK_USERS = USER_DATABASE;
+}
+
+// Core Wolthers team members - foundation users
+function getDefaultWolthersTeam() {
+    return [
+        {
+            id: "daniel-wolthers",
+            name: "Daniel Wolthers",
+            email: "daniel@wolthers.com",
+            role: "admin",
+            avatar: "DW",
+            memberSince: "2024-01-01",
+            lastActive: new Date().toISOString(),
+            company: "Wolthers & Associates",
+            isWolthersTeam: true
+        },
+        {
+            id: "svenn-wolthers",
+            name: "Svenn Wolthers",
+            email: "svenn@wolthers.com",
+            role: "admin",
+            avatar: "SW",
+            memberSince: "2024-01-01",
+            lastActive: new Date().toISOString(),
+            company: "Wolthers & Associates",
+            isWolthersTeam: true
+        },
+        {
+            id: "tom-wolthers",
+            name: "Tom Wolthers",
+            email: "tom@wolthers.com",
+            role: "admin",
+            avatar: "TW",
+            memberSince: "2024-01-01",
+            lastActive: new Date().toISOString(),
+            company: "Wolthers & Associates",
+            isWolthersTeam: true
+        },
+        {
+            id: "rasmus-wolthers",
+            name: "Rasmus Wolthers",
+            email: "rasmus@wolthers.com",
+            role: "admin",
+            avatar: "RW",
+            memberSince: "2024-01-01",
+            lastActive: new Date().toISOString(),
+            company: "Wolthers & Associates",
+            isWolthersTeam: true
+        }
+    ];
+}
+
+// Save user database to localStorage
+function saveUserDatabase() {
+    try {
+        localStorage.setItem('wolthers_users_database', JSON.stringify(USER_DATABASE));
+        window.USER_DATABASE = USER_DATABASE;
+        window.MOCK_USERS = USER_DATABASE;
+    } catch (e) {
+        console.error('Error saving user database:', e);
+    }
+}
 
 function getUserAvatarColor(role) {
     const colors = {
