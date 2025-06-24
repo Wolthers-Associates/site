@@ -379,9 +379,9 @@
             </div>
             
             <div class="fluent-modal-body">
-                <!-- Profile Section (30%) -->
+                <!-- Profile Section (30%) - Flat Design -->
                 <section class="fluent-profile-section">
-                    <div class="fluent-profile-card">
+                    <div class="fluent-profile-card-flat">
                         <div class="fluent-profile-info">
                             <div class="fluent-profile-avatar">
                                 <div class="fluent-avatar-circle" id="modalProfileAvatar">DW</div>
@@ -426,6 +426,12 @@
                                         <option value="guest">Guest</option>
                                     </select>
                                 </div>
+                                <div class="fluent-filter-dropdown">
+                                    <select id="userCompanyFilter" class="fluent-select">
+                                        <option value="">All companies</option>
+                                        <!-- Companies will be populated dynamically -->
+                                    </select>
+                                </div>
                                 <button class="fluent-btn fluent-btn-primary" onclick="showAddUserModal()">
                                     <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
                                         <path d="M8.75 3.75a.75.75 0 00-1.5 0v3.5h-3.5a.75.75 0 000 1.5h3.5v3.5a.75.75 0 001.5 0v-3.5h3.5a.75.75 0 000-1.5h-3.5v-3.5z"/>
@@ -456,27 +462,43 @@
                                             <path d="M6 2L4.5 3.5h3L6 2zM6 10l1.5-1.5h-3L6 10z"/>
                                         </svg>
                                     </th>
-                                    <th>Company</th>
+                                    <th class="fluent-th-sortable" data-sort="company">
+                                        <span>Company</span>
+                                        <svg width="12" height="12" viewBox="0 0 12 12" class="fluent-sort-icon">
+                                            <path d="M6 2L4.5 3.5h3L6 2zM6 10l1.5-1.5h-3L6 10z"/>
+                                        </svg>
+                                    </th>
                                     <th class="fluent-th-sortable" data-sort="role">
                                         <span>User type</span>
                                         <svg width="12" height="12" viewBox="0 0 12 12" class="fluent-sort-icon">
                                             <path d="M6 2L4.5 3.5h3L6 2zM6 10l1.5-1.5h-3L6 10z"/>
                                         </svg>
                                     </th>
-                                                                         <th class="fluent-th-sortable" data-sort="memberSince">
-                                         <span>Member since</span>
-                                         <svg width="12" height="12" viewBox="0 0 12 12" class="fluent-sort-icon">
-                                             <path d="M6 2L4.5 3.5h3L6 2zM6 10l1.5-1.5h-3L6 10z"/>
-                                         </svg>
-                                     </th>
-                                     <th class="fluent-th-sortable" data-sort="lastActive">
-                                         <span>Last active</span>
-                                         <svg width="12" height="12" viewBox="0 0 12 12" class="fluent-sort-icon">
-                                             <path d="M6 2L4.5 3.5h3L6 2zM6 10l1.5-1.5h-3L6 10z"/>
-                                         </svg>
-                                     </th>
-                                     <th>Status</th>
-                                     <th>Actions</th>
+                                    <th class="fluent-th-sortable" data-sort="memberSince">
+                                        <span>Member since</span>
+                                        <svg width="12" height="12" viewBox="0 0 12 12" class="fluent-sort-icon">
+                                            <path d="M6 2L4.5 3.5h3L6 2zM6 10l1.5-1.5h-3L6 10z"/>
+                                        </svg>
+                                    </th>
+                                    <th class="fluent-th-sortable" data-sort="tripCount">
+                                        <span># of Trips</span>
+                                        <svg width="12" height="12" viewBox="0 0 12 12" class="fluent-sort-icon">
+                                            <path d="M6 2L4.5 3.5h3L6 2zM6 10l1.5-1.5h-3L6 10z"/>
+                                        </svg>
+                                    </th>
+                                    <th class="fluent-th-sortable" data-sort="lastTrip">
+                                        <span>Last Trip</span>
+                                        <svg width="12" height="12" viewBox="0 0 12 12" class="fluent-sort-icon">
+                                            <path d="M6 2L4.5 3.5h3L6 2zM6 10l1.5-1.5h-3L6 10z"/>
+                                        </svg>
+                                    </th>
+                                    <th class="fluent-th-sortable" data-sort="upcomingTrip">
+                                        <span>Upcoming/Next Trip</span>
+                                        <svg width="12" height="12" viewBox="0 0 12 12" class="fluent-sort-icon">
+                                            <path d="M6 2L4.5 3.5h3L6 2zM6 10l1.5-1.5h-3L6 10z"/>
+                                        </svg>
+                                    </th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="modalUsersList">

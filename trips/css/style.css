@@ -3363,6 +3363,26 @@ body {
     max-width: 100%;
 }
 
+/* Flat Design Profile Card */
+.fluent-profile-card-flat {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 100%;
+    background: var(--card-background);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 24px;
+    transition: all 0.2s ease;
+}
+
+@media (prefers-color-scheme: dark) {
+    .fluent-profile-card-flat {
+        background: var(--dark-card);
+        border-color: var(--dark-border);
+    }
+}
+
 .fluent-profile-info {
     display: flex;
     align-items: center;
@@ -3848,7 +3868,52 @@ body {
     color: #dc3545;
 }
 
+/* Trip Info Display in Table */
+.trip-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.trip-name {
+    font-weight: 500;
+    color: var(--dark-green);
+    font-size: 0.9rem;
+}
+
+.trip-date {
+    font-size: 0.8rem;
+    color: #666;
+}
+
+.fluent-trip-count {
+    text-align: center;
+    font-weight: 500;
+    color: var(--dark-green);
+}
+
+.fluent-user-name {
+    font-weight: 500;
+    color: var(--text-color);
+}
+
 @media (prefers-color-scheme: dark) {
+    .trip-name {
+        color: var(--dark-accent);
+    }
+    
+    .trip-date {
+        color: var(--dark-text-secondary);
+    }
+    
+    .fluent-trip-count {
+        color: var(--dark-accent);
+    }
+    
+    .fluent-user-name {
+        color: var(--dark-text);
+    }
+    
     .fluent-action-btn:hover {
         background: var(--dark-border);
         color: var(--dark-accent);

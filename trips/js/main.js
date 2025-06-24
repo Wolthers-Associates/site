@@ -1657,40 +1657,32 @@ function loadModalUsersList() {
         paginationInfo.textContent = `Showing 1-${users.length} of ${users.length} users`;
     }
     
-    // Create table rows using Fluent Design styling
+    // Populate company filter dropdown
+    populateCompanyFilter(users);
+    
+    // Create table rows using clean text-only format
     const tableRows = users.map((user, index) => {
         const userTrips = getUserTripsData(user);
+        const tripCount = userTrips.count;
         const lastTrip = userTrips.lastTrip;
+        const upcomingTrip = userTrips.upcomingTrip;
         
         return `
             <tr>
                 <td class="fluent-th-checkbox">
                     <input type="checkbox" class="fluent-checkbox user-checkbox" data-user-id="${user.id}">
                 </td>
-                <td>
-                    <div class="fluent-user-cell">
-                        <div class="fluent-user-avatar" style="background: ${getUserAvatarColor(user.role)}">
-                            ${user.avatar || user.name?.charAt(0) || '?'}
-                        </div>
-                        <div class="fluent-user-info">
-                            <h4>${user.name}</h4>
-                        </div>
-                    </div>
-                </td>
+                <td class="fluent-user-name">${user.name}</td>
                 <td class="fluent-user-email">${user.email}</td>
                 <td class="fluent-user-company">${getUserCompany(user)}</td>
                 <td>
-                    <span class="fluent-badge-table ${user.role}">${user.role === 'admin' ? 'Administrator' : user.role === 'editor' ? 'Editor' : user.role === 'guest' ? 'Guest' : 'User'}</span>
+                    <span class="fluent-badge-table ${user.role}">${getRoleDisplayName(user.role)}</span>
                     ${user.isWolthersTeam ? '<br><span class="fluent-badge-table team" style="background: var(--medium-green); color: white; margin-top: 4px;">Team</span>' : ''}
                 </td>
                 <td class="fluent-member-since">${formatTableDate(user.memberSince)}</td>
-                <td class="fluent-last-active">${formatRelativeTime(user.lastActive)}</td>
-                <td class="fluent-status">
-                    <span class="fluent-status-active">
-                        <span class="fluent-status-dot"></span>
-                        Active
-                    </span>
-                </td>
+                <td class="fluent-trip-count">${tripCount}</td>
+                <td class="fluent-last-trip">${formatLastTrip(lastTrip)}</td>
+                <td class="fluent-upcoming-trip">${formatUpcomingTrip(upcomingTrip)}</td>
                 <td class="fluent-actions">
                     <div class="fluent-action-buttons">
                         <button class="fluent-action-btn" onclick="editUser('${user.id}')" title="Edit user">
@@ -2204,27 +2196,124 @@ function getUserCompany(user) {
 }
 
 function getUserTripsData(user) {
+    // Get all trips from localStorage (including real trip data)
+    const allTrips = getAllTrips();
+    
     // Get trips where user has permissions or is creator
-    const userTrips = MOCK_TRIPS.filter(trip => 
-        user.tripPermissions.includes(trip.id) || 
+    const userTrips = allTrips.filter(trip => 
+        user.tripPermissions?.includes(trip.id) || 
         trip.createdBy === user.email ||
-        trip.createdBy === user.name
+        trip.createdBy === user.name ||
+        trip.wolthersStaff?.includes(user.name)
     );
     
-    // Find most recent trip
+    const now = new Date();
+    
+    // Separate past and upcoming trips
+    const pastTrips = userTrips.filter(trip => new Date(trip.endDate || trip.date) < now);
+    const upcomingTrips = userTrips.filter(trip => new Date(trip.startDate || trip.date) > now);
+    
+    // Find most recent past trip
     let lastTrip = null;
-    if (userTrips.length > 0) {
-        lastTrip = userTrips.reduce((latest, current) => {
-            const currentDate = new Date(current.date);
-            const latestDate = new Date(latest.date);
+    if (pastTrips.length > 0) {
+        lastTrip = pastTrips.reduce((latest, current) => {
+            const currentDate = new Date(current.endDate || current.date);
+            const latestDate = new Date(latest.endDate || latest.date);
             return currentDate > latestDate ? current : latest;
+        });
+    }
+    
+    // Find next upcoming trip
+    let upcomingTrip = null;
+    if (upcomingTrips.length > 0) {
+        upcomingTrip = upcomingTrips.reduce((earliest, current) => {
+            const currentDate = new Date(current.startDate || current.date);
+            const earliestDate = new Date(earliest.startDate || earliest.date);
+            return currentDate < earliestDate ? current : earliest;
         });
     }
     
     return {
         count: userTrips.length,
-        lastTrip: lastTrip
+        lastTrip: lastTrip,
+        upcomingTrip: upcomingTrip
     };
+}
+
+// Get all trips from various sources
+function getAllTrips() {
+    const trips = [];
+    
+    // Add mock trips if they exist
+    if (typeof MOCK_TRIPS !== 'undefined' && MOCK_TRIPS.length > 0) {
+        trips.push(...MOCK_TRIPS);
+    }
+    
+    // Add trips from localStorage
+    try {
+        const savedTrips = localStorage.getItem('wolthers_trips');
+        if (savedTrips) {
+            const parsedTrips = JSON.parse(savedTrips);
+            if (Array.isArray(parsedTrips)) {
+                trips.push(...parsedTrips);
+            }
+        }
+    } catch (e) {
+        console.log('No saved trips found');
+    }
+    
+    // Remove duplicates based on ID
+    const uniqueTrips = trips.filter((trip, index, self) => 
+        index === self.findIndex(t => t.id === trip.id)
+    );
+    
+    return uniqueTrips;
+}
+
+// Populate company filter dropdown
+function populateCompanyFilter(users) {
+    const companyFilter = document.getElementById('userCompanyFilter');
+    if (!companyFilter) return;
+    
+    // Get unique companies
+    const companies = [...new Set(users.map(user => getUserCompany(user)))].sort();
+    
+    // Clear existing options except "All companies"
+    companyFilter.innerHTML = '<option value="">All companies</option>';
+    
+    // Add company options
+    companies.forEach(company => {
+        const option = document.createElement('option');
+        option.value = company;
+        option.textContent = company;
+        companyFilter.appendChild(option);
+    });
+}
+
+// Format last trip display
+function formatLastTrip(trip) {
+    if (!trip) return '-';
+    
+    const tripDate = new Date(trip.endDate || trip.date);
+    const formattedDate = formatTableDate(tripDate.toISOString());
+    
+    return `<div class="trip-info">
+        <div class="trip-name">${trip.title || trip.name || 'Untitled Trip'}</div>
+        <div class="trip-date">${formattedDate}</div>
+    </div>`;
+}
+
+// Format upcoming trip display
+function formatUpcomingTrip(trip) {
+    if (!trip) return '-';
+    
+    const tripDate = new Date(trip.startDate || trip.date);
+    const formattedDate = formatTableDate(tripDate.toISOString());
+    
+    return `<div class="trip-info">
+        <div class="trip-name">${trip.title || trip.name || 'Untitled Trip'}</div>
+        <div class="trip-date">${formattedDate}</div>
+    </div>`;
 }
 
 function getUserAvatarColor(role) {
@@ -2270,16 +2359,24 @@ function setupUserManagementInteractions() {
     // Search functionality with debouncing
     const searchInput = document.getElementById('userSearchInput');
     if (searchInput) {
-        searchInput.addEventListener('input', debounce(async () => {
-            await loadModalUsersList();
+        searchInput.addEventListener('input', debounce(() => {
+            applyFiltersAndSearch();
         }, 300));
     }
     
     // Role filter functionality
     const roleFilter = document.getElementById('userRoleFilter');
     if (roleFilter) {
-        roleFilter.addEventListener('change', async () => {
-            await loadModalUsersList();
+        roleFilter.addEventListener('change', () => {
+            applyFiltersAndSearch();
+        });
+    }
+    
+    // Company filter functionality
+    const companyFilter = document.getElementById('userCompanyFilter');
+    if (companyFilter) {
+        companyFilter.addEventListener('change', () => {
+            applyFiltersAndSearch();
         });
     }
     
@@ -2294,6 +2391,37 @@ function setupUserManagementInteractions() {
     sortableHeaders.forEach(header => {
         header.addEventListener('click', () => sortUserTable(header.dataset.sort));
     });
+}
+
+// Apply filters and search to user list
+function applyFiltersAndSearch() {
+    let users = getUsersFromDatabase();
+    
+    // Apply search filter
+    const searchInput = document.getElementById('userSearchInput');
+    if (searchInput && searchInput.value.trim()) {
+        const searchTerm = searchInput.value.toLowerCase().trim();
+        users = users.filter(user => 
+            user.name.toLowerCase().includes(searchTerm) ||
+            user.email.toLowerCase().includes(searchTerm) ||
+            getUserCompany(user).toLowerCase().includes(searchTerm)
+        );
+    }
+    
+    // Apply role filter
+    const roleFilter = document.getElementById('userRoleFilter');
+    if (roleFilter && roleFilter.value) {
+        users = users.filter(user => user.role === roleFilter.value);
+    }
+    
+    // Apply company filter
+    const companyFilter = document.getElementById('userCompanyFilter');
+    if (companyFilter && companyFilter.value) {
+        users = users.filter(user => getUserCompany(user) === companyFilter.value);
+    }
+    
+    // Render filtered users
+    renderFilteredUsers(users);
 }
 
 // Production-ready debounce function
@@ -2375,6 +2503,10 @@ function sortUserTable(column) {
                 aValue = a.email.toLowerCase();
                 bValue = b.email.toLowerCase();
                 break;
+            case 'company':
+                aValue = getUserCompany(a).toLowerCase();
+                bValue = getUserCompany(b).toLowerCase();
+                break;
             case 'role':
                 const roleOrder = { admin: 4, editor: 3, user: 2, guest: 1 };
                 aValue = roleOrder[a.role] || 0;
@@ -2383,6 +2515,24 @@ function sortUserTable(column) {
             case 'memberSince':
                 aValue = new Date(a.memberSince);
                 bValue = new Date(b.memberSince);
+                break;
+            case 'tripCount':
+                const aTrips = getUserTripsData(a);
+                const bTrips = getUserTripsData(b);
+                aValue = aTrips.count;
+                bValue = bTrips.count;
+                break;
+            case 'lastTrip':
+                const aLastTrip = getUserTripsData(a).lastTrip;
+                const bLastTrip = getUserTripsData(b).lastTrip;
+                aValue = aLastTrip ? new Date(aLastTrip.endDate || aLastTrip.date) : new Date(0);
+                bValue = bLastTrip ? new Date(bLastTrip.endDate || bLastTrip.date) : new Date(0);
+                break;
+            case 'upcomingTrip':
+                const aUpcoming = getUserTripsData(a).upcomingTrip;
+                const bUpcoming = getUserTripsData(b).upcomingTrip;
+                aValue = aUpcoming ? new Date(aUpcoming.startDate || aUpcoming.date) : new Date('2099-12-31');
+                bValue = bUpcoming ? new Date(bUpcoming.startDate || bUpcoming.date) : new Date('2099-12-31');
                 break;
             default:
                 return 0;
@@ -2398,6 +2548,63 @@ function sortUserTable(column) {
     
     // Render sorted users
     renderFilteredUsers(sortedUsers);
+}
+
+// Render filtered users in the table
+function renderFilteredUsers(users) {
+    const usersList = document.getElementById('modalUsersList');
+    if (!usersList) return;
+    
+    // Update pagination info
+    const paginationInfo = document.getElementById('paginationInfo');
+    if (paginationInfo) {
+        paginationInfo.textContent = `Showing 1-${users.length} of ${users.length} users`;
+    }
+    
+    // Create table rows using clean text-only format
+    const tableRows = users.map((user, index) => {
+        const userTrips = getUserTripsData(user);
+        const tripCount = userTrips.count;
+        const lastTrip = userTrips.lastTrip;
+        const upcomingTrip = userTrips.upcomingTrip;
+        
+        return `
+            <tr>
+                <td class="fluent-th-checkbox">
+                    <input type="checkbox" class="fluent-checkbox user-checkbox" data-user-id="${user.id}">
+                </td>
+                <td class="fluent-user-name">${user.name}</td>
+                <td class="fluent-user-email">${user.email}</td>
+                <td class="fluent-user-company">${getUserCompany(user)}</td>
+                <td>
+                    <span class="fluent-badge-table ${user.role}">${getRoleDisplayName(user.role)}</span>
+                    ${user.isWolthersTeam ? '<br><span class="fluent-badge-table team" style="background: var(--medium-green); color: white; margin-top: 4px;">Team</span>' : ''}
+                </td>
+                <td class="fluent-member-since">${formatTableDate(user.memberSince)}</td>
+                <td class="fluent-trip-count">${tripCount}</td>
+                <td class="fluent-last-trip">${formatLastTrip(lastTrip)}</td>
+                <td class="fluent-upcoming-trip">${formatUpcomingTrip(upcomingTrip)}</td>
+                <td class="fluent-actions">
+                    <div class="fluent-action-buttons">
+                        <button class="fluent-action-btn" onclick="editUser('${user.id}')" title="Edit user">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                                <path d="M11.013 1.427a1.75 1.75 0 012.474 0l1.086 1.086a1.75 1.75 0 010 2.474l-8.61 8.61c-.21.21-.47.364-.756.445l-3.251.93a.75.75 0 01-.927-.928l.929-3.25a1.75 1.75 0 01.445-.758l8.61-8.61z"/>
+                            </svg>
+                        </button>
+                        ${!user.isWolthersTeam ? `
+                            <button class="fluent-action-btn danger" onclick="deleteUser('${user.id}')" title="Delete user">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                                    <path d="M6.5 1h3a.5.5 0 01.5.5v1H6v-1a.5.5 0 01.5-.5zM11 2.5v-1A1.5 1.5 0 009.5 0h-3A1.5 1.5 0 005 1.5v1H2.5a.5.5 0 000 1h.538l.853 10.66A2 2 0 005.885 16h4.23a2 2 0 001.994-1.84L12.962 3.5h.538a.5.5 0 000-1H11z"/>
+                                </svg>
+                            </button>
+                        ` : ''}
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join('');
+    
+    usersList.innerHTML = tableRows;
 }
 
 // Update sort icons in table headers
