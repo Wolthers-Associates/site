@@ -952,7 +952,8 @@ const ui = {
             <div class="trip-card ${status}" onclick="trips.openTrip('${trip.id}')" role="button" tabindex="0" onkeypress="if(event.key==='Enter') trips.openTrip('${trip.id}')">
                 <div class="trip-card-header">
                     <div class="trip-title">${trip.title}</div>
-                    <div class="trip-date">${startDate} - ${endDate} <span style="color:#888;font-size:0.95em;">(${totalDays} days)</span></div>
+                    <div class="trip-date">${startDate} - ${endDate}</div>
+                    <div class="trip-total-days">Total trip: ${totalDays} days</div>
                 </div>
                 
                 <div class="trip-description">${trip.description}</div>
@@ -1131,7 +1132,9 @@ const ui = {
         content.innerHTML = `
             <div class="trip-preview-header">
                 <h3 class="trip-preview-title">${trip.title}</h3>
-                <div class="trip-preview-dates">${dateRange} <span style="color:#888;font-size:0.95em;">(${totalDays} days)</span></div>
+                <div class="trip-preview-dates">${dateRange}</div>
+                <div class="trip-total-days">Total trip: ${totalDays} days</div>
+                ${overviewHTML}
                 ${trip.wolthersGuide ? `<div class="trip-preview-guide">Guided by: ${trip.wolthersGuide}</div>` : ''}
                 <div class="trip-preview-description">${trip.description}</div>
                 
@@ -1142,8 +1145,6 @@ const ui = {
             </div>
             
             <div class="trip-preview-body">
-                ${overviewHTML}
-                
                 ${trip.highlights && trip.highlights.length > 0 ? `
                 <div class="trip-preview-highlights">
                     <h4 class="preview-section-title">Highlights</h4>
