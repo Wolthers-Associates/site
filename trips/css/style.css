@@ -2301,7 +2301,8 @@ body {
     .modal-header {
         border-bottom-color: #23272b;
     }
-    .modal-title {
+    .modal-title,
+    .modal h2 {
         color: #FFE082;
     }
     .close-btn {
@@ -2323,6 +2324,7 @@ body {
     .form-input:focus,
     .form-textarea:focus {
         border-color: #FFE082;
+        box-shadow: 0 0 0 2px rgba(255, 224, 130, 0.2);
     }
     .form-input::placeholder,
     .form-textarea::placeholder {
