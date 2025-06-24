@@ -13,6 +13,14 @@
     --cream: #f5f1e8;
     --white: #ffffff;
     --gold: #D4AF37;
+    
+    /* Dark mode colors */
+    --dark-bg: #181c1f;
+    --dark-bg-secondary: #23272b;
+    --dark-border: #2d3136;
+    --dark-text: #ffffff;
+    --dark-text-secondary: #e6edf3;
+    --dark-accent: #FFE082;
 }
 
 body {
@@ -25,8 +33,8 @@ body {
 
 @media (prefers-color-scheme: dark) {
     body {
-        background: linear-gradient(135deg, #0d1117 0%, #161b22 100%);
-        color: #e6edf3;
+        background: linear-gradient(135deg, var(--dark-bg) 0%, var(--dark-bg-secondary) 100%);
+        color: var(--dark-text-secondary);
     }
 }
 
@@ -83,9 +91,10 @@ body {
 
 @media (prefers-color-scheme: dark) {
     .login-box {
-        background: #1a1a1a;
-        color: white;
+        background: var(--dark-bg);
+        color: var(--dark-text);
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        border: 1px solid var(--dark-border);
     }
 }
 
@@ -107,7 +116,7 @@ body {
 
 @media (prefers-color-scheme: dark) {
     .login-title {
-        color: var(--light-green);
+        color: var(--dark-accent);
     }
 }
 
@@ -119,7 +128,7 @@ body {
 
 @media (prefers-color-scheme: dark) {
     .login-subtitle {
-        color: #aaa;
+        color: var(--dark-text-secondary);
     }
 }
 
@@ -195,8 +204,8 @@ body {
 
 @media (prefers-color-scheme: dark) {
     .test-credentials {
-        border-top-color: #333;
-        color: #aaa;
+        border-top-color: var(--dark-border);
+        color: var(--dark-text-secondary);
     }
 }
 
@@ -210,7 +219,7 @@ body {
 
 @media (prefers-color-scheme: dark) {
     .test-credentials strong {
-        color: var(--light-green);
+        color: var(--dark-accent);
     }
 }
 
@@ -224,8 +233,8 @@ body {
 
 @media (prefers-color-scheme: dark) {
     .test-credentials em {
-        background: #333;
-        color: #fff;
+        background: var(--dark-bg-secondary);
+        color: var(--dark-text);
     }
 }
 
@@ -278,18 +287,19 @@ body {
 
 @media (prefers-color-scheme: dark) {
     .input-group input {
-        background: #21262d;
-        border-color: #30363d;
-        color: #e6edf3;
+        background: var(--dark-bg-secondary);
+        border-color: var(--dark-border);
+        color: var(--dark-text);
     }
     
     .input-group input:focus {
-        border-color: var(--light-green);
-        box-shadow: 0 0 0 4px rgba(50, 92, 54, 0.2);
+        border-color: var(--dark-accent) !important;
+        box-shadow: 0 0 0 4px rgba(255, 224, 130, 0.2) !important;
     }
     
     .input-group input::placeholder {
-        color: #7d8590;
+        color: var(--dark-text-secondary);
+        opacity: 0.7;
     }
 }
 
@@ -318,11 +328,13 @@ body {
 
 @media (prefers-color-scheme: dark) {
     .continue-btn, .sign-in-btn, .create-account-btn, .verify-btn {
-        background: var(--dark-green);
+        background: var(--dark-accent);
+        color: var(--dark-bg);
     }
     
     .continue-btn:hover, .sign-in-btn:hover, .create-account-btn:hover, .verify-btn:hover {
-        background: var(--light-green);
+        background: #f4d03f;
+        color: var(--dark-bg);
     }
 }
 
@@ -349,11 +361,11 @@ body {
 
 @media (prefers-color-scheme: dark) {
     .divider-line {
-        background: #30363d;
+        background: var(--dark-border);
     }
     
     .divider-text {
-        color: #7d8590;
+        color: var(--dark-text-secondary);
     }
 }
 
@@ -397,11 +409,11 @@ body {
 
 @media (prefers-color-scheme: dark) {
     .back-button {
-        color: var(--light-green);
+        color: var(--dark-accent);
     }
     
     .back-button:hover {
-        color: #58a6ff;
+        color: #f4d03f;
     }
 }
 
@@ -426,11 +438,11 @@ body {
 
 @media (prefers-color-scheme: dark) {
     .welcome-message h3 {
-        color: var(--light-green);
+        color: var(--dark-accent);
     }
     
     .welcome-message p {
-        color: #7d8590;
+        color: var(--dark-text-secondary);
     }
 }
 
@@ -455,11 +467,11 @@ body {
 
 @media (prefers-color-scheme: dark) {
     .account-creation-message h3, .code-message h3 {
-        color: var(--light-green);
+        color: var(--dark-accent);
     }
     
     .account-creation-message p, .code-message p {
-        color: #7d8590;
+        color: var(--dark-text-secondary);
     }
 }
 
@@ -488,11 +500,11 @@ body {
 
 @media (prefers-color-scheme: dark) {
     .link-btn {
-        color: var(--light-green);
+        color: var(--dark-accent);
     }
     
     .link-btn:hover {
-        color: #58a6ff;
+        color: #f4d03f;
     }
 }
 
