@@ -2431,6 +2431,22 @@ body {
     justify-content: center;
     color: white;
     font-size: 1.2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.profile-avatar-icon {
+    width: 32px;
+    height: 32px;
+    filter: brightness(0) invert(1);
+    transition: filter 0.3s ease;
+}
+
+/* Light mode - white icon on green background */
+@media (prefers-color-scheme: light) {
+    .profile-avatar-icon {
+        filter: brightness(0) invert(1);
+    }
 }
 
 .profile-details h4 {
@@ -3056,6 +3072,14 @@ body {
         }
         .profile-details p {
             color: #b0b8c1;
+        }
+        
+        .profile-avatar {
+            background: #DAA520;
+        }
+        
+        .profile-avatar-icon {
+            filter: brightness(0) invert(1);
         }
         .role-badge.admin {
             background: rgba(255, 224, 130, 0.2);

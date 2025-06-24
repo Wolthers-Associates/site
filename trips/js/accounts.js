@@ -20,6 +20,10 @@ function initializeUserDatabase() {
         saveUserDatabase();
         console.log('Initialized user database with Wolthers team');
     }
+    
+    // Update global references
+    window.USER_DATABASE = USER_DATABASE;
+    window.MOCK_USERS = USER_DATABASE;
 }
 
 // Core Wolthers team members - foundation users
@@ -82,13 +86,21 @@ function saveUserDatabase() {
         localStorage.setItem('wolthers_users_database', JSON.stringify(USER_DATABASE));
         // Also save timestamp of last update
         localStorage.setItem('wolthers_users_last_updated', new Date().toISOString());
+        
+        // Update global references
+        window.USER_DATABASE = USER_DATABASE;
+        window.MOCK_USERS = USER_DATABASE;
     } catch (e) {
         console.error('Error saving user database:', e);
     }
 }
 
+// Make USER_DATABASE globally accessible
+window.USER_DATABASE = USER_DATABASE;
+
 // Compatibility - MOCK_USERS points to real database
 const MOCK_USERS = USER_DATABASE;
+window.MOCK_USERS = MOCK_USERS;
 
 // Mock trips data - reset to empty for fresh start
 const MOCK_TRIPS_ACCOUNTS = [];

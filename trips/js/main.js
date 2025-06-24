@@ -1590,17 +1590,25 @@ function loadUserManagementData() {
         document.getElementById('modalProfileRole').textContent = currentUser.role === 'admin' ? 'Administrator' : 'User';
     }
     
-    // Load users list from accounts.js MOCK_USERS
+    // Debug: Check what users we have
+    const users = getUsersFromDatabase();
+    console.log('Loading user management data. Users found:', users.length, users);
+    
+    // Load users list from database
     loadModalUsersList();
     loadModalTripAdminList();
 }
 
 function loadModalUsersList() {
     const usersList = document.getElementById('modalUsersList');
-    if (!usersList) return;
+    if (!usersList) {
+        console.log('modalUsersList element not found');
+        return;
+    }
     
     // Get users from the global USER_DATABASE array
     const users = getUsersFromDatabase();
+    console.log('loadModalUsersList: Found', users.length, 'users:', users.map(u => u.name));
     
     // Create table structure
     const tableHTML = `
@@ -1751,15 +1759,25 @@ function editProfile() {
 
 // User Database Functions
 function getUsersFromDatabase() {
-    // Access the MOCK_USERS from accounts.js
-    if (typeof MOCK_USERS !== 'undefined') {
+    // Access the USER_DATABASE from accounts.js
+    if (typeof USER_DATABASE !== 'undefined' && USER_DATABASE.length > 0) {
+        return USER_DATABASE;
+    }
+    // Fallback to MOCK_USERS if USER_DATABASE not available
+    if (typeof MOCK_USERS !== 'undefined' && MOCK_USERS.length > 0) {
         return MOCK_USERS;
     }
-    // Fallback to current user if MOCK_USERS not available
+    // Last fallback to current user
     return currentUser ? [currentUser] : [];
 }
 
 function addUserToDatabase(user) {
+    if (typeof USER_DATABASE !== 'undefined') {
+        USER_DATABASE.push(user);
+        // Refresh the user list in the modal
+        loadModalUsersList();
+        return true;
+    }
     if (typeof MOCK_USERS !== 'undefined') {
         MOCK_USERS.push(user);
         // Refresh the user list in the modal
@@ -1770,6 +1788,14 @@ function addUserToDatabase(user) {
 }
 
 function removeUserFromDatabase(userId) {
+    if (typeof USER_DATABASE !== 'undefined') {
+        const index = USER_DATABASE.findIndex(user => user.id === userId);
+        if (index !== -1) {
+            USER_DATABASE.splice(index, 1);
+            loadModalUsersList();
+            return true;
+        }
+    }
     if (typeof MOCK_USERS !== 'undefined') {
         const index = MOCK_USERS.findIndex(user => user.id === userId);
         if (index !== -1) {
