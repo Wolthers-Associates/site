@@ -1375,10 +1375,7 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('👤 Regular Login: Wolthers team emails (daniel@wolthers.com, svenn@wolthers.com, tom@wolthers.com, rasmus@wolthers.com) / any password');
     console.log('🔑 Trip Codes: BRAZIL2025, COLOMBIA2025, ETHIOPIA2025');
     
-    // Initialize user database first (required for user management)
-    initializeUserDatabase();
-    
-    // Initialize enhanced authentication system
+    // Initialize auth system first - don't initialize user database here to avoid conflicts
     auth.init().catch(error => {
         console.error('Failed to initialize authentication:', error);
     });
@@ -1577,6 +1574,11 @@ function systemConfiguration() {
 
 // User Management Modal Functions
 function showUserManagementModal() {
+    // Initialize user database when first opening modal (safe timing - after auth is established)
+    if (!window.USER_DATABASE || window.USER_DATABASE.length === 0) {
+        initializeUserDatabase();
+    }
+    
     document.getElementById('userManagementModal').style.display = 'flex';
     document.body.style.overflow = 'hidden';
     loadUserManagementData();
@@ -2029,22 +2031,25 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
-// User Database Functions (restored for compatibility)
+// User Database - Integrated from accounts.js
 let USER_DATABASE = [];
 
-// Initialize user database for compatibility with existing auth
+// Initialize user database
 function initializeUserDatabase() {
     const savedUsers = localStorage.getItem('wolthers_users_database');
     if (savedUsers) {
         try {
             USER_DATABASE = JSON.parse(savedUsers);
+            console.log(`Loaded ${USER_DATABASE.length} users from database`);
         } catch (e) {
+            console.error('Error loading user database:', e);
             USER_DATABASE = getDefaultWolthersTeam();
             saveUserDatabase();
         }
     } else {
         USER_DATABASE = getDefaultWolthersTeam();
         saveUserDatabase();
+        console.log('Initialized user database with Wolthers team');
     }
     
     // Make globally accessible for compatibility
@@ -2062,8 +2067,9 @@ function getDefaultWolthersTeam() {
             role: "admin",
             avatar: "DW",
             memberSince: "2024-01-01",
+            tripPermissions: [],
+            isCreator: true,
             lastActive: new Date().toISOString(),
-            company: "Wolthers & Associates",
             isWolthersTeam: true
         },
         {
@@ -2073,8 +2079,9 @@ function getDefaultWolthersTeam() {
             role: "admin",
             avatar: "SW",
             memberSince: "2024-01-01",
+            tripPermissions: [],
+            isCreator: true,
             lastActive: new Date().toISOString(),
-            company: "Wolthers & Associates",
             isWolthersTeam: true
         },
         {
@@ -2084,8 +2091,9 @@ function getDefaultWolthersTeam() {
             role: "admin",
             avatar: "TW",
             memberSince: "2024-01-01",
+            tripPermissions: [],
+            isCreator: true,
             lastActive: new Date().toISOString(),
-            company: "Wolthers & Associates",
             isWolthersTeam: true
         },
         {
@@ -2095,8 +2103,9 @@ function getDefaultWolthersTeam() {
             role: "admin",
             avatar: "RW",
             memberSince: "2024-01-01",
+            tripPermissions: [],
+            isCreator: true,
             lastActive: new Date().toISOString(),
-            company: "Wolthers & Associates",
             isWolthersTeam: true
         }
     ];
@@ -2106,11 +2115,116 @@ function getDefaultWolthersTeam() {
 function saveUserDatabase() {
     try {
         localStorage.setItem('wolthers_users_database', JSON.stringify(USER_DATABASE));
+        localStorage.setItem('wolthers_users_last_updated', new Date().toISOString());
+        
+        // Update global references
         window.USER_DATABASE = USER_DATABASE;
         window.MOCK_USERS = USER_DATABASE;
     } catch (e) {
         console.error('Error saving user database:', e);
     }
+}
+
+// User Database Functions
+function getUsersFromDatabase() {
+    // Access the USER_DATABASE from accounts.js
+    if (typeof USER_DATABASE !== 'undefined' && USER_DATABASE.length > 0) {
+        return USER_DATABASE;
+    }
+    // Fallback to MOCK_USERS if USER_DATABASE not available
+    if (typeof MOCK_USERS !== 'undefined' && MOCK_USERS.length > 0) {
+        return MOCK_USERS;
+    }
+    // Last fallback to current user
+    return currentUser ? [currentUser] : [];
+}
+
+function addUserToDatabase(user) {
+    if (typeof USER_DATABASE !== 'undefined') {
+        USER_DATABASE.push(user);
+        // Refresh the user list in the modal
+        loadModalUsersList();
+        return true;
+    }
+    if (typeof MOCK_USERS !== 'undefined') {
+        MOCK_USERS.push(user);
+        // Refresh the user list in the modal
+        loadModalUsersList();
+        return true;
+    }
+    return false;
+}
+
+function removeUserFromDatabase(userId) {
+    if (typeof USER_DATABASE !== 'undefined') {
+        const index = USER_DATABASE.findIndex(user => user.id === userId);
+        if (index !== -1) {
+            USER_DATABASE.splice(index, 1);
+            loadModalUsersList();
+            return true;
+        }
+    }
+    if (typeof MOCK_USERS !== 'undefined') {
+        const index = MOCK_USERS.findIndex(user => user.id === userId);
+        if (index !== -1) {
+            MOCK_USERS.splice(index, 1);
+            loadModalUsersList();
+            return true;
+        }
+    }
+    return false;
+}
+
+function getUserCompany(user) {
+    if (user.isWolthersTeam) {
+        return 'Wolthers & Associates';
+    }
+    
+    // Extract company from email domain
+    const emailDomain = user.email.split('@')[1];
+    if (emailDomain) {
+        // Common company domain mappings
+        const domainToCompany = {
+            'gmail.com': 'Personal',
+            'yahoo.com': 'Personal',
+            'hotmail.com': 'Personal',
+            'outlook.com': 'Personal',
+            'wolthers.com': 'Wolthers & Associates'
+        };
+        
+        if (domainToCompany[emailDomain]) {
+            return domainToCompany[emailDomain];
+        }
+        
+        // Convert domain to company name (e.g., company.com -> Company)
+        return emailDomain.split('.')[0].charAt(0).toUpperCase() + emailDomain.split('.')[0].slice(1);
+    }
+    
+    return 'Unknown';
+}
+
+function getUserTripsData(user) {
+    // Get trips where user has permissions or is creator
+    const userTrips = MOCK_TRIPS.filter(trip => 
+        user.tripPermissions.includes(trip.id) || 
+        trip.createdBy === user.email ||
+        trip.createdBy === user.name
+    );
+    
+    // Find most recent trip
+    let lastTrip = null;
+    if (userTrips.length > 0) {
+        lastTrip = userTrips.reduce((latest, current) => {
+            const currentDate = new Date(current.date);
+            const latestDate = new Date(latest.date);
+            return currentDate > latestDate ? current : latest;
+        });
+    }
+    
+    return {
+        count: userTrips.length,
+        lastTrip: lastTrip
+    };
 }
 
 function getUserAvatarColor(role) {
