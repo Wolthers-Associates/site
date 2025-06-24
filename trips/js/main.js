@@ -953,7 +953,7 @@ const ui = {
                 <div class="trip-card-header">
                     <div class="trip-title">${trip.title}</div>
                     <div class="trip-date">${startDate} - ${endDate}</div>
-                    <div class="trip-total-days">Total trip: ${totalDays} days</div>
+                    <div class="trip-total-days">Total trip duration: ${totalDays} days</div>
                 </div>
                 
                 <div class="trip-description">${trip.description}</div>
@@ -1133,7 +1133,7 @@ const ui = {
             <div class="trip-preview-header">
                 <h3 class="trip-preview-title">${trip.title}</h3>
                 <div class="trip-preview-dates">${dateRange}</div>
-                <div class="trip-total-days">Total trip: ${totalDays} days</div>
+                <div class="trip-total-days">Total trip duration: ${totalDays} days</div>
                 ${overviewHTML}
                 ${trip.wolthersGuide ? `<div class="trip-preview-guide">Guided by: ${trip.wolthersGuide}</div>` : ''}
                 <div class="trip-preview-description">${trip.description}</div>

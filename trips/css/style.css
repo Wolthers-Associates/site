@@ -2147,4 +2147,10 @@ body {
     .trip-detail-content {
         padding: 20px;
     }
+}
+
+.trip-total-days {
+    font-size: 0.95em;
+    color: #888;
+    margin-top: 2px;
 } 
