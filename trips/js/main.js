@@ -1104,28 +1104,21 @@ const ui = {
             `;
         }
         
+        let statusText = daysUntilStart > 0 ? `Starts in ${daysUntilStart} days` : ongoing ? 'Ongoing' : 'Completed';
         let overviewHTML = `
             <div class="trip-preview-info">
-              ${trip.guests ? `
-              <div class="preview-info-item">
-                <span class="preview-info-icon">👤</span>
-                <span>${trip.guests}</span>
-              </div>
-              ` : ''}
-              ${trip.cars ? `
-              <div class="preview-info-item">
-                <img src="images/disco-icon.png" alt="Car" style="height:18px;vertical-align:middle;margin-right:6px;">
-                <span>${trip.cars}</span>
-              </div>
-              ` : ''}
-              <div class="preview-info-item">
-                <span class="preview-info-icon">📅</span>
-                <span>${daysUntilStart > 0 ? `Starts in ${daysUntilStart} days` : ongoing ? 'Ongoing' : 'Completed'}</span>
-              </div>
-              <div class="preview-info-item">
-                <span class="preview-info-icon">✨</span>
-                <span>${daysUntilStart > 0 ? 'Upcoming' : ongoing ? 'Ongoing' : 'Completed'}</span>
-              </div>
+                ${trip.guests ? `
+                <div class="preview-info-item">
+                    <span class="preview-info-icon">👤</span>
+                    <span>${trip.guests}</span>
+                </div>
+                ` : ''}
+                ${trip.cars ? `
+                <div class="preview-info-item">
+                    <img src="images/disco-icon.png" alt="Car" style="height:18px;vertical-align:middle;margin-right:6px;">
+                    <span>${trip.cars}</span>
+                </div>
+                ` : ''}
             </div>
         `;
         
@@ -1133,17 +1126,15 @@ const ui = {
             <div class="trip-preview-header">
                 <h3 class="trip-preview-title">${trip.title}</h3>
                 <div class="trip-preview-dates">${dateRange}</div>
-                <div class="trip-total-days">Total trip duration: ${totalDays} days</div>
+                <div class="trip-total-days">Total trip duration: ${totalDays} days | ${statusText}</div>
                 ${overviewHTML}
                 ${trip.wolthersGuide ? `<div class="trip-preview-guide">Guided by: ${trip.wolthersGuide}</div>` : ''}
                 <div class="trip-preview-description">${trip.description}</div>
-                
                 <div class="trip-preview-actions">
                     <button class="preview-btn secondary" onclick="ui.hideTripPreview()">Close</button>
                     <button class="preview-btn primary" onclick="trips.openFullTrip('${trip.id}')">Open Trip</button>
                 </div>
             </div>
-            
             <div class="trip-preview-body">
                 ${trip.highlights && trip.highlights.length > 0 ? `
                 <div class="trip-preview-highlights">
@@ -1153,7 +1144,6 @@ const ui = {
                     `).join('')}
                 </div>
                 ` : ''}
-                
                 ${daysHTML}
             </div>
         `;
