@@ -1864,7 +1864,16 @@ function showUserManagementModal() {
         if (modalContent) {
             modalContent.style.backgroundColor = '#1e1e1e';
             modalContent.style.color = '#ffffff';
+            modalContent.style.border = '1px solid #333';
         }
+        // Apply dark styling to all child elements immediately
+        const allElements = modal.querySelectorAll('*');
+        allElements.forEach(el => {
+            if (el.style) {
+                el.style.backgroundColor = el.style.backgroundColor || 'inherit';
+                el.style.color = el.style.color || 'inherit';
+            }
+        });
     }
     
     modal.style.display = 'flex';
@@ -3606,7 +3615,16 @@ function showVehicleManagementModal() {
         if (modalContent) {
             modalContent.style.backgroundColor = '#1e1e1e';
             modalContent.style.color = '#ffffff';
+            modalContent.style.border = '1px solid #333';
         }
+        // Apply dark styling to all child elements immediately
+        const allElements = modal.querySelectorAll('*');
+        allElements.forEach(el => {
+            if (el.style) {
+                el.style.backgroundColor = el.style.backgroundColor || 'inherit';
+                el.style.color = el.style.color || 'inherit';
+            }
+        });
     }
     
     modal.style.display = 'flex';
@@ -3723,17 +3741,23 @@ function createModalVehicleRow(vehicle) {
     }
     
     // Last trip information
-    let lastTripDisplay = 'No trips';
+    let lastTripDisplay = '<span class="no-trip">No trips</span>';
     if (vehicle.last_trip) {
         const tripDate = formatTableDate(vehicle.last_trip.end_date || vehicle.last_trip.start_date);
-        lastTripDisplay = `<a href="#" onclick="openTripDetails('${vehicle.last_trip.id}')" class="trip-link" title="View trip details">${vehicle.last_trip.title}<br><small>${tripDate}</small></a>`;
+        lastTripDisplay = `<a href="#" onclick="openTripDetails('${vehicle.last_trip.id}')" class="trip-link" title="View trip details">
+            <div class="trip-name">${vehicle.last_trip.title}</div>
+            <div class="trip-date">${tripDate}</div>
+        </a>`;
     }
     
     // Next trip information
-    let nextTripDisplay = 'No scheduled trips';
+    let nextTripDisplay = '<span class="no-trip">No scheduled trips</span>';
     if (vehicle.next_trip) {
         const tripDate = formatTableDate(vehicle.next_trip.start_date);
-        nextTripDisplay = `<a href="#" onclick="openTripDetails('${vehicle.next_trip.id}')" class="trip-link" title="View trip details">${vehicle.next_trip.title}<br><small>${tripDate}</small></a>`;
+        nextTripDisplay = `<a href="#" onclick="openTripDetails('${vehicle.next_trip.id}')" class="trip-link" title="View trip details">
+            <div class="trip-name">${vehicle.next_trip.title}</div>
+            <div class="trip-date">${tripDate}</div>
+        </a>`;
     }
     
     return `
@@ -3741,7 +3765,7 @@ function createModalVehicleRow(vehicle) {
             <td>
                 <div class="vehicle-info">
                     <div class="vehicle-name">${vehicle.make} ${vehicle.model}</div>
-                    <div class="vehicle-year">${vehicle.year} • <span class="vehicle-type ${typeClass}">${vehicle.vehicle_type.toUpperCase()}</span></div>
+                    <div class="vehicle-year">${vehicle.year}</div>
                     <div class="vehicle-capacity">${vehicle.capacity} people</div>
                 </div>
             </td>

@@ -289,47 +289,67 @@
             text-transform: uppercase;
         }
         
-        /* Trip Info Styling */
-        .trip-info {
-            max-width: 180px;
-        }
-        
-        .trip-link {
-            color: #2C5530;
-            text-decoration: none;
-            display: block;
-            padding: 4px 0;
-            border-radius: 4px;
-            transition: all 0.2s ease;
-        }
-        
-        .trip-link:hover {
-            color: #1e3b21;
-            background: rgba(44, 85, 48, 0.1);
-            text-decoration: underline;
-        }
-        
-        .trip-link small {
-            color: #757575;
-            font-size: 0.8em;
-            display: block;
-            margin-top: 2px;
-        }
-        
-        @media (prefers-color-scheme: dark) {
-            .trip-link {
-                color: #DAA520;
-            }
-            
-            .trip-link:hover {
-                color: #B8860B;
-                background: rgba(218, 165, 32, 0.1);
-            }
-            
-            .trip-link small {
-                color: var(--dark-text-secondary);
-            }
-        }
+                 /* Trip Info Styling */
+         .trip-info {
+             max-width: 160px;
+             vertical-align: top;
+         }
+         
+         .trip-link {
+             color: #2C5530;
+             text-decoration: none;
+             display: block;
+             padding: 6px 8px;
+             border-radius: 6px;
+             transition: all 0.2s ease;
+             border: 1px solid transparent;
+         }
+         
+         .trip-link:hover {
+             color: #1e3b21;
+             background: rgba(44, 85, 48, 0.08);
+             border-color: rgba(44, 85, 48, 0.2);
+             text-decoration: none;
+         }
+         
+         .trip-name {
+             font-weight: 500;
+             font-size: 0.875em;
+             line-height: 1.3;
+             margin-bottom: 2px;
+         }
+         
+         .trip-date {
+             color: #757575;
+             font-size: 0.75em;
+             line-height: 1.2;
+         }
+         
+         .no-trip {
+             color: #999;
+             font-style: italic;
+             font-size: 0.875em;
+         }
+         
+         @media (prefers-color-scheme: dark) {
+             .trip-link {
+                 color: #DAA520;
+             }
+             
+             .trip-link:hover {
+                 color: #B8860B;
+                 background: rgba(218, 165, 32, 0.1);
+                 border-color: rgba(218, 165, 32, 0.3);
+             }
+             
+             .trip-date {
+                 color: var(--dark-text-secondary);
+             }
+             
+             .no-trip {
+                 color: #666;
+             }
+         }
     </style>
     
     <link rel="stylesheet" href="css/style.css">
