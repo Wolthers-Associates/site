@@ -148,91 +148,100 @@ async function loadVehicles() {
 }
 
 function displayVehicles(vehicles) {
-    const grid = document.getElementById('vehicle-grid');
+    const tableBody = document.querySelector('#vehicles-table tbody');
     
     if (!vehicles || vehicles.length === 0) {
-        grid.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--text-light);">No vehicles found</div>';
+        tableBody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 40px; color: var(--text-light);">No vehicles found</td></tr>';
         return;
     }
     
-    grid.innerHTML = vehicles.map(vehicle => createVehicleCard(vehicle)).join('');
+    tableBody.innerHTML = vehicles.map(vehicle => createVehicleRow(vehicle)).join('');
 }
 
-function createVehicleCard(vehicle) {
+function createVehicleRow(vehicle) {
     const statusClass = vehicle.status.toLowerCase();
     const statusLabel = vehicle.status.charAt(0).toUpperCase() + vehicle.status.slice(1);
     
-    // Check for alerts
+    // Check for alerts and warnings
     const alerts = [];
     const warnings = [];
     
     if (vehicle.computed_status === 'insurance_expired') {
-        alerts.push('Insurance expired');
+        alerts.push('EXPIRED');
     } else if (vehicle.insurance_days_remaining !== null && vehicle.insurance_days_remaining < 30) {
-        warnings.push(`Insurance expires in ${vehicle.insurance_days_remaining} days`);
+        warnings.push(`${vehicle.insurance_days_remaining}d`);
     }
     
     if (vehicle.computed_status === 'revision_overdue') {
-        alerts.push('Revision overdue');
+        alerts.push('OVERDUE');
     } else if (vehicle.revision_days_remaining !== null && vehicle.revision_days_remaining < 30) {
-        warnings.push(`Revision due in ${vehicle.revision_days_remaining} days`);
+        warnings.push(`${vehicle.revision_days_remaining}d`);
     }
     
-    if (vehicle.computed_status === 'overdue_maintenance') {
-        alerts.push('Maintenance overdue');
+    // Insurance status
+    let insuranceStatus = 'Active';
+    let insuranceClass = 'status-active';
+    if (vehicle.computed_status === 'insurance_expired') {
+        insuranceStatus = 'Expired';
+        insuranceClass = 'status-expired';
+    } else if (vehicle.insurance_days_remaining !== null && vehicle.insurance_days_remaining < 30) {
+        insuranceStatus = `${vehicle.insurance_days_remaining} days`;
+        insuranceClass = 'status-warning';
     }
     
-    const alertsHtml = alerts.map(alert => 
-        `<div class="alert-item">${alert}</div>`
-    ).join('');
-    
-    const warningsHtml = warnings.map(warning => 
-        `<div class="warning-item">${warning}</div>`
-    ).join('');
+    // Revision status
+    let revisionStatus = 'Current';
+    let revisionClass = 'status-active';
+    if (vehicle.computed_status === 'revision_overdue') {
+        revisionStatus = 'Overdue';
+        revisionClass = 'status-expired';
+    } else if (vehicle.revision_days_remaining !== null && vehicle.revision_days_remaining < 30) {
+        revisionStatus = `${vehicle.revision_days_remaining} days`;
+        revisionClass = 'status-warning';
+    }
     
     return `
-        <div class="vehicle-card ${statusClass}">
-            <div class="vehicle-header">
-                <h3 class="vehicle-title">${vehicle.make} ${vehicle.model}</h3>
-                <span class="vehicle-status status-${statusClass}">${statusLabel}</span>
-            </div>
-            
-            <div class="vehicle-details">
-                <div class="detail-item">
-                    <span class="detail-label">Year:</span>
-                    <span class="detail-value">${vehicle.year || 'N/A'}</span>
+        <tr class="vehicle-row">
+            <td class="vehicle-cell">
+                <div class="vehicle-info">
+                    <strong class="vehicle-name">${vehicle.make} ${vehicle.model}</strong>
+                    <span class="vehicle-year">${vehicle.year || 'N/A'}</span>
                 </div>
-                <div class="detail-item">
-                    <span class="detail-label">License:</span>
-                    <span class="detail-value">${vehicle.license_plate || 'N/A'}</span>
-                </div>
-                <div class="detail-item">
-                    <span class="detail-label">Type:</span>
-                    <span class="detail-value">${vehicle.vehicle_type.toUpperCase()}</span>
-                </div>
-                <div class="detail-item">
-                    <span class="detail-label">Capacity:</span>
-                    <span class="detail-value">${vehicle.capacity} people</span>
-                </div>
-                <div class="detail-item">
-                    <span class="detail-label">Location:</span>
-                    <span class="detail-value">${vehicle.location || 'N/A'}</span>
-                </div>
-                <div class="detail-item">
-                    <span class="detail-label">Mileage:</span>
-                    <span class="detail-value">${vehicle.current_mileage.toLocaleString()} km</span>
-                </div>
-            </div>
-            
-            ${alertsHtml}
-            ${warningsHtml}
-            
-            <div class="vehicle-actions">
-                <button class="action-btn btn-edit" onclick="editVehicle(${vehicle.id})">Edit</button>
-                <button class="action-btn btn-maintenance" onclick="scheduleMaintenanceForVehicle(${vehicle.id})">Maintenance</button>
-                <button class="action-btn btn-logs" onclick="viewVehicleLogs(${vehicle.id})">Logs</button>
-            </div>
-        </div>
+            </td>
+            <td>
+                <span class="vehicle-type badge badge-${vehicle.vehicle_type}">${vehicle.vehicle_type.toUpperCase()}</span>
+                <div class="vehicle-capacity">${vehicle.capacity} people</div>
+            </td>
+            <td class="license-plate">${vehicle.license_plate || 'N/A'}</td>
+            <td class="location">${vehicle.location || 'N/A'}</td>
+            <td class="mileage">${vehicle.current_mileage ? vehicle.current_mileage.toLocaleString() : 'N/A'} km</td>
+            <td>
+                <span class="status-badge status-${statusClass}">${statusLabel}</span>
+            </td>
+            <td>
+                <span class="status-indicator ${insuranceClass}">${insuranceStatus}</span>
+            </td>
+            <td>
+                <span class="status-indicator ${revisionClass}">${revisionStatus}</span>
+            </td>
+            <td class="action-buttons">
+                <button class="table-btn btn-edit" onclick="editVehicle(${vehicle.id})" title="Edit Vehicle">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                    </svg>
+                </button>
+                <button class="table-btn btn-maintenance" onclick="scheduleMaintenanceForVehicle(${vehicle.id})" title="Schedule Maintenance">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"/>
+                    </svg>
+                </button>
+                <button class="table-btn btn-logs" onclick="viewVehicleLogs(${vehicle.id})" title="View Logs">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4zm2.5 2.25l1.77-1.77c.39-.39.39-1.02 0-1.41L18.36 14.2c-.39-.39-1.02-.39-1.41 0L15.18 15.97l1.77 1.77c.39.39 1.02.39 1.41 0l.14-.14v2.65h2z"/>
+                    </svg>
+                </button>
+            </td>
+        </tr>
     `;
 }
 
