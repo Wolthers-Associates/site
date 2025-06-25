@@ -1751,7 +1751,9 @@ const EnhancedTripCreation = {
         this.loadVehicles();
         this.loadStaff();
         this.loadTemplates();
-        this.setupDateHandlers();
+        // Show initial availability messages
+        this.checkVehicleAvailability(null, null);
+        this.checkStaffAvailability(null, null);
     },
 
     // Set up all event handlers
@@ -1802,38 +1804,13 @@ const EnhancedTripCreation = {
         }
     },
 
-    // Set up date change handlers
-    setupDateHandlers() {
-        const startDateInput = document.getElementById('startDate');
-        const endDateInput = document.getElementById('endDate');
+    // Extract dates from AI-processed itinerary
+    extractDatesFromItinerary(itinerary) {
+        if (!itinerary || itinerary.length === 0) return null;
         
-        if (!startDateInput || !endDateInput) {
-            setTimeout(() => this.setupDateHandlers(), 100);
-            return;
-        }
-
-        const handleDateChange = () => {
-            const startDate = startDateInput.value;
-            const endDate = endDateInput.value;
-            
-            if (startDate && endDate) {
-                this.checkVehicleAvailability(startDate, endDate);
-                this.checkStaffAvailability(startDate, endDate);
-            }
-        };
-
-        startDateInput.addEventListener('change', handleDateChange);
-        endDateInput.addEventListener('change', handleDateChange);
-
-        // Set default dates
-        const today = new Date();
-        const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, today.getDate());
-        const weekLater = new Date(nextMonth.getTime() + 7 * 24 * 60 * 60 * 1000);
-        
-        startDateInput.value = nextMonth.toISOString().split('T')[0];
-        endDateInput.value = weekLater.toISOString().split('T')[0];
-        
-        setTimeout(handleDateChange, 500);
+        // For now, return null - dates will be set when itinerary is processed
+        // This can be enhanced later to extract actual dates from itinerary text
+        return null;
     },
 
     // Vehicle Management
@@ -1887,6 +1864,13 @@ const EnhancedTripCreation = {
 
     async checkVehicleAvailability(startDate, endDate) {
         const availabilityInfo = document.getElementById('vehicleAvailabilityInfo');
+        if (!startDate || !endDate) {
+            if (availabilityInfo) {
+                availabilityInfo.innerHTML = `<span style="color: #666;">📅 Dates will be set from itinerary processing</span>`;
+            }
+            return;
+        }
+
         if (availabilityInfo) {
             availabilityInfo.textContent = `Checking vehicle availability for ${startDate} to ${endDate}...`;
         }
@@ -2022,20 +2006,9 @@ const EnhancedTripCreation = {
 
     async fetchStaff() {
         try {
-            const startDate = document.getElementById('startDate')?.value;
-            const endDate = document.getElementById('endDate')?.value;
-            
-            if (!startDate || !endDate) {
-                // Return default staff if dates not set
-                return this.getDefaultStaff();
-            }
-            
-            const params = new URLSearchParams({
-                start_date: startDate,
-                end_date: endDate
-            });
-            
-            const response = await fetch(`api/staff/availability.php?${params}`);
+            // Load all staff without date restrictions initially
+            // Availability will be checked later when dates are available from itinerary
+            const response = await fetch('api/staff/availability.php');
             const data = await response.json();
             
             if (data.success) {
@@ -2044,7 +2017,7 @@ const EnhancedTripCreation = {
                     name: member.name,
                     department: member.department || 'Operations',
                     role: member.role || 'Staff',
-                    available: member.available
+                    available: true // Assume available initially, will check later with dates
                 }));
             } else {
                 throw new Error(data.message || 'Failed to fetch staff');
@@ -2070,6 +2043,13 @@ const EnhancedTripCreation = {
 
     async checkStaffAvailability(startDate, endDate) {
         const availabilityInfo = document.getElementById('staffAvailabilityInfo');
+        if (!startDate || !endDate) {
+            if (availabilityInfo) {
+                availabilityInfo.innerHTML = `<span style="color: #666;">📅 Dates will be set from itinerary processing</span>`;
+            }
+            return;
+        }
+
         if (availabilityInfo) {
             availabilityInfo.textContent = `Checking staff availability for ${startDate} to ${endDate}...`;
         }
@@ -2130,14 +2110,11 @@ const EnhancedTripCreation = {
         
         if (!member || this.selectedStaff.find(s => s.id === staffId)) return;
 
-        const startDate = document.getElementById('startDate').value;
-        const endDate = document.getElementById('endDate').value;
-
         this.selectedStaff.push({
             ...member,
             attendanceType: 'full',
             startDay: 1,
-            endDay: this.getTripDuration(startDate, endDate),
+            endDay: 7, // Default to 7 days, will be updated when itinerary is processed
             customRole: member.role
         });
 
@@ -2153,9 +2130,7 @@ const EnhancedTripCreation = {
         const container = document.getElementById('selectedStaffList');
         if (!container) return;
 
-        const startDate = document.getElementById('startDate').value;
-        const endDate = document.getElementById('endDate').value;
-        const totalDays = this.getTripDuration(startDate, endDate);
+        const totalDays = 7; // Default to 7 days, will be updated when itinerary is processed
 
         container.innerHTML = this.selectedStaff.map(member => `
             <div class="selected-staff-item">
@@ -2200,10 +2175,8 @@ const EnhancedTripCreation = {
             
             // Auto-adjust for full attendance
             if (field === 'attendanceType' && value === 'full') {
-                const startDate = document.getElementById('startDate').value;
-                const endDate = document.getElementById('endDate').value;
                 member.startDay = 1;
-                member.endDay = this.getTripDuration(startDate, endDate);
+                member.endDay = 7; // Default to 7 days, will be updated when itinerary is processed
             }
             
             this.updateSelectedStaffList();
@@ -2211,6 +2184,10 @@ const EnhancedTripCreation = {
     },
 
     generateAttendancePreview(member, startDate, endDate) {
+        if (!startDate || !endDate) {
+            return `📅 ${member.name} attending: Day ${member.startDay}-${member.endDay} (dates will be set from itinerary)`;
+        }
+        
         const start = new Date(startDate);
         const startAttendance = new Date(start.getTime() + (member.startDay - 1) * 24 * 60 * 60 * 1000);
         const endAttendance = new Date(start.getTime() + (member.endDay - 1) * 24 * 60 * 60 * 1000);
@@ -2283,9 +2260,15 @@ const EnhancedTripCreation = {
         const lines = rawText.split('\n').filter(line => line.trim());
         const days = [];
         let currentDay = null;
+        let extractedDates = null;
 
         lines.forEach(line => {
             const trimmed = line.trim().toLowerCase();
+            
+            // Try to extract dates from the text
+            if (!extractedDates) {
+                extractedDates = this.extractDatesFromText(line);
+            }
             
             // Detect day markers
             if (trimmed.includes('day ') || trimmed.match(/^\d+/) || trimmed.includes('dia ')) {
@@ -2308,7 +2291,73 @@ const EnhancedTripCreation = {
         });
 
         if (currentDay) days.push(currentDay);
+
+        // Auto-set dates if found
+        if (extractedDates) {
+            this.autoSetTripDates(extractedDates.startDate, extractedDates.endDate);
+        } else if (days.length > 0) {
+            // If no dates found, set default dates based on number of days
+            this.autoSetDefaultDates(days.length);
+        }
+
         return days;
+    },
+
+    extractDatesFromText(text) {
+        // Look for date patterns in various formats
+        const datePatterns = [
+            /(\d{1,2}\/\d{1,2}\/\d{4})/g, // MM/DD/YYYY or DD/MM/YYYY
+            /(\d{4}-\d{1,2}-\d{1,2})/g,   // YYYY-MM-DD
+            /(january|february|march|april|may|june|july|august|september|october|november|december)\s+\d{1,2},?\s+\d{4}/gi,
+            /(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\s+\d{1,2},?\s+\d{4}/gi
+        ];
+
+        for (const pattern of datePatterns) {
+            const matches = text.match(pattern);
+            if (matches && matches.length >= 2) {
+                return {
+                    startDate: matches[0],
+                    endDate: matches[matches.length - 1]
+                };
+            }
+        }
+        return null;
+    },
+
+    autoSetTripDates(startDate, endDate) {
+        const startInput = document.getElementById('startDate');
+        const endInput = document.getElementById('endDate');
+        
+        if (startInput && endInput) {
+            try {
+                const start = new Date(startDate);
+                const end = new Date(endDate);
+                
+                startInput.value = start.toISOString().split('T')[0];
+                endInput.value = end.toISOString().split('T')[0];
+                
+                console.log('✅ Auto-set trip dates from itinerary:', startDate, 'to', endDate);
+            } catch (error) {
+                console.warn('Could not parse extracted dates:', error);
+                this.autoSetDefaultDates(7);
+            }
+        }
+    },
+
+    autoSetDefaultDates(numberOfDays) {
+        const startInput = document.getElementById('startDate');
+        const endInput = document.getElementById('endDate');
+        
+        if (startInput && endInput) {
+            const today = new Date();
+            const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, today.getDate());
+            const endDate = new Date(nextMonth.getTime() + (numberOfDays - 1) * 24 * 60 * 60 * 1000);
+            
+            startInput.value = nextMonth.toISOString().split('T')[0];
+            endInput.value = endDate.toISOString().split('T')[0];
+            
+            console.log(`✅ Auto-set default dates for ${numberOfDays}-day trip`);
+        }
     },
 
     enhanceItineraryWithAI(days) {
