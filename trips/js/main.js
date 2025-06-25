@@ -3640,9 +3640,9 @@ async function loadFleetManagementData() {
         
         if (data.success) {
             fleetData = data.vehicles;
-            filteredFleetData = [...fleetData];
             
-            displayFleetData(filteredFleetData);
+            // Apply filtering to exclude retired/sold vehicles by default
+            filterFleetData();
             updateFleetSummary(data.summary);
             setupFleetInteractions();
             
@@ -3790,6 +3790,7 @@ function getFleetStatusClass(status) {
         case 'available': return 'fluent-badge-success';
         case 'maintenance': return 'fluent-badge-warning';
         case 'retired': return 'fluent-badge-secondary';
+        case 'sold': return 'fluent-badge-error';
         default: return 'fluent-badge-secondary';
     }
 }
@@ -3902,9 +3903,11 @@ function filterFleetData() {
     const typeFilter = document.getElementById('fleetTypeFilter')?.value.toLowerCase() || '';
     
     filteredFleetData = fleetData.filter(vehicle => {
-        // Hide retired vehicles by default unless specifically filtering for them
+        // Hide retired/sold vehicles by default unless specifically filtering for them
         const isRetired = vehicle.status && vehicle.status.toLowerCase() === 'retired';
-        if (isRetired && statusFilter !== 'retired') {
+        const isSold = vehicle.status && vehicle.status.toLowerCase() === 'sold';
+        
+        if ((isRetired && statusFilter !== 'retired') || (isSold && statusFilter !== 'sold')) {
             return false;
         }
         
