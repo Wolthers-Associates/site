@@ -5363,6 +5363,183 @@ body {
     color: var(--text-light);
 }
 
+/* Mobile Navigation Styles */
+.mobile-nav {
+    display: none;
+    position: relative;
+}
+
+.hamburger-menu {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    width: 30px;
+    height: 30px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    z-index: 1001;
+}
+
+.hamburger-menu .bar {
+    width: 25px;
+    height: 3px;
+    background-color: var(--text-light);
+    transition: all 0.3s ease;
+    border-radius: 2px;
+}
+
+.hamburger-menu.active .bar:nth-child(1) {
+    transform: rotate(-45deg) translate(-5px, 6px);
+}
+
+.hamburger-menu.active .bar:nth-child(2) {
+    opacity: 0;
+}
+
+.hamburger-menu.active .bar:nth-child(3) {
+    transform: rotate(45deg) translate(-5px, -6px);
+}
+
+.mobile-nav-menu {
+    position: absolute;
+    top: 40px;
+    right: 0;
+    background: var(--bg-darker);
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    min-width: 200px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    z-index: 1000;
+    border: 1px solid var(--border-dark);
+}
+
+.mobile-nav-menu.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.mobile-nav-link {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    color: var(--text-light);
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+    border-bottom: 1px solid var(--border-dark);
+}
+
+.mobile-nav-link:last-child {
+    border-bottom: none;
+    border-radius: 0 0 8px 8px;
+}
+
+.mobile-nav-link:first-child {
+    border-radius: 8px 8px 0 0;
+}
+
+.mobile-nav-link:hover {
+    background-color: var(--bg-dark);
+}
+
+.mobile-nav-link.active {
+    background-color: var(--primary-green);
+    color: white;
+}
+
+.nav-icon {
+    margin-right: 12px;
+    font-size: 1.1em;
+    width: 20px;
+    text-align: center;
+}
+
+.nav-text {
+    font-weight: 500;
+}
+
+/* Show mobile nav on smaller screens */
+@media (max-width: 768px) {
+    .mobile-nav {
+        display: block;
+    }
+    
+    .admin-settings {
+        display: none !important;
+    }
+    
+    .logout-btn {
+        display: none;
+    }
+}
+
+/* Dark mode for mobile nav */
+[data-theme="dark"] .hamburger-menu .bar {
+    background-color: var(--text-light);
+}
+
+[data-theme="dark"] .mobile-nav-menu {
+    background: var(--bg-darker);
+    border-color: var(--border-dark);
+}
+
+[data-theme="dark"] .mobile-nav-link {
+    color: var(--text-light);
+    border-bottom-color: var(--border-dark);
+}
+
+[data-theme="dark"] .mobile-nav-link:hover {
+    background-color: var(--bg-dark);
+}
+
+[data-theme="dark"] .mobile-nav-link.active {
+    background-color: var(--primary-green);
+}
+
+/* Admin Mobile Navigation Styles */
+.mobile-nav-admin {
+    display: none;
+    position: relative;
+}
+
+.desktop-nav {
+    display: flex;
+}
+
+/* Accounts page specific nav styles */
+.accounts-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px solid var(--border-dark);
+    margin-bottom: 30px;
+}
+
+.nav-left {
+    display: flex;
+    align-items: center;
+}
+
+@media (max-width: 768px) {
+    .desktop-nav {
+        display: none;
+    }
+    
+    .mobile-nav-admin {
+        display: block;
+    }
+    
+    .back-btn.desktop-nav {
+        display: none;
+    }
+}
+
 /* Additional responsive styles for admin interface */
 @media (max-width: 768px) {
     .vehicle-actions {

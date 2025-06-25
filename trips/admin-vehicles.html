@@ -419,11 +419,36 @@
                 <img src="images/wolthers-logo-off-white.svg" alt="Wolthers & Associates" class="nav-logo">
                 <span class="nav-title">Coffee Travel Admin</span>
             </div>
-            <div class="nav-links">
+            <div class="nav-links desktop-nav">
                 <a href="index.html" class="nav-link">Trips</a>
-                <a href="accounts.html" class="nav-link">Accounts</a>
+                <a href="accounts.html" class="nav-link" id="accountsNavLink">Accounts</a>
                 <a href="admin-vehicles.html" class="nav-link active">Vehicles</a>
                 <a href="#" id="logoutBtn" class="nav-link">Logout</a>
+            </div>
+            <div class="mobile-nav-admin">
+                <button class="hamburger-menu" id="hamburgerMenuAdmin" onclick="toggleAdminMobileMenu()">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </button>
+                <div class="mobile-nav-menu" id="mobileNavMenuAdmin">
+                    <a href="index.html" class="mobile-nav-link">
+                        <span class="nav-icon">🏠</span>
+                        <span class="nav-text">Trips</span>
+                    </a>
+                    <a href="accounts.html" class="mobile-nav-link" id="mobileAccountsNavLink">
+                        <span class="nav-icon">👥</span>
+                        <span class="nav-text">Accounts</span>
+                    </a>
+                    <a href="admin-vehicles.html" class="mobile-nav-link active">
+                        <span class="nav-icon">🚗</span>
+                        <span class="nav-text">Vehicles</span>
+                    </a>
+                    <a href="#" onclick="logout()" class="mobile-nav-link">
+                        <span class="nav-icon">🚪</span>
+                        <span class="nav-text">Logout</span>
+                    </a>
+                </div>
             </div>
         </div>
     </nav>

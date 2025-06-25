@@ -21,7 +21,34 @@
 
     <div class="container">
         <nav class="accounts-nav">
-            <a href="index.html" class="back-btn">← Back to Trips</a>
+            <div class="nav-left">
+                <a href="index.html" class="back-btn desktop-nav">← Back to Trips</a>
+                <div class="mobile-nav-admin">
+                    <button class="hamburger-menu" id="hamburgerMenuAccounts" onclick="toggleAccountsMobileMenu()">
+                        <span class="bar"></span>
+                        <span class="bar"></span>
+                        <span class="bar"></span>
+                    </button>
+                    <div class="mobile-nav-menu" id="mobileNavMenuAccounts">
+                        <a href="index.html" class="mobile-nav-link">
+                            <span class="nav-icon">🏠</span>
+                            <span class="nav-text">Trips</span>
+                        </a>
+                        <a href="accounts.html" class="mobile-nav-link active">
+                            <span class="nav-icon">👥</span>
+                            <span class="nav-text">Accounts</span>
+                        </a>
+                        <a href="admin-vehicles.html" class="mobile-nav-link" id="mobileVehiclesLink">
+                            <span class="nav-icon">🚗</span>
+                            <span class="nav-text">Vehicles</span>
+                        </a>
+                        <a href="#" onclick="logout()" class="mobile-nav-link">
+                            <span class="nav-icon">🚪</span>
+                            <span class="nav-text">Logout</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
             <div class="nav-user">
                 <span class="user-info" id="currentUserInfo">Loading...</span>
             </div>

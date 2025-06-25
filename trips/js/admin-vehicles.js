@@ -16,6 +16,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
 async function initializeApp() {
     try {
+        // Update navigation visibility based on user role
+        updateAdminNavigationVisibility();
+        
         await Promise.all([
             loadVehicles(),
             loadUsers(),
@@ -903,4 +906,96 @@ function exportData() {
 function exportReport() {
     // This would export the current report data
     console.log('Export report functionality would be implemented here');
+}
+
+// ============================================================================
+// 🚗 MOBILE NAVIGATION FOR ADMIN PAGES
+// ============================================================================
+
+/**
+ * Toggle mobile navigation menu for admin pages
+ */
+function toggleAdminMobileMenu() {
+    const hamburger = document.getElementById('hamburgerMenuAdmin');
+    const menu = document.getElementById('mobileNavMenuAdmin');
+    
+    if (hamburger && menu) {
+        hamburger.classList.toggle('active');
+        menu.classList.toggle('active');
+        
+        // Close menu when clicking outside
+        if (menu.classList.contains('active')) {
+            document.addEventListener('click', closeAdminMobileMenuOnOutsideClick);
+        } else {
+            document.removeEventListener('click', closeAdminMobileMenuOnOutsideClick);
+        }
+    }
+}
+
+/**
+ * Close admin mobile menu when clicking outside
+ */
+function closeAdminMobileMenuOnOutsideClick(event) {
+    const hamburger = document.getElementById('hamburgerMenuAdmin');
+    const menu = document.getElementById('mobileNavMenuAdmin');
+    
+    if (hamburger && menu && 
+        !hamburger.contains(event.target) && 
+        !menu.contains(event.target)) {
+        hamburger.classList.remove('active');
+        menu.classList.remove('active');
+        document.removeEventListener('click', closeAdminMobileMenuOnOutsideClick);
+    }
+}
+
+/**
+ * Logout function for admin pages
+ */
+function logout() {
+    // Clear session storage
+    sessionStorage.removeItem('userSession');
+    localStorage.removeItem('wolthers_auth');
+    
+    // Redirect to login page
+    window.location.href = 'index.html';
+}
+
+/**
+ * Update admin navigation visibility based on user role
+ */
+function updateAdminNavigationVisibility() {
+    // Get current user from session
+    const session = sessionStorage.getItem('userSession');
+    if (!session) {
+        // Redirect to login if no session
+        window.location.href = 'index.html';
+        return;
+    }
+    
+    try {
+        const userData = JSON.parse(session);
+        const user = userData.user;
+        const role = user.role || 'employee';
+        const isAdmin = role === 'admin';
+        
+        // Show/hide accounts link based on admin status
+        const accountsNavLink = document.getElementById('accountsNavLink');
+        const mobileAccountsNavLink = document.getElementById('mobileAccountsNavLink');
+        
+        if (accountsNavLink) {
+            accountsNavLink.style.display = isAdmin ? 'block' : 'none';
+        }
+        
+        if (mobileAccountsNavLink) {
+            mobileAccountsNavLink.style.display = isAdmin ? 'flex' : 'none';
+        }
+        
+        console.log(`Admin navigation updated for ${user.name} (${role}):`, {
+            canAccessAccounts: isAdmin
+        });
+        
+    } catch (error) {
+        console.error('Error parsing user session:', error);
+        window.location.href = 'index.html';
+    }
 } 

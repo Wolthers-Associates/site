@@ -129,6 +129,38 @@
                     <button class="admin-icon-btn" onclick="showUserManagementModal()" title="User Management">
                         <img src="images/user-LM.svg" alt="User Management" class="admin-icon">
                     </button>
+                    <button class="admin-icon-btn" id="vehicleManagementBtn" onclick="goToVehicleManagement()" title="Vehicle Management" style="display: none;">
+                        <img src="images/car.svg" alt="Vehicle Management" class="admin-icon">
+                    </button>
+                </div>
+                <div class="mobile-nav">
+                    <button class="hamburger-menu" id="hamburgerMenu" onclick="toggleMobileMenu()">
+                        <span class="bar"></span>
+                        <span class="bar"></span>
+                        <span class="bar"></span>
+                    </button>
+                    <div class="mobile-nav-menu" id="mobileNavMenu">
+                        <a href="index.html" class="mobile-nav-link active">
+                            <span class="nav-icon">🏠</span>
+                            <span class="nav-text">Trips</span>
+                        </a>
+                        <a href="accounts.html" class="mobile-nav-link" id="mobileAccountsLink" style="display: none;">
+                            <span class="nav-icon">👥</span>
+                            <span class="nav-text">Accounts</span>
+                        </a>
+                        <a href="admin-vehicles.html" class="mobile-nav-link" id="mobileCarsLink" style="display: none;">
+                            <span class="nav-icon">🚗</span>
+                            <span class="nav-text">Cars</span>
+                        </a>
+                        <a href="#" onclick="showAdminPanel()" class="mobile-nav-link" id="mobileAdminLink" style="display: none;">
+                            <span class="nav-icon">⚙️</span>
+                            <span class="nav-text">Settings</span>
+                        </a>
+                        <a href="#" onclick="logout()" class="mobile-nav-link">
+                            <span class="nav-icon">🚪</span>
+                            <span class="nav-text">Logout</span>
+                        </a>
+                    </div>
                 </div>
                 <button class="logout-btn" onclick="logout()">Logout</button>
             </div>

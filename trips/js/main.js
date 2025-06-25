@@ -425,9 +425,10 @@ const auth = {
             try {
                 const userData = JSON.parse(session);
                 if (await auth.validateSession(userData)) {
-                    currentUser = userData.user;
-                    ui.showDashboard();
-                    await trips.loadTrips();
+                                    currentUser = userData.user;
+                ui.showDashboard();
+                updateNavigationVisibility(currentUser);
+                await trips.loadTrips();
                     return;
                 }
             } catch (e) {
@@ -474,6 +475,7 @@ const auth = {
                 
                 utils.hideLoading();
                 ui.showDashboard();
+                updateNavigationVisibility(currentUser);
                 await trips.loadTrips();
             } else {
                 utils.hideLoading();
@@ -597,14 +599,8 @@ const ui = {
     // Show add trip button for employees (handled in renderTrips now)
     console.log('✅ User can add trips:', currentUser.canAddTrips);
     
-    // Show admin settings for admin users (Wolthers team members are admins)
-    const isWolthersAdmin = currentUser.email && currentUser.email.endsWith('@wolthers.com');
-    if (isWolthersAdmin || currentUser.role === 'admin') {
-        const adminSettings = document.getElementById('adminSettings');
-        if (adminSettings) {
-            adminSettings.style.display = 'flex';
-        }
-    }
+    // Update navigation visibility based on user role
+    updateNavigationVisibility(currentUser);
     
     // Load trips
     trips.loadTrips();
@@ -3499,4 +3495,99 @@ function viewTripDetails() {
         const { trip } = window.currentTripCodeData;
         trips.showTripDetails(trip);
     }
+}
+
+// ============================================================================
+// 🚗 MOBILE NAVIGATION & VEHICLE MANAGEMENT
+// ============================================================================
+
+/**
+ * Toggle mobile navigation menu
+ */
+function toggleMobileMenu() {
+    const hamburger = document.getElementById('hamburgerMenu');
+    const menu = document.getElementById('mobileNavMenu');
+    
+    if (hamburger && menu) {
+        hamburger.classList.toggle('active');
+        menu.classList.toggle('active');
+        
+        // Close menu when clicking outside
+        if (menu.classList.contains('active')) {
+            document.addEventListener('click', closeMobileMenuOnOutsideClick);
+        } else {
+            document.removeEventListener('click', closeMobileMenuOnOutsideClick);
+        }
+    }
+}
+
+/**
+ * Close mobile menu when clicking outside
+ */
+function closeMobileMenuOnOutsideClick(event) {
+    const hamburger = document.getElementById('hamburgerMenu');
+    const menu = document.getElementById('mobileNavMenu');
+    
+    if (hamburger && menu && 
+        !hamburger.contains(event.target) && 
+        !menu.contains(event.target)) {
+        hamburger.classList.remove('active');
+        menu.classList.remove('active');
+        document.removeEventListener('click', closeMobileMenuOnOutsideClick);
+    }
+}
+
+/**
+ * Navigate to vehicle management page
+ */
+function goToVehicleManagement() {
+    window.location.href = 'admin-vehicles.html';
+}
+
+/**
+ * Update navigation visibility based on user role
+ */
+function updateNavigationVisibility(user) {
+    if (!user) return;
+    
+    const role = user.role || 'employee';
+    const isAdmin = role === 'admin';
+    const isAdminOrDriver = isAdmin || role === 'driver';
+    
+    // Desktop navigation elements
+    const vehicleManagementBtn = document.getElementById('vehicleManagementBtn');
+    const adminSettings = document.getElementById('adminSettings');
+    
+    // Mobile navigation elements
+    const mobileAccountsLink = document.getElementById('mobileAccountsLink');
+    const mobileCarsLink = document.getElementById('mobileCarsLink');
+    const mobileAdminLink = document.getElementById('mobileAdminLink');
+    
+    // Show/hide vehicle management for admins and drivers
+    if (vehicleManagementBtn) {
+        vehicleManagementBtn.style.display = isAdminOrDriver ? 'inline-block' : 'none';
+    }
+    
+    // Show/hide admin settings
+    if (adminSettings) {
+        adminSettings.style.display = isAdmin ? 'flex' : 'none';
+    }
+    
+    // Update mobile navigation
+    if (mobileAccountsLink) {
+        mobileAccountsLink.style.display = isAdmin ? 'flex' : 'none';
+    }
+    
+    if (mobileCarsLink) {
+        mobileCarsLink.style.display = isAdminOrDriver ? 'flex' : 'none';
+    }
+    
+    if (mobileAdminLink) {
+        mobileAdminLink.style.display = isAdmin ? 'flex' : 'none';
+    }
+    
+    console.log(`Navigation updated for ${user.name} (${role}):`, {
+        canAccessVehicles: isAdminOrDriver,
+        canAccessAdmin: isAdmin
+    });
 } 

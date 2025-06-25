@@ -127,6 +127,7 @@ function initializeAccountsPage() {
     toggleAdminSections();
     setupFormHandlers();
     loadSettings();
+    updateAccountsNavigationVisibility();
 }
 
 function loadCurrentUserInfo() {
@@ -575,4 +576,78 @@ window.AccountsManager = {
     getCurrentUser,
     sendTripNotificationEmail,
     showNotification
-}; 
+};
+
+// ============================================================================
+// 🚗 MOBILE NAVIGATION FOR ACCOUNTS PAGE
+// ============================================================================
+
+/**
+ * Toggle mobile navigation menu for accounts page
+ */
+function toggleAccountsMobileMenu() {
+    const hamburger = document.getElementById('hamburgerMenuAccounts');
+    const menu = document.getElementById('mobileNavMenuAccounts');
+    
+    if (hamburger && menu) {
+        hamburger.classList.toggle('active');
+        menu.classList.toggle('active');
+        
+        // Close menu when clicking outside
+        if (menu.classList.contains('active')) {
+            document.addEventListener('click', closeAccountsMobileMenuOnOutsideClick);
+        } else {
+            document.removeEventListener('click', closeAccountsMobileMenuOnOutsideClick);
+        }
+    }
+}
+
+/**
+ * Close accounts mobile menu when clicking outside
+ */
+function closeAccountsMobileMenuOnOutsideClick(event) {
+    const hamburger = document.getElementById('hamburgerMenuAccounts');
+    const menu = document.getElementById('mobileNavMenuAccounts');
+    
+    if (hamburger && menu && 
+        !hamburger.contains(event.target) && 
+        !menu.contains(event.target)) {
+        hamburger.classList.remove('active');
+        menu.classList.remove('active');
+        document.removeEventListener('click', closeAccountsMobileMenuOnOutsideClick);
+    }
+}
+
+/**
+ * Logout function for accounts page
+ */
+function logout() {
+    // Clear session storage
+    sessionStorage.removeItem('userSession');
+    localStorage.removeItem('wolthers_auth');
+    
+    // Redirect to login page
+    window.location.href = 'index.html';
+}
+
+/**
+ * Update accounts navigation visibility based on user role
+ */
+function updateAccountsNavigationVisibility() {
+    // Get current user
+    const user = getCurrentUser();
+    const role = user.role || 'employee';
+    const isAdmin = role === 'admin';
+    const isAdminOrDriver = isAdmin || role === 'driver';
+    
+    // Show/hide vehicles link based on admin/driver status
+    const mobileVehiclesLink = document.getElementById('mobileVehiclesLink');
+    
+    if (mobileVehiclesLink) {
+        mobileVehiclesLink.style.display = isAdminOrDriver ? 'flex' : 'none';
+    }
+    
+    console.log(`Accounts navigation updated for ${user.name} (${role}):`, {
+        canAccessVehicles: isAdminOrDriver
+    });
+} 
