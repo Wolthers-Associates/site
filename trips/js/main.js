@@ -3866,7 +3866,10 @@ function formatNextTripInfo(nextTrip) {
 function updateFleetSummary(summary) {
     if (!summary) return;
     
-    document.getElementById('fleetTotalVehicles').textContent = summary.total || 0;
+    // Calculate active fleet totals (excluding retired vehicles)
+    const activeTotal = (summary.available || 0) + (summary.maintenance || 0);
+    
+    document.getElementById('fleetTotalVehicles').textContent = activeTotal;
     document.getElementById('fleetAvailableVehicles').textContent = summary.available || 0;
     document.getElementById('fleetMaintenanceVehicles').textContent = summary.maintenance || 0;
     document.getElementById('fleetRetiredVehicles').textContent = summary.retired || 0;
@@ -3899,6 +3902,12 @@ function filterFleetData() {
     const typeFilter = document.getElementById('fleetTypeFilter')?.value.toLowerCase() || '';
     
     filteredFleetData = fleetData.filter(vehicle => {
+        // Hide retired vehicles by default unless specifically filtering for them
+        const isRetired = vehicle.status && vehicle.status.toLowerCase() === 'retired';
+        if (isRetired && statusFilter !== 'retired') {
+            return false;
+        }
+        
         // Search filter
         const matchesSearch = !searchTerm || 
             `${vehicle.make} ${vehicle.model}`.toLowerCase().includes(searchTerm) ||
@@ -4539,9 +4548,9 @@ async function deleteFleetVehicle(vehicleId) {
     
     const vehicleName = `${vehicle.make} ${vehicle.model}`;
     const confirmed = await showConfirmDialog(
-        'Delete Vehicle',
-        `Are you sure you want to delete ${vehicleName}?\n\nThis action cannot be undone.`,
-        'Delete',
+        'Retire Vehicle',
+        `Are you sure you want to retire ${vehicleName}?\n\nThis will remove it from your active fleet. The vehicle can be restored later if needed.`,
+        'Retire',
         'error'
     );
     
@@ -4554,7 +4563,7 @@ async function deleteFleetVehicle(vehicleId) {
             const data = await response.json();
             
             if (data.success) {
-                showToast(`${vehicleName} has been deleted successfully.`, 'success');
+                showToast(`${vehicleName} has been retired and removed from active fleet.`, 'success');
                 loadFleetManagementData(); // Reload data
             } else {
                 throw new Error(data.error || 'Failed to delete vehicle');
