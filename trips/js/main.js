@@ -1169,8 +1169,8 @@ const trips = {
             });
     },
 
-    // Load staff for simple dropdown
-    loadStaffAvailability: () => {
+    // Load staff for simple dropdown - API ONLY
+    loadStaffAvailability: async () => {
         const staffSelect = document.getElementById('wolthersStaff');
         const staffContainer = document.getElementById('staffSelectionContainer');
         const loadingMessage = document.getElementById('staffLoadingMessage');
@@ -1179,64 +1179,59 @@ const trips = {
 
         // Show loading message
         if (loadingMessage) {
-            loadingMessage.textContent = 'Loading staff...';
+            loadingMessage.textContent = '🔄 Loading staff from database...';
             loadingMessage.style.display = 'block';
         }
 
-        // Try to load from API first
-        fetch('api/staff/availability.php')
-            .then(response => response.json())
-            .then(data => {
+        try {
+            const response = await fetch('api/staff/mock-availability.php');
+            
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            
+            const data = await response.json();
+            
+            if (data.success && data.staff) {
                 if (loadingMessage) loadingMessage.style.display = 'none';
                 if (staffContainer) staffContainer.style.display = 'block';
                 
                 staffSelect.innerHTML = '';
-                if (data.success && data.staff) {
-                    data.staff.forEach(staff => {
-                        const option = document.createElement('option');
-                        option.value = staff.id;
-                        option.textContent = `${staff.name} (${staff.department})`;
-                        staffSelect.appendChild(option);
-                    });
-                    
-                    // Show availability info
-                    const availabilityInfo = document.getElementById('staffAvailabilityInfo');
-                    if (availabilityInfo) {
-                        availabilityInfo.textContent = `${data.staff.length} staff members available`;
-                    }
-                }
-            })
-            .catch(error => {
-                console.log('API not available, using mock data');
-                // Mock staff data
-                const mockStaff = [
-                    { id: 'daniel', name: 'Daniel Wolthers', department: 'Management' },
-                    { id: 'christian', name: 'Christian Wolthers', department: 'Operations' },
-                    { id: 'svenn', name: 'Svenn Wolthers', department: 'Business Development' },
-                    { id: 'patricia', name: 'Patricia Arakaki', department: 'Operations' },
-                    { id: 'anderson', name: 'Anderson Nunes', department: 'Logistics' },
-                    { id: 'edgar', name: 'Edgar Gomes', department: 'Farm Relations' },
-                    { id: 'kauan', name: 'Kauan Marcelino', department: 'Processing' },
-                    { id: 'matheus', name: 'Matheus Oliveira', department: 'Quality Control' }
-                ];
-                
-                if (loadingMessage) loadingMessage.style.display = 'none';
-                if (staffContainer) staffContainer.style.display = 'block';
-                
-                staffSelect.innerHTML = '';
-                mockStaff.forEach(staff => {
+                data.staff.forEach(staff => {
                     const option = document.createElement('option');
                     option.value = staff.id;
-                    option.textContent = `${staff.name} (${staff.department})`;
+                    option.textContent = `${staff.name} - ${staff.role || staff.department}`;
+                    
+                    if (staff.available === false) {
+                        option.disabled = true;
+                        option.textContent += ' (Unavailable)';
+                    }
+                    
                     staffSelect.appendChild(option);
                 });
                 
                 // Show availability info
                 const availabilityInfo = document.getElementById('staffAvailabilityInfo');
                 if (availabilityInfo) {
-                    availabilityInfo.textContent = `${mockStaff.length} staff members available`;
+                    availabilityInfo.textContent = `${data.staff.length} staff members loaded from database`;
                 }
-            });
+                
+                console.log(`✅ Loaded ${data.staff.length} staff members from API`);
+                utils.showNotification(`Loaded ${data.staff.length} staff members successfully`, 'success');
+            } else {
+                throw new Error('Invalid API response: ' + JSON.stringify(data));
+            }
+        } catch (error) {
+            console.error('❌ Failed to load staff from API:', error);
+            
+            if (loadingMessage) {
+                loadingMessage.textContent = '❌ Failed to load staff - Check database connection';
+                loadingMessage.style.display = 'block';
+            }
+            
+            staffSelect.innerHTML = '<option value="">❌ Failed to load staff</option>';
+            utils.showNotification('Failed to load staff. Please check your database connection.', 'error');
+        }
     },
 
     // Load and display trips
@@ -1597,38 +1592,48 @@ const trips = {
         }
     },
 
-    // Load vehicles from database
+    // Load vehicles from database - API ONLY
     loadVehicles: async () => {
+        const vehicleSelect = document.getElementById('vehicles');
+        if (!vehicleSelect) return;
+
+        vehicleSelect.innerHTML = '<option value="">🔄 Loading vehicles from database...</option>';
+
         try {
-            const response = await fetch('api/vehicles/list.php');
+            const response = await fetch('api/vehicles/mock-list.php');
+            
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            
             const data = await response.json();
             
-            if (data.success) {
-                const vehicleSelect = document.getElementById('vehicles');
-                if (vehicleSelect) {
-                    vehicleSelect.innerHTML = '';
+            if (data.success && data.vehicles) {
+                vehicleSelect.innerHTML = '';
+                
+                data.vehicles.forEach(vehicle => {
+                    const option = document.createElement('option');
+                    option.value = vehicle.id;
+                    option.textContent = `${vehicle.make} ${vehicle.model} (${vehicle.licensePlate}) - ${vehicle.capacity} seats`;
                     
-                    data.vehicles.forEach(vehicle => {
-                        const option = document.createElement('option');
-                        option.value = vehicle.id;
-                        option.textContent = `${vehicle.displayName} (${vehicle.capacity} seats)`;
-                        option.className = vehicle.isAvailable ? 'available' : 'unavailable';
-                        option.disabled = !vehicle.isAvailable;
-                        option.title = vehicle.isAvailable ? 
-                            `Available - Location: ${vehicle.location}` : 
-                            `Unavailable - ${vehicle.upcomingTrips.join(', ')}`;
-                        vehicleSelect.appendChild(option);
-                    });
+                    if (!vehicle.isAvailable) {
+                        option.disabled = true;
+                        option.textContent += ` (${vehicle.status})`;
+                    }
                     
-                    console.log(`✅ Loaded ${data.vehicles.length} vehicles (${data.summary.available} available)`);
-                }
+                    option.title = `Status: ${vehicle.status} | Location: ${vehicle.location || 'Unknown'} | Assignments: ${vehicle.currentAssignments}`;
+                    vehicleSelect.appendChild(option);
+                });
+                
+                console.log(`✅ Loaded ${data.vehicles.length} vehicles from API`);
+                utils.showNotification(`Loaded ${data.vehicles.length} vehicles successfully`, 'success');
+            } else {
+                throw new Error('Invalid API response: ' + JSON.stringify(data));
             }
         } catch (error) {
-            console.error('Failed to load vehicles:', error);
-            const vehicleSelect = document.getElementById('vehicles');
-            if (vehicleSelect) {
-                vehicleSelect.innerHTML = '<option value="">Failed to load vehicles</option>';
-            }
+            console.error('❌ Failed to load vehicles from API:', error);
+            vehicleSelect.innerHTML = '<option value="">❌ Failed to load vehicles - Check database connection</option>';
+            utils.showNotification('Failed to load vehicles. Please check your database connection.', 'error');
         }
     },
 

@@ -13,6 +13,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 require_once '../config.php';
 
 try {
+    $pdo = getDBConnection();
+    
     // Get vehicles with availability information
     $stmt = $pdo->query("
         SELECT 
