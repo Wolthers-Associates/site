@@ -5209,4 +5209,191 @@ body {
     .staff-date-range input {
         flex: 1;
     }
+}
+
+/* Admin Vehicle Management Styles */
+.badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 0.75em;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.badge-routine { background: #e3f2fd; color: #1565c0; }
+.badge-repair { background: #ffebee; color: #c62828; }
+.badge-inspection { background: #f3e5f5; color: #7b1fa2; }
+.badge-revision { background: #e8f5e8; color: #2e7d32; }
+.badge-emergency { background: #ffebee; color: #d32f2f; }
+
+.badge-scheduled { background: #fff3e0; color: #ef6c00; }
+.badge-in_progress { background: #e3f2fd; color: #1976d2; }
+.badge-completed { background: #e8f5e8; color: #388e3c; }
+.badge-cancelled { background: #f5f5f5; color: #757575; }
+
+.badge-active { background: #e3f2fd; color: #1976d2; }
+.badge-pending_review { background: #fff3e0; color: #f57c00; }
+
+.btn-delete {
+    background: #f44336;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8em;
+}
+
+.btn-delete:hover {
+    background: #d32f2f;
+}
+
+.form-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: flex-end;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--light-gray);
+}
+
+.notification {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    border-left: 4px solid;
+    transition: all 0.3s ease;
+}
+
+.notification-success {
+    border-left-color: #4CAF50;
+}
+
+.notification-error {
+    border-left-color: #F44336;
+}
+
+.notification-info {
+    border-left-color: #2196F3;
+}
+
+/* Dark mode for admin styles */
+[data-theme="dark"] .vehicle-card,
+[data-theme="dark"] .summary-card,
+[data-theme="dark"] .table-container,
+[data-theme="dark"] .modal-content {
+    background-color: var(--bg-darker);
+    border-color: var(--border-dark);
+}
+
+[data-theme="dark"] .data-table th {
+    background-color: var(--bg-dark);
+    color: var(--text-light);
+}
+
+[data-theme="dark"] .data-table td {
+    color: var(--text-light);
+    border-bottom-color: var(--border-dark);
+}
+
+[data-theme="dark"] .data-table tr:hover {
+    background-color: var(--bg-dark);
+}
+
+[data-theme="dark"] .form-input,
+[data-theme="dark"] .form-select,
+[data-theme="dark"] .form-textarea,
+[data-theme="dark"] .filter-input {
+    background-color: var(--bg-dark);
+    border-color: var(--border-dark);
+    color: var(--text-light);
+}
+
+[data-theme="dark"] .form-label,
+[data-theme="dark"] .filter-label {
+    color: var(--text-light);
+}
+
+[data-theme="dark"] .alert-item {
+    background-color: #4a1a1a;
+    border-color: #5a2d2d;
+    color: #ff6b6b;
+}
+
+[data-theme="dark"] .warning-item {
+    background-color: #4a3a1a;
+    border-color: #5a4a2d;
+    color: #ffb74d;
+}
+
+[data-theme="dark"] .tab {
+    color: var(--text-light);
+}
+
+[data-theme="dark"] .tab:hover {
+    background-color: var(--bg-dark);
+}
+
+[data-theme="dark"] .tab.active {
+    color: var(--primary-green);
+    background-color: var(--bg-dark);
+}
+
+[data-theme="dark"] .admin-header h1 {
+    color: var(--text-light);
+}
+
+[data-theme="dark"] .summary-number {
+    color: var(--primary-green);
+}
+
+[data-theme="dark"] .summary-label {
+    color: var(--text-light);
+}
+
+[data-theme="dark"] .vehicle-title {
+    color: var(--text-light);
+}
+
+[data-theme="dark"] .detail-label {
+    color: var(--text-light);
+}
+
+[data-theme="dark"] .detail-value {
+    color: var(--text-light);
+}
+
+/* Additional responsive styles for admin interface */
+@media (max-width: 768px) {
+    .vehicle-actions {
+        flex-direction: column;
+    }
+    
+    .action-btn {
+        width: 100%;
+        margin-bottom: 5px;
+    }
+    
+    .data-table {
+        font-size: 0.85em;
+    }
+    
+    .data-table th,
+    .data-table td {
+        padding: 8px 6px;
+    }
+    
+    .admin-header {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .header-actions {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .header-actions button {
+        width: 100%;
+    }
 } 
