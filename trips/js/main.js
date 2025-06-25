@@ -29,8 +29,21 @@ function updateLogoForColorScheme() {
 // Listen for color scheme changes
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateLogoForColorScheme);
 
-// Mock Data
+// Mock data for development - will be replaced with API calls
 const MOCK_TRIPS = [
+    {
+        id: 'upcoming-sample-trip',
+        title: 'Upcoming Sample Trip',
+        description: 'This is a sample upcoming trip for testing purposes.',
+        date: '2025-02-15',
+        endDate: '2025-02-22',
+        guests: 'Sample Participants',
+        cars: '2 SUVs',
+        driver: 'Local Driver',
+        status: 'upcoming',
+        partnerEmails: ['sample@example.com'],
+        partnerCodes: ['BRAZIL2025', 'COLOMBIA2025', 'ETHIOPIA2025']
+    }
     // Add mock trips here or load from API
 ];
 
@@ -39,6 +52,294 @@ const MOCK_CREDENTIALS = {
     wolthers: ['daniel@wolthers.com', 'svenn@wolthers.com', 'tom@wolthers.com', 'rasmus@wolthers.com'],
     tripCodes: ['BRAZIL2025', 'COLOMBIA2025', 'ETHIOPIA2025']
 };
+
+// ============================================================================
+// 🤖 AI TRIP CODE GENERATOR SYSTEM
+// ============================================================================
+
+/**
+ * Company Abbreviation Mapping System
+ * Handles intelligent abbreviation generation for company names
+ */
+const COMPANY_ABBREVIATIONS = {
+    // Pre-defined recognizable company mappings
+    'mitsui': 'MITSUI',
+    'mitsui & co': 'MITSUI',
+    'cape horn coffees': 'CHC',
+    'douqué': 'DQ',
+    'blaser': 'BT',
+    'blaser trading': 'BT',
+    'equatorial': 'EQT',
+    'equatorial coffee': 'EQT',
+    'volcafe': 'VOLC',
+    'neumann': 'NEUM',
+    'ed&f man': 'EDF',
+    'sucafina': 'SUCA',
+    'olam': 'OLAM',
+    'louis dreyfus': 'LDC',
+    'cargill': 'CARG',
+    'coffee holding': 'CHC',
+    'royal coffee': 'ROYAL',
+    'green coffee company': 'GCC',
+    'specialty coffee': 'SPEC',
+    'importers alliance': 'IMPA',
+    'atlantic specialty coffee': 'ASC',
+    'red fox coffee': 'RFX',
+    'genuine origin': 'GO',
+    'ally coffee': 'ALLY',
+    'coffee beans international': 'CBI',
+    'sustainable harvest': 'SH',
+    'wolthers & associates': 'WA',
+    'wolthers': 'WA'
+};
+
+/**
+ * AI Trip Code Generator Class
+ * Generates intelligent, memorable trip codes following business rules
+ */
+class TripCodeGenerator {
+    constructor() {
+        this.existingCodes = new Set();
+        this.loadExistingCodes();
+    }
+
+    /**
+     * Load existing trip codes to prevent duplicates
+     */
+    loadExistingCodes() {
+        // Load from mock data
+        MOCK_TRIPS.forEach(trip => {
+            if (trip.partnerCodes) {
+                trip.partnerCodes.forEach(code => this.existingCodes.add(code));
+            }
+        });
+        
+        // Add hardcoded existing codes
+        ['BRAZIL2025', 'COLOMBIA2025', 'ETHIOPIA2025', 'GUATEMALA2024'].forEach(code => {
+            this.existingCodes.add(code);
+        });
+    }
+
+    /**
+     * Generate company abbreviation with intelligent logic
+     * @param {string} companyName - Full company name
+     * @returns {string} - Company abbreviation (2-5 chars)
+     */
+    generateCompanyAbbreviation(companyName) {
+        if (!companyName) return 'GEN'; // Generic fallback
+        
+        const cleaned = companyName.toLowerCase().trim();
+        
+        // Check predefined mappings first
+        if (COMPANY_ABBREVIATIONS[cleaned]) {
+            return COMPANY_ABBREVIATIONS[cleaned];
+        }
+        
+        // Smart abbreviation generation
+        const words = cleaned
+            .replace(/[^a-z0-9\s]/g, '') // Remove special chars
+            .split(/\s+/)
+            .filter(word => word.length > 0);
+        
+        if (words.length === 1) {
+            // Single word: take first 3-4 characters
+            const word = words[0];
+            if (word.length <= 3) return word.toUpperCase();
+            if (word.length <= 5) return word.toUpperCase();
+            return word.substring(0, 4).toUpperCase();
+        } else if (words.length === 2) {
+            // Two words: take first 2-3 chars of each
+            const first = words[0].substring(0, 2);
+            const second = words[1].substring(0, 2);
+            return (first + second).toUpperCase();
+        } else {
+            // Multiple words: take first letter of each (max 5)
+            const initials = words.slice(0, 5).map(word => word[0]).join('');
+            return initials.toUpperCase();
+        }
+    }
+
+    /**
+     * Generate guest surname abbreviation
+     * @param {string} guestName - Main guest name or participant list
+     * @returns {string} - Surname abbreviation (3-4 chars)
+     */
+    generateGuestAbbreviation(guestName) {
+        if (!guestName) return 'ANON';
+        
+        // Extract surnames from participant list or single name
+        const names = guestName.split(/[,\n\r]+/).map(name => name.trim());
+        const mainName = names[0] || guestName;
+        
+        // Get surname (last word typically)
+        const nameParts = mainName.split(/\s+/).filter(part => part.length > 0);
+        const surname = nameParts.length > 1 ? nameParts[nameParts.length - 1] : nameParts[0];
+        
+        if (!surname) return 'ANON';
+        
+        // Clean and format surname
+        const cleaned = surname.replace(/[^a-zA-Z]/g, '');
+        if (cleaned.length <= 4) return cleaned.toUpperCase();
+        
+        return cleaned.substring(0, 4).toUpperCase();
+    }
+
+    /**
+     * Generate random month format
+     * @param {Date} date - Trip start date
+     * @returns {string} - Month in random format
+     */
+    generateMonthFormat(date) {
+        const month = date.getMonth();
+        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                           'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const monthNamesLong = ['January', 'February', 'March', 'April', 'May', 'June',
+                               'July', 'August', 'September', 'October', 'November', 'December'];
+        
+        const formats = [
+            monthNames[month],                           // "Jan"
+            String(month + 1).padStart(2, '0'),        // "01"
+            monthNamesLong[month]                       // "January"
+        ];
+        
+        return formats[Math.floor(Math.random() * formats.length)];
+    }
+
+    /**
+     * Generate random year format
+     * @param {Date} date - Trip start date
+     * @returns {string} - Year in random format
+     */
+    generateYearFormat(date) {
+        const year = date.getFullYear();
+        const formats = [
+            String(year).slice(-2),  // "25"
+            String(year)             // "2025"
+        ];
+        
+        return formats[Math.floor(Math.random() * formats.length)];
+    }
+
+    /**
+     * Generate unique suffix if needed
+     * @param {string} baseCode - Base code without suffix
+     * @returns {string} - Suffix (empty or 2-digit number)
+     */
+    generateUniqueSuffix(baseCode) {
+        if (!this.existingCodes.has(baseCode)) {
+            return '';
+        }
+        
+        // Try suffixes 01-99
+        for (let i = 1; i <= 99; i++) {
+            const suffix = String(i).padStart(2, '0');
+            const codeWithSuffix = `${baseCode}-${suffix}`;
+            if (!this.existingCodes.has(codeWithSuffix)) {
+                return `-${suffix}`;
+            }
+        }
+        
+        // Fallback: use random suffix
+        const randomSuffix = Math.floor(Math.random() * 99) + 1;
+        return `-${String(randomSuffix).padStart(2, '0')}`;
+    }
+
+    /**
+     * Main trip code generation function
+     * @param {Object} tripData - Trip information
+     * @returns {Object} - Generated code info
+     */
+    generateTripCode(tripData) {
+        const {
+            companyName = '',
+            guestName = '',
+            startDate = new Date(),
+            title = ''
+        } = tripData;
+
+        const tripDate = new Date(startDate);
+        
+        // Generate components
+        const companyAbbrev = this.generateCompanyAbbreviation(companyName);
+        const guestAbbrev = this.generateGuestAbbreviation(guestName);
+        const monthFormat = this.generateMonthFormat(tripDate);
+        const yearFormat = this.generateYearFormat(tripDate);
+        
+        // Build base code components
+        const components = [companyAbbrev, guestAbbrev, monthFormat];
+        
+        // Add year if total length allows
+        let baseCode = components.join('-');
+        if (baseCode.length + yearFormat.length + 1 <= 13) { // Leave room for suffix
+            baseCode += `-${yearFormat}`;
+        }
+        
+        // Ensure maximum 15 characters total
+        if (baseCode.length > 13) {
+            // Trim components if too long
+            const maxCompanyLen = Math.min(companyAbbrev.length, 4);
+            const maxGuestLen = Math.min(guestAbbrev.length, 3);
+            const trimmedCompany = companyAbbrev.substring(0, maxCompanyLen);
+            const trimmedGuest = guestAbbrev.substring(0, maxGuestLen);
+            baseCode = `${trimmedCompany}-${trimmedGuest}-${monthFormat}`;
+        }
+        
+        // Add unique suffix if needed
+        const suffix = this.generateUniqueSuffix(baseCode);
+        const finalCode = baseCode + suffix;
+        
+        // Add to existing codes set
+        this.existingCodes.add(finalCode);
+        
+        return {
+            code: finalCode,
+            components: {
+                company: companyAbbrev,
+                guest: guestAbbrev,
+                month: monthFormat,
+                year: yearFormat,
+                suffix: suffix.replace('-', '')
+            },
+            metadata: {
+                originalCompany: companyName,
+                originalGuest: guestName,
+                tripDate: tripDate.toISOString().split('T')[0],
+                generatedAt: new Date().toISOString()
+            }
+        };
+    }
+
+    /**
+     * Generate QR code data URL for a trip code
+     * @param {string} tripCode - The trip code
+     * @param {Object} tripData - Additional trip data for QR
+     * @returns {string} - QR code data URL
+     */
+    generateQRCode(tripCode, tripData = {}) {
+        // For now, return a placeholder. In production, use QR library
+        const qrData = {
+            code: tripCode,
+            trip: tripData.title || 'Wolthers Coffee Trip',
+            url: `${window.location.origin}/trips/?code=${tripCode}`,
+            company: 'Wolthers & Associates'
+        };
+        
+        // Placeholder QR code (in production, use a QR library like qrcode.js)
+        return `data:image/svg+xml,${encodeURIComponent(`
+            <svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+                <rect width="200" height="200" fill="white"/>
+                <rect x="20" y="20" width="160" height="160" fill="black"/>
+                <rect x="30" y="30" width="140" height="140" fill="white"/>
+                <text x="100" y="90" text-anchor="middle" font-size="12" font-family="monospace" fill="black">${tripCode}</text>
+                <text x="100" y="110" text-anchor="middle" font-size="8" font-family="Arial" fill="black">Wolthers Trips</text>
+                <text x="100" y="125" text-anchor="middle" font-size="6" font-family="Arial" fill="black">${qrData.url}</text>
+            </svg>
+        `)}`;
+    }
+}
+
+// Initialize the trip code generator
+const tripCodeGenerator = new TripCodeGenerator();
 
 // Utility Functions
 const utils = {
@@ -889,22 +1190,25 @@ const trips = {
         }
     },
 
-    // Create new trip
+    // Create new trip with AI-generated codes
     createTrip: (formData) => {
         utils.showLoading();
         
         // Simulate API call delay
         setTimeout(() => {
-            // Generate trip ID
+            // Extract form data
             const tripTitle = formData.get('tripTitle');
-            const tripId = tripTitle.toLowerCase()
-                .replace(/[^a-z0-9\s]/g, '')
-                .replace(/\s+/g, '-') + '-2025';
-            
-            // Process partner emails
+            const guestName = formData.get('guests') || '';
             const partnerEmailsText = formData.get('partnerEmails') || '';
             const partnerEmails = partnerEmailsText ? 
                 partnerEmailsText.split('\n').map(e => e.trim()).filter(e => e) : [];
+            
+            // Extract company name from partner emails (smart detection)
+            let companyName = '';
+            if (partnerEmails.length > 0) {
+                const emailDomain = partnerEmails[0].split('@')[1] || '';
+                companyName = trips.extractCompanyFromEmail(emailDomain);
+            }
             
             // Extract dates from itinerary or set defaults
             const itineraryText = formData.get('itineraryText') || '';
@@ -931,6 +1235,19 @@ const trips = {
                 endDate = new Date(nextMonth.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
             }
 
+            // 🤖 Generate AI Trip Code
+            const tripCodeData = tripCodeGenerator.generateTripCode({
+                companyName: companyName,
+                guestName: guestName,
+                startDate: startDate,
+                title: tripTitle
+            });
+
+            // Generate trip ID
+            const tripId = tripTitle.toLowerCase()
+                .replace(/[^a-z0-9\s]/g, '')
+                .replace(/\s+/g, '-') + '-2025';
+
             // Create new trip object
             const newTrip = {
                 id: tripId,
@@ -938,16 +1255,19 @@ const trips = {
                 description: formData.get('tripDescription') || '',
                 date: startDate,
                 endDate: endDate,
-                guests: formData.get('guests') || '',
+                guests: guestName,
                 cars: formData.get('cars') || '',
                 driver: formData.get('driver') || '',
                 status: 'upcoming',
                 partnerEmails: partnerEmails,
-                partnerCodes: [], // Would be generated in real app
+                partnerCodes: [tripCodeData.code], // AI-generated code
                 createdBy: currentUser.name,
                 highlights: [], // Would be added later
                 accommodations: '', // Would be added later
-                meals: '' // Would be added later
+                meals: '', // Would be added later
+                // Trip code metadata
+                tripCodeData: tripCodeData,
+                companyName: companyName
             };
             
             // Add to mock data (at the beginning for upcoming trips)
@@ -955,10 +1275,75 @@ const trips = {
             
             utils.hideLoading();
             ui.hideAddTripModal();
-            trips.loadTrips(); // Refresh display
             
-            utils.showNotification(`Trip "${newTrip.title}" created successfully!`, 'success');
+            // 🎉 Show Trip Code Success Modal
+            trips.showTripCodeModal(newTrip);
+            
+            // Refresh display in background
+            trips.loadTrips();
         }, 1500);
+    },
+
+    // Extract company name from email domain
+    extractCompanyFromEmail: (domain) => {
+        // Remove common email providers
+        const commonProviders = ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'live.com', 'icloud.com'];
+        if (commonProviders.includes(domain.toLowerCase())) {
+            return '';
+        }
+        
+        // Extract company name from domain
+        const parts = domain.split('.');
+        let companyName = parts[0] || '';
+        
+        // Clean up common prefixes/suffixes
+        companyName = companyName.replace(/^(www|mail|email)$/, '');
+        
+        // Capitalize first letter
+        return companyName.charAt(0).toUpperCase() + companyName.slice(1);
+    },
+
+    // Show Trip Code Success Modal
+    showTripCodeModal: (trip) => {
+        const modal = document.getElementById('tripCodeModal');
+        const tripCodeData = trip.tripCodeData;
+        
+        // Update trip code display
+        document.getElementById('generatedTripCode').textContent = tripCodeData.code;
+        
+        // Update code components
+        document.getElementById('codeCompanyPart').textContent = tripCodeData.components.company;
+        document.getElementById('codeGuestPart').textContent = tripCodeData.components.guest;
+        document.getElementById('codeDatePart').textContent = `${tripCodeData.components.month}${tripCodeData.components.year}`;
+        
+        // Show suffix if present
+        const suffixComponent = document.getElementById('codeSuffixComponent');
+        if (tripCodeData.components.suffix) {
+            document.getElementById('codeSuffixPart').textContent = tripCodeData.components.suffix;
+            suffixComponent.style.display = 'block';
+        } else {
+            suffixComponent.style.display = 'none';
+        }
+        
+        // Update QR code
+        const qrCodeImg = document.getElementById('tripQRCode');
+        const qrUrl = document.getElementById('tripQRUrl');
+        const qrData = tripCodeGenerator.generateQRCode(tripCodeData.code, trip);
+        qrCodeImg.src = qrData;
+        qrUrl.textContent = `${window.location.origin}/trips/?code=${tripCodeData.code}`;
+        
+        // Update trip summary
+        document.getElementById('summaryTripTitle').textContent = trip.title;
+        document.getElementById('summaryTripDates').textContent = formatDateRange(trip.date, trip.endDate);
+        document.getElementById('summaryTripGuests').textContent = trip.guests || 'TBD';
+        document.getElementById('summaryTripCompany').textContent = trip.companyName || 'Various Partners';
+        
+        // Store current trip for actions
+        window.currentTripCodeData = { trip, tripCodeData };
+        
+        // Show modal
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
     }
 };
 
@@ -1934,6 +2319,31 @@ function formatRelativeTime(dateString) {
     return date.toLocaleDateString();
 }
 
+// Format date range for trip code modal
+function formatDateRange(startDate, endDate) {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    
+    const options = { 
+        month: 'short', 
+        day: 'numeric',
+        year: 'numeric'
+    };
+    
+    if (start.getFullYear() === end.getFullYear()) {
+        if (start.getMonth() === end.getMonth()) {
+            // Same month and year
+            return `${start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${end.getDate()}, ${start.getFullYear()}`;
+        } else {
+            // Same year, different months
+            return `${start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${end.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}, ${start.getFullYear()}`;
+        }
+    } else {
+        // Different years
+        return `${start.toLocaleDateString('en-US', options)} - ${end.toLocaleDateString('en-US', options)}`;
+    }
+}
+
 function escapeHtml(text) {
     if (!text) return '';
     const div = document.createElement('div');
@@ -2684,4 +3094,155 @@ function copyEmail(email) {
         console.error('Failed to copy email:', err);
         showToast('Failed to copy email', 'error');
     });
+}
+
+// ============================================================================
+// 🎉 TRIP CODE MODAL FUNCTIONS
+// ============================================================================
+
+// Hide trip code modal
+function hideTripCodeModal() {
+    const modal = document.getElementById('tripCodeModal');
+    modal.style.display = 'none';
+    document.body.style.overflow = 'auto';
+    
+    // Clear stored data
+    window.currentTripCodeData = null;
+    
+    // Show success notification
+    showToast('Trip created successfully! Code has been generated.', 'success');
+}
+
+// Copy trip code to clipboard
+function copyTripCode() {
+    const tripCode = document.getElementById('generatedTripCode').textContent;
+    navigator.clipboard.writeText(tripCode).then(() => {
+        const btn = document.querySelector('.copy-code-btn');
+        const originalBg = btn.style.background;
+        
+        // Visual feedback
+        btn.style.background = 'rgba(40, 167, 69, 0.3)';
+        btn.innerHTML = `
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"/>
+            </svg>
+        `;
+        
+        setTimeout(() => {
+            btn.style.background = originalBg;
+            btn.innerHTML = `
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                    <path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"/>
+                    <path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"/>
+                </svg>
+            `;
+        }, 2000);
+        
+        showToast('Trip code copied to clipboard!', 'success');
+    }).catch(() => {
+        showToast('Failed to copy trip code', 'error');
+    });
+}
+
+// Print trip code details
+function printTripCode() {
+    if (!window.currentTripCodeData) return;
+    
+    const { trip, tripCodeData } = window.currentTripCodeData;
+    
+    // Create print-friendly version
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`
+        <html>
+        <head>
+            <title>Trip Code: ${tripCodeData.code}</title>
+            <style>
+                body { font-family: Arial, sans-serif; padding: 20px; }
+                .header { text-align: center; margin-bottom: 30px; }
+                .code-display { font-size: 24px; font-weight: bold; text-align: center; 
+                               padding: 20px; background: #f5f5f5; margin: 20px 0; }
+                .details { margin: 20px 0; }
+                .qr-code { text-align: center; margin: 20px 0; }
+                @media print { .no-print { display: none; } }
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <h1>Wolthers & Associates</h1>
+                <h2>Coffee Travel Trip Code</h2>
+            </div>
+            
+            <div class="code-display">${tripCodeData.code}</div>
+            
+            <div class="details">
+                <h3>Trip Details:</h3>
+                <p><strong>Title:</strong> ${trip.title}</p>
+                <p><strong>Dates:</strong> ${formatDateRange(trip.date, trip.endDate)}</p>
+                <p><strong>Participants:</strong> ${trip.guests || 'TBD'}</p>
+                <p><strong>Company:</strong> ${trip.companyName || 'Various Partners'}</p>
+            </div>
+            
+            <div class="details">
+                <h3>Access Information:</h3>
+                <p><strong>Website:</strong> trips.wolthers.com</p>
+                <p><strong>Access URL:</strong> ${window.location.origin}/trips/?code=${tripCodeData.code}</p>
+            </div>
+            
+            <div class="no-print" style="margin-top: 30px; text-align: center;">
+                <button onclick="window.print()">Print</button>
+                <button onclick="window.close()">Close</button>
+            </div>
+        </body>
+        </html>
+    `);
+    
+    printWindow.document.close();
+    printWindow.focus();
+    
+    // Auto-print after content loads
+    setTimeout(() => {
+        printWindow.print();
+    }, 500);
+}
+
+// Email trip code to participants
+function emailTripCode() {
+    if (!window.currentTripCodeData) return;
+    
+    const { trip, tripCodeData } = window.currentTripCodeData;
+    const subject = `Trip Access Code: ${trip.title}`;
+    const body = `Hello,
+
+Your access code for the "${trip.title}" trip has been generated:
+
+🎯 ACCESS CODE: ${tripCodeData.code}
+
+📅 Trip Dates: ${formatDateRange(trip.date, trip.endDate)}
+🌐 Access URL: ${window.location.origin}/trips/?code=${tripCodeData.code}
+
+Simply visit the website and enter your code to access trip details, itinerary, and updates.
+
+Best regards,
+Wolthers & Associates
+Coffee Travel Specialists`;
+
+    // Create mailto link
+    const emails = trip.partnerEmails.join(',');
+    const mailtoLink = `mailto:${emails}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    
+    // Open email client
+    window.open(mailtoLink);
+    
+    showToast('Email client opened with trip code details', 'info');
+}
+
+// View trip details (close modal and show trip)
+function viewTripDetails() {
+    hideTripCodeModal();
+    
+    // Show trip details in trip modal
+    if (window.currentTripCodeData) {
+        const { trip } = window.currentTripCodeData;
+        trips.showTripDetails(trip);
+    }
 } 

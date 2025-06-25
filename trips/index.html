@@ -615,6 +615,133 @@
         </div>
     </div>
 
+    <!-- Trip Code Success Modal -->
+    <div id="tripCodeModal" class="modal" style="display: none;" role="dialog" aria-labelledby="trip-code-title" aria-modal="true">
+        <div class="modal-backdrop" onclick="hideTripCodeModal()" aria-label="Close trip code modal"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="trip-code-title" class="modal-title">🎉 Trip Created Successfully!</h2>
+                <button class="close-btn" onclick="hideTripCodeModal()" aria-label="Close trip code modal">
+                    <span class="close-icon">×</span>
+                </button>
+            </div>
+            
+            <div class="trip-code-content">
+                <!-- AI-Generated Trip Code Display -->
+                <div class="trip-code-section">
+                    <div class="trip-code-header">
+                        <h3>🤖 AI-Generated Trip Code</h3>
+                        <p class="trip-code-subtitle">Unique access code for your trip participants</p>
+                    </div>
+                    
+                    <div class="trip-code-display">
+                        <div class="trip-code-main">
+                            <span id="generatedTripCode" class="trip-code-text">MITSUI-SMITH-Jan24</span>
+                            <button class="copy-code-btn" onclick="copyTripCode()" title="Copy to clipboard">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                                    <path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"/>
+                                    <path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"/>
+                                </svg>
+                            </button>
+                        </div>
+                        
+                        <!-- Code Components Breakdown -->
+                        <div class="trip-code-breakdown">
+                            <div class="code-component">
+                                <span class="component-label">Company:</span>
+                                <span class="component-value" id="codeCompanyPart">MITSUI</span>
+                            </div>
+                            <div class="code-component">
+                                <span class="component-label">Guest:</span>
+                                <span class="component-value" id="codeGuestPart">SMITH</span>
+                            </div>
+                            <div class="code-component">
+                                <span class="component-label">Date:</span>
+                                <span class="component-value" id="codeDatePart">Jan24</span>
+                            </div>
+                            <div class="code-component" id="codeSuffixComponent" style="display: none;">
+                                <span class="component-label">ID:</span>
+                                <span class="component-value" id="codeSuffixPart">01</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- QR Code Section -->
+                <div class="qr-code-section">
+                    <div class="qr-code-header">
+                        <h3>📱 QR Code</h3>
+                        <p>Scannable code for easy access</p>
+                    </div>
+                    <div class="qr-code-display">
+                        <div class="qr-code-container">
+                            <img id="tripQRCode" src="" alt="Trip QR Code" class="qr-code-image">
+                        </div>
+                        <div class="qr-code-info">
+                            <p class="qr-url" id="tripQRUrl">trips.wolthers.com/trips/?code=MITSUI-SMITH-Jan24</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Trip Summary -->
+                <div class="trip-summary-section">
+                    <div class="trip-summary-header">
+                        <h3>📋 Trip Summary</h3>
+                    </div>
+                    <div class="trip-summary-grid">
+                        <div class="summary-item">
+                            <span class="summary-label">Title:</span>
+                            <span class="summary-value" id="summaryTripTitle">Brazil Coffee Origins Tour</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Dates:</span>
+                            <span class="summary-value" id="summaryTripDates">Jan 15-22, 2024</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Participants:</span>
+                            <span class="summary-value" id="summaryTripGuests">John Smith, Sarah Johnson</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Company:</span>
+                            <span class="summary-value" id="summaryTripCompany">Mitsui & Co</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="trip-code-actions">
+                    <button class="btn btn-secondary" onclick="printTripCode()">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M5.75 0a.75.75 0 01.75.75V3h3.5V.75a.75.75 0 111.5 0V3h1.5A1.75 1.75 0 0114.75 4.75v3a.75.75 0 01-.75.75h-1.5v4.75A1.75 1.75 0 0110.75 15h-5.5A1.75 1.75 0 013.5 13.25V8.5H2a.75.75 0 01-.75-.75v-3A1.75 1.75 0 012.75 3H4.25V.75A.75.75 0 015.75 0zm-.25 8.5v4.75c0 .138.112.25.25.25h5.5a.25.25 0 00.25-.25V8.5H5.5zm6.5-4v1.5h1.25a.25.25 0 00.25-.25v-1a.25.25 0 00-.25-.25H12zm-7.5 0H2.75a.25.25 0 00-.25.25v1c0 .138.112.25.25.25H4.5V4.5z"/>
+                        </svg>
+                        Print Details
+                    </button>
+                    
+                    <button class="btn btn-secondary" onclick="emailTripCode()">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M1.75 2A1.75 1.75 0 000 3.75v8.5C0 13.216.784 14 1.75 14h12.5A1.75 1.75 0 0016 12.25v-8.5A1.75 1.75 0 0014.25 2H1.75zM1.5 3.75a.25.25 0 01.25-.25h12.5a.25.25 0 01.25.25v.852L8 8.309 1.5 4.602V3.75zm0 1.356l6.5 3.711 6.5-3.711v6.843a.25.25 0 01-.25.25H1.75a.25.25 0 01-.25-.25V5.106z"/>
+                        </svg>
+                        Email to Participants
+                    </button>
+                    
+                    <button class="btn btn-primary" onclick="viewTripDetails()">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M8 2a6 6 0 110 12A6 6 0 018 2zm-.5 9.25a.75.75 0 101.5 0V7.75a.75.75 0 10-1.5 0v3.5zM8 6.75a.75.75 0 100-1.5.75.75 0 000 1.5z"/>
+                        </svg>
+                        View Trip Details
+                    </button>
+                    
+                    <button class="btn btn-success" onclick="hideTripCodeModal()">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"/>
+                        </svg>
+                        Done
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Loading Spinner -->
     <div id="loadingSpinner" class="loading-spinner" style="display: none;" role="status" aria-label="Loading">
         <div class="spinner"></div>
