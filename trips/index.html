@@ -342,18 +342,24 @@
         
                  /* Trip Info Styling */
          .trip-info {
-             max-width: 160px;
+             width: 140px;
+             max-width: 140px;
+             min-width: 140px;
              vertical-align: top;
+             padding: 8px 6px;
+             overflow: hidden;
          }
          
          .trip-link {
              color: #2C5530;
              text-decoration: none;
              display: block;
-             padding: 6px 8px;
-             border-radius: 6px;
+             padding: 4px 6px;
+             border-radius: 4px;
              transition: all 0.2s ease;
              border: 1px solid transparent;
+             font-size: 0.85em;
+             line-height: 1.2;
          }
          
          .trip-link:hover {
@@ -365,22 +371,44 @@
          
          .trip-name {
              font-weight: 500;
-             font-size: 0.875em;
-             line-height: 1.3;
-             margin-bottom: 2px;
+             font-size: 0.8em;
+             line-height: 1.2;
+             margin-bottom: 1px;
+             white-space: nowrap;
+             overflow: hidden;
+             text-overflow: ellipsis;
          }
          
          .trip-date {
              color: #757575;
-             font-size: 0.75em;
-             line-height: 1.2;
+             font-size: 0.7em;
+             line-height: 1.1;
+             white-space: nowrap;
          }
          
          .no-trip {
              color: #999;
              font-style: italic;
-             font-size: 0.875em;
+             font-size: 0.8em;
+             text-align: center;
+             padding: 8px 4px;
          }
+         
+         /* Table column width fixes */
+         #modalVehiclesTable {
+             table-layout: fixed;
+             width: 100%;
+         }
+         
+         #modalVehiclesTable th:nth-child(1) { width: 180px; } /* Fleet */
+         #modalVehiclesTable th:nth-child(2) { width: 100px; } /* License */
+         #modalVehiclesTable th:nth-child(3) { width: 90px; }  /* Mileage */
+         #modalVehiclesTable th:nth-child(4) { width: 90px; }  /* Status */
+         #modalVehiclesTable th:nth-child(5) { width: 90px; }  /* Insurance */
+         #modalVehiclesTable th:nth-child(6) { width: 90px; }  /* Revision */
+         #modalVehiclesTable th:nth-child(7) { width: 140px; } /* Last Trip */
+         #modalVehiclesTable th:nth-child(8) { width: 140px; } /* Next Trip */
+         #modalVehiclesTable th:nth-child(9) { width: 80px; }  /* Actions */
          
          @media (prefers-color-scheme: dark) {
              .trip-link {
@@ -1197,7 +1225,7 @@
         <div class="modal-content fluent-modal-content" style="background: #23272b; color: #e6edf3; border: 1px solid #2d3136;">
             <div class="fluent-modal-header">
                 <div class="fluent-header-content">
-                    <h1 id="vehicle-management-title" class="fluent-modal-title">Vehicle Management</h1>
+                    <h1 id="vehicle-management-title" class="fluent-modal-title">Fleet Management</h1>
                     <p class="fluent-modal-subtitle">Manage fleet vehicles, maintenance, and driver logs</p>
                 </div>
                 <button class="fluent-close-btn" onclick="hideVehicleManagementModal()" aria-label="Close vehicle management">
@@ -1279,7 +1307,7 @@
                             <thead>
                                 <tr>
                                     <th class="fluent-th-sortable" data-sort="vehicle">
-                                        <span>Vehicle</span>
+                                        <span>Fleet</span>
                                         <svg width="12" height="12" viewBox="0 0 12 12" class="fluent-sort-icon">
                                             <path d="M6 2L4.5 3.5h3L6 2zM6 10l1.5-1.5h-3L6 10z"/>
                                         </svg>
