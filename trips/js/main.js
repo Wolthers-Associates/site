@@ -1747,6 +1747,7 @@ const EnhancedTripCreation = {
 
     // Initialize the enhanced trip creation system
     initialize() {
+        console.log('🚀 Initializing Enhanced Trip Creation System...');
         this.setupEventHandlers();
         this.loadVehicles();
         this.loadStaff();
@@ -1754,6 +1755,7 @@ const EnhancedTripCreation = {
         // Show initial availability messages
         this.checkVehicleAvailability(null, null);
         this.checkStaffAvailability(null, null);
+        console.log('✅ Enhanced Trip Creation System initialized');
     },
 
     // Set up all event handlers
@@ -1893,6 +1895,7 @@ const EnhancedTripCreation = {
 
         if (!container) return;
 
+        // Hide loading message and show the selection interface
         if (loadingMessage) loadingMessage.style.display = 'none';
         if (selectionContainer) selectionContainer.style.display = 'block';
 
@@ -1908,6 +1911,8 @@ const EnhancedTripCreation = {
                 <div class="vehicle-status ${vehicle.status}">${vehicle.status}</div>
             </div>
         `).join('');
+
+        console.log(`✅ Displayed ${vehicles.length} vehicles`);
     },
 
     selectVehicle(vehicleId) {
@@ -2072,6 +2077,7 @@ const EnhancedTripCreation = {
 
         if (!container) return;
 
+        // Hide loading message and show the selection interface
         if (loadingMessage) loadingMessage.style.display = 'none';
         if (selectionContainer) selectionContainer.style.display = 'block';
 
@@ -2089,6 +2095,8 @@ const EnhancedTripCreation = {
                 </div>
             </div>
         `).join('');
+
+        console.log(`✅ Displayed ${staff.length} staff members`);
     },
 
     selectStaff(staffId) {

@@ -789,11 +789,11 @@
                         <div class="form-group">
                             <label for="vehicleManagement">Vehicle & Driver Management:</label>
                             <div id="vehicleLoadingMessage" class="loading-message">Loading available vehicles...</div>
-                            <div id="vehicleSelectionContainer" style="display: none;">
-                                <div id="vehicleAvailabilityInfo" class="availability-info"></div>
+                            <div id="vehicleSelectionContainer" style="display: block;">
+                                <div id="vehicleAvailabilityInfo" class="availability-info">📅 Dates will be set from itinerary processing</div>
                                 <div id="selectedVehiclesList" class="selected-vehicles-list"></div>
-                                <div id="availableVehiclesList" class="available-vehicles-list"></div>
-                                <button type="button" id="addVehicleBtn" class="btn btn-secondary" style="margin-top: 10px;">+ Add Another Vehicle</button>
+                                <button type="button" id="addVehicleBtn" class="btn btn-secondary" style="margin-top: 10px; margin-bottom: 10px;">+ Select Vehicles</button>
+                                <div id="availableVehiclesList" class="available-vehicles-list" style="display: none;"></div>
                             </div>
                             <div class="input-help">Select vehicles and assign drivers. For multiple drivers per vehicle, separate names with commas (e.g., "Carlos Silva, Maria Santos")</div>
                         </div>
@@ -803,12 +803,12 @@
                     <div class="form-row full">
                         <div class="form-group">
                             <label for="wolthersStaff">Wolthers Staff Attending:</label>
-                            <div id="staffLoadingMessage" class="loading-message">Please select trip dates to check staff availability...</div>
-                            <div id="staffSelectionContainer" style="display: none;">
-                                <div id="staffAvailabilityInfo" class="availability-info"></div>
-                                <div id="staffList" class="staff-list"></div>
+                            <div id="staffLoadingMessage" class="loading-message">Loading Wolthers staff...</div>
+                            <div id="staffSelectionContainer" style="display: block;">
+                                <div id="staffAvailabilityInfo" class="availability-info">📅 Dates will be set from itinerary processing</div>
                                 <div id="selectedStaffList" class="selected-staff-list"></div>
-                                <button type="button" id="addStaffBtn" class="btn btn-secondary" style="margin-top: 10px;">+ Add Staff Member</button>
+                                <button type="button" id="addStaffBtn" class="btn btn-secondary" style="margin-top: 10px; margin-bottom: 10px;">+ Select Staff</button>
+                                <div id="staffList" class="staff-list" style="display: none;"></div>
                             </div>
                             <div class="input-help">
                                 Select staff and define their attendance periods. Staff can join for full trip or partial periods (e.g., Day 1-3, then another staff member Day 3-7).

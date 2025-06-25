@@ -5820,6 +5820,69 @@ body {
 }
 
 /* Staff Management with Partial Attendance */
+.staff-list {
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 10px;
+    background: white;
+}
+
+.staff-member {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.staff-member:hover {
+    background: #f8f9fa;
+}
+
+.staff-member.unavailable {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.staff-checkbox {
+    margin-right: 12px;
+}
+
+.staff-info {
+    flex: 1;
+}
+
+.staff-name {
+    font-weight: 500;
+    color: var(--dark-green);
+}
+
+.staff-department {
+    font-size: 0.85rem;
+    color: #6c757d;
+    margin-top: 2px;
+}
+
+.staff-availability {
+    font-size: 0.8rem;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-weight: 500;
+}
+
+.staff-availability.available {
+    background: #d4edda;
+    color: #155724;
+}
+
+.staff-availability.busy {
+    background: #f8d7da;
+    color: #721c24;
+}
+
 .selected-staff-list {
     margin-bottom: 15px;
 }
