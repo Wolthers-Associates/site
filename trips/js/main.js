@@ -971,6 +971,14 @@ document.addEventListener('DOMContentLoaded', async function() {
     console.log('👤 Regular Login: Wolthers team emails (daniel@wolthers.com, svenn@wolthers.com, tom@wolthers.com, rasmus@wolthers.com) / any password');
     console.log('🔑 Trip Codes: BRAZIL2025, COLOMBIA2025, ETHIOPIA2025');
     
+    // Remove logout success message from URL parameters (from Microsoft OAuth logout redirect)
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('logout') || urlParams.has('post_logout_redirect_uri') || window.location.search.includes('logout')) {
+        // Clean the URL without the logout parameters
+        const newUrl = window.location.origin + window.location.pathname;
+        window.history.replaceState({}, document.title, newUrl);
+    }
+    
     // Initialize Microsoft Authentication
     try {
         const configResponse = await fetch('/api/auth/microsoft-config.php');
@@ -1591,7 +1599,7 @@ function loadModalUsersList() {
                 </td>
                 <td class="fluent-member-since">${formatTableDate(user.memberSince)}</td>
                 <td class="fluent-trip-count">${tripCount}</td>
-                <td class="fluent-last-trip">${formatLastTrip(lastTrip)}</td>
+                <td class="fluent-last-login">${user.lastLoginDisplay || 'Never'}</td>
                 <td class="fluent-upcoming-trip">${formatUpcomingTrip(upcomingTrip)}</td>
                 <td class="fluent-actions">
                     <div class="fluent-action-buttons">
@@ -2553,11 +2561,9 @@ function sortUserTable(column) {
                 aValue = aTrips.count;
                 bValue = bTrips.count;
                 break;
-            case 'lastTrip':
-                const aLastTrip = getUserTripsData(a).lastTrip;
-                const bLastTrip = getUserTripsData(b).lastTrip;
-                aValue = aLastTrip ? new Date(aLastTrip.endDate || aLastTrip.date) : new Date(0);
-                bValue = bLastTrip ? new Date(bLastTrip.endDate || bLastTrip.date) : new Date(0);
+            case 'lastLogin':
+                aValue = a.lastLogin ? new Date(a.lastLogin) : new Date(0);
+                bValue = b.lastLogin ? new Date(b.lastLogin) : new Date(0);
                 break;
             case 'upcomingTrip':
                 const aUpcoming = getUserTripsData(a).upcomingTrip;
@@ -2623,7 +2629,7 @@ function renderFilteredUsers(users) {
                 </td>
                 <td class="fluent-member-since">${formatTableDate(user.memberSince)}</td>
                 <td class="fluent-trip-count">${tripCount}</td>
-                <td class="fluent-last-trip">${formatLastTrip(lastTrip)}</td>
+                <td class="fluent-last-login">${user.lastLoginDisplay || 'Never'}</td>
                 <td class="fluent-upcoming-trip">${formatUpcomingTrip(upcomingTrip)}</td>
                 <td class="fluent-actions">
                     <div class="fluent-action-buttons">

@@ -35,7 +35,7 @@ try {
         $isAdmin = true;
     }
     
-    // Query to get all users with basic information
+    // Query to get all users with basic information including last login (converted to Brazil timezone)
     $query = "
         SELECT 
             id,
@@ -46,7 +46,14 @@ try {
             status,
             created_at,
             updated_at,
-            office365_id IS NOT NULL as has_office365
+            last_login_at,
+            login_attempts,
+            office365_id,
+            office365_id IS NOT NULL as has_office365,
+            CASE 
+                WHEN last_login_at IS NOT NULL THEN CONVERT_TZ(last_login_at, '+00:00', '-03:00')
+                ELSE NULL
+            END as last_login_brazil_time
         FROM users 
         WHERE status = 'active'
         ORDER BY 
@@ -76,6 +83,10 @@ try {
             'avatar' => strtoupper(substr($user['name'], 0, 1)),
             'memberSince' => date('Y-m-d', strtotime($user['created_at'])),
             'lastActive' => date('c', strtotime($user['updated_at'])),
+            'lastLogin' => $user['last_login_brazil_time'] ? date('c', strtotime($user['last_login_brazil_time'])) : null,
+            'lastLoginDisplay' => $user['last_login_brazil_time'] ? date('M j, Y \a\t g:i A', strtotime($user['last_login_brazil_time'])) : 'Never',
+            'loginAttempts' => (int)$user['login_attempts'],
+            'office365Id' => $user['office365_id'],
             'isWolthersTeam' => strpos($user['email'], '@wolthers.com') !== false,
             'status' => $user['status'],
             'authMethods' => $user['has_office365'] ? ['office365'] : ['email'],
@@ -108,7 +119,8 @@ try {
             'database_source' => true,
             'last_updated' => date('c'),
             'current_user_id' => $currentUserId,
-            'is_admin_request' => $isAdmin
+            'is_admin_request' => $isAdmin,
+            'timezone_note' => 'Login times converted to Brazil time (UTC-3)'
         ]
     ]);
     
