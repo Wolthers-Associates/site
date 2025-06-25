@@ -1266,6 +1266,156 @@
         </div>
     </div>
 
+    <!-- Add Vehicle Modal -->
+    <div id="addVehicleModal" class="modal fluent-modal" style="display: none;" role="dialog" aria-labelledby="add-vehicle-title" aria-modal="true">
+        <div class="modal-backdrop" onclick="hideAddVehicleModal()"></div>
+        <div class="modal-content fluent-modal-content-small">
+            <div class="fluent-modal-header">
+                <div class="fluent-header-content">
+                    <h1 id="add-vehicle-title" class="fluent-modal-title">Add New Vehicle</h1>
+                    <p class="fluent-modal-subtitle">Add a new vehicle to your fleet</p>
+                </div>
+                <button class="fluent-close-btn" onclick="hideAddVehicleModal()">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M11.41 10l4.3-4.29a1 1 0 10-1.42-1.42L10 8.59l-4.29-4.3a1 1 0 00-1.42 1.42L8.59 10l-4.3 4.29a1 1 0 001.42 1.42L10 11.41l4.29 4.3a1 1 0 001.42-1.42L11.41 10z"/>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="fluent-modal-body-form">
+                <form id="addVehicleForm" class="fluent-form">
+                    <div class="fluent-form-section">
+                        <!-- Basic Vehicle Information -->
+                        <div class="fluent-form-row">
+                            <div class="fluent-form-group">
+                                <label for="vehicleMake" class="fluent-label">Make *</label>
+                                <input type="text" id="vehicleMake" class="fluent-input" placeholder="e.g., Toyota, Chevrolet, Ford" required>
+                            </div>
+                            <div class="fluent-form-group">
+                                <label for="vehicleModel" class="fluent-label">Model *</label>
+                                <input type="text" id="vehicleModel" class="fluent-input" placeholder="e.g., Hilux, S10, Ranger" required>
+                            </div>
+                        </div>
+                        
+                        <div class="fluent-form-row">
+                            <div class="fluent-form-group">
+                                <label for="vehicleYear" class="fluent-label">Year *</label>
+                                <input type="number" id="vehicleYear" class="fluent-input" placeholder="e.g., 2023" min="1990" max="2030" required>
+                            </div>
+                            <div class="fluent-form-group">
+                                <label for="vehicleType" class="fluent-label">Vehicle Type *</label>
+                                <select id="vehicleType" class="fluent-select" required>
+                                    <option value="">Select type</option>
+                                    <option value="suv">SUV</option>
+                                    <option value="pickup">Pickup Truck</option>
+                                    <option value="van">Van</option>
+                                    <option value="sedan">Sedan</option>
+                                    <option value="bus">Bus</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="fluent-form-row">
+                            <div class="fluent-form-group">
+                                <label for="vehicleLicense" class="fluent-label">License Plate *</label>
+                                <input type="text" id="vehicleLicense" class="fluent-input" placeholder="e.g., WOL-003" required style="text-transform: uppercase;">
+                            </div>
+                            <div class="fluent-form-group">
+                                <label for="vehicleCapacity" class="fluent-label">Capacity</label>
+                                <input type="number" id="vehicleCapacity" class="fluent-input" placeholder="e.g., 5" min="1" max="50">
+                            </div>
+                        </div>
+                        
+                        <!-- Vehicle Details -->
+                        <div class="fluent-form-row">
+                            <div class="fluent-form-group">
+                                <label for="vehicleColor" class="fluent-label">Color</label>
+                                <input type="text" id="vehicleColor" class="fluent-input" placeholder="e.g., White, Black, Silver">
+                            </div>
+                            <div class="fluent-form-group">
+                                <label for="vehicleFuelType" class="fluent-label">Fuel Type</label>
+                                <select id="vehicleFuelType" class="fluent-select">
+                                    <option value="">Select fuel type</option>
+                                    <option value="gasoline">Gasoline</option>
+                                    <option value="diesel">Diesel</option>
+                                    <option value="hybrid">Hybrid</option>
+                                    <option value="electric">Electric</option>
+                                    <option value="flex">Flex (Gasoline/Ethanol)</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="fluent-form-row">
+                            <div class="fluent-form-group">
+                                <label for="vehicleMileage" class="fluent-label">Current Mileage (km)</label>
+                                <input type="number" id="vehicleMileage" class="fluent-input" placeholder="e.g., 25000" min="0">
+                            </div>
+                            <div class="fluent-form-group">
+                                <label for="vehicleLocation" class="fluent-label">Location</label>
+                                <input type="text" id="vehicleLocation" class="fluent-input" placeholder="e.g., São Paulo Office, Bogotá">
+                            </div>
+                        </div>
+                        
+                        <!-- Insurance Information -->
+                        <div class="fluent-form-row">
+                            <div class="fluent-form-group">
+                                <label for="insuranceCompany" class="fluent-label">Insurance Company</label>
+                                <input type="text" id="insuranceCompany" class="fluent-input" placeholder="e.g., Seguros Mapfre">
+                            </div>
+                            <div class="fluent-form-group">
+                                <label for="insuranceEndDate" class="fluent-label">Insurance Expiry Date</label>
+                                <input type="date" id="insuranceEndDate" class="fluent-input">
+                            </div>
+                        </div>
+                        
+                        <!-- Revision Information -->
+                        <div class="fluent-form-row">
+                            <div class="fluent-form-group">
+                                <label for="lastRevisionDate" class="fluent-label">Last Revision Date</label>
+                                <input type="date" id="lastRevisionDate" class="fluent-input">
+                            </div>
+                            <div class="fluent-form-group">
+                                <label for="revisionInterval" class="fluent-label">Revision Interval (months)</label>
+                                <select id="revisionInterval" class="fluent-select">
+                                    <option value="">Select interval</option>
+                                    <option value="3">Every 3 months</option>
+                                    <option value="6">Every 6 months</option>
+                                    <option value="12">Every 12 months</option>
+                                    <option value="24">Every 24 months</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <!-- Vehicle Status -->
+                        <div class="fluent-form-row">
+                            <div class="fluent-form-group">
+                                <label for="vehicleStatus" class="fluent-label">Initial Status</label>
+                                <select id="vehicleStatus" class="fluent-select">
+                                    <option value="available">Available</option>
+                                    <option value="maintenance">Maintenance</option>
+                                    <option value="retired">Retired</option>
+                                </select>
+                            </div>
+                            <div class="fluent-form-group">
+                                <label for="vehicleNotes" class="fluent-label">Notes</label>
+                                <input type="text" id="vehicleNotes" class="fluent-input" placeholder="Any additional notes...">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="fluent-form-actions">
+                        <button type="button" class="fluent-btn fluent-btn-secondary" onclick="hideAddVehicleModal()">Cancel</button>
+                        <button type="submit" class="fluent-btn fluent-btn-primary" id="addVehicleSubmitBtn">
+                            <span class="btn-text">Add Vehicle</span>
+                            <div class="fluent-spinner" style="display: none;"></div>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Add User Modal -->
     <div id="addUserModal" class="modal fluent-modal" style="display: none;" role="dialog" aria-labelledby="add-user-title" aria-modal="true">
         <div class="modal-backdrop" onclick="hideAddUserModal()"></div>

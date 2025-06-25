@@ -4387,9 +4387,10 @@ body {
 }
 
 /* Error and Success States */
-.fluent-input.error {
-    border-color: #dc3545;
-    box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.1);
+.fluent-input.error,
+.fluent-input-error {
+    border-color: #dc3545 !important;
+    box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.1) !important;
 }
 
 .fluent-input.success {
@@ -4401,12 +4402,26 @@ body {
     color: #dc3545;
     font-size: 0.8rem;
     margin-top: 4px;
+    display: block;
+    font-weight: 500;
 }
 
 .fluent-success-message {
     color: #28a745;
     font-size: 0.8rem;
     margin-top: 4px;
+}
+
+@media (prefers-color-scheme: dark) {
+    .fluent-input.error,
+    .fluent-input-error {
+        border-color: #e74c3c !important;
+        box-shadow: 0 0 0 2px rgba(231, 76, 60, 0.1) !important;
+    }
+    
+    .fluent-error-message {
+        color: #e74c3c;
+    }
 }
 
 /* Status Indicators */

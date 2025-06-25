@@ -190,46 +190,63 @@ function handleCreateVehicle() {
     $input = json_decode(file_get_contents('php://input'), true);
     
     // Validate required fields
-    $required_fields = ['make', 'model', 'vehicle_type', 'capacity'];
+    $required_fields = ['make', 'model', 'year', 'vehicle_type', 'license_plate'];
     foreach ($required_fields as $field) {
         if (empty($input[$field])) {
             throw new Exception("Missing required field: $field");
         }
     }
     
+    // Check if license plate already exists
+    $license_check_sql = "SELECT id FROM vehicles WHERE license_plate = ? AND status != 'retired'";
+    $license_check_stmt = $pdo->prepare($license_check_sql);
+    $license_check_stmt->execute([$input['license_plate']]);
+    if ($license_check_stmt->fetch()) {
+        throw new Exception("License plate already exists in the system");
+    }
+    
     // Set defaults
     $input['status'] = $input['status'] ?? 'available';
-    $input['fuel_type'] = $input['fuel_type'] ?? 'gasoline';
-    $input['transmission'] = $input['transmission'] ?? 'automatic';
+    $input['fuel_type'] = $input['fuel_type'] ?? null;
+    $input['transmission'] = 'automatic'; // Default for new vehicles
     $input['current_mileage'] = $input['current_mileage'] ?? 0;
     $input['revision_interval_months'] = $input['revision_interval_months'] ?? 6;
     
     // Calculate next revision due if last revision date is provided
-    if (!empty($input['last_revision_date']) && empty($input['next_revision_due'])) {
+    if (!empty($input['last_revision_date']) && !empty($input['revision_interval_months'])) {
         $interval = $input['revision_interval_months'];
         $input['next_revision_due'] = date('Y-m-d', strtotime($input['last_revision_date'] . " +$interval months"));
     }
     
+    // Map form fields to database fields
     $sql = "INSERT INTO vehicles (
                 make, model, year, license_plate, vehicle_type, capacity, status, location,
-                color, fuel_type, transmission, engine_size, vin, purchase_date, purchase_price,
-                current_mileage, insurance_company, insurance_policy_number, insurance_start_date,
-                insurance_end_date, insurance_amount, last_revision_date, next_revision_due,
-                revision_interval_months, maintenance_start_date, maintenance_end_date,
-                maintenance_reason, notes
+                color, fuel_type, transmission, current_mileage, insurance_company, 
+                insurance_end_date, last_revision_date, next_revision_due,
+                revision_interval_months, notes
             ) VALUES (
-                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
             )";
     
     $params = [
-        $input['make'], $input['model'], $input['year'], $input['license_plate'],
-        $input['vehicle_type'], $input['capacity'], $input['status'], $input['location'],
-        $input['color'], $input['fuel_type'], $input['transmission'], $input['engine_size'],
-        $input['vin'], $input['purchase_date'], $input['purchase_price'], $input['current_mileage'],
-        $input['insurance_company'], $input['insurance_policy_number'], $input['insurance_start_date'],
-        $input['insurance_end_date'], $input['insurance_amount'], $input['last_revision_date'],
-        $input['next_revision_due'], $input['revision_interval_months'], $input['maintenance_start_date'],
-        $input['maintenance_end_date'], $input['maintenance_reason'], $input['notes']
+        $input['make'],
+        $input['model'], 
+        $input['year'], 
+        $input['license_plate'],
+        $input['vehicle_type'], 
+        $input['capacity'] ?? null, 
+        $input['status'], 
+        $input['location'] ?? null,
+        $input['color'] ?? null, 
+        $input['fuel_type'] ?? null, 
+        $input['transmission'], 
+        $input['current_mileage'],
+        $input['insurance_company'] ?? null, 
+        $input['insurance_end_date'] ?? null, 
+        $input['last_revision_date'] ?? null,
+        $input['next_revision_due'] ?? null, 
+        $input['revision_interval_months'], 
+        $input['notes'] ?? null
     ];
     
     $stmt = $pdo->prepare($sql);
@@ -237,10 +254,17 @@ function handleCreateVehicle() {
     
     $vehicle_id = $pdo->lastInsertId();
     
+    // Get the created vehicle data to return
+    $get_sql = "SELECT * FROM vehicles WHERE id = ?";
+    $get_stmt = $pdo->prepare($get_sql);
+    $get_stmt->execute([$vehicle_id]);
+    $vehicle = $get_stmt->fetch(PDO::FETCH_ASSOC);
+    
     echo json_encode([
         'success' => true,
         'message' => 'Vehicle created successfully',
-        'vehicle_id' => $vehicle_id
+        'vehicle_id' => $vehicle_id,
+        'vehicle' => $vehicle
     ]);
 }
 
