@@ -1130,6 +1130,106 @@ const calendar = {
 
 // Trip Management Functions
 const trips = {
+    // Load vehicles for simple dropdown
+    loadVehicles: () => {
+        const vehicleSelect = document.getElementById('vehicles');
+        if (!vehicleSelect) return;
+
+        // Try to load from API first
+        fetch('api/vehicles/list.php')
+            .then(response => response.json())
+            .then(data => {
+                vehicleSelect.innerHTML = '';
+                if (data.success && data.vehicles) {
+                    data.vehicles.forEach(vehicle => {
+                        const option = document.createElement('option');
+                        option.value = vehicle.id;
+                        option.textContent = `${vehicle.make} ${vehicle.model} (${vehicle.license_plate})`;
+                        vehicleSelect.appendChild(option);
+                    });
+                }
+            })
+            .catch(error => {
+                console.log('API not available, using mock data');
+                // Mock vehicle data
+                const mockVehicles = [
+                    { id: 1, make: 'Toyota', model: 'Land Cruiser', license_plate: 'ABC-123' },
+                    { id: 2, make: 'Ford', model: 'Transit', license_plate: 'DEF-456' },
+                    { id: 3, make: 'Chevrolet', model: 'Suburban', license_plate: 'GHI-789' },
+                    { id: 4, make: 'Nissan', model: 'Patrol', license_plate: 'JKL-012' }
+                ];
+                
+                vehicleSelect.innerHTML = '';
+                mockVehicles.forEach(vehicle => {
+                    const option = document.createElement('option');
+                    option.value = vehicle.id;
+                    option.textContent = `${vehicle.make} ${vehicle.model} (${vehicle.license_plate})`;
+                    vehicleSelect.appendChild(option);
+                });
+            });
+    },
+
+    // Load staff for simple dropdown
+    loadStaffAvailability: () => {
+        const staffSelect = document.getElementById('wolthersStaff');
+        const staffContainer = document.getElementById('staffSelectionContainer');
+        const loadingMessage = document.getElementById('staffLoadingMessage');
+
+        if (!staffSelect || !staffContainer || !loadingMessage) return;
+
+        // Try to load from API first
+        fetch('api/staff/availability.php')
+            .then(response => response.json())
+            .then(data => {
+                loadingMessage.style.display = 'none';
+                staffContainer.style.display = 'block';
+                
+                staffSelect.innerHTML = '';
+                if (data.success && data.staff) {
+                    data.staff.forEach(staff => {
+                        const option = document.createElement('option');
+                        option.value = staff.id;
+                        option.textContent = `${staff.name} (${staff.department})`;
+                        staffSelect.appendChild(option);
+                    });
+                    
+                    // Show availability info
+                    const availabilityInfo = document.getElementById('staffAvailabilityInfo');
+                    if (availabilityInfo) {
+                        availabilityInfo.textContent = `${data.staff.length} staff members available`;
+                    }
+                }
+            })
+            .catch(error => {
+                console.log('API not available, using mock data');
+                // Mock staff data
+                const mockStaff = [
+                    { id: 1, name: 'Daniel Wolthers', department: 'Management' },
+                    { id: 2, name: 'Christian Wolthers', department: 'Operations' },
+                    { id: 3, name: 'Svenn Wolthers', department: 'Business Development' },
+                    { id: 4, name: 'Patricia Arakaki', department: 'Operations' },
+                    { id: 5, name: 'Anderson Nunes', department: 'Logistics' }
+                ];
+                
+                loadingMessage.style.display = 'none';
+                staffContainer.style.display = 'block';
+                
+                staffSelect.innerHTML = '';
+                mockStaff.forEach(staff => {
+                    const option = document.createElement('option');
+                    option.value = staff.id;
+                    option.textContent = `${staff.name} (${staff.department})`;
+                    staffSelect.appendChild(option);
+                });
+                
+                // Show availability info
+                const availabilityInfo = document.getElementById('staffAvailabilityInfo');
+                if (availabilityInfo) {
+                    availabilityInfo.textContent = `${mockStaff.length} staff members available`;
+                }
+            });
+    },
+
     // Load and display trips
     loadTrips: () => {
         utils.showLoading();
@@ -1186,7 +1286,7 @@ const trips = {
         }
     },
 
-    // Create new trip with AI-generated codes and real staff/vehicle assignments
+    // Create new trip with simple form data
     createTrip: async (formData) => {
         utils.showLoading();
         
@@ -1198,11 +1298,18 @@ const trips = {
             const partnerEmails = partnerEmailsText ? 
                 partnerEmailsText.split('\n').map(e => e.trim()).filter(e => e) : [];
             
-            // Get enhanced trip creation data
-            const enhancedData = EnhancedTripCreation.getCollectedData();
-            const selectedVehicles = enhancedData.vehicles || [];
-            const selectedStaff = enhancedData.staff || [];
-            const enhancedItinerary = enhancedData.itinerary || null;
+            // Get selected vehicles and staff from simple dropdowns
+            const vehicleSelect = document.getElementById('vehicles');
+            const staffSelect = document.getElementById('wolthersStaff');
+            const driverInput = document.getElementById('driver');
+            
+            const selectedVehicleIds = Array.from(vehicleSelect.selectedOptions).map(option => option.value);
+            const selectedStaffIds = Array.from(staffSelect.selectedOptions).map(option => option.value);
+            const externalDrivers = driverInput ? driverInput.value.trim() : '';
+            
+            // Get selected vehicle and staff names for display
+            const selectedVehicleNames = Array.from(vehicleSelect.selectedOptions).map(option => option.textContent);
+            const selectedStaffNames = Array.from(staffSelect.selectedOptions).map(option => option.textContent);
             
             // Extract company name from partner emails (smart detection)
             let companyName = '';
@@ -1211,17 +1318,26 @@ const trips = {
                 companyName = trips.extractCompanyFromEmail(emailDomain);
             }
             
-            // Get dates from form fields
-            const startDate = formData.get('startDate');
-            const endDate = formData.get('endDate');
+            // Auto-generate dates from itinerary if available
+            const itineraryText = formData.get('itinerary') || '';
+            let startDate = null;
+            let endDate = null;
             
-            // Validate dates
-            if (!startDate || !endDate) {
-                throw new Error('Please select both start and end dates');
+            if (itineraryText) {
+                const extractedDates = trips.extractDatesFromItinerary(itineraryText);
+                startDate = extractedDates.startDate;
+                endDate = extractedDates.endDate;
             }
             
-            if (new Date(startDate) >= new Date(endDate)) {
-                throw new Error('End date must be after start date');
+            // If no dates extracted, use default 7-day trip starting tomorrow
+            if (!startDate || !endDate) {
+                const tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                startDate = tomorrow.toISOString().split('T')[0];
+                
+                const endDateObj = new Date(tomorrow);
+                endDateObj.setDate(endDateObj.getDate() + 6); // 7-day trip
+                endDate = endDateObj.toISOString().split('T')[0];
             }
 
             // 🤖 Generate AI Trip Code
@@ -1237,21 +1353,7 @@ const trips = {
                 .replace(/[^a-z0-9\s]/g, '')
                 .replace(/\s+/g, '-') + '-2025';
 
-            // Format vehicles for display
-            const vehicleDisplayNames = selectedVehicles.map(v => {
-                const drivers = v.drivers ? ` (${v.drivers})` : '';
-                return `${v.name} ${v.license}${drivers}`;
-            });
-
-            // Format staff for display
-            const staffDisplayNames = selectedStaff.map(s => {
-                const attendance = s.attendanceType === 'partial' 
-                    ? ` (Day ${s.startDay}-${s.endDay})`
-                    : '';
-                return `${s.name} - ${s.customRole}${attendance}`;
-            });
-
-            // Create new trip object with enhanced data
+            // Create new trip object with simple data
             const newTrip = {
                 id: tripId,
                 title: tripTitle,
@@ -1259,10 +1361,6 @@ const trips = {
                 date: startDate,
                 endDate: endDate,
                 guests: guestName,
-                // Enhanced vehicle and staff data
-                vehicleAssignments: selectedVehicles,
-                staffAssignments: selectedStaff,
-                enhancedItinerary: enhancedItinerary,
                 status: 'upcoming',
                 partnerEmails: partnerEmails,
                 partnerCodes: [tripCodeData.code],
@@ -1273,11 +1371,16 @@ const trips = {
                 // Trip code metadata
                 tripCodeData: tripCodeData,
                 companyName: companyName,
+                // Simple vehicle and staff data
+                selectedVehicleIds: selectedVehicleIds,
+                selectedStaffIds: selectedStaffIds,
+                externalDrivers: externalDrivers,
+                itinerary: itineraryText,
                 // Formatted display for compatibility with existing UI
-                cars: vehicleDisplayNames.length > 0 ? vehicleDisplayNames.join(', ') : 'TBD',
-                driver: trips.formatDriversDisplay(selectedVehicles),
-                wolthersStaff: staffDisplayNames.length > 0 ? staffDisplayNames.join(', ') : 'TBD',
-                wolthersGuide: selectedStaff.length > 0 ? selectedStaff[0].name : currentUser.name
+                cars: selectedVehicleNames.length > 0 ? selectedVehicleNames.join(', ') : 'TBD',
+                driver: externalDrivers || 'Wolthers Staff',
+                wolthersStaff: selectedStaffNames.length > 0 ? selectedStaffNames.join(', ') : 'TBD',
+                wolthersGuide: selectedStaffNames.length > 0 ? selectedStaffNames[0].split(' (')[0] : currentUser.name
             };
             
             // Simulate API delay for realism
@@ -1288,10 +1391,8 @@ const trips = {
             utils.hideLoading();
             ui.hideAddTripModal();
                 
-                // Reset enhanced trip creation state
-                EnhancedTripCreation.selectedVehicles = [];
-                EnhancedTripCreation.selectedStaff = [];
-                EnhancedTripCreation.currentItinerary = null;
+                // Reset form
+                document.getElementById('addTripForm').reset();
                 
                 // 🎉 Show Trip Code Success Modal
                 trips.showTripCodeModal(newTrip);
@@ -1299,12 +1400,13 @@ const trips = {
                 // Refresh display in background
                 trips.loadTrips();
                 
-                console.log('✅ Enhanced trip created successfully:', {
+                console.log('✅ Trip created successfully:', {
                     title: newTrip.title,
-                    vehicles: selectedVehicles.length,
-                    staff: selectedStaff.length,
-                    hasItinerary: !!enhancedItinerary,
-                    enhancedData: enhancedData
+                    vehicles: selectedVehicleIds.length,
+                    staff: selectedStaffIds.length,
+                    hasItinerary: !!itineraryText,
+                    startDate: startDate,
+                    endDate: endDate
                 });
         }, 1500);
             
@@ -1313,6 +1415,39 @@ const trips = {
             utils.hideLoading();
             utils.showNotification('Failed to create trip. Please try again.', 'error');
         }
+    },
+
+    // Extract dates from itinerary text
+    extractDatesFromItinerary: (itinerary) => {
+        const datePatterns = [
+            /(\d{1,2}\/\d{1,2}\/\d{4})/g,      // MM/DD/YYYY or M/D/YYYY
+            /(\d{4}-\d{1,2}-\d{1,2})/g,        // YYYY-MM-DD
+            /(January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2},?\s+\d{4}/gi,
+            /(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+\d{1,2},?\s+\d{4}/gi
+        ];
+        
+        const dates = [];
+        datePatterns.forEach(pattern => {
+            const matches = itinerary.match(pattern);
+            if (matches) {
+                matches.forEach(match => {
+                    const date = new Date(match);
+                    if (!isNaN(date.getTime())) {
+                        dates.push(date);
+                    }
+                });
+            }
+        });
+        
+        if (dates.length === 0) {
+            return { startDate: null, endDate: null };
+        }
+        
+        dates.sort((a, b) => a - b);
+        const startDate = dates[0].toISOString().split('T')[0];
+        const endDate = dates[dates.length - 1].toISOString().split('T')[0];
+        
+        return { startDate, endDate };
     },
 
     // Extract company name from email domain
@@ -1648,12 +1783,18 @@ document.addEventListener('DOMContentLoaded', async function() {
         trips.createTrip(new FormData(this));
     });
 
-    // Enhanced Trip Creation Modal Initialization
+    // Trip Creation Modal Initialization
     window.showAddTripModal = () => {
         ui.showAddTripModal();
         
-        // Initialize enhanced trip creation system
-        EnhancedTripCreation.initialize();
+        // Load vehicles when modal opens
+        trips.loadVehicles();
+        
+        // Initialize staff assignments array
+        window.selectedStaffAssignments = [];
+        
+        // Load staff availability
+        trips.loadStaffAvailability();
     };
     
     // Modal click handlers

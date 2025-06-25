@@ -723,8 +723,8 @@ body {
     background: white;
     border-radius: 12px;
     padding: 0;
-    width: 90%;
-    max-width: 500px;
+    width: 95%;
+    max-width: 900px;
     max-height: 90vh;
     overflow-y: auto;
     position: relative;
@@ -6295,5 +6295,56 @@ body {
     .remove-staff-btn {
         position: static;
         align-self: flex-end;
+    }
+}
+
+/* ==============================================================================
+   SIMPLE MULTI-SELECT DROPDOWN STYLES
+   ============================================================================ */
+
+/* Multi-select dropdown styling */
+select[multiple] {
+    min-height: 120px;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 8px;
+}
+
+select[multiple] option {
+    padding: 8px;
+    border-bottom: 1px solid #f0f0f0;
+    cursor: pointer;
+}
+
+select[multiple] option:hover {
+    background: #f8f9fa;
+}
+
+select[multiple] option:checked {
+    background: var(--dark-green);
+    color: white;
+}
+
+@media (prefers-color-scheme: dark) {
+    select[multiple] {
+        background: #2d2d2d;
+        border-color: #555;
+        color: white;
+    }
+    
+    select[multiple] option {
+        background: #2d2d2d;
+        color: white;
+        border-bottom-color: #444;
+    }
+    
+    select[multiple] option:hover {
+        background: #3d3d3d;
+    }
+    
+    select[multiple] option:checked {
+        background: var(--medium-green);
+        color: white;
     }
 }

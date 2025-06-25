@@ -764,16 +764,7 @@
                         </div>
                     </div>
 
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="startDate">Start Date:</label>
-                            <input type="date" id="startDate" name="startDate" class="form-input" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="endDate">End Date:</label>
-                            <input type="date" id="endDate" name="endDate" class="form-input" required>
-                        </div>
-                    </div>
+                    <!-- Dates will be automatically extracted from itinerary -->
 
 
 
@@ -784,36 +775,34 @@
                         </div>
                     </div>
 
-                    <!-- Enhanced Vehicle & Driver Management -->
-                    <div class="form-row full">
+                    <!-- Simple Vehicle Selection -->
+                    <div class="form-row">
                         <div class="form-group">
-                            <label for="vehicleManagement">Vehicle & Driver Management:</label>
-                            <div id="vehicleLoadingMessage" class="loading-message">Loading available vehicles...</div>
-                            <div id="vehicleSelectionContainer" style="display: block;">
-                                <div id="vehicleAvailabilityInfo" class="availability-info">📅 Dates will be set from itinerary processing</div>
-                                <div id="selectedVehiclesList" class="selected-vehicles-list"></div>
-                                <button type="button" id="addVehicleBtn" class="btn btn-secondary" style="margin-top: 10px; margin-bottom: 10px;">+ Select Vehicles</button>
-                                <div id="availableVehiclesList" class="available-vehicles-list" style="display: none;"></div>
-                            </div>
-                            <div class="input-help">Select vehicles and assign drivers. For multiple drivers per vehicle, separate names with commas (e.g., "Carlos Silva, Maria Santos")</div>
+                            <label for="vehicles">Vehicle(s):</label>
+                            <select id="vehicles" class="form-input" multiple>
+                                <option value="">Loading vehicles...</option>
+                            </select>
+                            <div class="input-help">Hold Ctrl (Windows) or Cmd (Mac) to select multiple vehicles</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="driver">External Driver(s):</label>
+                            <input type="text" id="driver" class="form-input" placeholder="e.g., Carlos Silva, Maria Santos (comma-separated)">
+                            <div class="input-help">Leave blank if Wolthers staff will drive. For multiple drivers, separate with commas.</div>
                         </div>
                     </div>
 
-                    <!-- Enhanced Staff Management with Partial Attendance -->
+                    <!-- Simple Staff Selection -->
                     <div class="form-row full">
                         <div class="form-group">
                             <label for="wolthersStaff">Wolthers Staff Attending:</label>
-                            <div id="staffLoadingMessage" class="loading-message">Loading Wolthers staff...</div>
-                            <div id="staffSelectionContainer" style="display: block;">
-                                <div id="staffAvailabilityInfo" class="availability-info">📅 Dates will be set from itinerary processing</div>
-                                <div id="selectedStaffList" class="selected-staff-list"></div>
-                                <button type="button" id="addStaffBtn" class="btn btn-secondary" style="margin-top: 10px; margin-bottom: 10px;">+ Select Staff</button>
-                                <div id="staffList" class="staff-list" style="display: none;"></div>
+                            <div id="staffLoadingMessage" class="loading-message">Checking staff availability...</div>
+                            <div id="staffSelectionContainer" style="display: none;">
+                                <div id="staffAvailabilityInfo" class="availability-info"></div>
+                                <select id="wolthersStaff" class="form-input" multiple>
+                                    <option value="">Loading staff...</option>
+                                </select>
                             </div>
-                            <div class="input-help">
-                                Select staff and define their attendance periods. Staff can join for full trip or partial periods (e.g., Day 1-3, then another staff member Day 3-7).
-                                <br><strong>Partial Attendance Example:</strong> Daniel (Day 1-5), Christian (Day 5-10)
-                            </div>
+                            <div class="input-help">Hold Ctrl (Windows) or Cmd (Mac) to select multiple staff members. System will check for conflicts automatically.</div>
                         </div>
                     </div>
 
