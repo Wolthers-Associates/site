@@ -134,34 +134,28 @@ const auth = {
                 throw new Error('Microsoft authentication not initialized. Please check Azure AD configuration.');
             }
             
+            utils.showLoading();
             const result = await microsoftAuth.signIn();
-            if (result.success || result.user) {
-                // Extract access token from the result
-                const accessToken = result.accessToken || result.access_token;
-                
-                const response = await fetch('/api/auth/login.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        login_type: 'office365',
-                        access_token: accessToken 
-                    })
-                });
-                
-                if (response.ok) {
-                    const userData = await response.json();
-                    sessionStorage.setItem('userSession', JSON.stringify(userData));
-                    currentUser = userData.user;
-                    ui.showDashboard();
-                    await trips.loadTrips();
-                } else {
-                    const errorData = await response.json();
-                    throw new Error(errorData.error || 'Authentication failed');
-                }
+            
+            // The Microsoft auth returns data from auth-callback.html
+            // which already contains the authenticated user data
+            if (result && result.user) {
+                // The auth-callback.html already processed the Microsoft token
+                // and stored the authenticated user data
+                sessionStorage.setItem('userSession', JSON.stringify(result));
+                currentUser = result.user;
+                utils.hideLoading();
+                ui.showDashboard();
+                await trips.loadTrips();
+                utils.showNotification(`Welcome ${result.user.name}!`, 'success');
             } else {
+                utils.hideLoading();
+                console.error('Microsoft auth result:', result);
                 throw new Error('Microsoft authentication was cancelled or failed');
             }
         } catch (error) {
+            utils.hideLoading();
+            console.error('Microsoft sign-in error:', error);
             utils.showError('Microsoft sign-in failed: ' + error.message);
         }
     },
