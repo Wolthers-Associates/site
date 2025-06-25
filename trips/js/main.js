@@ -1,21 +1,10 @@
-// Development Configuration
+// Production Configuration - NO DEVELOPMENT MODE
 const CONFIG = {
-    DEVELOPMENT_MODE: true,
-    TEMP_DOMAIN: 'khaki-raccoon-228009.hostingersite.com',
-    FUTURE_DOMAIN: 'wolthers.com',
-    VERSION: '1.0.0-dev'
+    DEVELOPMENT_MODE: false,
+    DOMAIN: 'trips.wolthers.com',
+    API_BASE: '/api',
+    VERSION: '1.0.0'
 };
-
-// Mock Data - Coffee Trip Itineraries - Reset for fresh start
-const MOCK_TRIPS = [];
-
-// Mock Credentials for Testing - Reset for fresh start
-const MOCK_CREDENTIALS = {
-    emails: [],
-    codes: []
-};
-
-// Keep the enhanced user management but make it completely optional
 
 // Global Application State
 let currentUser = null;
@@ -99,591 +88,99 @@ const utils = {
 
 // Enhanced Authentication Functions
 const auth = {
-    // Initialize authentication system
+    // Real authentication only
     init: async () => {
-        auth.initializeLoginForms();
-        await auth.initializeMicrosoftAuth();
-        auth.validateExistingSession();
-    },
-
-    // Initialize form handlers
-    initializeLoginForms: () => {
-        // Initial form (step 1)
-        const initialForm = document.getElementById('initialForm');
-        if (initialForm) {
-            initialForm.addEventListener('submit', auth.handleInitialInput);
-        }
-        
-        // Password form (step 2)
-        const passwordForm = document.getElementById('passwordForm');
-        if (passwordForm) {
-            passwordForm.addEventListener('submit', auth.handlePasswordLogin);
-        }
-        
-        // Create account form (step 3)
-        const createAccountForm = document.getElementById('createAccountForm');
-        if (createAccountForm) {
-            createAccountForm.addEventListener('submit', auth.handleAccountCreation);
-        }
-        
-        // Code verification form (step 4)
-        const codeForm = document.getElementById('codeForm');
-        if (codeForm) {
-            codeForm.addEventListener('submit', auth.handleCodeVerification);
-        }
-        
-        // Setup dark mode detection for Microsoft button
-        auth.setupDarkModeDetection();
-    },
-
-    // Microsoft Auth instance
-    msAuth: null,
-
-    // Initialize Microsoft authentication
-    initializeMicrosoftAuth: async () => {
-        try {
-            // Load Azure AD configuration from backend
-            const config = await auth.loadMicrosoftConfig();
-            
-            if (!config.clientId) {
-                console.warn('Microsoft authentication not configured. Client ID missing.');
-                return;
+        const session = sessionStorage.getItem('userSession');
+        if (session) {
+            try {
+                const userData = JSON.parse(session);
+                if (await auth.validateSession(userData)) {
+                    currentUser = userData.user;
+                    ui.showDashboard();
+                    await trips.loadTrips();
+                    return;
+                }
+            } catch (e) {
+                sessionStorage.removeItem('userSession');
             }
-            
-            // Initialize Microsoft Auth
-            auth.msAuth = new MicrosoftAuth(config.clientId, config.tenantId || 'common');
-            
-            const microsoftBtn = document.getElementById('microsoftLoginBtn');
-            if (microsoftBtn) {
-                microsoftBtn.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    auth.handleMicrosoftLogin();
+        }
+        ui.showLogin();
+    },
+
+    // Real session validation
+    validateSession: async (userData) => {
+        try {
+            const response = await fetch('/api/auth/validate.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ session_token: userData.token })
+            });
+            return response.ok;
+        } catch (error) {
+            return false;
+        }
+    },
+
+    // Real Office 365 authentication
+    signInWithMicrosoft: async () => {
+        try {
+            const result = await microsoftAuth.signIn();
+            if (result.success) {
+                const response = await fetch('/api/auth/microsoft-validate.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ access_token: result.accessToken })
                 });
+                
+                if (response.ok) {
+                    const userData = await response.json();
+                    sessionStorage.setItem('userSession', JSON.stringify(userData));
+                    currentUser = userData.user;
+                    ui.showDashboard();
+                    await trips.loadTrips();
+                } else {
+                    throw new Error('Authentication failed');
+                }
             }
         } catch (error) {
-            console.error('Failed to initialize Microsoft authentication:', error);
-        }
-    },
-
-    // Load Microsoft configuration from backend
-    loadMicrosoftConfig: async () => {
-        try {
-            const response = await fetch('/api/auth/microsoft-config.php');
-            if (response.ok) {
-                const data = await response.json();
-                return data.config;
-            }
-            throw new Error('Failed to load Microsoft configuration');
-        } catch (error) {
-            console.error('Error loading Microsoft config:', error);
-            // Fallback to hardcoded values for development
-            console.warn('Using fallback Microsoft configuration. Update secure-config.php with your Azure AD credentials.');
-            return { 
-                clientId: null, // Set to null to disable Microsoft auth until configured
-                tenantId: 'common' 
-            };
-        }
-    },
-
-    // Handle Microsoft login
-    handleMicrosoftLogin: async () => {
-        if (!auth.msAuth) {
-            utils.showError('Microsoft authentication not initialized. Please configure your Azure AD credentials.');
-            return;
-        }
-
-        try {
-            const result = await auth.msAuth.signIn();
-            console.log('Microsoft sign-in successful:', result);
-            
-            // The Microsoft auth callback will handle the login
-            // This is just a fallback for direct usage
-            if (result && result.user) {
-                auth.handleSuccessfulLogin(result);
-            }
-        } catch (error) {
-            console.error('Microsoft sign-in error:', error);
             utils.showError('Microsoft sign-in failed: ' + error.message);
         }
     },
 
-    // Setup dark mode detection for Microsoft button and logo
-    setupDarkModeDetection: () => {
-        const microsoftImg = document.getElementById('microsoftBtnImg');
-        const loginLogo = document.querySelector('.login-logo-image');
-        
-        const updateForDarkMode = () => {
-            const isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-            
-            // Update Microsoft button
-            if (microsoftImg) {
-                microsoftImg.src = isDarkMode ? 'images/ms_signin_dark_short.svg' : 'images/ms_signin_light_short.svg';
-            }
-            
-            // Update Wolthers logo
-            if (loginLogo) {
-                loginLogo.src = isDarkMode ? 'images/wolthers-logo-off-white.svg' : 'images/wolthers-logo-green.svg';
-            }
-        };
-
-        // Initial setup
-        updateForDarkMode();
-
-        // Listen for changes
-        if (window.matchMedia) {
-            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateForDarkMode);
-        }
-    },
-
-    // Current user email for multi-step flow
-    currentEmail: null,
-    
-    // Handle initial input (step 1)
-    handleInitialInput: async (e) => {
+    // Real email authentication
+    handleEmailLogin: async (e) => {
         e.preventDefault();
+        const email = document.getElementById('primaryInput').value.trim();
         
-        const input = document.getElementById('primaryInput').value.trim();
-        
-        if (!input) {
-            utils.showError('Please enter your email or trip access code');
+        if (!email || !email.includes('@')) {
+            utils.showError('Please enter a valid email address');
             return;
         }
-        
-        // Check if it's an email or trip code
-        if (input.includes('@')) {
-            // It's an email - check if user exists
-            auth.currentEmail = input;
-            await auth.checkUserExists(input);
-        } else {
-            // It's a trip code - process directly
-            await auth.processPasscodeLogin(input.toUpperCase());
-        }
-    },
-    
-    // Check if user exists
-    checkUserExists: async (email) => {
+
         try {
             const response = await fetch('/api/auth/check-user.php', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ email: email })
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email })
             });
             
             const data = await response.json();
-            
-            if (data.exists) {
-                // User exists - show password step
-                auth.showStep2(data.user.name);
-            } else {
-                // User doesn't exist - show account creation step
-                auth.showStep3(email);
-            }
-        } catch (error) {
-            // For development, mock the user check
-            auth.mockUserCheck(email);
-        }
-    },
-    
-    // Handle password login (step 2)
-    handlePasswordLogin: async (e) => {
-        e.preventDefault();
-        
-        const password = document.getElementById('passwordInput').value.trim();
-        
-        if (!password) {
-            utils.showError('Please enter your password');
-            return;
-        }
-        
-        await auth.processRegularLogin(auth.currentEmail, password);
-    },
-    
-    // Handle account creation (step 3)
-    handleAccountCreation: async (e) => {
-        e.preventDefault();
-        
-        const name = document.getElementById('fullNameInput').value.trim();
-        const company = document.getElementById('companyInput').value.trim();
-        
-        if (!name) {
-            utils.showError('Please enter your full name');
-            return;
-        }
-        
-        try {
-            const response = await fetch('/api/auth/register.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    name: name,
-                    email: auth.currentEmail,
-                    company: company
-                })
-            });
-            
-            const data = await response.json();
-            
             if (data.success) {
-                utils.showNotification('Account created! Check your email for confirmation.', 'success');
-                auth.goBackToStep1();
-            } else {
-                utils.showError(data.error || 'Failed to create account');
-            }
-        } catch (error) {
-            // For development, mock account creation
-            utils.showNotification('Account created! (Development mode)', 'success');
-            setTimeout(() => auth.goBackToStep1(), 2000);
-        }
-    },
-    
-    // Handle code verification (step 4)
-    handleCodeVerification: async (e) => {
-        e.preventDefault();
-        
-        const code = document.getElementById('codeInput').value.trim();
-        
-        if (!code || code.length !== 6) {
-            utils.showError('Please enter the 6-digit code');
-            return;
-        }
-        
-        try {
-            const response = await fetch('/api/auth/verify-code.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    email: auth.currentEmail,
-                    code: code
-                })
-            });
-            
-            const data = await response.json();
-            
-            if (data.success) {
-                localStorage.setItem('userSession', JSON.stringify(data));
-                auth.handleSuccessfulLogin(data);
-            } else {
-                utils.showError(data.error || 'Invalid code');
-            }
-        } catch (error) {
-            // For development, mock code verification
-            if (code === '123456') {
-                const mockData = {
-                    success: true,
-                    user: { name: 'Test User', email: auth.currentEmail, role: 'partner' },
-                    auth_type: 'one_time_code'
-                };
-                auth.handleSuccessfulLogin(mockData);
-            } else {
-                utils.showError('Invalid code. Try 123456 for development.');
-            }
-        }
-    },
-    
-    // Process regular email/password login
-    processRegularLogin: async (email, password) => {
-        try {
-            const response = await fetch('/api/auth/login.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    login_type: 'regular',
-                    username: email,
-                    password: password
-                })
-            });
-            
-            const data = await response.json();
-            
-            if (data.success) {
-                localStorage.setItem('userSession', JSON.stringify(data));
-                auth.handleSuccessfulLogin(data);
-            } else {
-                utils.showError(data.error || 'Invalid password');
-            }
-        } catch (error) {
-            // For development, fall back to mock authentication
-            auth.mockRegularLogin(email, password);
-        }
-    },
-
-    // Process trip passcode login
-    processPasscodeLogin: async (tripCode) => {
-        try {
-            const response = await fetch('/api/auth/login.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    login_type: 'passcode',
-                    trip_code: tripCode
-                })
-            });
-            
-            const data = await response.json();
-            
-            if (data.success) {
-                localStorage.setItem('userSession', JSON.stringify(data));
-                auth.handleSuccessfulLogin(data);
-            } else {
-                utils.showError(data.error || 'Invalid trip code');
-            }
-        } catch (error) {
-            // For development, fall back to mock authentication
-            auth.mockPasscodeLogin(tripCode);
-        }
-    },
-
-    // Handle Microsoft Office 365 login
-    handleMicrosoftLogin: async () => {
-        if (!auth.msAuth) {
-            utils.showError('Microsoft authentication not initialized. Please configure your Azure AD credentials.');
-            return;
-        }
-
-        try {
-            console.log('🚀 Starting Microsoft authentication...');
-            const result = await auth.msAuth.signIn();
-            console.log('✅ Microsoft sign-in successful:', result);
-            
-            // Convert the session data to the expected format for handleSuccessfulLogin
-            if (result && result.user) {
-                const loginData = {
-                    success: true,
-                    user: result.user,
-                    auth_type: result.auth_type || 'office365',
-                    session_id: result.session_id,
-                    access_level: 'full', // Office 365 users get full access by default
-                    restrictions: null
-                };
-                
-                // Store session for backend validation
-                localStorage.setItem('userSession', JSON.stringify(loginData));
-                
-                // Handle the successful login (this will redirect to main content)
-                auth.handleSuccessfulLogin(loginData);
-            }
-        } catch (error) {
-            console.error('❌ Microsoft sign-in error:', error);
-            utils.showError('Microsoft sign-in failed: ' + error.message);
-        }
-    },
-
-    // Handle successful login
-    handleSuccessfulLogin: (data) => {
-        // Update global user state
-        currentUser = {
-            id: data.user.id,
-            name: data.user.name,
-            email: data.user.email,
-            role: data.user.role,
-            type: data.auth_type,
-            canAddTrips: data.auth_type === 'regular' || data.auth_type === 'office365' || (data.user.email && data.user.email.endsWith('@wolthers.com')),
-            accessLevel: data.access_level,
-            tripAccess: data.trip_access,
-            restrictions: data.restrictions,
-            loginTime: new Date().toISOString()
-        };
-        
-        // Store in session
-        sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
-        
-        // Show main content
-        ui.showMainContent();
-        
-        // Show access restrictions if applicable
-        if (data.restrictions) {
-            auth.showAccessRestrictions(data.restrictions);
-        }
-    },
-
-    // Step navigation functions
-    showStep2: (userName) => {
-        document.getElementById('step1').classList.remove('active');
-        document.getElementById('step2').classList.add('active');
-        document.getElementById('welcomeMessage').innerHTML = `
-            <h3>Welcome back, ${userName}!</h3>
-            <p>Enter your password to continue</p>
-        `;
-    },
-    
-    showStep3: (email) => {
-        document.getElementById('step1').classList.remove('active');
-        document.getElementById('step3').classList.add('active');
-        document.getElementById('emailToConfirm').textContent = email;
-    },
-    
-    showStep4: (email) => {
-        document.getElementById('step2').classList.remove('active');
-        document.getElementById('step4').classList.add('active');
-        document.getElementById('emailForCode').textContent = email;
-    },
-    
-    goBackToStep1: () => {
-        document.querySelectorAll('.login-step').forEach(step => step.classList.remove('active'));
-        document.getElementById('step1').classList.add('active');
-        document.getElementById('primaryInput').value = '';
-        auth.currentEmail = null;
-    },
-    
-    goBackToStep2: () => {
-        document.getElementById('step4').classList.remove('active');
-        document.getElementById('step2').classList.add('active');
-    },
-    
-    // Mock user check for development
-    mockUserCheck: (email) => {
-        const knownUsers = [
-            { email: 'daniel@wolthers.com', name: 'Daniel Wolthers' },
-            { email: 'svenn@wolthers.com', name: 'Svenn Wolthers' },
-            { email: 'tom@wolthers.com', name: 'Tom Wolthers' },
-            { email: 'rasmus@wolthers.com', name: 'Rasmus Wolthers' }
-        ];
-        
-        const user = knownUsers.find(u => u.email === email);
-        if (user) {
-            auth.showStep2(user.name);
-        } else {
-            auth.showStep3(email);
-        }
-    },
-
-    // Mock authentication for development
-    mockRegularLogin: (email, password) => {
-        const mockUsers = [
-            { email: 'daniel@wolthers.com', name: 'Daniel Wolthers', role: 'admin' },
-            { email: 'svenn@wolthers.com', name: 'Svenn Wolthers', role: 'admin' },
-            { email: 'tom@wolthers.com', name: 'Tom Wolthers', role: 'admin' },
-            { email: 'rasmus@wolthers.com', name: 'Rasmus Wolthers', role: 'admin' }
-        ];
-        
-        const user = mockUsers.find(u => u.email === email);
-        if (user && (password === 'any' || password === 'password')) {
-            const mockData = {
-                success: true,
-                user: user,
-                auth_type: 'regular'
-            };
-            auth.handleSuccessfulLogin(mockData);
-        } else {
-            utils.showError('Invalid credentials. Try one of the Wolthers team emails (daniel@wolthers.com, svenn@wolthers.com, tom@wolthers.com, rasmus@wolthers.com) with any password.');
-        }
-    },
-
-    // Mock passcode authentication for development
-    mockPasscodeLogin: (tripCode) => {
-        const validCodes = ['BRAZIL2025', 'COLOMBIA2025', 'ETHIOPIA2025'];
-        
-        if (validCodes.includes(tripCode)) {
-            const mockData = {
-                success: true,
-                user: { name: 'Trip Visitor', role: 'visitor' },
-                auth_type: 'passcode',
-                access_level: 'trip_only',
-                trip_access: { trip_id: 1, trip_title: 'Brazil Coffee Origins Tour' },
-                restrictions: {
-                    cannot_access_other_trips: true,
-                    cannot_see_past_trips: true,
-                    read_only_access: true
+                auth.currentEmail = email;
+                if (data.user_type === 'employee') {
+                    auth.showStep2(data.user.name);
+                } else {
+                    auth.showStep3(email);
                 }
-            };
-            auth.handleSuccessfulLogin(mockData);
-        } else {
-            utils.showError('Invalid trip code. Try BRAZIL2025, COLOMBIA2025, or ETHIOPIA2025');
-        }
-    },
-
-    // Validate existing session
-    validateExistingSession: async () => {
-        const session = localStorage.getItem('userSession');
-        const savedUser = sessionStorage.getItem('currentUser');
-        
-        if (savedUser) {
-            currentUser = JSON.parse(savedUser);
-            ui.showMainContent();
-            return;
-        }
-        
-        if (!session) return;
-        
-        try {
-            const response = await fetch('/api/auth/validate.php');
-            const data = await response.json();
-            
-            if (data.success && data.authenticated) {
-                auth.handleSuccessfulLogin(data);
             } else {
-                localStorage.removeItem('userSession');
-                sessionStorage.removeItem('currentUser');
+                utils.showError(data.error || 'Email not found');
             }
         } catch (error) {
-            localStorage.removeItem('userSession');
-            sessionStorage.removeItem('currentUser');
-            console.error('Session validation error:', error);
+            utils.showError('Authentication error: ' + error.message);
         }
-    },
-
-    // Show access restrictions notice
-    showAccessRestrictions: (restrictions) => {
-        if (restrictions.cannot_access_other_trips) {
-            const notice = document.createElement('div');
-            notice.className = 'access-notice';
-            notice.innerHTML = `
-                <div class="notice-content" style="background: #fff3cd; border: 1px solid #ffeaa7; color: #856404; padding: 10px; border-radius: 6px; margin: 10px 0;">
-                    <span class="notice-icon">ℹ️</span>
-                    <span>You have limited access to this specific trip only.</span>
-                </div>
-            `;
-            const header = document.querySelector('.header');
-            if (header) {
-                header.appendChild(notice);
-            }
-        }
-    },
-
-    // Check for existing authentication
-    checkAuth: () => {
-        auth.validateExistingSession();
-    },
-
-    // Enhanced logout function
-    logout: async () => {
-        try {
-            // Call logout endpoint
-            await fetch('/api/auth/logout.php', { method: 'POST' });
-        } catch (error) {
-            console.error('Logout API error:', error);
-        }
-        
-        // Clear local storage and session
-        localStorage.removeItem('userSession');
-        sessionStorage.removeItem('currentUser');
-        currentUser = null;
-        currentTrips = [];
-        selectedTrip = null;
-        
-        // Show login page
-        document.getElementById('loginContainer').style.display = 'flex';
-        document.getElementById('mainContainer').style.display = 'none';
-        
-        // Reset login forms
-        auth.goBackToStep1();
-        
-        // Clear error messages
-        const errorDiv = document.getElementById('errorMessage');
-        if (errorDiv) errorDiv.textContent = '';
-        
-        utils.showNotification('Logged out successfully', 'info');
     }
+
+    // Remove all mock functions (mockUserCheck, mockRegularLogin, mockPasscodeLogin)
 };
 
 // UI Management Functions
