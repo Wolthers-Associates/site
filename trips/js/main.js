@@ -3526,12 +3526,7 @@ function closeMobileMenuOnOutsideClick(event) {
     }
 }
 
-/**
- * Navigate to vehicle management page
- */
-function goToVehicleManagement() {
-    window.location.href = 'admin-vehicles.html';
-}
+
 
 /**
  * Update navigation visibility based on user role
@@ -3544,18 +3539,12 @@ function updateNavigationVisibility(user) {
     const isAdminOrDriver = isAdmin || role === 'driver';
     
     // Desktop navigation elements
-    const vehicleManagementBtn = document.getElementById('vehicleManagementBtn');
     const adminSettings = document.getElementById('adminSettings');
     
     // Mobile navigation elements
     const mobileAccountsLink = document.getElementById('mobileAccountsLink');
     const mobileCarsLink = document.getElementById('mobileCarsLink');
     const mobileAdminLink = document.getElementById('mobileAdminLink');
-    
-    // Show/hide vehicle management for admins and drivers
-    if (vehicleManagementBtn) {
-        vehicleManagementBtn.style.display = isAdminOrDriver ? 'inline-block' : 'none';
-    }
     
     // Show/hide admin settings
     if (adminSettings) {
@@ -3576,7 +3565,7 @@ function updateNavigationVisibility(user) {
     }
     
     console.log(`Navigation updated for ${user.name} (${role}):`, {
-        canAccessVehicles: isAdminOrDriver,
+        canAccessFleet: isAdminOrDriver,
         canAccessAdmin: isAdmin
     });
 }
@@ -4287,10 +4276,10 @@ function generateModalReports() {
 }
 
 /**
- * Update the original function to use modal
+ * Legacy compatibility: redirect to Fleet Management modal
  */
 function goToVehicleManagement() {
-    showVehicleManagementModal();
+    showFleetManagementModal();
 }
 
 /**
