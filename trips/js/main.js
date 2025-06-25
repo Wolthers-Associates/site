@@ -3702,18 +3702,14 @@ function createModalVehicleRow(vehicle) {
     let lastTripDisplay = '<span class="no-trip">None</span>';
     if (vehicle.last_trip) {
         const tripDate = formatTableDate(vehicle.last_trip.end_date || vehicle.last_trip.start_date);
-        lastTripDisplay = `<a href="#" onclick="openTripDetails('${vehicle.last_trip.id}')" class="trip-link" title="${vehicle.last_trip.title} - ${tripDate}">
-            ${vehicle.last_trip.title}
-        </a>`;
+        lastTripDisplay = `<a href="#" onclick="openTripDetails('${vehicle.last_trip.id}')" class="trip-link" title="${vehicle.last_trip.title} - ${tripDate}">${vehicle.last_trip.title}</a>`;
     }
     
     // Next trip information
     let nextTripDisplay = '<span class="no-trip">None Scheduled</span>';
     if (vehicle.next_trip) {
         const tripDate = formatTableDate(vehicle.next_trip.start_date);
-        nextTripDisplay = `<a href="#" onclick="openTripDetails('${vehicle.next_trip.id}')" class="trip-link" title="${vehicle.next_trip.title} - ${tripDate}">
-            ${vehicle.next_trip.title}
-        </a>`;
+        nextTripDisplay = `<a href="#" onclick="openTripDetails('${vehicle.next_trip.id}')" class="trip-link" title="${vehicle.next_trip.title} - ${tripDate}">${vehicle.next_trip.title}</a>`;
     }
     
     return `
