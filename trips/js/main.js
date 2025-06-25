@@ -1855,7 +1855,19 @@ function showUserManagementModal() {
         initializeUserDatabase();
     }
     
-    document.getElementById('userManagementModal').style.display = 'flex';
+    const modal = document.getElementById('userManagementModal');
+    
+    // Apply immediate dark mode styling to prevent white blink
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        modal.style.backgroundColor = 'rgba(0, 0, 0, 0.6)';
+        const modalContent = modal.querySelector('.modal-content, .fluent-modal-content');
+        if (modalContent) {
+            modalContent.style.backgroundColor = '#1e1e1e';
+            modalContent.style.color = '#ffffff';
+        }
+    }
+    
+    modal.style.display = 'flex';
     document.body.style.overflow = 'hidden';
     loadUserManagementData();
 }
@@ -3585,7 +3597,19 @@ function updateNavigationVisibility(user) {
  * Show Vehicle Management Modal
  */
 function showVehicleManagementModal() {
-    document.getElementById('vehicleManagementModal').style.display = 'flex';
+    const modal = document.getElementById('vehicleManagementModal');
+    
+    // Apply immediate dark mode styling to prevent white blink
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        modal.style.backgroundColor = 'rgba(0, 0, 0, 0.6)';
+        const modalContent = modal.querySelector('.modal-content, .fluent-modal-content');
+        if (modalContent) {
+            modalContent.style.backgroundColor = '#1e1e1e';
+            modalContent.style.color = '#ffffff';
+        }
+    }
+    
+    modal.style.display = 'flex';
     document.body.style.overflow = 'hidden';
     loadVehicleManagementData();
 }
