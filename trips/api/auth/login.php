@@ -45,17 +45,26 @@ try {
         $userInfo = validateOffice365Token($accessToken);
         if ($userInfo) {
             // Check if user exists in our system
-            $stmt = $pdo->prepare("SELECT id, name, email, role FROM users WHERE email = ? AND status = 'active'");
+            $stmt = $pdo->prepare("SELECT id, name, email, role, office365_id FROM users WHERE email = ? AND status = 'active'");
             $stmt->execute([$userInfo['email']]);
             $user = $stmt->fetch();
             
             if (!$user) {
                 // Auto-create user from Office 365 if they don't exist
-                $stmt = $pdo->prepare("
-                    INSERT INTO users (email, name, role, office365_id, status) 
-                    VALUES (?, ?, 'employee', ?, 'active')
-                ");
-                $stmt->execute([$userInfo['email'], $userInfo['name'], $userInfo['id']]);
+                try {
+                    $stmt = $pdo->prepare("
+                        INSERT INTO users (email, name, role, office365_id, status, last_login_at) 
+                        VALUES (?, ?, 'employee', ?, 'active', NOW())
+                    ");
+                    $stmt->execute([$userInfo['email'], $userInfo['name'], $userInfo['id']]);
+                } catch (Exception $e) {
+                    // Fallback if last_login_at column doesn't exist
+                    $stmt = $pdo->prepare("
+                        INSERT INTO users (email, name, role, office365_id, status) 
+                        VALUES (?, ?, 'employee', ?, 'active')
+                    ");
+                    $stmt->execute([$userInfo['email'], $userInfo['name'], $userInfo['id']]);
+                }
                 $userId = $pdo->lastInsertId();
                 
                 $user = [
@@ -64,6 +73,24 @@ try {
                     'email' => $userInfo['email'],
                     'role' => 'employee'
                 ];
+            } else {
+                // Update existing user with Office 365 ID and last login (if columns exist)
+                try {
+                    $updateStmt = $pdo->prepare("
+                        UPDATE users 
+                        SET office365_id = ?, last_login_at = NOW(), login_attempts = 0
+                        WHERE id = ?
+                    ");
+                    $updateStmt->execute([$userInfo['id'], $user['id']]);
+                } catch (Exception $e) {
+                    // Fallback if last_login_at or login_attempts columns don't exist
+                    $updateStmt = $pdo->prepare("
+                        UPDATE users 
+                        SET office365_id = ?, updated_at = NOW()
+                        WHERE id = ?
+                    ");
+                    $updateStmt->execute([$userInfo['id'], $user['id']]);
+                }
             }
             
             logActivity($user['id'], 'office365_login', ['email' => $userInfo['email']]);
@@ -100,6 +127,16 @@ try {
         $user = $stmt->fetch();
         
         if ($user && ($user['password_hash'] === null || password_verify($password, $user['password_hash']))) {
+            // Update last login time (if column exists)
+            try {
+                $updateStmt = $pdo->prepare("UPDATE users SET last_login_at = NOW(), login_attempts = 0 WHERE id = ?");
+                $updateStmt->execute([$user['id']]);
+            } catch (Exception $e) {
+                // Fallback if last_login_at or login_attempts columns don't exist
+                $updateStmt = $pdo->prepare("UPDATE users SET updated_at = NOW() WHERE id = ?");
+                $updateStmt->execute([$user['id']]);
+            }
+            
             // For development: if no password hash, any password works
             logActivity($user['id'], 'regular_login', ['email' => $username]);
             
