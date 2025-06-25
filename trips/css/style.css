@@ -826,7 +826,7 @@ body {
 
 .header h1 {
     font-family: 'Playfair Display', serif;
-    font-size: 2.5rem;
+    font-size: 2rem;
     margin-bottom: 10px;
     color: var(--gold);
 }
@@ -2920,7 +2920,9 @@ body {
         background: linear-gradient(135deg, #121B13 0%, #0F1610 100%);
         color: #E3D6C0;
     }
-    .header h1,
+    .header h1 {
+        color: var(--gold);
+    }
     .header p {
         color: #ffffff;
     }
