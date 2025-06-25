@@ -67,6 +67,7 @@ function handleGetVehicles() {
     $location = $_GET['location'] ?? null;
     $include_maintenance = $_GET['include_maintenance'] ?? 'true';
     $include_driver_logs = $_GET['include_driver_logs'] ?? 'false';
+    $include_trips = $_GET['include_trips'] ?? 'false';
     
     // Build query with filters
     $conditions = [];
@@ -133,6 +134,35 @@ function handleGetVehicles() {
             $driver_stmt = $pdo->prepare($driver_sql);
             $driver_stmt->execute([$vehicle['id']]);
             $vehicle['recent_driver_logs'] = $driver_stmt->fetchAll(PDO::FETCH_ASSOC);
+        }
+    }
+    
+    // Add trip information if requested
+    if ($include_trips === 'true') {
+        foreach ($vehicles as &$vehicle) {
+            // Get last completed trip
+            $last_trip_sql = "SELECT vdl.trip_id, t.title, t.start_date, t.end_date, vdl.end_date as log_end_date
+                             FROM vehicle_driver_logs vdl 
+                             LEFT JOIN trips t ON vdl.trip_id = t.id
+                             WHERE vdl.vehicle_id = ? AND vdl.status = 'completed' 
+                             ORDER BY vdl.end_date DESC 
+                             LIMIT 1";
+            $last_trip_stmt = $pdo->prepare($last_trip_sql);
+            $last_trip_stmt->execute([$vehicle['id']]);
+            $last_trip = $last_trip_stmt->fetch(PDO::FETCH_ASSOC);
+            $vehicle['last_trip'] = $last_trip ?: null;
+            
+            // Get next scheduled trip
+            $next_trip_sql = "SELECT vdl.trip_id, t.title, t.start_date, t.end_date, vdl.start_date as log_start_date
+                             FROM vehicle_driver_logs vdl 
+                             LEFT JOIN trips t ON vdl.trip_id = t.id
+                             WHERE vdl.vehicle_id = ? AND vdl.status IN ('scheduled', 'active') AND vdl.start_date >= CURDATE()
+                             ORDER BY vdl.start_date ASC 
+                             LIMIT 1";
+            $next_trip_stmt = $pdo->prepare($next_trip_sql);
+            $next_trip_stmt->execute([$vehicle['id']]);
+            $next_trip = $next_trip_stmt->fetch(PDO::FETCH_ASSOC);
+            $vehicle['next_trip'] = $next_trip ?: null;
         }
     }
     

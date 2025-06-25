@@ -2941,32 +2941,21 @@ function getUserTripsData(user) {
 
 // Get all trips from various sources
 function getAllTrips() {
-    const trips = [];
-    
-    // Add mock trips if they exist
-    if (typeof MOCK_TRIPS !== 'undefined' && MOCK_TRIPS.length > 0) {
-        trips.push(...MOCK_TRIPS);
+    // Try to get trips from various sources
+    if (typeof window.tripsData !== 'undefined') {
+        return window.tripsData;
     }
     
-    // Add trips from localStorage
-    try {
-        const savedTrips = localStorage.getItem('wolthers_trips');
-        if (savedTrips) {
-            const parsedTrips = JSON.parse(savedTrips);
-            if (Array.isArray(parsedTrips)) {
-                trips.push(...parsedTrips);
-            }
-        }
-    } catch (e) {
-        console.log('No saved trips found');
+    if (typeof trips !== 'undefined' && trips.data) {
+        return trips.data;
     }
     
-    // Remove duplicates based on ID
-    const uniqueTrips = trips.filter((trip, index, self) => 
-        index === self.findIndex(t => t.id === trip.id)
-    );
+    if (typeof mockTrips !== 'undefined') {
+        return mockTrips;
+    }
     
-    return uniqueTrips;
+    // Return empty array if no trips found
+    return [];
 }
 
 // Populate company filter dropdown
@@ -3640,7 +3629,7 @@ async function loadVehicleManagementData() {
  */
 async function loadModalVehicles() {
     try {
-        const response = await fetch('api/vehicles/manage.php?include_maintenance=true');
+        const response = await fetch('api/vehicles/manage.php?include_maintenance=true&include_trips=true');
         if (response.ok) {
             const data = await response.json();
             if (data.success) {
@@ -3709,23 +3698,36 @@ function createModalVehicleRow(vehicle) {
         revisionClass = 'status-warning';
     }
     
+    // Last trip information
+    let lastTripDisplay = 'No trips';
+    if (vehicle.last_trip) {
+        const tripDate = formatTableDate(vehicle.last_trip.end_date || vehicle.last_trip.start_date);
+        lastTripDisplay = `<a href="#" onclick="openTripDetails('${vehicle.last_trip.id}')" class="trip-link" title="View trip details">${vehicle.last_trip.title}<br><small>${tripDate}</small></a>`;
+    }
+    
+    // Next trip information
+    let nextTripDisplay = 'No scheduled trips';
+    if (vehicle.next_trip) {
+        const tripDate = formatTableDate(vehicle.next_trip.start_date);
+        nextTripDisplay = `<a href="#" onclick="openTripDetails('${vehicle.next_trip.id}')" class="trip-link" title="View trip details">${vehicle.next_trip.title}<br><small>${tripDate}</small></a>`;
+    }
+    
     return `
         <tr>
             <td>
                 <div class="vehicle-info">
                     <div class="vehicle-name">${vehicle.make} ${vehicle.model}</div>
-                    <div class="vehicle-year">${vehicle.year}</div>
-                    <span class="vehicle-type ${typeClass}">${vehicle.vehicle_type.toUpperCase()}</span>
+                    <div class="vehicle-year">${vehicle.year} • <span class="vehicle-type ${typeClass}">${vehicle.vehicle_type.toUpperCase()}</span></div>
                     <div class="vehicle-capacity">${vehicle.capacity} people</div>
                 </div>
             </td>
-            <td><span class="fluent-badge-table ${typeClass}">${vehicle.vehicle_type.toUpperCase()}</span></td>
             <td><span class="license-plate">${vehicle.license_plate}</span></td>
-            <td class="location">${vehicle.location}</td>
             <td class="mileage">${vehicle.current_mileage ? Number(vehicle.current_mileage).toLocaleString() + ' km' : 'N/A'}</td>
             <td><span class="status-badge ${statusClass}">${vehicle.status.toUpperCase()}</span></td>
             <td><span class="status-indicator ${insuranceClass}">${insuranceStatus}</span></td>
             <td><span class="status-indicator ${revisionClass}">${revisionStatus}</span></td>
+            <td class="trip-info">${lastTripDisplay}</td>
+            <td class="trip-info">${nextTripDisplay}</td>
             <td>
                 <div class="fluent-action-buttons">
                     <button class="fluent-action-btn" onclick="editModalVehicle(${vehicle.id})" title="Edit">
@@ -3951,4 +3953,69 @@ function generateModalReports() {
  */
 function goToVehicleManagement() {
     showVehicleManagementModal();
+}
+
+/**
+ * Open Trip Details from Vehicle Management
+ */
+function openTripDetails(tripId) {
+    // Close vehicle management modal
+    hideVehicleManagementModal();
+    
+    // Find the trip in the existing trips data
+    const allTrips = getAllTrips();
+    const trip = allTrips.find(t => t.id === tripId || t.id === parseInt(tripId));
+    
+    if (trip) {
+        // Use the existing trip details functionality
+        if (typeof trips !== 'undefined' && trips.showTripDetails) {
+            trips.showTripDetails(trip);
+        } else {
+            // Fallback: show trip information in a simple modal
+            showTripDetailsModal(trip);
+        }
+    } else {
+        showToast('Trip not found', 'error');
+    }
+}
+
+/**
+ * Show Trip Details Modal (fallback)
+ */
+function showTripDetailsModal(trip) {
+    const modal = document.createElement('div');
+    modal.className = 'modal fluent-modal';
+    modal.style.display = 'flex';
+    
+    modal.innerHTML = `
+        <div class="modal-backdrop" onclick="this.parentElement.remove()"></div>
+        <div class="modal-content fluent-modal-content">
+            <div class="fluent-modal-header">
+                <div class="fluent-header-content">
+                    <h1 class="fluent-modal-title">${trip.title}</h1>
+                    <p class="fluent-modal-subtitle">${formatDateRange(trip.date, trip.endDate)}</p>
+                </div>
+                <button class="fluent-close-btn" onclick="this.closest('.modal').remove()">×</button>
+            </div>
+            <div class="fluent-modal-body">
+                <div class="trip-details">
+                    <p><strong>Dates:</strong> ${formatDateRange(trip.date, trip.endDate)}</p>
+                    <p><strong>Participants:</strong> ${trip.guests || 'TBD'}</p>
+                    <p><strong>Company:</strong> ${trip.companyName || 'Various Partners'}</p>
+                    ${trip.description ? `<p><strong>Description:</strong> ${trip.description}</p>` : ''}
+                </div>
+                <div class="fluent-form-actions">
+                    <button class="fluent-btn fluent-btn-primary" onclick="this.closest('.modal').remove()">Close</button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    document.body.style.overflow = 'hidden';
+    
+    // Clean up when modal is removed
+    modal.addEventListener('remove', () => {
+        document.body.style.overflow = 'auto';
+    });
 }

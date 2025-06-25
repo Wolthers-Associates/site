@@ -288,6 +288,48 @@
             font-weight: bold;
             text-transform: uppercase;
         }
+        
+        /* Trip Info Styling */
+        .trip-info {
+            max-width: 180px;
+        }
+        
+        .trip-link {
+            color: #2C5530;
+            text-decoration: none;
+            display: block;
+            padding: 4px 0;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+        
+        .trip-link:hover {
+            color: #1e3b21;
+            background: rgba(44, 85, 48, 0.1);
+            text-decoration: underline;
+        }
+        
+        .trip-link small {
+            color: #757575;
+            font-size: 0.8em;
+            display: block;
+            margin-top: 2px;
+        }
+        
+        @media (prefers-color-scheme: dark) {
+            .trip-link {
+                color: #DAA520;
+            }
+            
+            .trip-link:hover {
+                color: #B8860B;
+                background: rgba(218, 165, 32, 0.1);
+            }
+            
+            .trip-link small {
+                color: var(--dark-text-secondary);
+            }
+        }
     </style>
     
     <link rel="stylesheet" href="css/style.css">
@@ -1042,7 +1084,7 @@
                 <div class="trip-code-actions">
                     <button class="btn btn-secondary" onclick="printTripCode()">
                         <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                            <path d="M5.75 0a.75.75 0 01.75.75V3h3.5V.75a.75.75 0 111.5 0V3h1.5A1.75 1.75 0 0114.75 4.75v3a.75.75 0 01-.75.75h-1.5v4.75A1.75 1.75 0 0110.75 15h-5.5A1.75 1.75 0 013.5 13.25V8.5H2a.75.75 0 01-.75-.75v-3A1.75 1.75 0 012.75 3H4.25V.75A.75.75 0 015.75 0zm-.25 8.5v4.75c0 .138.112.25.25.25h5.5a.25.25 0 00.25-.25V8.5H5.5zm6.5-4v1.5h1.25a.25.25 0 00.25-.25v-1a.25.25 0 00-.25-.25H12zm-7.5 0H2.75a.25.25 0 00-.25.25v1c0 .138.112.25.25.25H4.5V4.5z"/>
+                            <path d="M5.75 0a.75.75 0 01.75.75V3h3.5V.75a.75.75 0 111.5 0v3.5h3.5a.75.75 0 000-1.5h-3.5v-3.5z"/>
                         </svg>
                         Print Details
                     </button>
@@ -1171,14 +1213,8 @@
                                             <path d="M6 2L4.5 3.5h3L6 2zM6 10l1.5-1.5h-3L6 10z"/>
                                         </svg>
                                     </th>
-                                    <th class="fluent-th-sortable" data-sort="type">
-                                        <span>Type</span>
-                                    </th>
                                     <th class="fluent-th-sortable" data-sort="license">
                                         <span>License</span>
-                                    </th>
-                                    <th class="fluent-th-sortable" data-sort="location">
-                                        <span>Location</span>
                                     </th>
                                     <th class="fluent-th-sortable" data-sort="mileage">
                                         <span>Mileage</span>
@@ -1191,6 +1227,12 @@
                                     </th>
                                     <th class="fluent-th-sortable" data-sort="revision">
                                         <span>Revision</span>
+                                    </th>
+                                    <th class="fluent-th-sortable" data-sort="lastTrip">
+                                        <span>Last Trip</span>
+                                    </th>
+                                    <th class="fluent-th-sortable" data-sort="nextTrip">
+                                        <span>Next Trip</span>
                                     </th>
                                     <th>Actions</th>
                                 </tr>
