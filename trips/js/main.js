@@ -34,6 +34,12 @@ const MOCK_TRIPS = [
     // Add mock trips here or load from API
 ];
 
+const MOCK_CREDENTIALS = {
+    // Development credentials for testing
+    wolthers: ['daniel@wolthers.com', 'svenn@wolthers.com', 'tom@wolthers.com', 'rasmus@wolthers.com'],
+    tripCodes: ['BRAZIL2025', 'COLOMBIA2025', 'ETHIOPIA2025']
+};
+
 // Utility Functions
 const utils = {
     // Format date for display

@@ -828,6 +828,7 @@ body {
     font-family: 'Playfair Display', serif;
     font-size: 2.5rem;
     margin-bottom: 10px;
+    color: var(--gold);
 }
 
 .header p {
