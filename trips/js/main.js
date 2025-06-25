@@ -3590,4 +3590,365 @@ function updateNavigationVisibility(user) {
         canAccessVehicles: isAdminOrDriver,
         canAccessAdmin: isAdmin
     });
-} 
+}
+
+/**
+ * Show Vehicle Management Modal
+ */
+function showVehicleManagementModal() {
+    document.getElementById('vehicleManagementModal').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    loadVehicleManagementData();
+}
+
+/**
+ * Hide Vehicle Management Modal
+ */
+function hideVehicleManagementModal() {
+    document.getElementById('vehicleManagementModal').style.display = 'none';
+    document.body.style.overflow = 'auto';
+}
+
+/**
+ * Load Vehicle Management Data
+ */
+async function loadVehicleManagementData() {
+    try {
+        // Show loading state
+        showLoadingState(true);
+        
+        // Load vehicles data
+        await loadModalVehicles();
+        
+        // Load maintenance and driver logs for other tabs
+        await loadModalMaintenance();
+        await loadModalDriverLogs();
+        
+        // Setup interactions
+        setupVehicleManagementInteractions();
+        
+    } catch (error) {
+        console.error('Failed to load vehicle management data:', error);
+        showToast('Failed to load vehicle data', 'error');
+    } finally {
+        showLoadingState(false);
+    }
+}
+
+/**
+ * Load Vehicles for Modal
+ */
+async function loadModalVehicles() {
+    try {
+        const response = await fetch('api/vehicles/manage.php?include_maintenance=true');
+        if (response.ok) {
+            const data = await response.json();
+            if (data.success) {
+                displayModalVehicles(data.vehicles);
+                updateModalVehicleSummary(data.summary);
+            } else {
+                throw new Error(data.error || 'Failed to load vehicles');
+            }
+        }
+    } catch (error) {
+        console.error('Error loading vehicles:', error);
+        // Show fallback empty state
+        document.getElementById('modalVehiclesList').innerHTML = `
+            <tr><td colspan="9" style="text-align: center; padding: 40px; color: var(--text-light);">
+                No vehicles found. <a href="#" onclick="openVehicleAddModal()" style="color: var(--primary-green);">Add your first vehicle</a>
+            </td></tr>
+        `;
+        updateModalVehicleSummary({ total: 0, available: 0, maintenance: 0, retired: 0 });
+    }
+}
+
+/**
+ * Display Vehicles in Modal Table
+ */
+function displayModalVehicles(vehicles) {
+    const tableBody = document.getElementById('modalVehiclesList');
+    
+    if (!vehicles || vehicles.length === 0) {
+        tableBody.innerHTML = `
+            <tr><td colspan="9" style="text-align: center; padding: 40px;">
+                No vehicles found. <a href="#" onclick="openVehicleAddModal()">Add your first vehicle</a>
+            </td></tr>
+        `;
+        return;
+    }
+    
+    tableBody.innerHTML = vehicles.map(vehicle => createModalVehicleRow(vehicle)).join('');
+}
+
+/**
+ * Create Vehicle Row for Modal Table
+ */
+function createModalVehicleRow(vehicle) {
+    const statusClass = `status-${vehicle.status}`;
+    const typeClass = `badge-${vehicle.vehicle_type}`;
+    
+    // Insurance status
+    let insuranceStatus = 'Active';
+    let insuranceClass = 'status-active';
+    if (vehicle.insurance_days_remaining !== null && vehicle.insurance_days_remaining < 0) {
+        insuranceStatus = 'Expired';
+        insuranceClass = 'status-expired';
+    } else if (vehicle.insurance_days_remaining !== null && vehicle.insurance_days_remaining < 30) {
+        insuranceStatus = `${vehicle.insurance_days_remaining} days`;
+        insuranceClass = 'status-warning';
+    }
+    
+    // Revision status
+    let revisionStatus = 'Current';
+    let revisionClass = 'status-active';
+    if (vehicle.revision_days_remaining !== null && vehicle.revision_days_remaining < 0) {
+        revisionStatus = 'Overdue';
+        revisionClass = 'status-expired';
+    } else if (vehicle.revision_days_remaining !== null && vehicle.revision_days_remaining < 30) {
+        revisionStatus = `${vehicle.revision_days_remaining} days`;
+        revisionClass = 'status-warning';
+    }
+    
+    return `
+        <tr>
+            <td>
+                <div class="vehicle-info">
+                    <div class="vehicle-name">${vehicle.make} ${vehicle.model}</div>
+                    <div class="vehicle-year">${vehicle.year}</div>
+                    <span class="vehicle-type ${typeClass}">${vehicle.vehicle_type.toUpperCase()}</span>
+                    <div class="vehicle-capacity">${vehicle.capacity} people</div>
+                </div>
+            </td>
+            <td><span class="fluent-badge-table ${typeClass}">${vehicle.vehicle_type.toUpperCase()}</span></td>
+            <td><span class="license-plate">${vehicle.license_plate}</span></td>
+            <td class="location">${vehicle.location}</td>
+            <td class="mileage">${vehicle.current_mileage ? Number(vehicle.current_mileage).toLocaleString() + ' km' : 'N/A'}</td>
+            <td><span class="status-badge ${statusClass}">${vehicle.status.toUpperCase()}</span></td>
+            <td><span class="status-indicator ${insuranceClass}">${insuranceStatus}</span></td>
+            <td><span class="status-indicator ${revisionClass}">${revisionStatus}</span></td>
+            <td>
+                <div class="fluent-action-buttons">
+                    <button class="fluent-action-btn" onclick="editModalVehicle(${vehicle.id})" title="Edit">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M11.013 1.427a1.75 1.75 0 012.474 0l1.086 1.086a1.75 1.75 0 010 2.474l-8.61 8.61c-.21.21-.47.364-.756.445l-3.251.93a.75.75 0 01-.927-.928l.929-3.25a1.75 1.75 0 01.445-.758l8.61-8.61z"/>
+                        </svg>
+                    </button>
+                    <button class="fluent-action-btn" onclick="viewModalVehicleLogs(${vehicle.id})" title="View Logs">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M2 3.75C2 2.784 2.784 2 3.75 2h8.5c.966 0 1.75.784 1.75 1.75v8.5A1.75 1.75 0 0112.25 14h-8.5A1.75 1.75 0 012 12.25v-8.5zm1.75-.25a.25.25 0 00-.25.25v8.5c0 .138.112.25.25.25h8.5a.25.25 0 00.25-.25v-8.5a.25.25 0 00-.25-.25h-8.5z"/>
+                        </svg>
+                    </button>
+                </div>
+            </td>
+        </tr>
+    `;
+}
+
+/**
+ * Update Modal Vehicle Summary
+ */
+function updateModalVehicleSummary(summary) {
+    const defaultSummary = { total: 0, available: 0, maintenance: 0, retired: 0 };
+    const finalSummary = summary || defaultSummary;
+    
+    try {
+        document.getElementById('modal-total-vehicles').textContent = finalSummary.total || 0;
+        document.getElementById('modal-available-vehicles').textContent = finalSummary.available || 0;
+        document.getElementById('modal-maintenance-vehicles').textContent = finalSummary.maintenance || 0;
+        document.getElementById('modal-retired-vehicles').textContent = finalSummary.retired || 0;
+    } catch (error) {
+        console.error('Error updating modal vehicle summary:', error);
+    }
+}
+
+/**
+ * Show Vehicle Tab
+ */
+function showVehicleTab(tabName, event) {
+    // Hide all vehicle tab contents
+    document.querySelectorAll('.vehicle-tab-content').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    
+    // Remove active class from all vehicle tabs
+    document.querySelectorAll('.fluent-tab').forEach(button => {
+        button.classList.remove('active');
+    });
+    
+    // Show selected tab
+    const targetTab = document.getElementById(`modal-${tabName}-tab`);
+    if (targetTab) {
+        targetTab.classList.add('active');
+    }
+    
+    // Add active class to clicked button
+    if (event && event.target) {
+        event.target.classList.add('active');
+    }
+    
+    // Load data for the selected tab
+    switch(tabName) {
+        case 'vehicles':
+            loadModalVehicles();
+            break;
+        case 'maintenance':
+            loadModalMaintenance();
+            break;
+        case 'driver-logs':
+            loadModalDriverLogs();
+            break;
+        case 'reports':
+            generateModalReports();
+            break;
+    }
+}
+
+/**
+ * Load Modal Maintenance Data
+ */
+async function loadModalMaintenance() {
+    try {
+        const response = await fetch('api/vehicles/maintenance.php');
+        if (response.ok) {
+            const data = await response.json();
+            if (data.success) {
+                displayModalMaintenance(data.maintenance_logs);
+            }
+        }
+    } catch (error) {
+        console.error('Error loading maintenance data:', error);
+    }
+}
+
+/**
+ * Load Modal Driver Logs Data
+ */
+async function loadModalDriverLogs() {
+    try {
+        const response = await fetch('api/vehicles/driver-logs.php');
+        if (response.ok) {
+            const data = await response.json();
+            if (data.success) {
+                displayModalDriverLogs(data.driver_logs);
+            }
+        }
+    } catch (error) {
+        console.error('Error loading driver logs:', error);
+    }
+}
+
+/**
+ * Display Modal Maintenance
+ */
+function displayModalMaintenance(logs) {
+    const tableBody = document.getElementById('modalMaintenanceList');
+    if (!logs || logs.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px;">No maintenance logs found</td></tr>';
+        return;
+    }
+    
+    tableBody.innerHTML = logs.map(log => `
+        <tr>
+            <td>${log.vehicle_make} ${log.vehicle_model}</td>
+            <td><span class="badge-${log.maintenance_type}">${log.maintenance_type}</span></td>
+            <td>${log.description}</td>
+            <td>${formatDate(log.start_date)}</td>
+            <td><span class="badge-${log.status}">${log.status}</span></td>
+            <td>
+                <button class="fluent-action-btn" onclick="editModalMaintenance(${log.id})">Edit</button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+/**
+ * Display Modal Driver Logs
+ */
+function displayModalDriverLogs(logs) {
+    const tableBody = document.getElementById('modalDriverLogsList');
+    if (!logs || logs.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px;">No driver logs found</td></tr>';
+        return;
+    }
+    
+    tableBody.innerHTML = logs.map(log => `
+        <tr>
+            <td>${log.vehicle_make} ${log.vehicle_model}</td>
+            <td>${log.driver_name}</td>
+            <td>${log.route_description || 'N/A'}</td>
+            <td>${formatDate(log.start_date)}</td>
+            <td><span class="badge-${log.status}">${log.status}</span></td>
+            <td>
+                <button class="fluent-action-btn" onclick="editModalDriverLog(${log.id})">Edit</button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+/**
+ * Setup Vehicle Management Interactions
+ */
+function setupVehicleManagementInteractions() {
+    // Search functionality
+    const searchInput = document.getElementById('vehicleSearchInput');
+    if (searchInput) {
+        searchInput.addEventListener('input', debounce(filterModalVehicles, 300));
+    }
+    
+    // Filter functionality
+    const statusFilter = document.getElementById('vehicleStatusFilter');
+    const typeFilter = document.getElementById('vehicleTypeFilter');
+    
+    if (statusFilter) statusFilter.addEventListener('change', filterModalVehicles);
+    if (typeFilter) typeFilter.addEventListener('change', filterModalVehicles);
+}
+
+/**
+ * Filter Modal Vehicles
+ */
+function filterModalVehicles() {
+    // Implementation for filtering vehicles in modal
+    console.log('Filtering vehicles...');
+}
+
+/**
+ * Placeholder functions for modal actions
+ */
+function openVehicleAddModal() {
+    showToast('Add Vehicle functionality coming soon', 'info');
+}
+
+function openMaintenanceAddModal() {
+    showToast('Add Maintenance functionality coming soon', 'info');
+}
+
+function openDriverLogAddModal() {
+    showToast('Add Driver Log functionality coming soon', 'info');
+}
+
+function editModalVehicle(id) {
+    showToast(`Edit Vehicle ${id} functionality coming soon`, 'info');
+}
+
+function viewModalVehicleLogs(id) {
+    showToast(`View Vehicle ${id} logs functionality coming soon`, 'info');
+}
+
+function editModalMaintenance(id) {
+    showToast(`Edit Maintenance ${id} functionality coming soon`, 'info');
+}
+
+function editModalDriverLog(id) {
+    showToast(`Edit Driver Log ${id} functionality coming soon`, 'info');
+}
+
+function generateModalReports() {
+    showToast('Reports functionality coming soon', 'info');
+}
+
+/**
+ * Update the original function to use modal
+ */
+function goToVehicleManagement() {
+    showVehicleManagementModal();
+}

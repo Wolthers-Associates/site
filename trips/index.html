@@ -70,6 +70,223 @@
                 background: var(--dark-bg-secondary) !important;
                 border: 1px solid #2d3136 !important;
             }
+            
+            /* Vehicle Management Modal Styles */
+            .vehicle-summary-section {
+                margin-bottom: 25px !important;
+            }
+            .summary-cards {
+                display: grid !important;
+                grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)) !important;
+                gap: 15px !important;
+                background: var(--dark-bg-secondary) !important;
+            }
+            .summary-card {
+                background: var(--dark-bg) !important;
+                border: 1px solid #2d3136 !important;
+                padding: 20px !important;
+                border-radius: 8px !important;
+                text-align: center !important;
+            }
+            .summary-number {
+                font-size: 2em !important;
+                font-weight: bold !important;
+                color: #DAA520 !important;
+            }
+            .summary-label {
+                color: var(--dark-text-secondary) !important;
+                font-size: 0.9em !important;
+            }
+            .vehicle-tabs {
+                display: flex !important;
+                gap: 2px !important;
+                margin-bottom: 25px !important;
+                border-bottom: 2px solid #2d3136 !important;
+            }
+            .fluent-tab {
+                padding: 12px 24px !important;
+                background: none !important;
+                border: none !important;
+                border-bottom: 3px solid transparent !important;
+                cursor: pointer !important;
+                font-weight: 500 !important;
+                color: var(--dark-text-secondary) !important;
+                transition: all 0.2s ease !important;
+            }
+            .fluent-tab:hover {
+                background: var(--dark-bg) !important;
+            }
+            .fluent-tab.active {
+                color: #DAA520 !important;
+                border-bottom-color: #DAA520 !important;
+                background: var(--dark-bg) !important;
+            }
+            .vehicle-tab-content {
+                display: none !important;
+            }
+            .vehicle-tab-content.active {
+                display: block !important;
+            }
+            .reports-grid {
+                display: grid !important;
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)) !important;
+                gap: 20px !important;
+            }
+            .report-card {
+                background: var(--dark-bg) !important;
+                border: 1px solid #2d3136 !important;
+                padding: 20px !important;
+                border-radius: 8px !important;
+            }
+            .report-card h4 {
+                color: var(--dark-text) !important;
+                margin-bottom: 10px !important;
+            }
+            .report-card p {
+                color: var(--dark-text-secondary) !important;
+                margin-bottom: 15px !important;
+            }
+        }
+    </style>
+    
+    <style>
+        /* Vehicle Management Modal Styles for Light Mode */
+        .vehicle-summary-section {
+            margin-bottom: 25px;
+        }
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+        }
+        .summary-card {
+            background: white;
+            border: 1px solid #e1e5e9;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .summary-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #2C5530;
+            margin-bottom: 5px;
+        }
+        .summary-label {
+            color: #757575;
+            font-size: 0.9em;
+        }
+        .vehicle-tabs {
+            display: flex;
+            gap: 2px;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #e1e5e9;
+        }
+        .fluent-tab {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-weight: 500;
+            color: #757575;
+            transition: all 0.2s ease;
+        }
+        .fluent-tab:hover {
+            background: #f5f5f5;
+            color: #2C5530;
+        }
+        .fluent-tab.active {
+            color: #2C5530;
+            border-bottom-color: #D4AF37;
+            background: #f5f5f5;
+        }
+        .vehicle-tab-content {
+            display: none;
+        }
+        .vehicle-tab-content.active {
+            display: block;
+        }
+        .reports-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        .report-card {
+            background: white;
+            border: 1px solid #e1e5e9;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .report-card h4 {
+            color: #2C5530;
+            margin-bottom: 10px;
+        }
+        .report-card p {
+            color: #757575;
+            margin-bottom: 15px;
+        }
+        
+        /* Vehicle Badge Styles */
+        .badge-suv { background: #e3f2fd; color: #1565c0; }
+        .badge-pickup { background: #fff3e0; color: #ef6c00; }
+        .badge-van { background: #e8f5e8; color: #2e7d32; }
+        .badge-sedan { background: #f3e5f5; color: #7b1fa2; }
+        .badge-car { background: #f3e5f5; color: #7b1fa2; }
+        .badge-bus { background: #ffebee; color: #c62828; }
+        
+        .status-available { background: #e8f5e8; color: #2e7d32; }
+        .status-maintenance { background: #fff3e0; color: #f57c00; }
+        .status-retired { background: #f5f5f5; color: #616161; }
+        
+        .status-active { background: #e8f5e8; color: #2e7d32; }
+        .status-warning { background: #fff3e0; color: #f57c00; }
+        .status-expired { background: #ffebee; color: #c62828; }
+        
+        .vehicle-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .vehicle-name {
+            font-weight: 600;
+            color: #2C5530;
+        }
+        
+        .vehicle-year {
+            font-size: 0.85em;
+            color: #757575;
+        }
+        
+        .vehicle-type {
+            display: inline-block;
+            font-size: 0.75em;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 12px;
+            text-transform: uppercase;
+        }
+        
+        .vehicle-capacity {
+            font-size: 0.8em;
+            color: #757575;
+        }
+        
+        .license-plate {
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+        }
+        
+        .status-badge, .status-indicator {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75em;
+            font-weight: bold;
+            text-transform: uppercase;
         }
     </style>
     
@@ -861,7 +1078,224 @@
         <div class="loading-text">Loading...</div>
     </div>
 
+    <!-- Vehicle Management Modal -->
+    <div id="vehicleManagementModal" class="modal fluent-modal" style="display: none;" role="dialog" aria-labelledby="vehicle-management-title" aria-modal="true">
+        <div class="modal-backdrop" onclick="hideVehicleManagementModal()" aria-label="Close vehicle management"></div>
+        <div class="modal-content fluent-modal-content">
+            <div class="fluent-modal-header">
+                <div class="fluent-header-content">
+                    <h1 id="vehicle-management-title" class="fluent-modal-title">Vehicle Management</h1>
+                    <p class="fluent-modal-subtitle">Manage fleet vehicles, maintenance, and driver logs</p>
+                </div>
+                <button class="fluent-close-btn" onclick="hideVehicleManagementModal()" aria-label="Close vehicle management">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M11.41 10l4.3-4.29a1 1 0 10-1.42-1.42L10 8.59l-4.29-4.3a1 1 0 00-1.42 1.42L8.59 10l-4.3 4.29a1 1 0 001.42 1.42L10 11.41l4.29 4.3a1 1 0 001.42-1.42L11.41 10z"/>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="fluent-modal-body">
+                <!-- Vehicle Summary Cards -->
+                <div class="vehicle-summary-section">
+                    <div class="summary-cards">
+                        <div class="summary-card">
+                            <div class="summary-number" id="modal-total-vehicles">0</div>
+                            <div class="summary-label">Total Vehicles</div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="summary-number" id="modal-available-vehicles">0</div>
+                            <div class="summary-label">Available</div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="summary-number" id="modal-maintenance-vehicles">0</div>
+                            <div class="summary-label">In Maintenance</div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="summary-number" id="modal-retired-vehicles">0</div>
+                            <div class="summary-label">Retired</div>
+                        </div>
+                    </div>
+                </div>
 
+                <!-- Vehicle Management Tabs -->
+                <div class="vehicle-tabs">
+                    <button class="fluent-tab active" onclick="showVehicleTab('vehicles', event)">Vehicles</button>
+                    <button class="fluent-tab" onclick="showVehicleTab('maintenance', event)">Maintenance</button>
+                    <button class="fluent-tab" onclick="showVehicleTab('driver-logs', event)">Driver Logs</button>
+                    <button class="fluent-tab" onclick="showVehicleTab('reports', event)">Reports</button>
+                </div>
+
+                <!-- Vehicles Tab Content -->
+                <div id="modal-vehicles-tab" class="vehicle-tab-content active">
+                    <div class="fluent-section-header">
+                        <div class="fluent-header-group">
+                            <h3 class="fluent-section-title">Fleet Vehicles</h3>
+                            <div class="fluent-section-controls">
+                                <div class="fluent-search-box">
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" class="fluent-search-icon">
+                                        <path d="M11.742 10.344a6.5 6.5 0 10-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 001.415-1.414l-3.85-3.85a1.007 1.007 0 00-.115-.1zM12 6.5a5.5 5.5 0 11-11 0 5.5 5.5 0 0111 0z"/>
+                                    </svg>
+                                    <input type="text" id="vehicleSearchInput" placeholder="Search vehicles" class="fluent-search-input">
+                                </div>
+                                <select id="vehicleStatusFilter" class="fluent-select">
+                                    <option value="">All Status</option>
+                                    <option value="available">Available</option>
+                                    <option value="maintenance">Maintenance</option>
+                                    <option value="retired">Retired</option>
+                                </select>
+                                <select id="vehicleTypeFilter" class="fluent-select">
+                                    <option value="">All Types</option>
+                                    <option value="suv">SUV</option>
+                                    <option value="pickup">Pickup</option>
+                                    <option value="van">Van</option>
+                                    <option value="car">Car</option>
+                                </select>
+                                <button class="fluent-btn fluent-btn-primary" onclick="openVehicleAddModal()">
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                                        <path d="M8.75 3.75a.75.75 0 00-1.5 0v3.5h-3.5a.75.75 0 000 1.5h3.5v3.5a.75.75 0 001.5 0v-3.5h3.5a.75.75 0 000-1.5h-3.5v-3.5z"/>
+                                    </svg>
+                                    Add Vehicle
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Vehicles Table -->
+                    <div class="fluent-table-container">
+                        <table class="fluent-table" id="modalVehiclesTable">
+                            <thead>
+                                <tr>
+                                    <th class="fluent-th-sortable" data-sort="vehicle">
+                                        <span>Vehicle</span>
+                                        <svg width="12" height="12" viewBox="0 0 12 12" class="fluent-sort-icon">
+                                            <path d="M6 2L4.5 3.5h3L6 2zM6 10l1.5-1.5h-3L6 10z"/>
+                                        </svg>
+                                    </th>
+                                    <th class="fluent-th-sortable" data-sort="type">
+                                        <span>Type</span>
+                                    </th>
+                                    <th class="fluent-th-sortable" data-sort="license">
+                                        <span>License</span>
+                                    </th>
+                                    <th class="fluent-th-sortable" data-sort="location">
+                                        <span>Location</span>
+                                    </th>
+                                    <th class="fluent-th-sortable" data-sort="mileage">
+                                        <span>Mileage</span>
+                                    </th>
+                                    <th class="fluent-th-sortable" data-sort="status">
+                                        <span>Status</span>
+                                    </th>
+                                    <th class="fluent-th-sortable" data-sort="insurance">
+                                        <span>Insurance</span>
+                                    </th>
+                                    <th class="fluent-th-sortable" data-sort="revision">
+                                        <span>Revision</span>
+                                    </th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="modalVehiclesList">
+                                <!-- Vehicles will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Maintenance Tab Content -->
+                <div id="modal-maintenance-tab" class="vehicle-tab-content">
+                    <div class="fluent-section-header">
+                        <div class="fluent-header-group">
+                            <h3 class="fluent-section-title">Maintenance Logs</h3>
+                            <div class="fluent-section-controls">
+                                <button class="fluent-btn fluent-btn-primary" onclick="openMaintenanceAddModal()">
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                                        <path d="M8.75 3.75a.75.75 0 00-1.5 0v3.5h-3.5a.75.75 0 000 1.5h3.5v3.5a.75.75 0 001.5 0v-3.5h3.5a.75.75 0 000-1.5h-3.5v-3.5z"/>
+                                    </svg>
+                                    Schedule Maintenance
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="fluent-table-container">
+                        <table class="fluent-table" id="modalMaintenanceTable">
+                            <thead>
+                                <tr>
+                                    <th>Vehicle</th>
+                                    <th>Type</th>
+                                    <th>Description</th>
+                                    <th>Start Date</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="modalMaintenanceList">
+                                <!-- Maintenance logs will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Driver Logs Tab Content -->
+                <div id="modal-driver-logs-tab" class="vehicle-tab-content">
+                    <div class="fluent-section-header">
+                        <div class="fluent-header-group">
+                            <h3 class="fluent-section-title">Driver Logs</h3>
+                            <div class="fluent-section-controls">
+                                <button class="fluent-btn fluent-btn-primary" onclick="openDriverLogAddModal()">
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                                        <path d="M8.75 3.75a.75.75 0 00-1.5 0v3.5h-3.5a.75.75 0 000 1.5h3.5v3.5a.75.75 0 001.5 0v-3.5h3.5a.75.75 0 000-1.5h-3.5v-3.5z"/>
+                                    </svg>
+                                    New Driver Log
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="fluent-table-container">
+                        <table class="fluent-table" id="modalDriverLogsTable">
+                            <thead>
+                                <tr>
+                                    <th>Vehicle</th>
+                                    <th>Driver</th>
+                                    <th>Route</th>
+                                    <th>Start Date</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="modalDriverLogsList">
+                                <!-- Driver logs will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Reports Tab Content -->
+                <div id="modal-reports-tab" class="vehicle-tab-content">
+                    <div class="fluent-section-header">
+                        <h3 class="fluent-section-title">Vehicle Reports & Analytics</h3>
+                    </div>
+                    <div class="reports-grid">
+                        <div class="report-card">
+                            <h4>Fleet Utilization</h4>
+                            <p>Vehicle usage statistics and efficiency metrics</p>
+                            <button class="fluent-btn fluent-btn-secondary">Generate Report</button>
+                        </div>
+                        <div class="report-card">
+                            <h4>Maintenance Costs</h4>
+                            <p>Breakdown of maintenance expenses by vehicle</p>
+                            <button class="fluent-btn fluent-btn-secondary">Generate Report</button>
+                        </div>
+                        <div class="report-card">
+                            <h4>Driver Performance</h4>
+                            <p>Driving logs and performance analytics</p>
+                            <button class="fluent-btn fluent-btn-secondary">Generate Report</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script src="js/main.js"></script>
 </body>
