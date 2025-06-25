@@ -120,20 +120,36 @@ function sendError($message, $status = 400) {
 
 // Authentication helper (for future implementation)
 function validateSession() {
-    // Mock validation for development
-    if (ENVIRONMENT === 'development') {
-        return [
-            'user_id' => 1,
-            'email' => 'daniel@wolthers.com',
-            'role' => 'admin',
-            'name' => 'Daniel Wolthers'
-        ];
+    if (!isset($_SESSION['user_id']) || !isset($_SESSION['token'])) {
+        return false;
     }
     
-    // TODO: Implement real session validation
-    // Check JWT token or session
-    // Validate against database
-    // Return user data or false
+    try {
+        $pdo = getDBConnection();
+        $stmt = $pdo->prepare("
+            SELECT u.*, s.expires_at 
+            FROM users u 
+            JOIN user_sessions s ON u.id = s.user_id 
+            WHERE u.id = ? AND s.token = ? AND s.expires_at > NOW() AND s.is_active = 1
+        ");
+        $stmt->execute([$_SESSION['user_id'], $_SESSION['token']]);
+        
+        $user = $stmt->fetch();
+        if ($user) {
+            // Update last activity
+            $updateStmt = $pdo->prepare("UPDATE user_sessions SET last_activity = NOW() WHERE token = ?");
+            $updateStmt->execute([$_SESSION['token']]);
+            
+            return [
+                'user_id' => $user['id'],
+                'email' => $user['email'],
+                'role' => $user['role'],
+                'name' => $user['name']
+            ];
+        }
+    } catch (Exception $e) {
+        error_log("Session validation error: " . $e->getMessage());
+    }
     
     return false;
 }
