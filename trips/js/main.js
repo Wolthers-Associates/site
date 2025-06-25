@@ -10,6 +10,12 @@ const CONFIG = {
 let currentUser = null;
 let currentTrips = [];
 let selectedTrip = null;
+let microsoftAuth = null;
+
+// Mock Data
+const MOCK_TRIPS = [
+    // Add mock trips here or load from API
+];
 
 // Utility Functions
 const utils = {
@@ -124,12 +130,22 @@ const auth = {
     // Real Office 365 authentication
     signInWithMicrosoft: async () => {
         try {
+            if (!microsoftAuth) {
+                throw new Error('Microsoft authentication not initialized. Please check Azure AD configuration.');
+            }
+            
             const result = await microsoftAuth.signIn();
-            if (result.success) {
-                const response = await fetch('/api/auth/microsoft-validate.php', {
+            if (result.success || result.user) {
+                // Extract access token from the result
+                const accessToken = result.accessToken || result.access_token;
+                
+                const response = await fetch('/api/auth/login.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ access_token: result.accessToken })
+                    body: JSON.stringify({ 
+                        login_type: 'office365',
+                        access_token: accessToken 
+                    })
                 });
                 
                 if (response.ok) {
@@ -139,8 +155,11 @@ const auth = {
                     ui.showDashboard();
                     await trips.loadTrips();
                 } else {
-                    throw new Error('Authentication failed');
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Authentication failed');
                 }
+            } else {
+                throw new Error('Microsoft authentication was cancelled or failed');
             }
         } catch (error) {
             utils.showError('Microsoft sign-in failed: ' + error.message);
@@ -178,13 +197,62 @@ const auth = {
         } catch (error) {
             utils.showError('Authentication error: ' + error.message);
         }
-    }
+    },
 
     // Remove all mock functions (mockUserCheck, mockRegularLogin, mockPasscodeLogin)
+    
+    // Login step functions
+    showStep2: (userName) => {
+        document.getElementById('step1').classList.remove('active');
+        document.getElementById('step2').classList.add('active');
+        document.getElementById('welcomeMessage').innerHTML = `<h3>Welcome back, ${userName}!</h3>`;
+    },
+    
+    showStep3: (email) => {
+        document.getElementById('step1').classList.remove('active');
+        document.getElementById('step3').classList.add('active');
+        document.getElementById('emailToConfirm').textContent = email;
+    },
+    
+    showStep4: (email) => {
+        document.getElementById('step2').classList.remove('active');
+        document.getElementById('step4').classList.add('active');
+        document.getElementById('emailForCode').textContent = email;
+    },
+    
+    goBackToStep1: () => {
+        document.querySelectorAll('.login-step').forEach(step => step.classList.remove('active'));
+        document.getElementById('step1').classList.add('active');
+        document.getElementById('primaryInput').value = '';
+        document.getElementById('errorMessage').classList.remove('show');
+    },
+    
+    goBackToStep2: () => {
+        document.getElementById('step4').classList.remove('active');
+        document.getElementById('step2').classList.add('active');
+    },
+    
+    logout: () => {
+        sessionStorage.removeItem('userSession');
+        localStorage.removeItem('wolthers_auth');
+        currentUser = null;
+        ui.showLogin();
+    }
 };
 
 // UI Management Functions
 const ui = {
+    // Show login screen
+    showLogin: () => {
+        document.getElementById('loginContainer').style.display = 'block';
+        document.getElementById('mainContainer').style.display = 'none';
+    },
+    
+    // Show dashboard/main content after authentication
+    showDashboard: () => {
+        ui.showMainContent();
+    },
+    
     // Show main content after authentication
     showMainContent: () => {
         document.getElementById('loginContainer').style.display = 'none';
@@ -864,7 +932,7 @@ const trips = {
 };
 
 // Event Listeners
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
     console.log('🚧 Development Mode - Enhanced Authentication Active');
     console.log('🎯 Available authentication methods:');
     console.log('🏢 Microsoft/Office 365: Ready (configure Azure AD credentials)');
@@ -872,10 +940,41 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('👤 Regular Login: Wolthers team emails (daniel@wolthers.com, svenn@wolthers.com, tom@wolthers.com, rasmus@wolthers.com) / any password');
     console.log('🔑 Trip Codes: BRAZIL2025, COLOMBIA2025, ETHIOPIA2025');
     
+    // Initialize Microsoft Authentication
+    try {
+        const configResponse = await fetch('/api/auth/microsoft-config.php');
+        const configData = await configResponse.json();
+        
+        if (configData.success && configData.config.clientId) {
+            microsoftAuth = new MicrosoftAuth(
+                configData.config.clientId,
+                configData.config.tenantId,
+                configData.config.redirectUri
+            );
+            console.log('✅ Microsoft Auth initialized successfully');
+            
+            // Set up Microsoft login button click handler
+            const microsoftBtn = document.getElementById('microsoftLoginBtn');
+            if (microsoftBtn) {
+                microsoftBtn.addEventListener('click', auth.signInWithMicrosoft);
+            }
+        } else {
+            console.warn('⚠️ Microsoft Auth not configured - check Azure AD credentials');
+        }
+    } catch (error) {
+        console.error('❌ Failed to initialize Microsoft Auth:', error);
+    }
+    
     // Initialize auth system first - don't initialize user database here to avoid conflicts
     auth.init().catch(error => {
         console.error('Failed to initialize authentication:', error);
     });
+    
+    // Set up form event handlers
+    const initialForm = document.getElementById('initialForm');
+    if (initialForm) {
+        initialForm.addEventListener('submit', auth.handleEmailLogin);
+    }
     
     // Global functions for modal interactions
     // Registration modal functions removed - using compact login only
