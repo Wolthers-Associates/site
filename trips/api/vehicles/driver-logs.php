@@ -52,7 +52,7 @@ try {
 }
 
 function handleGetDriverLogs() {
-    global $pdo;
+    $pdo = getDBConnection();
     
     // Get filters from query parameters
     $vehicle_id = $_GET['vehicle_id'] ?? null;
@@ -154,7 +154,7 @@ function handleGetDriverLogs() {
 }
 
 function handleCreateDriverLog() {
-    global $pdo;
+    $pdo = getDBConnection();
     
     $input = json_decode(file_get_contents('php://input'), true);
     
@@ -242,7 +242,7 @@ function handleCreateDriverLog() {
 }
 
 function handleUpdateDriverLog() {
-    global $pdo;
+    $pdo = getDBConnection();
     
     $input = json_decode(file_get_contents('php://input'), true);
     
@@ -307,7 +307,7 @@ function handleUpdateDriverLog() {
 }
 
 function handleDeleteDriverLog() {
-    global $pdo;
+    $pdo = getDBConnection();
     
     $log_id = $_GET['id'] ?? null;
     

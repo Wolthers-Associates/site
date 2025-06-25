@@ -40,16 +40,16 @@ if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
 
 // Password validation (more strict)
 if (!empty($password)) {
-    if (strlen($password) < 8) {
-        sendError('Password must be at least 8 characters long');
-    }
+if (strlen($password) < 8) {
+    sendError('Password must be at least 8 characters long');
+}
     
     if (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/', $password)) {
         sendError('Password must contain at least one uppercase letter, one lowercase letter, and one number');
     }
-    
-    if ($password !== $confirmPassword) {
-        sendError('Passwords do not match');
+
+if ($password !== $confirmPassword) {
+    sendError('Passwords do not match');
     }
 }
 
@@ -73,7 +73,7 @@ try {
     
     if ($existing_user) {
         if ($existing_user['status'] === 'active') {
-            sendError('Email address already registered', 409);
+        sendError('Email address already registered', 409);
         } else {
             sendError('Email address is associated with an inactive account. Please contact support.', 409);
         }

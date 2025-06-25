@@ -498,7 +498,7 @@ const auth = {
             utils.showError('Please enter a valid email address');
             return;
         }
-
+        
         try {
             const response = await fetch('/api/auth/check-user.php', {
                 method: 'POST',
@@ -511,7 +511,7 @@ const auth = {
                 auth.currentEmail = email;
                 if (data.user_type === 'employee') {
                     auth.showStep2(data.user.name);
-                } else {
+            } else {
                     auth.showStep3(email);
                 }
             } else {
@@ -576,7 +576,7 @@ const ui = {
     
     // Show dashboard/main content after authentication
     showDashboard: () => {
-        ui.showMainContent();
+            ui.showMainContent();
     },
     
     // Show main content after authentication
@@ -798,7 +798,7 @@ const ui = {
                     <span>${trip.cars}</span>
                 </div>
                 ` : ''}
-            </div>
+                </div>
         `;
         
         content.innerHTML = `
@@ -815,15 +815,15 @@ const ui = {
                 </div>
             </div>
             <div class="trip-preview-body">
-                ${trip.highlights && trip.highlights.length > 0 ? `
-                <div class="trip-preview-highlights">
-                    <h4 class="preview-section-title">Highlights</h4>
-                    ${trip.highlights.map(highlight => `
-                        <div class="preview-highlight-item">${highlight}</div>
-                    `).join('')}
-                </div>
-                ` : ''}
-                ${daysHTML}
+            ${trip.highlights && trip.highlights.length > 0 ? `
+            <div class="trip-preview-highlights">
+                <h4 class="preview-section-title">Highlights</h4>
+                ${trip.highlights.map(highlight => `
+                    <div class="preview-highlight-item">${highlight}</div>
+                `).join('')}
+            </div>
+            ` : ''}
+            ${daysHTML}
             </div>
         `;
         
@@ -1268,11 +1268,11 @@ const trips = {
             
             // Simulate API delay for realism
             setTimeout(() => {
-                // Add to mock data (at the beginning for upcoming trips)
-                MOCK_TRIPS.unshift(newTrip);
-                
-                utils.hideLoading();
-                ui.hideAddTripModal();
+            // Add to mock data (at the beginning for upcoming trips)
+            MOCK_TRIPS.unshift(newTrip);
+            
+            utils.hideLoading();
+            ui.hideAddTripModal();
                 
                 // Reset form state
                 window.selectedStaffAssignments = [];
@@ -1288,7 +1288,7 @@ const trips = {
                     staff: selectedStaff,
                     vehicles: selectedVehicles
                 });
-            }, 1500);
+        }, 1500);
             
         } catch (error) {
             console.error('Error creating trip:', error);
@@ -1745,7 +1745,7 @@ window.DEV = {
 };
 
 console.log('✅ Trip Management System loaded successfully');
-console.log('🔧 Development tools available in window.DEV');
+console.log('🔧 Development tools available in window.DEV'); 
 
 // Helper to get days until start
 function getDaysUntilStart(startDate) {

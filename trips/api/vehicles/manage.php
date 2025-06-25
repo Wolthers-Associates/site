@@ -45,14 +45,21 @@ try {
     }
 } catch (Exception $e) {
     http_response_code(500);
+    error_log('Vehicle API Error: ' . $e->getMessage());
+    error_log('Stack trace: ' . $e->getTraceAsString());
     echo json_encode([
         'success' => false,
-        'error' => $e->getMessage()
+        'error' => $e->getMessage(),
+        'debug' => [
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+            'trace' => DEBUG_MODE ? $e->getTraceAsString() : 'Hidden in production'
+        ]
     ]);
 }
 
 function handleGetVehicles() {
-    global $pdo;
+    $pdo = getDBConnection();
     
     // Get filters from query parameters
     $status = $_GET['status'] ?? null;
@@ -148,7 +155,7 @@ function handleGetVehicles() {
 }
 
 function handleCreateVehicle() {
-    global $pdo;
+    $pdo = getDBConnection();
     
     $input = json_decode(file_get_contents('php://input'), true);
     
@@ -208,7 +215,7 @@ function handleCreateVehicle() {
 }
 
 function handleUpdateVehicle() {
-    global $pdo;
+    $pdo = getDBConnection();
     
     $input = json_decode(file_get_contents('php://input'), true);
     
@@ -272,7 +279,7 @@ function handleUpdateVehicle() {
 }
 
 function handleDeleteVehicle() {
-    global $pdo;
+    $pdo = getDBConnection();
     
     $vehicle_id = $_GET['id'] ?? null;
     

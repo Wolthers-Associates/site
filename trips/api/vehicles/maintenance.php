@@ -52,7 +52,7 @@ try {
 }
 
 function handleGetMaintenanceLogs() {
-    global $pdo;
+    $pdo = getDBConnection();
     
     // Get filters from query parameters
     $vehicle_id = $_GET['vehicle_id'] ?? null;
@@ -141,7 +141,7 @@ function handleGetMaintenanceLogs() {
 }
 
 function handleCreateMaintenanceLog() {
-    global $pdo;
+    $pdo = getDBConnection();
     
     $input = json_decode(file_get_contents('php://input'), true);
     
@@ -227,7 +227,7 @@ function handleCreateMaintenanceLog() {
 }
 
 function handleUpdateMaintenanceLog() {
-    global $pdo;
+    $pdo = getDBConnection();
     
     $input = json_decode(file_get_contents('php://input'), true);
     
@@ -306,7 +306,7 @@ function handleUpdateMaintenanceLog() {
 }
 
 function handleDeleteMaintenanceLog() {
-    global $pdo;
+    $pdo = getDBConnection();
     
     $log_id = $_GET['id'] ?? null;
     

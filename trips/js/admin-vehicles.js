@@ -67,7 +67,7 @@ function initializeEventListeners() {
 }
 
 // Tab Management
-function showTab(tabName) {
+function showTab(tabName, event) {
     // Hide all tabs
     document.querySelectorAll('.tab-content').forEach(tab => {
         tab.classList.remove('active');
@@ -82,7 +82,12 @@ function showTab(tabName) {
     document.getElementById(`${tabName}-tab`).classList.add('active');
     
     // Add active class to clicked button
-    event.target.classList.add('active');
+    if (event && event.target) {
+        event.target.classList.add('active');
+    } else {
+        // Fallback: find the button by the tab name
+        document.querySelector(`button[onclick="showTab('${tabName}')"]`)?.classList.add('active');
+    }
     
     // Load data for the selected tab
     switch(tabName) {
@@ -107,19 +112,38 @@ function showTab(tabName) {
 // Vehicle Management
 async function loadVehicles() {
     try {
-        const response = await fetch('/trips/api/vehicles/manage.php?include_maintenance=true&include_driver_logs=false');
-        const data = await response.json();
+        console.log('Loading vehicles from:', 'api/vehicles/manage.php');
+        const response = await fetch('api/vehicles/manage.php?include_maintenance=true&include_driver_logs=false');
+        
+        console.log('Response status:', response.status);
+        console.log('Response headers:', response.headers);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const text = await response.text();
+        console.log('Raw response:', text);
+        
+        let data;
+        try {
+            data = JSON.parse(text);
+        } catch (parseError) {
+            console.error('JSON parse error:', parseError);
+            throw new Error('Invalid JSON response from server');
+        }
         
         if (data.success) {
             currentVehicles = data.vehicles;
             displayVehicles(data.vehicles);
             updateVehicleSummary(data.summary);
+            console.log('Vehicles loaded successfully:', data.vehicles.length);
         } else {
             throw new Error(data.error || 'Failed to load vehicles');
         }
     } catch (error) {
         console.error('Error loading vehicles:', error);
-        showNotification('Failed to load vehicles', 'error');
+        showNotification(`Failed to load vehicles: ${error.message}`, 'error');
     }
 }
 
@@ -310,7 +334,7 @@ async function handleVehicleSubmit(e) {
     }
     
     try {
-        const url = '/trips/api/vehicles/manage.php';
+        const url = 'api/vehicles/manage.php';
         const method = isEdit ? 'PUT' : 'POST';
         
         const response = await fetch(url, {
@@ -346,7 +370,7 @@ async function deleteVehicle(vehicleId) {
     }
     
     try {
-        const response = await fetch(`/trips/api/vehicles/manage.php?id=${vehicleId}`, {
+        const response = await fetch(`api/vehicles/manage.php?id=${vehicleId}`, {
             method: 'DELETE'
         });
         
@@ -367,7 +391,7 @@ async function deleteVehicle(vehicleId) {
 // Maintenance Management
 async function loadMaintenanceLogs() {
     try {
-        const response = await fetch('/trips/api/vehicles/maintenance.php');
+        const response = await fetch('api/vehicles/maintenance.php');
         const data = await response.json();
         
         if (data.success) {
@@ -460,7 +484,7 @@ async function handleMaintenanceSubmit(e) {
     }
     
     try {
-        const url = '/trips/api/vehicles/maintenance.php';
+        const url = 'api/vehicles/maintenance.php';
         const method = isEdit ? 'PUT' : 'POST';
         
         const response = await fetch(url, {
@@ -490,7 +514,7 @@ async function handleMaintenanceSubmit(e) {
 // Driver Logs Management
 async function loadDriverLogs() {
     try {
-        const response = await fetch('/trips/api/vehicles/driver-logs.php');
+        const response = await fetch('api/vehicles/driver-logs.php');
         const data = await response.json();
         
         if (data.success) {
@@ -583,7 +607,7 @@ async function handleDriverLogSubmit(e) {
     }
     
     try {
-        const url = '/trips/api/vehicles/driver-logs.php';
+        const url = 'api/vehicles/driver-logs.php';
         const method = isEdit ? 'PUT' : 'POST';
         
         const response = await fetch(url, {
@@ -613,7 +637,7 @@ async function handleDriverLogSubmit(e) {
 // Utility Functions
 async function loadUsers() {
     try {
-        const response = await fetch('/trips/api/auth/list-users.php');
+        const response = await fetch('api/auth/list-users.php');
         const data = await response.json();
         
         if (data.success) {
@@ -626,7 +650,7 @@ async function loadUsers() {
 
 async function loadTrips() {
     try {
-        const response = await fetch('/trips/api/trips/list.php');
+        const response = await fetch('api/trips/list.php');
         const data = await response.json();
         
         if (data.success) {
@@ -728,7 +752,7 @@ async function generateReport() {
     const endDate = document.getElementById('report-end-date').value;
     
     try {
-        let url = '/trips/api/vehicles/driver-logs.php';
+        let url = 'api/vehicles/driver-logs.php';
         if (startDate) url += `?start_date=${startDate}`;
         if (endDate) url += `${startDate ? '&' : '?'}end_date=${endDate}`;
         
@@ -749,7 +773,7 @@ function updateReportSummary(summary) {
     document.getElementById('active-logs').textContent = summary.active || 0;
     
     // Get maintenance cost separately
-    fetch('/trips/api/vehicles/maintenance.php')
+            fetch('api/vehicles/maintenance.php')
         .then(response => response.json())
         .then(data => {
             if (data.success) {
@@ -816,7 +840,7 @@ async function deleteMaintenanceLog(id) {
     }
     
     try {
-        const response = await fetch(`/trips/api/vehicles/maintenance.php?id=${id}`, {
+        const response = await fetch(`api/vehicles/maintenance.php?id=${id}`, {
             method: 'DELETE'
         });
         
@@ -840,7 +864,7 @@ async function deleteDriverLog(id) {
     }
     
     try {
-        const response = await fetch(`/trips/api/vehicles/driver-logs.php?id=${id}`, {
+        const response = await fetch(`api/vehicles/driver-logs.php?id=${id}`, {
             method: 'DELETE'
         });
         
