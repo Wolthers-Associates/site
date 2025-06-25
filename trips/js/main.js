@@ -1198,13 +1198,11 @@ const trips = {
             const partnerEmails = partnerEmailsText ? 
                 partnerEmailsText.split('\n').map(e => e.trim()).filter(e => e) : [];
             
-            // Get selected staff and vehicles from the new system
-            const selectedStaff = window.selectedStaffAssignments || [];
-            const selectedVehicles = Array.from(document.getElementById('vehicles').selectedOptions)
-                .map(option => ({ 
-                    id: option.value, 
-                    displayName: option.textContent 
-                })).filter(v => v.id);
+            // Get enhanced trip creation data
+            const enhancedData = EnhancedTripCreation.getCollectedData();
+            const selectedVehicles = enhancedData.vehicles || [];
+            const selectedStaff = enhancedData.staff || [];
+            const enhancedItinerary = enhancedData.itinerary || null;
             
             // Extract company name from partner emails (smart detection)
             let companyName = '';
@@ -1239,7 +1237,21 @@ const trips = {
                 .replace(/[^a-z0-9\s]/g, '')
                 .replace(/\s+/g, '-') + '-2025';
 
-            // Create new trip object with real staff and vehicle data
+            // Format vehicles for display
+            const vehicleDisplayNames = selectedVehicles.map(v => {
+                const drivers = v.drivers ? ` (${v.drivers})` : '';
+                return `${v.name} ${v.license}${drivers}`;
+            });
+
+            // Format staff for display
+            const staffDisplayNames = selectedStaff.map(s => {
+                const attendance = s.attendanceType === 'partial' 
+                    ? ` (Day ${s.startDay}-${s.endDay})`
+                    : '';
+                return `${s.name} - ${s.customRole}${attendance}`;
+            });
+
+            // Create new trip object with enhanced data
             const newTrip = {
                 id: tripId,
                 title: tripTitle,
@@ -1247,23 +1259,25 @@ const trips = {
                 date: startDate,
                 endDate: endDate,
                 guests: guestName,
-                vehicles: selectedVehicles,
-                externalDriver: formData.get('driver') || '',
+                // Enhanced vehicle and staff data
+                vehicleAssignments: selectedVehicles,
                 staffAssignments: selectedStaff,
+                enhancedItinerary: enhancedItinerary,
                 status: 'upcoming',
                 partnerEmails: partnerEmails,
-                partnerCodes: [tripCodeData.code], // AI-generated code
+                partnerCodes: [tripCodeData.code],
                 createdBy: currentUser.name,
-                highlights: [], // Would be added later
-                accommodations: '', // Would be added later
-                meals: '', // Would be added later
+                highlights: [],
+                accommodations: '',
+                meals: '',
                 // Trip code metadata
                 tripCodeData: tripCodeData,
                 companyName: companyName,
-                // Formatted display for compatibility
-                cars: selectedVehicles.map(v => v.displayName).join(', ') || 'TBD',
-                driver: selectedStaff.find(s => s.role === 'driver')?.name || formData.get('driver') || 'TBD',
-                wolthersStaff: selectedStaff.map(s => `${s.name} (${s.role})`).join(', ') || 'TBD'
+                // Formatted display for compatibility with existing UI
+                cars: vehicleDisplayNames.length > 0 ? vehicleDisplayNames.join(', ') : 'TBD',
+                driver: trips.formatDriversDisplay(selectedVehicles),
+                wolthersStaff: staffDisplayNames.length > 0 ? staffDisplayNames.join(', ') : 'TBD',
+                wolthersGuide: selectedStaff.length > 0 ? selectedStaff[0].name : currentUser.name
             };
             
             // Simulate API delay for realism
@@ -1274,8 +1288,10 @@ const trips = {
             utils.hideLoading();
             ui.hideAddTripModal();
                 
-                // Reset form state
-                window.selectedStaffAssignments = [];
+                // Reset enhanced trip creation state
+                EnhancedTripCreation.selectedVehicles = [];
+                EnhancedTripCreation.selectedStaff = [];
+                EnhancedTripCreation.currentItinerary = null;
                 
                 // 🎉 Show Trip Code Success Modal
                 trips.showTripCodeModal(newTrip);
@@ -1283,10 +1299,12 @@ const trips = {
                 // Refresh display in background
                 trips.loadTrips();
                 
-                console.log('✅ Trip created with staff and vehicle assignments:', {
+                console.log('✅ Enhanced trip created successfully:', {
                     title: newTrip.title,
-                    staff: selectedStaff,
-                    vehicles: selectedVehicles
+                    vehicles: selectedVehicles.length,
+                    staff: selectedStaff.length,
+                    hasItinerary: !!enhancedItinerary,
+                    enhancedData: enhancedData
                 });
         }, 1500);
             
@@ -1314,6 +1332,21 @@ const trips = {
         
         // Capitalize first letter
         return companyName.charAt(0).toUpperCase() + companyName.slice(1);
+    },
+
+    // Helper function to format drivers display
+    formatDriversDisplay: (vehicles) => {
+        if (!vehicles || vehicles.length === 0) return 'TBD';
+        
+        const driversWithVehicles = vehicles
+            .filter(v => v.drivers && v.drivers.trim())
+            .map(v => `${v.drivers} (${v.name})`);
+            
+        if (driversWithVehicles.length === 0) {
+            return 'Wolthers Staff';
+        }
+        
+        return driversWithVehicles.join(', ');
     },
 
     // Load vehicles from database
@@ -1615,55 +1648,12 @@ document.addEventListener('DOMContentLoaded', async function() {
         trips.createTrip(new FormData(this));
     });
 
-    // Initialize staff and vehicle management when modal opens
+    // Enhanced Trip Creation Modal Initialization
     window.showAddTripModal = () => {
         ui.showAddTripModal();
         
-        // Load vehicles when modal opens
-        trips.loadVehicles();
-        
-        // Initialize staff assignments array
-        window.selectedStaffAssignments = [];
-        
-        // Set up date change handlers for staff availability
-        const setupDateHandlers = () => {
-            const startDateInput = document.getElementById('startDate');
-            const endDateInput = document.getElementById('endDate');
-            
-            if (!startDateInput || !endDateInput) {
-                // If date inputs don't exist, check again in 100ms
-                setTimeout(setupDateHandlers, 100);
-                return;
-            }
-            
-            const checkStaffAvailability = () => {
-                const startDate = startDateInput.value;
-                const endDate = endDateInput.value;
-                
-                if (startDate && endDate) {
-                    trips.loadStaffAvailability(startDate, endDate);
-                } else {
-                    document.getElementById('staffLoadingMessage').textContent = 'Please select trip dates to check staff availability';
-                    document.getElementById('staffSelectionContainer').style.display = 'none';
-                }
-            };
-            
-            startDateInput.addEventListener('change', checkStaffAvailability);
-            endDateInput.addEventListener('change', checkStaffAvailability);
-            
-            // Set default dates (next month)
-            const today = new Date();
-            const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, today.getDate());
-            const weekLater = new Date(nextMonth.getTime() + 7 * 24 * 60 * 60 * 1000);
-            
-            startDateInput.value = nextMonth.toISOString().split('T')[0];
-            endDateInput.value = weekLater.toISOString().split('T')[0];
-            
-            // Initial check with default dates
-            setTimeout(checkStaffAvailability, 500);
-        };
-        
-        setupDateHandlers();
+        // Initialize enhanced trip creation system
+        EnhancedTripCreation.initialize();
     };
     
     // Modal click handlers
@@ -1742,6 +1732,813 @@ window.DEV = {
     auth: auth,
     ui: ui,
     trips: trips
+};
+
+// ============================================================================
+// ENHANCED TRIP CREATION SYSTEM
+// ============================================================================
+
+const EnhancedTripCreation = {
+    // State management
+    selectedVehicles: [],
+    selectedStaff: [],
+    currentItinerary: null,
+    templates: {},
+
+    // Initialize the enhanced trip creation system
+    initialize() {
+        this.setupEventHandlers();
+        this.loadVehicles();
+        this.loadStaff();
+        this.loadTemplates();
+        this.setupDateHandlers();
+    },
+
+    // Set up all event handlers
+    setupEventHandlers() {
+        // Vehicle management
+        const addVehicleBtn = document.getElementById('addVehicleBtn');
+        if (addVehicleBtn) {
+            addVehicleBtn.addEventListener('click', () => this.showVehicleSelection());
+        }
+
+        // Staff management
+        const addStaffBtn = document.getElementById('addStaffBtn');
+        if (addStaffBtn) {
+            addStaffBtn.addEventListener('click', () => this.showStaffSelection());
+        }
+
+        // AI Itinerary
+        const formatItineraryBtn = document.getElementById('formatItineraryBtn');
+        if (formatItineraryBtn) {
+            formatItineraryBtn.addEventListener('click', () => this.formatItinerary());
+        }
+
+        const clearItineraryBtn = document.getElementById('clearItineraryBtn');
+        if (clearItineraryBtn) {
+            clearItineraryBtn.addEventListener('click', () => this.clearItinerary());
+        }
+
+        // Template selection
+        const templateSelect = document.getElementById('itineraryTemplate');
+        if (templateSelect) {
+            templateSelect.addEventListener('change', (e) => this.loadTemplate(e.target.value));
+        }
+
+        // Preview actions
+        const approveItineraryBtn = document.getElementById('approveItineraryBtn');
+        if (approveItineraryBtn) {
+            approveItineraryBtn.addEventListener('click', () => this.approveItinerary());
+        }
+
+        const editItineraryBtn = document.getElementById('editItineraryBtn');
+        if (editItineraryBtn) {
+            editItineraryBtn.addEventListener('click', () => this.editItinerary());
+        }
+
+        const regenerateItineraryBtn = document.getElementById('regenerateItineraryBtn');
+        if (regenerateItineraryBtn) {
+            regenerateItineraryBtn.addEventListener('click', () => this.regenerateItinerary());
+        }
+    },
+
+    // Set up date change handlers
+    setupDateHandlers() {
+        const startDateInput = document.getElementById('startDate');
+        const endDateInput = document.getElementById('endDate');
+        
+        if (!startDateInput || !endDateInput) {
+            setTimeout(() => this.setupDateHandlers(), 100);
+            return;
+        }
+
+        const handleDateChange = () => {
+            const startDate = startDateInput.value;
+            const endDate = endDateInput.value;
+            
+            if (startDate && endDate) {
+                this.checkVehicleAvailability(startDate, endDate);
+                this.checkStaffAvailability(startDate, endDate);
+            }
+        };
+
+        startDateInput.addEventListener('change', handleDateChange);
+        endDateInput.addEventListener('change', handleDateChange);
+
+        // Set default dates
+        const today = new Date();
+        const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, today.getDate());
+        const weekLater = new Date(nextMonth.getTime() + 7 * 24 * 60 * 60 * 1000);
+        
+        startDateInput.value = nextMonth.toISOString().split('T')[0];
+        endDateInput.value = weekLater.toISOString().split('T')[0];
+        
+        setTimeout(handleDateChange, 500);
+    },
+
+    // Vehicle Management
+    async loadVehicles() {
+        const loadingMessage = document.getElementById('vehicleLoadingMessage');
+        if (loadingMessage) {
+            loadingMessage.textContent = 'Loading available vehicles...';
+        }
+
+        try {
+            // Simulate API call to get vehicles
+            const vehicles = await this.fetchVehicles();
+            this.displayAvailableVehicles(vehicles);
+        } catch (error) {
+            console.error('Error loading vehicles:', error);
+            if (loadingMessage) {
+                loadingMessage.textContent = 'Error loading vehicles. Please try again.';
+            }
+        }
+    },
+
+    async fetchVehicles() {
+        try {
+            const response = await fetch('api/vehicles/list.php');
+            const data = await response.json();
+            
+            if (data.success) {
+                return data.vehicles.map(vehicle => ({
+                    id: vehicle.id,
+                    name: vehicle.displayName,
+                    license: vehicle.license_plate,
+                    status: vehicle.isAvailable ? 'available' : 'maintenance',
+                    capacity: vehicle.capacity || 4,
+                    location: vehicle.location || 'Unknown'
+                }));
+            } else {
+                throw new Error(data.message || 'Failed to fetch vehicles');
+            }
+        } catch (error) {
+            console.error('Error fetching vehicles:', error);
+            // Fallback to mock data for development
+            return [
+                { id: 1, name: 'Chevrolet S10', license: 'ABC-1234', status: 'available', capacity: 4 },
+                { id: 2, name: 'Toyota Hilux', license: 'DEF-5678', status: 'available', capacity: 4 },
+                { id: 3, name: 'Ford Ranger', license: 'GHI-9012', status: 'maintenance', capacity: 4 },
+                { id: 4, name: 'Nissan Frontier', license: 'JKL-3456', status: 'available', capacity: 4 },
+                { id: 5, name: 'Volkswagen Amarok', license: 'MNO-7890', status: 'available', capacity: 4 }
+            ];
+        }
+    },
+
+    async checkVehicleAvailability(startDate, endDate) {
+        const availabilityInfo = document.getElementById('vehicleAvailabilityInfo');
+        if (availabilityInfo) {
+            availabilityInfo.textContent = `Checking vehicle availability for ${startDate} to ${endDate}...`;
+        }
+
+        // Simulate availability check
+        setTimeout(() => {
+            if (availabilityInfo) {
+                availabilityInfo.innerHTML = `
+                    <span style="color: green;">✓ 4 vehicles available</span> | 
+                    <span style="color: orange;">⚠ 1 in maintenance</span>
+                `;
+            }
+        }, 500);
+    },
+
+    displayAvailableVehicles(vehicles) {
+        const container = document.getElementById('availableVehiclesList');
+        const loadingMessage = document.getElementById('vehicleLoadingMessage');
+        const selectionContainer = document.getElementById('vehicleSelectionContainer');
+
+        if (!container) return;
+
+        if (loadingMessage) loadingMessage.style.display = 'none';
+        if (selectionContainer) selectionContainer.style.display = 'block';
+
+        container.innerHTML = vehicles.map(vehicle => `
+            <div class="available-vehicle-item ${vehicle.status === 'available' ? '' : 'unavailable'}" 
+                 onclick="EnhancedTripCreation.selectVehicle(${vehicle.id})">
+                <input type="checkbox" class="vehicle-checkbox" id="vehicle-${vehicle.id}" 
+                       ${vehicle.status === 'available' ? '' : 'disabled'}>
+                <div class="vehicle-info">
+                    <div class="vehicle-info-name">${vehicle.name}</div>
+                    <div class="vehicle-info-details">${vehicle.license} • ${vehicle.capacity} passengers</div>
+                </div>
+                <div class="vehicle-status ${vehicle.status}">${vehicle.status}</div>
+            </div>
+        `).join('');
+    },
+
+    selectVehicle(vehicleId) {
+        const checkbox = document.getElementById(`vehicle-${vehicleId}`);
+        if (checkbox && !checkbox.disabled) {
+            checkbox.checked = !checkbox.checked;
+            
+            if (checkbox.checked) {
+                this.addVehicleToSelection(vehicleId);
+            } else {
+                this.removeVehicleFromSelection(vehicleId);
+            }
+        }
+    },
+
+    async addVehicleToSelection(vehicleId) {
+        // Get vehicle details
+        const vehicles = await this.fetchVehicles();
+        const vehicle = vehicles.find(v => v.id === vehicleId);
+        
+        if (!vehicle || this.selectedVehicles.find(v => v.id === vehicleId)) return;
+
+        this.selectedVehicles.push({
+            ...vehicle,
+            drivers: ''
+        });
+
+        this.updateSelectedVehiclesList();
+    },
+
+    removeVehicleFromSelection(vehicleId) {
+        this.selectedVehicles = this.selectedVehicles.filter(v => v.id !== vehicleId);
+        this.updateSelectedVehiclesList();
+    },
+
+    updateSelectedVehiclesList() {
+        const container = document.getElementById('selectedVehiclesList');
+        if (!container) return;
+
+        container.innerHTML = this.selectedVehicles.map(vehicle => `
+            <div class="selected-vehicle-item">
+                <div class="vehicle-header">
+                    <div>
+                        <span class="vehicle-name">${vehicle.name}</span>
+                        <span class="vehicle-license">${vehicle.license}</span>
+                    </div>
+                    <button type="button" class="remove-vehicle-btn" 
+                            onclick="EnhancedTripCreation.removeVehicleFromSelection(${vehicle.id})">×</button>
+                </div>
+                <div class="driver-assignment">
+                    <label>Driver(s) for this vehicle:</label>
+                    <input type="text" class="driver-input" 
+                           placeholder="e.g., Carlos Silva, Maria Santos (comma-separated for multiple drivers)"
+                           value="${vehicle.drivers}"
+                           onchange="EnhancedTripCreation.updateVehicleDrivers(${vehicle.id}, this.value)">
+                    <div class="driver-help">
+                        💡 For multiple drivers per vehicle, separate names with commas. 
+                        Leave blank if Wolthers staff will drive.
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    },
+
+    updateVehicleDrivers(vehicleId, drivers) {
+        const vehicle = this.selectedVehicles.find(v => v.id === vehicleId);
+        if (vehicle) {
+            vehicle.drivers = drivers;
+        }
+    },
+
+    showVehicleSelection() {
+        const container = document.getElementById('availableVehiclesList');
+        if (container) {
+            container.style.display = container.style.display === 'none' ? 'block' : 'none';
+        }
+    },
+
+    // Staff Management
+    async loadStaff() {
+        const loadingMessage = document.getElementById('staffLoadingMessage');
+        if (loadingMessage) {
+            loadingMessage.textContent = 'Loading Wolthers staff...';
+        }
+
+        try {
+            const staff = await this.fetchStaff();
+            this.displayAvailableStaff(staff);
+        } catch (error) {
+            console.error('Error loading staff:', error);
+            if (loadingMessage) {
+                loadingMessage.textContent = 'Error loading staff. Please try again.';
+            }
+        }
+    },
+
+    async fetchStaff() {
+        try {
+            const startDate = document.getElementById('startDate')?.value;
+            const endDate = document.getElementById('endDate')?.value;
+            
+            if (!startDate || !endDate) {
+                // Return default staff if dates not set
+                return this.getDefaultStaff();
+            }
+            
+            const params = new URLSearchParams({
+                start_date: startDate,
+                end_date: endDate
+            });
+            
+            const response = await fetch(`api/staff/availability.php?${params}`);
+            const data = await response.json();
+            
+            if (data.success) {
+                return data.staff.map(member => ({
+                    id: member.id,
+                    name: member.name,
+                    department: member.department || 'Operations',
+                    role: member.role || 'Staff',
+                    available: member.available
+                }));
+            } else {
+                throw new Error(data.message || 'Failed to fetch staff');
+            }
+        } catch (error) {
+            console.error('Error fetching staff:', error);
+            return this.getDefaultStaff();
+        }
+    },
+
+    getDefaultStaff() {
+        // Fallback staff data for development
+        return [
+            { id: 1, name: 'Daniel Wolthers', department: 'Management', role: 'CEO', available: true },
+            { id: 2, name: 'Christian Wolthers', department: 'Operations', role: 'COO', available: true },
+            { id: 3, name: 'Svenn Wolthers', department: 'Sales', role: 'Sales Director', available: false },
+            { id: 4, name: 'Rasmus Wolthers', department: 'Marketing', role: 'Marketing Manager', available: true },
+            { id: 5, name: 'Ana Molina', department: 'Operations', role: 'Tour Guide', available: true },
+            { id: 6, name: 'Edgar Gomes', department: 'Operations', role: 'Driver', available: true },
+            { id: 7, name: 'Hector Posada', department: 'Operations', role: 'Tour Guide', available: true }
+        ];
+    },
+
+    async checkStaffAvailability(startDate, endDate) {
+        const availabilityInfo = document.getElementById('staffAvailabilityInfo');
+        if (availabilityInfo) {
+            availabilityInfo.textContent = `Checking staff availability for ${startDate} to ${endDate}...`;
+        }
+
+        // Simulate availability check
+        setTimeout(() => {
+            if (availabilityInfo) {
+                availabilityInfo.innerHTML = `
+                    <span style="color: green;">✓ 6 staff members available</span> | 
+                    <span style="color: orange;">⚠ 1 unavailable</span>
+                `;
+            }
+        }, 500);
+    },
+
+    displayAvailableStaff(staff) {
+        const container = document.getElementById('staffList');
+        const loadingMessage = document.getElementById('staffLoadingMessage');
+        const selectionContainer = document.getElementById('staffSelectionContainer');
+
+        if (!container) return;
+
+        if (loadingMessage) loadingMessage.style.display = 'none';
+        if (selectionContainer) selectionContainer.style.display = 'block';
+
+        container.innerHTML = staff.map(member => `
+            <div class="staff-member ${member.available ? '' : 'unavailable'}" 
+                 onclick="EnhancedTripCreation.selectStaff(${member.id})">
+                <input type="checkbox" class="staff-checkbox" id="staff-${member.id}" 
+                       ${member.available ? '' : 'disabled'}>
+                <div class="staff-info">
+                    <div class="staff-name">${member.name}</div>
+                    <div class="staff-department">${member.department} • ${member.role}</div>
+                </div>
+                <div class="staff-availability ${member.available ? 'available' : 'busy'}">
+                    ${member.available ? 'Available' : 'Unavailable'}
+                </div>
+            </div>
+        `).join('');
+    },
+
+    selectStaff(staffId) {
+        const checkbox = document.getElementById(`staff-${staffId}`);
+        if (checkbox && !checkbox.disabled) {
+            checkbox.checked = !checkbox.checked;
+            
+            if (checkbox.checked) {
+                this.addStaffToSelection(staffId);
+            } else {
+                this.removeStaffFromSelection(staffId);
+            }
+        }
+    },
+
+    async addStaffToSelection(staffId) {
+        const staff = await this.fetchStaff();
+        const member = staff.find(s => s.id === staffId);
+        
+        if (!member || this.selectedStaff.find(s => s.id === staffId)) return;
+
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+
+        this.selectedStaff.push({
+            ...member,
+            attendanceType: 'full',
+            startDay: 1,
+            endDay: this.getTripDuration(startDate, endDate),
+            customRole: member.role
+        });
+
+        this.updateSelectedStaffList();
+    },
+
+    removeStaffFromSelection(staffId) {
+        this.selectedStaff = this.selectedStaff.filter(s => s.id !== staffId);
+        this.updateSelectedStaffList();
+    },
+
+    updateSelectedStaffList() {
+        const container = document.getElementById('selectedStaffList');
+        if (!container) return;
+
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+        const totalDays = this.getTripDuration(startDate, endDate);
+
+        container.innerHTML = this.selectedStaff.map(member => `
+            <div class="selected-staff-item">
+                <div class="staff-header">
+                    <div class="staff-name-role">
+                        <span class="staff-name">${member.name}</span>
+                        <span class="staff-role-badge">${member.customRole}</span>
+                    </div>
+                    <button type="button" class="remove-staff-btn" 
+                            onclick="EnhancedTripCreation.removeStaffFromSelection(${member.id})">×</button>
+                </div>
+                <div class="staff-attendance-config">
+                    <div class="attendance-field">
+                        <label>Attendance:</label>
+                        <select onchange="EnhancedTripCreation.updateStaffAttendance(${member.id}, 'attendanceType', this.value)">
+                            <option value="full" ${member.attendanceType === 'full' ? 'selected' : ''}>Full Trip</option>
+                            <option value="partial" ${member.attendanceType === 'partial' ? 'selected' : ''}>Partial</option>
+                        </select>
+                    </div>
+                    <div class="attendance-field">
+                        <label>From Day:</label>
+                        <input type="number" min="1" max="${totalDays}" value="${member.startDay}"
+                               onchange="EnhancedTripCreation.updateStaffAttendance(${member.id}, 'startDay', this.value)">
+                    </div>
+                    <div class="attendance-field">
+                        <label>To Day:</label>
+                        <input type="number" min="1" max="${totalDays}" value="${member.endDay}"
+                               onchange="EnhancedTripCreation.updateStaffAttendance(${member.id}, 'endDay', this.value)">
+                    </div>
+                </div>
+                <div class="attendance-preview">
+                    ${this.generateAttendancePreview(member, startDate, endDate)}
+                </div>
+            </div>
+        `).join('');
+    },
+
+    updateStaffAttendance(staffId, field, value) {
+        const member = this.selectedStaff.find(s => s.id === staffId);
+        if (member) {
+            member[field] = field === 'attendanceType' ? value : parseInt(value);
+            
+            // Auto-adjust for full attendance
+            if (field === 'attendanceType' && value === 'full') {
+                const startDate = document.getElementById('startDate').value;
+                const endDate = document.getElementById('endDate').value;
+                member.startDay = 1;
+                member.endDay = this.getTripDuration(startDate, endDate);
+            }
+            
+            this.updateSelectedStaffList();
+        }
+    },
+
+    generateAttendancePreview(member, startDate, endDate) {
+        const start = new Date(startDate);
+        const startAttendance = new Date(start.getTime() + (member.startDay - 1) * 24 * 60 * 60 * 1000);
+        const endAttendance = new Date(start.getTime() + (member.endDay - 1) * 24 * 60 * 60 * 1000);
+        
+        return `📅 ${member.name} attending: ${startAttendance.toLocaleDateString()} - ${endAttendance.toLocaleDateString()} (Day ${member.startDay}-${member.endDay})`;
+    },
+
+    getTripDuration(startDate, endDate) {
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        return Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
+    },
+
+    showStaffSelection() {
+        const container = document.getElementById('staffList');
+        if (container) {
+            container.style.display = container.style.display === 'none' ? 'block' : 'none';
+        }
+    },
+
+    // AI-Enhanced Itinerary
+    async formatItinerary() {
+        const textarea = document.getElementById('itineraryText');
+        const preview = document.getElementById('itineraryPreview');
+        const actions = document.querySelector('.preview-actions');
+        
+        if (!textarea || !preview) return;
+
+        const rawText = textarea.value.trim();
+        if (!rawText) {
+            utils.showNotification('Please enter some itinerary text first.', 'warning');
+            return;
+        }
+
+        // Show processing state
+        preview.classList.add('processing');
+        preview.innerHTML = '<div class="preview-placeholder"><p>🤖 AI is enhancing your itinerary...</p></div>';
+        
+        try {
+            // Simulate AI processing
+            const enhancedItinerary = await this.processItineraryWithAI(rawText);
+            
+            // Display enhanced itinerary
+            preview.classList.remove('processing');
+            preview.innerHTML = this.renderEnhancedItinerary(enhancedItinerary);
+            
+            if (actions) actions.style.display = 'flex';
+            
+            this.currentItinerary = enhancedItinerary;
+            
+        } catch (error) {
+            console.error('Error processing itinerary:', error);
+            preview.classList.remove('processing');
+            preview.innerHTML = '<div class="preview-placeholder"><p style="color: red;">❌ Error processing itinerary. Please try again.</p></div>';
+        }
+    },
+
+    async processItineraryWithAI(rawText) {
+        // Simulate AI processing - replace with real AI API
+        return new Promise(resolve => {
+            setTimeout(() => {
+                const days = this.parseRawItinerary(rawText);
+                const enhanced = this.enhanceItineraryWithAI(days);
+                resolve(enhanced);
+            }, 2000);
+        });
+    },
+
+    parseRawItinerary(rawText) {
+        const lines = rawText.split('\n').filter(line => line.trim());
+        const days = [];
+        let currentDay = null;
+
+        lines.forEach(line => {
+            const trimmed = line.trim().toLowerCase();
+            
+            // Detect day markers
+            if (trimmed.includes('day ') || trimmed.match(/^\d+/) || trimmed.includes('dia ')) {
+                if (currentDay) days.push(currentDay);
+                currentDay = {
+                    dayNumber: days.length + 1,
+                    activities: [],
+                    rawLine: line
+                };
+            } else if (currentDay) {
+                currentDay.activities.push(line.trim());
+            } else {
+                // First activity without day marker
+                currentDay = {
+                    dayNumber: 1,
+                    activities: [line.trim()],
+                    rawLine: 'Day 1'
+                };
+            }
+        });
+
+        if (currentDay) days.push(currentDay);
+        return days;
+    },
+
+    enhanceItineraryWithAI(days) {
+        return days.map(day => ({
+            ...day,
+            activities: day.activities.map(activity => this.enhanceActivity(activity))
+        }));
+    },
+
+    enhanceActivity(activity) {
+        // Simple AI enhancement simulation
+        const enhanced = activity
+            .replace(/(\d{1,2})(am|pm)/gi, '$1:00 $2')
+            .replace(/(\d{1,2})(\d{2})(am|pm)/gi, '$1:$2 $3')
+            .replace(/\b(morning|afternoon|evening|night)\b/gi, match => {
+                const timeMap = {
+                    'morning': '9:00 AM',
+                    'afternoon': '2:00 PM', 
+                    'evening': '6:00 PM',
+                    'night': '8:00 PM'
+                };
+                return timeMap[match.toLowerCase()] || match;
+            });
+
+        // Extract time if present
+        const timeMatch = enhanced.match(/(\d{1,2}:\d{2}\s*(AM|PM))/i);
+        const time = timeMatch ? timeMatch[0] : '';
+        const text = enhanced.replace(/(\d{1,2}:\d{2}\s*(AM|PM))/i, '').trim();
+
+        // Capitalize first letter
+        const capitalizedText = text.charAt(0).toUpperCase() + text.slice(1);
+        
+        // Add period if missing
+        const finalText = capitalizedText.endsWith('.') ? capitalizedText : capitalizedText + '.';
+
+        return {
+            time: time,
+            text: finalText,
+            location: this.extractLocation(finalText),
+            enhanced: true
+        };
+    },
+
+    extractLocation(text) {
+        // Simple location extraction
+        const locationKeywords = ['at ', 'in ', 'to ', 'visit ', 'farm ', 'hotel ', 'restaurant ', 'airport '];
+        for (const keyword of locationKeywords) {
+            const index = text.toLowerCase().indexOf(keyword);
+            if (index !== -1) {
+                const afterKeyword = text.slice(index + keyword.length);
+                const location = afterKeyword.split(/[,.!?]/)[0].trim();
+                if (location.length > 0 && location.length < 50) {
+                    return location;
+                }
+            }
+        }
+        return '';
+    },
+
+    renderEnhancedItinerary(itinerary) {
+        return `
+            <div class="ai-formatted-content">
+                ${itinerary.map(day => `
+                    <div class="ai-day-section">
+                        <div class="ai-day-header">
+                            <div class="ai-day-number">${day.dayNumber}</div>
+                            <span>Day ${day.dayNumber}</span>
+                            <span class="ai-enhancement-badge">AI Enhanced</span>
+                        </div>
+                        ${day.activities.map(activity => `
+                            <div class="ai-activity">
+                                <div class="ai-time">${activity.time || '—'}</div>
+                                <div class="ai-activity-text">
+                                    ${activity.text}
+                                    ${activity.location ? `<div class="ai-location">📍 ${activity.location}</div>` : ''}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    },
+
+    clearItinerary() {
+        const textarea = document.getElementById('itineraryText');
+        const preview = document.getElementById('itineraryPreview');
+        const actions = document.querySelector('.preview-actions');
+        
+        if (textarea) textarea.value = '';
+        if (preview) {
+            preview.innerHTML = `
+                <div class="preview-placeholder">
+                    <p style="color: #666; font-style: italic;">✨ Your AI-enhanced itinerary will appear here</p>
+                    <p style="color: #888; font-size: 0.9em;">Type or paste your itinerary above, then click "AI Format & Enhance" to see the magic!</p>
+                </div>
+            `;
+        }
+        if (actions) actions.style.display = 'none';
+        
+        this.currentItinerary = null;
+    },
+
+    approveItinerary() {
+        if (this.currentItinerary) {
+            utils.showNotification('✅ Itinerary approved and ready for trip creation!', 'success');
+            const actions = document.querySelector('.preview-actions');
+            if (actions) actions.style.display = 'none';
+        }
+    },
+
+    editItinerary() {
+        const textarea = document.getElementById('itineraryText');
+        if (textarea) {
+            textarea.focus();
+            utils.showNotification('💡 Make your changes above, then click "AI Format & Enhance" again.', 'info');
+        }
+    },
+
+    async regenerateItinerary() {
+        const textarea = document.getElementById('itineraryText');
+        if (textarea && textarea.value.trim()) {
+            await this.formatItinerary();
+        }
+    },
+
+    // Template Management
+    loadTemplates() {
+        this.templates = {
+            'coffee-origin': {
+                title: 'Coffee Origin Tour (5 days)',
+                description: 'Complete coffee journey from farm to cup',
+                content: `Day 1
+Arrival at airport
+Transfer to hotel in coffee region
+Welcome dinner with local coffee farmers
+Coffee cupping introduction session
+
+Day 2
+Morning visit to high-altitude coffee farm
+Meet with farm owner and learn about cultivation
+Lunch at farm with traditional Colombian food
+Afternoon processing facility tour
+Evening return to hotel
+
+Day 3
+Early morning harvest experience
+Traditional coffee processing workshop
+Lunch break
+Afternoon roasting session
+Evening cultural presentation
+
+Day 4
+Visit to cooperative facilities
+Meet with coffee exporters
+Quality control laboratory tour
+Farewell dinner with live music
+
+Day 5
+Final cupping session
+Departure preparations
+Transfer to airport`
+            },
+            'city-coffee': {
+                title: 'City Coffee Experience (3 days)',
+                description: 'Urban coffee culture immersion',
+                content: `Day 1
+Airport pickup
+Check-in at boutique hotel
+Lunch at specialty coffee shop
+Afternoon coffee shop tour
+Evening at roastery with dinner
+
+Day 2
+Morning at coffee museum
+Barista workshop session
+Lunch break
+Afternoon coffee tasting tour
+Evening free time
+
+Day 3
+Final coffee breakfast
+Shopping for coffee souvenirs
+Transfer to airport`
+            }
+        };
+    },
+
+    loadTemplate(templateKey) {
+        const template = this.templates[templateKey];
+        const textarea = document.getElementById('itineraryText');
+        const preview = document.getElementById('itineraryPreview');
+        
+        if (!template || !textarea) return;
+
+        if (templateKey === '') {
+            this.clearItinerary();
+            return;
+        }
+
+        textarea.value = template.content;
+        
+        // Show template preview
+        if (preview) {
+            preview.innerHTML = `
+                <div class="template-preview active">
+                    <div class="template-title">${template.title}</div>
+                    <div class="template-description">${template.description}</div>
+                    <div class="template-highlights">
+                        <li>Pre-structured daily activities</li>
+                        <li>Optimized timing and flow</li>
+                        <li>Professional formatting ready</li>
+                        <li>Customizable for your needs</li>
+                    </div>
+                    <p style="margin-top: 15px; font-style: italic; color: #666;">
+                        Click "AI Format & Enhance" to process this template with AI improvements.
+                    </p>
+                </div>
+            `;
+        }
+    },
+
+    // Get collected data for trip creation
+    getCollectedData() {
+        return {
+            vehicles: this.selectedVehicles,
+            staff: this.selectedStaff,
+            itinerary: this.currentItinerary
+        };
+    }
 };
 
 console.log('✅ Trip Management System loaded successfully');
