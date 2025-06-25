@@ -4189,7 +4189,342 @@ function editFleetVehicle(vehicleId) {
     }
     
     console.log('Editing vehicle:', vehicle);
-    showToast(`Edit functionality for ${vehicle.make} ${vehicle.model} coming soon!`, 'info');
+    showEditVehicleModal(vehicle);
+}
+
+/**
+ * Show Edit Vehicle Modal
+ */
+function showEditVehicleModal(vehicle) {
+    const modal = document.getElementById('editVehicleModal');
+    if (modal && vehicle) {
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+        
+        // Store vehicle ID for submission
+        modal.dataset.vehicleId = vehicle.id;
+        
+        // Populate form with vehicle data
+        populateEditVehicleForm(vehicle);
+        
+        // Clear any previous errors
+        clearEditVehicleFormErrors();
+        
+        // Set up form submission and interactions
+        setupEditVehicleForm();
+    }
+}
+
+/**
+ * Hide Edit Vehicle Modal
+ */
+function hideEditVehicleModal() {
+    const modal = document.getElementById('editVehicleModal');
+    if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+        
+        // Clear form data
+        document.getElementById('editVehicleForm').reset();
+        clearEditVehicleFormErrors();
+        
+        // Remove stored vehicle ID
+        delete modal.dataset.vehicleId;
+    }
+}
+
+/**
+ * Populate Edit Vehicle Form with existing data
+ */
+function populateEditVehicleForm(vehicle) {
+    // Basic information
+    document.getElementById('editVehicleMake').value = vehicle.make || '';
+    document.getElementById('editVehicleModel').value = vehicle.model || '';
+    document.getElementById('editVehicleYear').value = vehicle.year || '';
+    document.getElementById('editVehicleType').value = vehicle.vehicle_type || '';
+    document.getElementById('editLicensePlate').value = vehicle.license_plate || '';
+    
+    // Vehicle details
+    document.getElementById('editVehicleCapacity').value = vehicle.capacity || '';
+    document.getElementById('editVehicleColor').value = vehicle.color || '';
+    document.getElementById('editFuelType').value = vehicle.fuel_type || 'gasoline';
+    document.getElementById('editVehicleLocation').value = vehicle.location || '';
+    document.getElementById('editCurrentMileage').value = vehicle.current_mileage || '';
+    
+    // Insurance information
+    document.getElementById('editInsuranceCompany').value = vehicle.insurance_company || '';
+    document.getElementById('editInsuranceExpiry').value = vehicle.insurance_expiry_date || '';
+    
+    // Maintenance information
+    document.getElementById('editLastRevision').value = vehicle.last_revision_date || '';
+    document.getElementById('editRevisionInterval').value = vehicle.revision_interval_months || '6';
+    document.getElementById('editNextRevision').value = vehicle.next_revision_due || '';
+    
+    // Status and notes
+    document.getElementById('editVehicleStatus').value = vehicle.status || 'available';
+    document.getElementById('editVehicleNotes').value = vehicle.notes || '';
+}
+
+/**
+ * Setup Edit Vehicle Form interactions
+ */
+function setupEditVehicleForm() {
+    // Auto-calculate next revision date when last revision or interval changes
+    const updateEditNextRevisionDate = () => {
+        const lastRevisionInput = document.getElementById('editLastRevision');
+        const intervalInput = document.getElementById('editRevisionInterval');
+        const nextRevisionInput = document.getElementById('editNextRevision');
+        
+        if (lastRevisionInput.value && intervalInput.value) {
+            const lastRevision = new Date(lastRevisionInput.value);
+            const intervalMonths = parseInt(intervalInput.value);
+            const nextRevision = new Date(lastRevision);
+            nextRevision.setMonth(nextRevision.getMonth() + intervalMonths);
+            
+            nextRevisionInput.value = nextRevision.toISOString().split('T')[0];
+        } else {
+            nextRevisionInput.value = '';
+        }
+    };
+    
+    // Add event listeners for auto-calculation
+    document.getElementById('editLastRevision').addEventListener('change', updateEditNextRevisionDate);
+    document.getElementById('editRevisionInterval').addEventListener('change', updateEditNextRevisionDate);
+    
+    // Auto-uppercase license plate
+    document.getElementById('editLicensePlate').addEventListener('input', function() {
+        this.value = this.value.toUpperCase();
+    });
+    
+    // Clear errors on input
+    const formInputs = document.querySelectorAll('#editVehicleForm .fluent-input');
+    formInputs.forEach(input => {
+        input.addEventListener('input', function() {
+            this.classList.remove('fluent-input-error');
+            const errorElement = document.getElementById(this.id.replace('edit', 'edit') + 'Error');
+            if (errorElement) {
+                errorElement.textContent = '';
+            }
+        });
+    });
+}
+
+/**
+ * Handle Edit Vehicle Form Submission
+ */
+async function handleEditVehicleSubmit(event) {
+    event.preventDefault();
+    
+    const modal = document.getElementById('editVehicleModal');
+    const vehicleId = modal.dataset.vehicleId;
+    
+    if (!vehicleId) {
+        showToast('Vehicle ID not found', 'error');
+        return;
+    }
+    
+    try {
+        // Show loading state
+        const submitButton = event.target.querySelector('button[type="submit"]');
+        const originalText = submitButton.innerHTML;
+        submitButton.disabled = true;
+        submitButton.innerHTML = `
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="margin-right: 8px; animation: spin 1s linear infinite;">
+                <path d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16zM8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1z"/>
+                <path d="M8 4a4 4 0 0 1 4 4h1a5 5 0 0 0-5-5v1z"/>
+            </svg>
+            Updating...
+        `;
+        
+        // Collect and validate form data
+        const formData = collectEditVehicleFormData();
+        const validationErrors = validateEditVehicleFormData(formData);
+        
+        if (validationErrors.length > 0) {
+            displayEditVehicleFormErrors(validationErrors);
+            return;
+        }
+        
+        // Clear any existing errors
+        clearEditVehicleFormErrors();
+        
+        // Submit to API
+        const response = await fetch(`api/vehicles/manage.php?id=${vehicleId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showToast(`Vehicle ${formData.make} ${formData.model} updated successfully!`, 'success');
+            hideEditVehicleModal();
+            loadFleetManagementData(); // Reload the fleet data
+        } else {
+            throw new Error(data.error || 'Failed to update vehicle');
+        }
+        
+    } catch (error) {
+        console.error('Error updating vehicle:', error);
+        showToast('Failed to update vehicle: ' + error.message, 'error');
+        
+        // Handle validation errors from server
+        if (error.message.includes('License plate already exists')) {
+            displayEditVehicleFormErrors([{
+                field: 'license_plate',
+                message: 'This license plate is already registered to another vehicle'
+            }]);
+        }
+    } finally {
+        // Restore button state
+        const submitButton = event.target.querySelector('button[type="submit"]');
+        submitButton.disabled = false;
+        submitButton.innerHTML = `
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="margin-right: 8px;">
+                <path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"/>
+            </svg>
+            Update Vehicle
+        `;
+    }
+}
+
+/**
+ * Collect Edit Vehicle Form Data
+ */
+function collectEditVehicleFormData() {
+    const formData = {
+        make: document.getElementById('editVehicleMake').value.trim(),
+        model: document.getElementById('editVehicleModel').value.trim(),
+        year: parseInt(document.getElementById('editVehicleYear').value),
+        vehicle_type: document.getElementById('editVehicleType').value,
+        license_plate: document.getElementById('editLicensePlate').value.trim().toUpperCase(),
+        capacity: document.getElementById('editVehicleCapacity').value ? parseInt(document.getElementById('editVehicleCapacity').value) : null,
+        color: document.getElementById('editVehicleColor').value.trim(),
+        fuel_type: document.getElementById('editFuelType').value,
+        location: document.getElementById('editVehicleLocation').value.trim(),
+        current_mileage: document.getElementById('editCurrentMileage').value ? parseInt(document.getElementById('editCurrentMileage').value) : null,
+        insurance_company: document.getElementById('editInsuranceCompany').value.trim(),
+        insurance_expiry_date: document.getElementById('editInsuranceExpiry').value || null,
+        last_revision_date: document.getElementById('editLastRevision').value || null,
+        revision_interval_months: parseInt(document.getElementById('editRevisionInterval').value),
+        next_revision_due: document.getElementById('editNextRevision').value || null,
+        status: document.getElementById('editVehicleStatus').value,
+        notes: document.getElementById('editVehicleNotes').value.trim()
+    };
+    
+    // Remove empty strings and convert to null
+    Object.keys(formData).forEach(key => {
+        if (formData[key] === '') {
+            formData[key] = null;
+        }
+    });
+    
+    return formData;
+}
+
+/**
+ * Validate Edit Vehicle Form Data
+ */
+function validateEditVehicleFormData(formData) {
+    const errors = [];
+    
+    // Required fields validation
+    if (!formData.make) {
+        errors.push({ field: 'make', message: 'Make is required' });
+    }
+    
+    if (!formData.model) {
+        errors.push({ field: 'model', message: 'Model is required' });
+    }
+    
+    if (!formData.year) {
+        errors.push({ field: 'year', message: 'Year is required' });
+    } else if (formData.year < 1990 || formData.year > 2030) {
+        errors.push({ field: 'year', message: 'Year must be between 1990 and 2030' });
+    }
+    
+    if (!formData.vehicle_type) {
+        errors.push({ field: 'vehicle_type', message: 'Vehicle type is required' });
+    }
+    
+    if (!formData.license_plate) {
+        errors.push({ field: 'license_plate', message: 'License plate is required' });
+    } else if (formData.license_plate.length < 3) {
+        errors.push({ field: 'license_plate', message: 'License plate must be at least 3 characters' });
+    }
+    
+    // Optional field validation
+    if (formData.capacity && (formData.capacity < 1 || formData.capacity > 20)) {
+        errors.push({ field: 'capacity', message: 'Capacity must be between 1 and 20' });
+    }
+    
+    if (formData.current_mileage && formData.current_mileage < 0) {
+        errors.push({ field: 'current_mileage', message: 'Mileage cannot be negative' });
+    }
+    
+    // Date validation
+    if (formData.insurance_expiry_date) {
+        const expiryDate = new Date(formData.insurance_expiry_date);
+        if (isNaN(expiryDate.getTime())) {
+            errors.push({ field: 'insurance_expiry_date', message: 'Invalid insurance expiry date' });
+        }
+    }
+    
+    if (formData.last_revision_date) {
+        const revisionDate = new Date(formData.last_revision_date);
+        if (isNaN(revisionDate.getTime())) {
+            errors.push({ field: 'last_revision_date', message: 'Invalid last revision date' });
+        }
+    }
+    
+    return errors;
+}
+
+/**
+ * Display Edit Vehicle Form Errors
+ */
+function displayEditVehicleFormErrors(errors) {
+    // Clear previous errors
+    clearEditVehicleFormErrors();
+    
+    errors.forEach(error => {
+        const fieldId = `edit${error.field.charAt(0).toUpperCase() + error.field.slice(1).replace('_', '')}`;
+        const input = document.getElementById(fieldId);
+        const errorElement = document.getElementById(`${fieldId}Error`);
+        
+        if (input) {
+            input.classList.add('fluent-input-error');
+        }
+        
+        if (errorElement) {
+            errorElement.textContent = error.message;
+        }
+    });
+    
+    // Scroll to first error
+    const firstErrorElement = document.querySelector('#editVehicleForm .fluent-input-error');
+    if (firstErrorElement) {
+        firstErrorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        firstErrorElement.focus();
+    }
+}
+
+/**
+ * Clear Edit Vehicle Form Errors
+ */
+function clearEditVehicleFormErrors() {
+    // Remove error classes from inputs
+    document.querySelectorAll('#editVehicleForm .fluent-input-error').forEach(input => {
+        input.classList.remove('fluent-input-error');
+    });
+    
+    // Clear error messages
+    document.querySelectorAll('#editVehicleForm .fluent-error-message').forEach(errorElement => {
+        errorElement.textContent = '';
+    });
 }
 
 /**

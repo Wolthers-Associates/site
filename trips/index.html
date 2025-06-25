@@ -1416,6 +1416,175 @@
         </div>
     </div>
 
+    <!-- Edit Vehicle Modal -->
+    <div id="editVehicleModal" class="modal fluent-modal" style="display: none;" role="dialog" aria-labelledby="edit-vehicle-title" aria-modal="true">
+        <div class="modal-backdrop" onclick="hideEditVehicleModal()"></div>
+        <div class="modal-content fluent-modal-content-small">
+            <div class="fluent-modal-header">
+                <div class="fluent-header-content">
+                    <h1 id="edit-vehicle-title" class="fluent-modal-title">Edit Vehicle</h1>
+                    <p class="fluent-modal-subtitle">Update vehicle information</p>
+                </div>
+                <button class="fluent-close-btn" onclick="hideEditVehicleModal()">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M11.414 10l4.293-4.293a1 1 0 00-1.414-1.414L10 8.586 5.707 4.293a1 1 0 00-1.414 1.414L8.586 10l-4.293 4.293a1 1 0 001.414 1.414L10 11.414l4.293 4.293a1 1 0 001.414-1.414L11.414 10z"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="fluent-modal-body fluent-modal-body-form">
+                <form id="editVehicleForm" onsubmit="handleEditVehicleSubmit(event)">
+                    <!-- Vehicle Basic Information -->
+                    <div class="fluent-form-group">
+                        <label for="editVehicleMake" class="fluent-label">Make *</label>
+                        <input type="text" id="editVehicleMake" name="make" class="fluent-input" required>
+                        <span class="fluent-error-message" id="editMakeError"></span>
+                    </div>
+
+                    <div class="fluent-form-group">
+                        <label for="editVehicleModel" class="fluent-label">Model *</label>
+                        <input type="text" id="editVehicleModel" name="model" class="fluent-input" required>
+                        <span class="fluent-error-message" id="editModelError"></span>
+                    </div>
+
+                    <div class="fluent-form-row">
+                        <div class="fluent-form-group">
+                            <label for="editVehicleYear" class="fluent-label">Year *</label>
+                            <input type="number" id="editVehicleYear" name="year" class="fluent-input" min="1990" max="2030" required>
+                            <span class="fluent-error-message" id="editYearError"></span>
+                        </div>
+                        <div class="fluent-form-group">
+                            <label for="editVehicleType" class="fluent-label">Vehicle Type *</label>
+                            <select id="editVehicleType" name="vehicle_type" class="fluent-input" required>
+                                <option value="">Select Type</option>
+                                <option value="suv">SUV</option>
+                                <option value="sedan">Sedan</option>
+                                <option value="pickup">Pickup Truck</option>
+                                <option value="van">Van</option>
+                                <option value="minivan">Minivan</option>
+                                <option value="hatchback">Hatchback</option>
+                                <option value="coupe">Coupe</option>
+                                <option value="convertible">Convertible</option>
+                                <option value="wagon">Station Wagon</option>
+                                <option value="crossover">Crossover</option>
+                                <option value="other">Other</option>
+                            </select>
+                            <span class="fluent-error-message" id="editVehicleTypeError"></span>
+                        </div>
+                    </div>
+
+                    <div class="fluent-form-group">
+                        <label for="editLicensePlate" class="fluent-label">License Plate *</label>
+                        <input type="text" id="editLicensePlate" name="license_plate" class="fluent-input" style="text-transform: uppercase;" required>
+                        <span class="fluent-error-message" id="editLicensePlateError"></span>
+                    </div>
+
+                    <!-- Vehicle Details -->
+                    <div class="fluent-form-row">
+                        <div class="fluent-form-group">
+                            <label for="editVehicleCapacity" class="fluent-label">Capacity (people)</label>
+                            <input type="number" id="editVehicleCapacity" name="capacity" class="fluent-input" min="1" max="20">
+                        </div>
+                        <div class="fluent-form-group">
+                            <label for="editVehicleColor" class="fluent-label">Color</label>
+                            <input type="text" id="editVehicleColor" name="color" class="fluent-input">
+                        </div>
+                    </div>
+
+                    <div class="fluent-form-row">
+                        <div class="fluent-form-group">
+                            <label for="editFuelType" class="fluent-label">Fuel Type</label>
+                            <select id="editFuelType" name="fuel_type" class="fluent-input">
+                                <option value="gasoline">Gasoline</option>
+                                <option value="diesel">Diesel</option>
+                                <option value="hybrid">Hybrid</option>
+                                <option value="electric">Electric</option>
+                                <option value="flex">Flex (Ethanol/Gas)</option>
+                            </select>
+                        </div>
+                        <div class="fluent-form-group">
+                            <label for="editVehicleLocation" class="fluent-label">Current Location</label>
+                            <input type="text" id="editVehicleLocation" name="location" class="fluent-input" placeholder="e.g., São Paulo Office">
+                        </div>
+                    </div>
+
+                    <div class="fluent-form-group">
+                        <label for="editCurrentMileage" class="fluent-label">Current Mileage (km)</label>
+                        <input type="number" id="editCurrentMileage" name="current_mileage" class="fluent-input" min="0">
+                    </div>
+
+                    <!-- Insurance Information -->
+                    <div class="fluent-form-section">
+                        <h3 class="fluent-section-title">Insurance Information</h3>
+                        <div class="fluent-form-row">
+                            <div class="fluent-form-group">
+                                <label for="editInsuranceCompany" class="fluent-label">Insurance Company</label>
+                                <input type="text" id="editInsuranceCompany" name="insurance_company" class="fluent-input">
+                            </div>
+                            <div class="fluent-form-group">
+                                <label for="editInsuranceExpiry" class="fluent-label">Insurance Expiry Date</label>
+                                <input type="date" id="editInsuranceExpiry" name="insurance_expiry_date" class="fluent-input">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Maintenance Information -->
+                    <div class="fluent-form-section">
+                        <h3 class="fluent-section-title">Maintenance Schedule</h3>
+                        <div class="fluent-form-row">
+                            <div class="fluent-form-group">
+                                <label for="editLastRevision" class="fluent-label">Last Revision Date</label>
+                                <input type="date" id="editLastRevision" name="last_revision_date" class="fluent-input">
+                            </div>
+                            <div class="fluent-form-group">
+                                <label for="editRevisionInterval" class="fluent-label">Revision Interval (months)</label>
+                                <select id="editRevisionInterval" name="revision_interval_months" class="fluent-input">
+                                    <option value="3">3 months</option>
+                                    <option value="6" selected>6 months</option>
+                                    <option value="12">12 months</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="fluent-form-group">
+                            <label for="editNextRevision" class="fluent-label">Next Revision Due</label>
+                            <input type="date" id="editNextRevision" name="next_revision_due" class="fluent-input" readonly>
+                            <small class="fluent-help-text">Automatically calculated based on last revision and interval</small>
+                        </div>
+                    </div>
+
+                    <!-- Status and Notes -->
+                    <div class="fluent-form-row">
+                        <div class="fluent-form-group">
+                            <label for="editVehicleStatus" class="fluent-label">Status</label>
+                            <select id="editVehicleStatus" name="status" class="fluent-input">
+                                <option value="available">Available</option>
+                                <option value="maintenance">In Maintenance</option>
+                                <option value="retired">Retired</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="fluent-form-group">
+                        <label for="editVehicleNotes" class="fluent-label">Notes</label>
+                        <textarea id="editVehicleNotes" name="notes" class="fluent-input" rows="3" placeholder="Additional information about this vehicle..."></textarea>
+                    </div>
+
+                    <!-- Form Actions -->
+                    <div class="fluent-modal-footer">
+                        <button type="button" class="fluent-btn fluent-btn-secondary" onclick="hideEditVehicleModal()">
+                            Cancel
+                        </button>
+                        <button type="submit" class="fluent-btn fluent-btn-primary">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="margin-right: 8px;">
+                                <path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"/>
+                            </svg>
+                            Update Vehicle
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Add User Modal -->
     <div id="addUserModal" class="modal fluent-modal" style="display: none;" role="dialog" aria-labelledby="add-user-title" aria-modal="true">
         <div class="modal-backdrop" onclick="hideAddUserModal()"></div>

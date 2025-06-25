@@ -273,11 +273,12 @@ function handleUpdateVehicle() {
     
     $input = json_decode(file_get_contents('php://input'), true);
     
-    if (empty($input['id'])) {
+    // Get vehicle ID from URL parameter
+    $vehicle_id = $_GET['id'] ?? null;
+    
+    if (!$vehicle_id) {
         throw new Exception('Vehicle ID is required');
     }
-    
-    $vehicle_id = $input['id'];
     
     // Check if vehicle exists
     $check_sql = "SELECT id FROM vehicles WHERE id = ?";
@@ -286,6 +287,16 @@ function handleUpdateVehicle() {
     
     if (!$check_stmt->fetch()) {
         throw new Exception('Vehicle not found');
+    }
+    
+    // Check if license plate already exists (excluding current vehicle)
+    if (isset($input['license_plate'])) {
+        $license_check_sql = "SELECT id FROM vehicles WHERE license_plate = ? AND id != ? AND status != 'retired'";
+        $license_check_stmt = $pdo->prepare($license_check_sql);
+        $license_check_stmt->execute([$input['license_plate'], $vehicle_id]);
+        if ($license_check_stmt->fetch()) {
+            throw new Exception("License plate already exists in the system");
+        }
     }
     
     // Build update query dynamically
@@ -301,6 +312,19 @@ function handleUpdateVehicle() {
         'revision_interval_months', 'maintenance_start_date', 'maintenance_end_date',
         'maintenance_reason', 'notes'
     ];
+    
+    // Handle field name mapping from frontend to database
+    $field_mapping = [
+        'insurance_expiry_date' => 'insurance_end_date'
+    ];
+    
+    // Apply field mapping
+    foreach ($field_mapping as $frontend_field => $db_field) {
+        if (array_key_exists($frontend_field, $input)) {
+            $input[$db_field] = $input[$frontend_field];
+            unset($input[$frontend_field]);
+        }
+    }
     
     foreach ($updatable_fields as $field) {
         if (array_key_exists($field, $input)) {
