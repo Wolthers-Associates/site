@@ -3673,57 +3673,33 @@ function displayModalVehicles(vehicles) {
  * Create Vehicle Row for Modal Table
  */
 function createModalVehicleRow(vehicle) {
-    const statusClass = `status-${vehicle.status}`;
-    const typeClass = `badge-${vehicle.vehicle_type}`;
-    
-    // Insurance status
-    let insuranceStatus = 'Active';
-    let insuranceClass = 'status-active';
-    if (vehicle.insurance_days_remaining !== null && vehicle.insurance_days_remaining < 0) {
-        insuranceStatus = 'Expired';
-        insuranceClass = 'status-expired';
-    } else if (vehicle.insurance_days_remaining !== null && vehicle.insurance_days_remaining < 30) {
-        insuranceStatus = `${vehicle.insurance_days_remaining} days`;
-        insuranceClass = 'status-warning';
-    }
-    
-    // Revision status
-    let revisionStatus = 'Current';
-    let revisionClass = 'status-active';
-    if (vehicle.revision_days_remaining !== null && vehicle.revision_days_remaining < 0) {
-        revisionStatus = 'Overdue';
-        revisionClass = 'status-expired';
-    } else if (vehicle.revision_days_remaining !== null && vehicle.revision_days_remaining < 30) {
-        revisionStatus = `${vehicle.revision_days_remaining} days`;
-        revisionClass = 'status-warning';
-    }
-    
-    // Last trip information
-    let lastTripDisplay = '<span class="no-trip">None</span>';
-    if (vehicle.last_trip && vehicle.last_trip.title) {
-        const tripDate = formatTableDate(vehicle.last_trip.end_date || vehicle.last_trip.start_date);
-        lastTripDisplay = `<a href="#" onclick="openTripDetails('${vehicle.last_trip.id}')" class="trip-link" title="${vehicle.last_trip.title} - ${tripDate}">${vehicle.last_trip.title}</a>`;
-    }
-    
-    // Next trip information
-    let nextTripDisplay = '<span class="no-trip">None Scheduled</span>';
-    if (vehicle.next_trip && vehicle.next_trip.title) {
-        const tripDate = formatTableDate(vehicle.next_trip.start_date);
-        nextTripDisplay = `<a href="#" onclick="openTripDetails('${vehicle.next_trip.id}')" class="trip-link" title="${vehicle.next_trip.title} - ${tripDate}">${vehicle.next_trip.title}</a>`;
-    }
-    
+    const statusClass = `status-${vehicle.status?.toLowerCase() || 'unknown'}`;
+    const insuranceClass = vehicle.insurance_days_remaining < 0 ? 'status-expired' : (vehicle.insurance_days_remaining < 30 ? 'status-warning' : 'status-active');
+    const revisionClass = vehicle.revision_days_remaining < 0 ? 'status-expired' : (vehicle.revision_days_remaining < 30 ? 'status-warning' : 'status-active');
+
+    const insuranceStatus = vehicle.insurance_days_remaining < 0 ? 'Expired' : (vehicle.insurance_days_remaining < 30 ? `${vehicle.insurance_days_remaining} days` : 'Active');
+    const revisionStatus = vehicle.revision_days_remaining < 0 ? 'Overdue' : (vehicle.revision_days_remaining < 30 ? `${vehicle.revision_days_remaining} days` : 'Current');
+
+    const lastTripDisplay = (vehicle.last_trip && vehicle.last_trip.title)
+        ? `<a href="#" onclick="openTripDetails('${vehicle.last_trip.id}')" class="trip-link" title="${vehicle.last_trip.title}">${vehicle.last_trip.title}</a>`
+        : '<span class="no-trip">None</span>';
+
+    const nextTripDisplay = (vehicle.next_trip && vehicle.next_trip.title)
+        ? `<a href="#" onclick="openTripDetails('${vehicle.next_trip.id}')" class="trip-link" title="${vehicle.next_trip.title}">${vehicle.next_trip.title}</a>`
+        : '<span class="no-trip">None Scheduled</span>';
+
     return `
         <tr>
             <td>
                 <div class="vehicle-info">
-                    <div class="vehicle-name">${vehicle.make} ${vehicle.model}</div>
-                    <div class="vehicle-year">${vehicle.year}</div>
-                    <div class="vehicle-capacity">${vehicle.capacity} people</div>
+                    <div class="vehicle-name">${vehicle.make || ''} ${vehicle.model || ''}</div>
+                    <div class="vehicle-year">${vehicle.year || ''}</div>
+                    <div class="vehicle-capacity">${vehicle.capacity || ''} people</div>
                 </div>
             </td>
-            <td><span class="license-plate">${vehicle.license_plate}</span></td>
+            <td><span class="license-plate">${vehicle.license_plate || 'N/A'}</span></td>
             <td class="mileage">${vehicle.current_mileage ? Number(vehicle.current_mileage).toLocaleString() + ' km' : 'N/A'}</td>
-            <td><span class="status-badge ${statusClass}">${vehicle.status.toUpperCase()}</span></td>
+            <td><span class="status-badge ${statusClass}">${vehicle.status?.toUpperCase() || 'N/A'}</span></td>
             <td><span class="status-indicator ${insuranceClass}">${insuranceStatus}</span></td>
             <td><span class="status-indicator ${revisionClass}">${revisionStatus}</span></td>
             <td class="trip-info">${lastTripDisplay}</td>
@@ -3731,14 +3707,10 @@ function createModalVehicleRow(vehicle) {
             <td>
                 <div class="fluent-action-buttons">
                     <button class="fluent-action-btn" onclick="editModalVehicle(${vehicle.id})" title="Edit">
-                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                            <path d="M11.013 1.427a1.75 1.75 0 012.474 0l1.086 1.086a1.75 1.75 0 010 2.474l-8.61 8.61c-.21.21-.47.364-.756.445l-3.251.93a.75.75 0 01-.927-.928l.929-3.25a1.75 1.75 0 01.445-.758l8.61-8.61z"/>
-                        </svg>
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M11.013 1.427a1.75 1.75 0 012.474 0l1.086 1.086a1.75 1.75 0 010 2.474l-8.61 8.61c-.21.21-.47.364-.756.445l-3.251.93a.75.75 0 01-.927-.928l.929-3.25a1.75 1.75 0 01.445-.758l8.61-8.61z"/></svg>
                     </button>
                     <button class="fluent-action-btn" onclick="viewModalVehicleLogs(${vehicle.id})" title="View Logs">
-                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                            <path d="M2 3.75C2 2.784 2.784 2 3.75 2h8.5c.966 0 1.75.784 1.75 1.75v8.5A1.75 1.75 0 0112.25 14h-8.5A1.75 1.75 0 012 12.25v-8.5zm1.75-.25a.25.25 0 00-.25.25v8.5c0 .138.112.25.25.25h8.5a.25.25 0 00.25-.25v-8.5a.25.25 0 00-.25-.25h-8.5z"/>
-                        </svg>
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M2 3.75C2 2.784 2.784 2 3.75 2h8.5c.966 0 1.75.784 1.75 1.75v8.5A1.75 1.75 0 0112.25 14h-8.5A1.75 1.75 0 012 12.25v-8.5zm1.75-.25a.25.25 0 00-.25.25v8.5c0 .138.112.25.25.25h8.5a.25.25 0 00.25-.25v-8.5a.25.25 0 00-.25-.25h-8.5z"/></svg>
                     </button>
                 </div>
             </td>
