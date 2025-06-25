@@ -1278,41 +1278,49 @@ function updateCurrentUserProfile(user) {
     }
 }
 
-// Load all users for admin view - combines multiple sources
+// Load all users for admin view - primarily from database API
 async function loadAllUsersForAdmin() {
     try {
-        console.log('🔍 Admin loading all users from multiple sources...');
+        console.log('🔍 Admin loading users from database...');
         
-        // 1. Load users from backend API (if available)
+        // 1. Load users from backend database API (primary source)
         try {
-            const response = await fetch('/api/auth/list-users.php');
+            const response = await fetch('/api/auth/list-users.php?auth_check=1');
             if (response.ok) {
-                const apiUsers = await response.json();
-                if (apiUsers.success && Array.isArray(apiUsers.users)) {
-                    console.log(`📡 Loaded ${apiUsers.users.length} users from backend API`);
-                    // Merge API users with existing database
-                    mergeUsersIntoDatabase(apiUsers.users);
+                const apiData = await response.json();
+                if (apiData.success && Array.isArray(apiData.users)) {
+                    console.log(`📡 Loaded ${apiData.users.length} users from database API`);
+                    console.log('📊 Database statistics:', apiData.statistics);
+                    
+                    // Replace USER_DATABASE with real database users
+                    USER_DATABASE = apiData.users;
+                    saveUserDatabase();
+                    
+                    console.log(`✅ Real database users loaded: ${USER_DATABASE.length}`);
+                    console.log('👥 Users from database:', USER_DATABASE.map(u => `${u.name} (${u.email})`));
+                    return;
                 }
             }
         } catch (error) {
-            console.log('⚠️ Backend user API not available:', error.message);
+            console.log('⚠️ Backend database API error:', error.message);
         }
         
-        // 2. Load users from Microsoft Auth sessions (recent logins)
+        // 2. Fallback: Load users from Microsoft Auth sessions (recent logins)
+        console.log('⚠️ Database API unavailable, falling back to local sources...');
         const recentMSUsers = loadRecentMicrosoftUsers();
         if (recentMSUsers.length > 0) {
             console.log(`🔐 Found ${recentMSUsers.length} recent Microsoft users`);
             mergeUsersIntoDatabase(recentMSUsers);
         }
         
-        // 3. Load any additional users from localStorage backups
+        // 3. Fallback: Load any additional users from localStorage backups
         const backupUsers = loadBackupUsers();
         if (backupUsers.length > 0) {
             console.log(`💾 Found ${backupUsers.length} backup users`);
             mergeUsersIntoDatabase(backupUsers);
         }
         
-        console.log(`✅ Total users loaded: ${USER_DATABASE.length}`);
+        console.log(`⚠️ Fallback: Total users loaded: ${USER_DATABASE.length}`);
         
     } catch (error) {
         console.error('❌ Error loading all users for admin:', error);
@@ -1533,14 +1541,19 @@ function loadModalUsersList() {
     const users = getUsersFromDatabase();
     console.log('loadModalUsersList: Found', users.length, 'users:', users.map(u => u.name));
     
+    // Check if we're using real database data
+    const isDatabaseSource = localStorage.getItem('wolthers_users_database_source') === 'true';
+    
     // Update pagination info with company breakdown for admins
     const paginationInfo = document.getElementById('paginationInfo');
     if (paginationInfo) {
         if (currentUser && currentUser.role === 'admin') {
             const companies = [...new Set(users.map(user => getUserCompany(user)))];
-            paginationInfo.textContent = `Showing 1-${users.length} of ${users.length} users from ${companies.length} companies`;
+            const sourceIndicator = isDatabaseSource ? '🗄️ Database' : '⚠️ Mock Data';
+            paginationInfo.textContent = `${sourceIndicator} | Showing 1-${users.length} of ${users.length} users from ${companies.length} companies`;
         } else {
-            paginationInfo.textContent = `Showing 1-${users.length} of ${users.length} users`;
+            const sourceIndicator = isDatabaseSource ? '🗄️ Database' : '⚠️ Mock Data';
+            paginationInfo.textContent = `${sourceIndicator} | Showing 1-${users.length} of ${users.length} users`;
         }
     }
     
@@ -1920,23 +1933,29 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
-// User Database - Integrated from accounts.js
+// User Database - Real database integration
 // Initialize user database
 function initializeUserDatabase() {
+    // Check if we have database-sourced users in localStorage
     const savedUsers = localStorage.getItem('wolthers_users_database');
-    if (savedUsers) {
+    const lastUpdated = localStorage.getItem('wolthers_users_last_updated');
+    const isDatabaseSource = localStorage.getItem('wolthers_users_database_source') === 'true';
+    
+    if (savedUsers && isDatabaseSource) {
         try {
             USER_DATABASE = JSON.parse(savedUsers);
-            console.log(`Loaded ${USER_DATABASE.length} users from database`);
+            console.log(`✅ Loaded ${USER_DATABASE.length} users from cached database`);
+            console.log(`📅 Last updated: ${lastUpdated}`);
         } catch (e) {
-            console.error('Error loading user database:', e);
+            console.error('Error loading cached user database:', e);
             USER_DATABASE = getDefaultUsersWithMultipleCompanies();
             saveUserDatabase();
         }
     } else {
+        // Use mock data as fallback (will be replaced by real data when admin loads)
         USER_DATABASE = getDefaultUsersWithMultipleCompanies();
         saveUserDatabase();
-        console.log('Initialized user database with Wolthers team and sample company users');
+        console.log('⚠️ Initialized with mock users - will load real database when admin accesses user management');
     }
     
     // Make globally accessible for compatibility
@@ -2111,9 +2130,19 @@ function saveUserDatabase() {
         localStorage.setItem('wolthers_users_database', JSON.stringify(USER_DATABASE));
         localStorage.setItem('wolthers_users_last_updated', new Date().toISOString());
         
+        // Track if this is real database data (check if users have database-like IDs)
+        const hasRealDbData = USER_DATABASE.some(user => 
+            typeof user.id === 'number' || 
+            user.department || 
+            user.authMethods
+        );
+        localStorage.setItem('wolthers_users_database_source', hasRealDbData ? 'true' : 'false');
+        
         // Update global references
         window.USER_DATABASE = USER_DATABASE;
         window.MOCK_USERS = USER_DATABASE;
+        
+        console.log(`💾 Saved ${USER_DATABASE.length} users to localStorage (DB source: ${hasRealDbData})`);
     } catch (e) {
         console.error('Error saving user database:', e);
     }
