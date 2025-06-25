@@ -147,7 +147,6 @@ const auth = {
                 utils.hideLoading();
                 ui.showDashboard();
                 await trips.loadTrips();
-                utils.showNotification(`Welcome ${result.user.name}!`, 'success');
             } else {
                 utils.hideLoading();
                 console.error('Microsoft auth result:', result);
@@ -249,8 +248,16 @@ const ui = {
     
     // Show main content after authentication
     showMainContent: () => {
-        document.getElementById('loginContainer').style.display = 'none';
-        document.getElementById('mainContainer').style.display = 'block';
+        const loginContainer = document.getElementById('loginContainer');
+        const mainContainer = document.getElementById('mainContainer');
+        
+        if (loginContainer) {
+            loginContainer.style.display = 'none';
+            loginContainer.remove(); // Completely remove the login form from DOM
+        }
+        if (mainContainer) {
+            mainContainer.style.display = 'block';
+        }
         
             // Update user info
     document.getElementById('userInfo').textContent = 
