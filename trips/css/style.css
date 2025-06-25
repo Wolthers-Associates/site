@@ -2916,7 +2916,7 @@ body {
 
 @media (prefers-color-scheme: dark) {
     .header {
-        background: linear-gradient(135deg, #181C1F 0%, #23272B 100%);
+        background: linear-gradient(135deg, #1a3d1e 0%, #2C5530 50%, #1f4623 100%);
         color: #E3D6C0;
     }
     .header h1,
