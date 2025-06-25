@@ -68,44 +68,57 @@ function initializeEventListeners() {
 
 // Tab Management
 function showTab(tabName, event) {
-    // Hide all tabs
-    document.querySelectorAll('.tab-content').forEach(tab => {
-        tab.classList.remove('active');
-    });
-    
-    // Remove active class from all tab buttons
-    document.querySelectorAll('.tab').forEach(button => {
-        button.classList.remove('active');
-    });
-    
-    // Show selected tab
-    document.getElementById(`${tabName}-tab`).classList.add('active');
-    
-    // Add active class to clicked button
-    if (event && event.target) {
-        event.target.classList.add('active');
-    } else {
-        // Fallback: find the button by the tab name
-        document.querySelector(`button[onclick="showTab('${tabName}')"]`)?.classList.add('active');
-    }
-    
-    // Load data for the selected tab
-    switch(tabName) {
-        case 'vehicles':
-            loadVehicles();
-            break;
-        case 'maintenance':
-            loadMaintenanceLogs();
-            populateVehicleSelects();
-            break;
-        case 'driver-logs':
-            loadDriverLogs();
-            populateVehicleSelects();
-            populateDriverSelects();
-            break;
-        case 'reports':
-            generateReport();
-            break;
+    try {
+        // Hide all tabs
+        document.querySelectorAll('.tab-content').forEach(tab => {
+            tab.classList.remove('active');
+        });
+        
+        // Remove active class from all tab buttons
+        document.querySelectorAll('.tab').forEach(button => {
+            button.classList.remove('active');
+        });
+        
+        // Show selected tab
+        const targetTab = document.getElementById(`${tabName}-tab`);
+        if (targetTab) {
+            targetTab.classList.add('active');
+        }
+        
+        // Add active class to clicked button
+        if (event && event.target) {
+            event.target.classList.add('active');
+        } else {
+            // Fallback: find the button by the tab name
+            const tabButtons = document.querySelectorAll('.tab');
+            tabButtons.forEach(button => {
+                if (button.textContent.toLowerCase().includes(tabName.replace('-', ' '))) {
+                    button.classList.add('active');
+                }
+            });
+        }
+        
+        // Load data for the selected tab
+        switch(tabName) {
+            case 'vehicles':
+                loadVehicles();
+                break;
+            case 'maintenance':
+                loadMaintenanceLogs();
+                populateVehicleSelects();
+                break;
+            case 'driver-logs':
+                loadDriverLogs();
+                populateVehicleSelects();
+                populateDriverSelects();
+                break;
+            case 'reports':
+                generateReport();
+                break;
+        }
+    } catch (error) {
+        console.error('Error switching tabs:', error);
+        showNotification('Tab switching error', 'error');
     }
 }
 
@@ -150,12 +163,23 @@ async function loadVehicles() {
 function displayVehicles(vehicles) {
     const tableBody = document.querySelector('#vehicles-table tbody');
     
-    if (!vehicles || vehicles.length === 0) {
-        tableBody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 40px; color: var(--text-light);">No vehicles found</td></tr>';
+    if (!tableBody) {
+        console.error('Table body not found!');
+        showNotification('Table display error', 'error');
         return;
     }
     
-    tableBody.innerHTML = vehicles.map(vehicle => createVehicleRow(vehicle)).join('');
+    if (!vehicles || vehicles.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 40px; color: var(--text-light);">No vehicles found. <a href="#" onclick="openVehicleModal()" style="color: var(--primary-green);">Add your first vehicle</a></td></tr>';
+        return;
+    }
+    
+    try {
+        tableBody.innerHTML = vehicles.map(vehicle => createVehicleRow(vehicle)).join('');
+    } catch (error) {
+        console.error('Error creating vehicle rows:', error);
+        tableBody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 40px; color: red;">Error displaying vehicles</td></tr>';
+    }
 }
 
 function createVehicleRow(vehicle) {
@@ -246,10 +270,29 @@ function createVehicleRow(vehicle) {
 }
 
 function updateVehicleSummary(summary) {
-    document.getElementById('total-vehicles').textContent = summary.total || 0;
-    document.getElementById('available-vehicles').textContent = summary.available || 0;
-    document.getElementById('maintenance-vehicles').textContent = summary.maintenance || 0;
-    document.getElementById('retired-vehicles').textContent = summary.retired || 0;
+    // Provide default values if summary is null or undefined
+    const defaultSummary = {
+        total: 0,
+        available: 0,
+        maintenance: 0,
+        retired: 0
+    };
+    
+    const finalSummary = summary || defaultSummary;
+    
+    try {
+        document.getElementById('total-vehicles').textContent = finalSummary.total || 0;
+        document.getElementById('available-vehicles').textContent = finalSummary.available || 0;
+        document.getElementById('maintenance-vehicles').textContent = finalSummary.maintenance || 0;
+        document.getElementById('retired-vehicles').textContent = finalSummary.retired || 0;
+    } catch (error) {
+        console.error('Error updating vehicle summary:', error);
+        // Set to 0 if there's an error
+        document.getElementById('total-vehicles').textContent = '0';
+        document.getElementById('available-vehicles').textContent = '0';
+        document.getElementById('maintenance-vehicles').textContent = '0';
+        document.getElementById('retired-vehicles').textContent = '0';
+    }
 }
 
 // Vehicle Modal Functions

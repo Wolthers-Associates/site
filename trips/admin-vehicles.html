@@ -19,12 +19,13 @@
             align-items: center;
             margin-bottom: 30px;
             padding-bottom: 20px;
-            border-bottom: 2px solid var(--accent-gold);
+            border-bottom: 2px solid var(--light-gray);
         }
 
         .admin-header h1 {
             color: var(--primary-green);
             margin: 0;
+            font-size: 2.2em;
         }
 
         .header-actions {
@@ -34,19 +35,20 @@
 
         .tabs {
             display: flex;
+            gap: 2px;
             margin-bottom: 30px;
-            border-bottom: 1px solid var(--light-gray);
+            border-bottom: 2px solid var(--light-gray);
         }
 
         .tab {
             padding: 12px 24px;
-            cursor: pointer;
-            border: none;
             background: none;
-            color: var(--text-dark);
-            font-weight: 500;
-            transition: all 0.3s ease;
+            border: none;
             border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--text-light);
+            transition: all 0.2s ease;
         }
 
         .tab:hover {
@@ -360,39 +362,50 @@
             height: 100%;
             background: rgba(0,0,0,0.5);
             z-index: 1000;
+            backdrop-filter: blur(2px);
         }
 
         .modal-content {
             background: white;
             margin: 50px auto;
             padding: 30px;
-            border-radius: 8px;
+            border-radius: 12px;
             max-width: 800px;
             max-height: 80vh;
             overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
         }
 
         .modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
             padding-bottom: 15px;
-            border-bottom: 1px solid var(--light-gray);
+            border-bottom: 2px solid var(--light-gray);
         }
 
         .modal-title {
             font-size: 1.4em;
             color: var(--primary-green);
             margin: 0;
+            font-weight: 600;
         }
 
         .close-btn {
             background: none;
             border: none;
-            font-size: 1.5em;
+            font-size: 1.8em;
             cursor: pointer;
             color: var(--text-light);
+            padding: 5px;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+
+        .close-btn:hover {
+            background: #f0f0f0;
+            color: var(--text-dark);
         }
 
         .form-grid {
@@ -531,6 +544,89 @@
                 padding: 20px;
             }
         }
+
+        /* Button Styling */
+        .btn-primary, .btn-secondary {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.9em;
+        }
+
+        .btn-primary {
+            background: var(--primary-green);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1e3b21;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: var(--light-gray);
+            color: var(--text-dark);
+            border: 1px solid #ddd;
+        }
+
+        .btn-secondary:hover {
+            background: #d0d0d0;
+            transform: translateY(-1px);
+        }
+
+        /* Enhanced Dark Mode Support */
+        @media (prefers-color-scheme: dark) {
+            .btn-primary {
+                background: var(--dark-accent);
+                color: var(--dark-bg);
+            }
+
+            .btn-primary:hover {
+                background: #B8860B;
+            }
+
+            .btn-secondary {
+                background: var(--dark-bg-secondary);
+                color: var(--dark-text-secondary);
+                border: 1px solid var(--dark-border);
+            }
+
+            .btn-secondary:hover {
+                background: var(--dark-bg);
+            }
+
+            .modal-content {
+                background: var(--dark-bg-secondary);
+                color: var(--dark-text-secondary);
+                border: 1px solid var(--dark-border);
+            }
+
+            .modal-title {
+                color: var(--dark-accent);
+            }
+
+            .close-btn {
+                color: var(--dark-text-secondary);
+            }
+
+            .close-btn:hover {
+                background: var(--dark-bg);
+                color: var(--dark-text);
+            }
+
+            .form-input, .form-select, .form-textarea {
+                background: var(--dark-bg);
+                border: 1px solid var(--dark-border);
+                color: var(--dark-text-secondary);
+            }
+
+            .form-label {
+                color: var(--dark-text);
+            }
+        }
     </style>
 </head>
 <body>
@@ -584,10 +680,10 @@
         </div>
 
         <div class="tabs">
-                            <button class="tab active" onclick="showTab('vehicles', event)">Vehicles</button>
-                <button class="tab" onclick="showTab('maintenance', event)">Maintenance</button>
-                <button class="tab" onclick="showTab('driver-logs', event)">Driver Logs</button>
-                <button class="tab" onclick="showTab('reports', event)">Reports</button>
+            <button class="tab active" onclick="showTab('vehicles', event)">Vehicles</button>
+            <button class="tab" onclick="showTab('maintenance', event)">Maintenance</button>
+            <button class="tab" onclick="showTab('driver-logs', event)">Driver Logs</button>
+            <button class="tab" onclick="showTab('reports', event)">Reports</button>
         </div>
 
         <!-- Vehicles Tab -->
