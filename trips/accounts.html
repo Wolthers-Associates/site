@@ -4,8 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Account Management - Wolthers & Associates</title>
-    <link rel="stylesheet" href="assets/css/style.css">
-    <link rel="stylesheet" href="assets/css/accounts.css">
+    
+    <!-- Immediate dark mode support to prevent white blink -->
+    <style>
+        /* Immediate dark mode styles to prevent FOUC (Flash of Unstyled Content) */
+        :root {
+            --dark-bg: #181c1f;
+            --dark-bg-secondary: #23272b;
+            --dark-text: #ffffff;
+            --dark-text-secondary: #e6edf3;
+        }
+        
+        @media (prefers-color-scheme: dark) {
+            * {
+                transition: none !important;
+            }
+            html, body {
+                background: var(--dark-bg) !important;
+                color: var(--dark-text-secondary) !important;
+            }
+            .container {
+                background: var(--dark-bg) !important;
+            }
+        }
+    </style>
+    
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/accounts.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Sans+Pro:wght@400;600;700&display=swap" rel="stylesheet">

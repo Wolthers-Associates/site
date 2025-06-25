@@ -5,6 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Trip Itineraries Management System - Wolthers & Associates">
     <title>Trip Itineraries - Wolthers & Associates</title>
+    
+    <!-- Immediate dark mode support to prevent white blink -->
+    <style>
+        /* Immediate dark mode styles to prevent FOUC (Flash of Unstyled Content) */
+        :root {
+            --dark-bg: #181c1f;
+            --dark-bg-secondary: #23272b;
+            --dark-text: #ffffff;
+            --dark-text-secondary: #e6edf3;
+        }
+        
+        @media (prefers-color-scheme: dark) {
+            * {
+                transition: none !important;
+            }
+            html, body {
+                background: var(--dark-bg) !important;
+                color: var(--dark-text-secondary) !important;
+            }
+            .main-container, .login-container {
+                background: var(--dark-bg) !important;
+            }
+        }
+    </style>
+    
     <link rel="stylesheet" href="css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
