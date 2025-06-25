@@ -1,1077 +1,452 @@
 /**
- * Vehicle Management Admin JavaScript
- * Handles all vehicle, maintenance, and driver log management functionality
+ * Fleet Management JavaScript - Clean Implementation
+ * Handles vehicle management with exact table structure requested
  */
 
-let currentVehicles = [];
-let currentMaintenanceLogs = [];
-let currentDriverLogs = [];
-let currentUsers = [];
-let currentTrips = [];
+// Sample vehicle data - exactly as requested
+const vehicles = [
+    {
+        id: 1,
+        name: "Chevrolet S10",
+        year: "2021",
+        capacity: "5 people",
+        license: "WOL-002",
+        mileage: "38,000 km",
+        status: "AVAILABLE",
+        insurance: "EXPIRED",
+        revision: "OVERDUE",
+        lastTrip: "None",
+        nextTrip: "None Scheduled"
+    },
+    {
+        id: 2,
+        name: "Toyota Hilux",
+        year: "2020",
+        capacity: "5 people",
+        license: "WOL-001",
+        mileage: "45,230 km",
+        status: "MAINTENANCE",
+        insurance: "ACTIVE",
+        revision: "CURRENT",
+        lastTrip: "Brazil Coffee Origins",
+        nextTrip: "Guatemala Highlands"
+    },
+    {
+        id: 3,
+        name: "Ford Transit",
+        year: "2019",
+        capacity: "12 people",
+        license: "WOL-003",
+        mileage: "67,890 km",
+        status: "AVAILABLE",
+        insurance: "WARNING",
+        revision: "WARNING",
+        lastTrip: "Colombian Coffee Route",
+        nextTrip: "None Scheduled"
+    },
+    {
+        id: 4,
+        name: "Honda CR-V",
+        year: "2022",
+        capacity: "7 people",
+        license: "WOL-004",
+        mileage: "15,670 km",
+        status: "AVAILABLE",
+        insurance: "ACTIVE",
+        revision: "CURRENT",
+        lastTrip: "None",
+        nextTrip: "Peru Coffee Expedition"
+    },
+    {
+        id: 5,
+        name: "Volkswagen Crafter",
+        year: "2018",
+        capacity: "15 people",
+        license: "WOL-005",
+        mileage: "89,450 km",
+        status: "RETIRED",
+        insurance: "EXPIRED",
+        revision: "OVERDUE",
+        lastTrip: "Costa Rica Coffee Tour",
+        nextTrip: "None Scheduled"
+    }
+];
+
+// Current filtered vehicles
+let filteredVehicles = [...vehicles];
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', function() {
-    initializeApp();
+    initializeFleetManagement();
 });
 
-async function initializeApp() {
-    try {
-        // Update navigation visibility based on user role
-        updateAdminNavigationVisibility();
-        
-        await Promise.all([
-            loadVehicles(),
-            loadUsers(),
-            loadTrips()
-        ]);
-        
-        // Initialize event listeners
-        initializeEventListeners();
-        
-        // Load initial data for active tab
-        showTab('vehicles');
-        
-    } catch (error) {
-        console.error('Failed to initialize app:', error);
-        showNotification('Failed to load initial data', 'error');
-    }
+/**
+ * Initialize Fleet Management
+ */
+function initializeFleetManagement() {
+    console.log('Initializing Fleet Management...');
+    
+    // Load and display vehicles
+    displayFleetTable();
+    
+    // Initialize event listeners
+    initializeEventListeners();
+    
+    console.log('Fleet Management initialized successfully');
 }
 
+/**
+ * Initialize Event Listeners
+ */
 function initializeEventListeners() {
-    // Vehicle form
-    document.getElementById('vehicle-form').addEventListener('submit', handleVehicleSubmit);
-    
-    // Maintenance form
-    document.getElementById('maintenance-form').addEventListener('submit', handleMaintenanceSubmit);
-    
-    // Driver log form
-    document.getElementById('driver-log-form').addEventListener('submit', handleDriverLogSubmit);
-    
-    // Damage checkbox toggle
-    document.getElementById('driver-log-damage').addEventListener('change', function() {
-        const damageGroup = document.getElementById('damage-description-group');
-        damageGroup.style.display = this.checked ? 'block' : 'none';
-    });
-    
-    // Driver selection auto-fill name
-    document.getElementById('driver-log-driver').addEventListener('change', function() {
-        const selectedUser = currentUsers.find(u => u.id == this.value);
-        if (selectedUser) {
-            document.getElementById('driver-log-name').value = selectedUser.name;
-        }
-    });
-    
-    // Auto-calculate next revision date
-    document.getElementById('vehicle-last-revision').addEventListener('change', calculateNextRevision);
-    document.getElementById('vehicle-revision-interval').addEventListener('input', calculateNextRevision);
-}
-
-// Tab Management
-function showTab(tabName, event) {
-    try {
-        // Hide all tabs
-        document.querySelectorAll('.tab-content').forEach(tab => {
-            tab.classList.remove('active');
-        });
-        
-        // Remove active class from all tab buttons
-        document.querySelectorAll('.tab').forEach(button => {
-            button.classList.remove('active');
-        });
-        
-        // Show selected tab
-        const targetTab = document.getElementById(`${tabName}-tab`);
-        if (targetTab) {
-            targetTab.classList.add('active');
-        }
-        
-        // Add active class to clicked button
-        if (event && event.target) {
-            event.target.classList.add('active');
-        } else {
-            // Fallback: find the button by the tab name
-            const tabButtons = document.querySelectorAll('.tab');
-            tabButtons.forEach(button => {
-                if (button.textContent.toLowerCase().includes(tabName.replace('-', ' '))) {
-                    button.classList.add('active');
-                }
-            });
-        }
-        
-        // Load data for the selected tab
-        switch(tabName) {
-            case 'vehicles':
-                loadVehicles();
-                break;
-            case 'maintenance':
-                loadMaintenanceLogs();
-                populateVehicleSelects();
-                break;
-            case 'driver-logs':
-                loadDriverLogs();
-                populateVehicleSelects();
-                populateDriverSelects();
-                break;
-            case 'reports':
-                generateReport();
-                break;
-        }
-    } catch (error) {
-        console.error('Error switching tabs:', error);
-        showNotification('Tab switching error', 'error');
+    // Search functionality
+    const searchInput = document.getElementById('fleet-search');
+    if (searchInput) {
+        searchInput.addEventListener('input', filterFleet);
     }
+    
+    // Filter functionality
+    const statusFilter = document.getElementById('status-filter');
+    const typeFilter = document.getElementById('type-filter');
+    
+    if (statusFilter) statusFilter.addEventListener('change', filterFleet);
+    if (typeFilter) typeFilter.addEventListener('change', filterFleet);
+    
+    console.log('Event listeners initialized');
 }
 
-// Vehicle Management
-async function loadVehicles() {
-    try {
-        console.log('Loading vehicles from:', 'api/vehicles/manage.php');
-        const response = await fetch('api/vehicles/manage.php?include_maintenance=true&include_driver_logs=false');
-        
-        console.log('Response status:', response.status);
-        console.log('Response headers:', response.headers);
-        
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const text = await response.text();
-        console.log('Raw response:', text);
-        
-        let data;
-        try {
-            data = JSON.parse(text);
-        } catch (parseError) {
-            console.error('JSON parse error:', parseError);
-            throw new Error('Invalid JSON response from server');
-        }
-        
-        if (data.success) {
-            currentVehicles = data.vehicles;
-            displayVehicles(data.vehicles);
-            updateVehicleSummary(data.summary);
-            console.log('Vehicles loaded successfully:', data.vehicles.length);
-        } else {
-            throw new Error(data.error || 'Failed to load vehicles');
-        }
-    } catch (error) {
-        console.error('Error loading vehicles:', error);
-        showNotification(`Failed to load vehicles: ${error.message}`, 'error');
-    }
-}
-
-function displayVehicles(vehicles) {
-    const tableBody = document.querySelector('#vehicles-table tbody');
+/**
+ * Display Fleet Table
+ */
+function displayFleetTable() {
+    const tableBody = document.getElementById('fleet-table-body');
     
     if (!tableBody) {
-        console.error('Table body not found!');
-        showNotification('Table display error', 'error');
+        console.error('Fleet table body not found!');
         return;
     }
     
-    if (!vehicles || vehicles.length === 0) {
-        tableBody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 40px; color: var(--text-light);">No vehicles found. <a href="#" onclick="openVehicleModal()" style="color: var(--primary-green);">Add your first vehicle</a></td></tr>';
+    // Clear existing content
+    tableBody.innerHTML = '';
+    
+    // Check if we have vehicles to display
+    if (!filteredVehicles || filteredVehicles.length === 0) {
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="9" class="empty-state">
+                    <h3>No vehicles found</h3>
+                    <p>Try adjusting your search or filters, or add a new vehicle to get started.</p>
+                    <button class="btn-add-vehicle" onclick="openAddVehicleModal()">
+                        <span>+</span> Add Your First Vehicle
+                    </button>
+                </td>
+            </tr>
+        `;
         return;
     }
     
-    try {
-        tableBody.innerHTML = vehicles.map(vehicle => createVehicleRow(vehicle)).join('');
-    } catch (error) {
-        console.error('Error creating vehicle rows:', error);
-        tableBody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 40px; color: red;">Error displaying vehicles</td></tr>';
-    }
+    // Generate table rows
+    filteredVehicles.forEach(vehicle => {
+        const row = createVehicleRow(vehicle);
+        tableBody.appendChild(row);
+    });
+    
+    console.log(`Displayed ${filteredVehicles.length} vehicles`);
 }
 
+/**
+ * Create Vehicle Table Row
+ */
 function createVehicleRow(vehicle) {
-    const statusClass = vehicle.status.toLowerCase();
-    const statusLabel = vehicle.status.charAt(0).toUpperCase() + vehicle.status.slice(1);
+    const row = document.createElement('tr');
     
-    // Check for alerts and warnings
-    const alerts = [];
-    const warnings = [];
-    
-    if (vehicle.computed_status === 'insurance_expired') {
-        alerts.push('EXPIRED');
-    } else if (vehicle.insurance_days_remaining !== null && vehicle.insurance_days_remaining < 30) {
-        warnings.push(`${vehicle.insurance_days_remaining}d`);
-    }
-    
-    if (vehicle.computed_status === 'revision_overdue') {
-        alerts.push('OVERDUE');
-    } else if (vehicle.revision_days_remaining !== null && vehicle.revision_days_remaining < 30) {
-        warnings.push(`${vehicle.revision_days_remaining}d`);
-    }
-    
-    // Insurance status
-    let insuranceStatus = 'Active';
-    let insuranceClass = 'status-active';
-    if (vehicle.computed_status === 'insurance_expired') {
-        insuranceStatus = 'Expired';
-        insuranceClass = 'status-expired';
-    } else if (vehicle.insurance_days_remaining !== null && vehicle.insurance_days_remaining < 30) {
-        insuranceStatus = `${vehicle.insurance_days_remaining} days`;
-        insuranceClass = 'status-warning';
-    }
-    
-    // Revision status
-    let revisionStatus = 'Current';
-    let revisionClass = 'status-active';
-    if (vehicle.computed_status === 'revision_overdue') {
-        revisionStatus = 'Overdue';
-        revisionClass = 'status-expired';
-    } else if (vehicle.revision_days_remaining !== null && vehicle.revision_days_remaining < 30) {
-        revisionStatus = `${vehicle.revision_days_remaining} days`;
-        revisionClass = 'status-warning';
-    }
-    
-    return `
-        <tr class="vehicle-row">
-            <td class="vehicle-cell">
-                <div class="vehicle-info">
-                    <strong class="vehicle-name">${vehicle.make} ${vehicle.model}</strong>
-                    <span class="vehicle-year">${vehicle.year || 'N/A'}</span>
-                </div>
-            </td>
-            <td>
-                <span class="vehicle-type badge badge-${vehicle.vehicle_type}">${vehicle.vehicle_type.toUpperCase()}</span>
-                <div class="vehicle-capacity">${vehicle.capacity} people</div>
-            </td>
-            <td class="license-plate">${vehicle.license_plate || 'N/A'}</td>
-            <td class="location">${vehicle.location || 'N/A'}</td>
-            <td class="mileage">${vehicle.current_mileage ? vehicle.current_mileage.toLocaleString() : 'N/A'} km</td>
-            <td>
-                <span class="status-badge status-${statusClass}">${statusLabel}</span>
-            </td>
-            <td>
-                <span class="status-indicator ${insuranceClass}">${insuranceStatus}</span>
-            </td>
-            <td>
-                <span class="status-indicator ${revisionClass}">${revisionStatus}</span>
-            </td>
-            <td class="action-buttons">
-                <button class="table-btn btn-edit" onclick="editVehicle(${vehicle.id})" title="Edit Vehicle">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
-                    </svg>
+    row.innerHTML = `
+        <td>
+            <div class="vehicle-info">
+                <div class="vehicle-name">${vehicle.name}</div>
+                <div class="vehicle-year">${vehicle.year}</div>
+                <div class="vehicle-capacity">${vehicle.capacity}</div>
+            </div>
+        </td>
+        <td>
+            <span class="license-plate">${vehicle.license}</span>
+        </td>
+        <td>
+            <span class="mileage">${vehicle.mileage}</span>
+        </td>
+        <td>
+            <span class="status-badge ${getStatusClass(vehicle.status)}">${vehicle.status}</span>
+        </td>
+        <td>
+            <span class="insurance-badge ${getInsuranceClass(vehicle.insurance)}">${vehicle.insurance}</span>
+        </td>
+        <td>
+            <span class="revision-badge ${getRevisionClass(vehicle.revision)}">${vehicle.revision}</span>
+        </td>
+        <td>
+            <span class="trip-info ${vehicle.lastTrip === 'None' ? 'none' : ''}">${vehicle.lastTrip}</span>
+        </td>
+        <td>
+            <span class="trip-info ${vehicle.nextTrip === 'None Scheduled' ? 'none' : ''}">${vehicle.nextTrip}</span>
+        </td>
+        <td>
+            <div class="action-buttons">
+                <button class="action-btn edit" onclick="editVehicle(${vehicle.id})" title="Edit Vehicle">
+                    ✏️
                 </button>
-                <button class="table-btn btn-maintenance" onclick="scheduleMaintenanceForVehicle(${vehicle.id})" title="Schedule Maintenance">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"/>
-                    </svg>
+                <button class="action-btn delete" onclick="deleteVehicle(${vehicle.id})" title="Delete Vehicle">
+                    🗑️
                 </button>
-                <button class="table-btn btn-logs" onclick="viewVehicleLogs(${vehicle.id})" title="View Logs">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4zm2.5 2.25l1.77-1.77c.39-.39.39-1.02 0-1.41L18.36 14.2c-.39-.39-1.02-.39-1.41 0L15.18 15.97l1.77 1.77c.39.39 1.02.39 1.41 0l.14-.14v2.65h2z"/>
-                    </svg>
-                </button>
-            </td>
-        </tr>
+            </div>
+        </td>
     `;
+    
+    return row;
 }
 
-function updateVehicleSummary(summary) {
-    // Provide default values if summary is null or undefined
-    const defaultSummary = {
-        total: 0,
-        available: 0,
-        maintenance: 0,
-        retired: 0
-    };
-    
-    const finalSummary = summary || defaultSummary;
-    
-    try {
-        document.getElementById('total-vehicles').textContent = finalSummary.total || 0;
-        document.getElementById('available-vehicles').textContent = finalSummary.available || 0;
-        document.getElementById('maintenance-vehicles').textContent = finalSummary.maintenance || 0;
-        document.getElementById('retired-vehicles').textContent = finalSummary.retired || 0;
-    } catch (error) {
-        console.error('Error updating vehicle summary:', error);
-        // Set to 0 if there's an error
-        document.getElementById('total-vehicles').textContent = '0';
-        document.getElementById('available-vehicles').textContent = '0';
-        document.getElementById('maintenance-vehicles').textContent = '0';
-        document.getElementById('retired-vehicles').textContent = '0';
+/**
+ * Get Status CSS Class
+ */
+function getStatusClass(status) {
+    switch(status.toLowerCase()) {
+        case 'available': return 'status-available';
+        case 'maintenance': return 'status-maintenance';
+        case 'retired': return 'status-retired';
+        default: return 'status-available';
     }
 }
 
-// Vehicle Modal Functions
-function openVehicleModal(vehicleId = null) {
-    const modal = document.getElementById('vehicle-modal');
-    const title = document.getElementById('vehicle-modal-title');
-    const form = document.getElementById('vehicle-form');
-    
-    // Reset form
-    form.reset();
-    document.getElementById('vehicle-id').value = '';
-    
-    if (vehicleId) {
-        title.textContent = 'Edit Vehicle';
-        const vehicle = currentVehicles.find(v => v.id == vehicleId);
-        if (vehicle) {
-            populateVehicleForm(vehicle);
-        }
-    } else {
-        title.textContent = 'Add Vehicle';
+/**
+ * Get Insurance CSS Class
+ */
+function getInsuranceClass(insurance) {
+    switch(insurance.toLowerCase()) {
+        case 'active': return 'insurance-active';
+        case 'warning': return 'insurance-warning';
+        case 'expired': return 'insurance-expired';
+        default: return 'insurance-active';
     }
-    
-    modal.style.display = 'block';
 }
 
-function populateVehicleForm(vehicle) {
-    document.getElementById('vehicle-id').value = vehicle.id;
-    document.getElementById('vehicle-make').value = vehicle.make || '';
-    document.getElementById('vehicle-model').value = vehicle.model || '';
-    document.getElementById('vehicle-year').value = vehicle.year || '';
-    document.getElementById('vehicle-license-plate').value = vehicle.license_plate || '';
-    document.getElementById('vehicle-type').value = vehicle.vehicle_type || '';
-    document.getElementById('vehicle-capacity').value = vehicle.capacity || '';
-    document.getElementById('vehicle-status').value = vehicle.status || '';
-    document.getElementById('vehicle-location').value = vehicle.location || '';
-    document.getElementById('vehicle-color').value = vehicle.color || '';
-    document.getElementById('vehicle-fuel-type').value = vehicle.fuel_type || '';
-    document.getElementById('vehicle-transmission').value = vehicle.transmission || '';
-    document.getElementById('vehicle-engine-size').value = vehicle.engine_size || '';
-    document.getElementById('vehicle-vin').value = vehicle.vin || '';
-    document.getElementById('vehicle-purchase-date').value = vehicle.purchase_date || '';
-    document.getElementById('vehicle-purchase-price').value = vehicle.purchase_price || '';
-    document.getElementById('vehicle-mileage').value = vehicle.current_mileage || '';
-    document.getElementById('vehicle-insurance-company').value = vehicle.insurance_company || '';
-    document.getElementById('vehicle-insurance-policy').value = vehicle.insurance_policy_number || '';
-    document.getElementById('vehicle-insurance-start').value = vehicle.insurance_start_date || '';
-    document.getElementById('vehicle-insurance-end').value = vehicle.insurance_end_date || '';
-    document.getElementById('vehicle-insurance-amount').value = vehicle.insurance_amount || '';
-    document.getElementById('vehicle-last-revision').value = vehicle.last_revision_date || '';
-    document.getElementById('vehicle-next-revision').value = vehicle.next_revision_due || '';
-    document.getElementById('vehicle-revision-interval').value = vehicle.revision_interval_months || 6;
-    document.getElementById('vehicle-notes').value = vehicle.notes || '';
+/**
+ * Get Revision CSS Class
+ */
+function getRevisionClass(revision) {
+    switch(revision.toLowerCase()) {
+        case 'current': return 'revision-current';
+        case 'warning': return 'revision-warning';
+        case 'overdue': return 'revision-overdue';
+        default: return 'revision-current';
+    }
 }
 
-async function handleVehicleSubmit(e) {
-    e.preventDefault();
+/**
+ * Filter Fleet based on search and filters
+ */
+function filterFleet() {
+    const searchTerm = document.getElementById('fleet-search')?.value.toLowerCase() || '';
+    const statusFilter = document.getElementById('status-filter')?.value.toLowerCase() || '';
+    const typeFilter = document.getElementById('type-filter')?.value.toLowerCase() || '';
     
-    const vehicleId = document.getElementById('vehicle-id').value;
-    const isEdit = vehicleId !== '';
-    
-    const vehicleData = {
-        make: document.getElementById('vehicle-make').value,
-        model: document.getElementById('vehicle-model').value,
-        year: document.getElementById('vehicle-year').value || null,
-        license_plate: document.getElementById('vehicle-license-plate').value,
-        vehicle_type: document.getElementById('vehicle-type').value,
-        capacity: parseInt(document.getElementById('vehicle-capacity').value),
-        status: document.getElementById('vehicle-status').value,
-        location: document.getElementById('vehicle-location').value,
-        color: document.getElementById('vehicle-color').value,
-        fuel_type: document.getElementById('vehicle-fuel-type').value,
-        transmission: document.getElementById('vehicle-transmission').value,
-        engine_size: document.getElementById('vehicle-engine-size').value,
-        vin: document.getElementById('vehicle-vin').value,
-        purchase_date: document.getElementById('vehicle-purchase-date').value || null,
-        purchase_price: parseFloat(document.getElementById('vehicle-purchase-price').value) || null,
-        current_mileage: parseInt(document.getElementById('vehicle-mileage').value) || 0,
-        insurance_company: document.getElementById('vehicle-insurance-company').value,
-        insurance_policy_number: document.getElementById('vehicle-insurance-policy').value,
-        insurance_start_date: document.getElementById('vehicle-insurance-start').value || null,
-        insurance_end_date: document.getElementById('vehicle-insurance-end').value || null,
-        insurance_amount: parseFloat(document.getElementById('vehicle-insurance-amount').value) || null,
-        last_revision_date: document.getElementById('vehicle-last-revision').value || null,
-        next_revision_due: document.getElementById('vehicle-next-revision').value || null,
-        revision_interval_months: parseInt(document.getElementById('vehicle-revision-interval').value) || 6,
-        notes: document.getElementById('vehicle-notes').value
-    };
-    
-    if (isEdit) {
-        vehicleData.id = vehicleId;
-    }
-    
-    try {
-        const url = 'api/vehicles/manage.php';
-        const method = isEdit ? 'PUT' : 'POST';
+    filteredVehicles = vehicles.filter(vehicle => {
+        // Search filter
+        const matchesSearch = !searchTerm || 
+            vehicle.name.toLowerCase().includes(searchTerm) ||
+            vehicle.license.toLowerCase().includes(searchTerm) ||
+            vehicle.year.includes(searchTerm);
         
-        const response = await fetch(url, {
-            method: method,
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(vehicleData)
-        });
+        // Status filter
+        const matchesStatus = !statusFilter || 
+            vehicle.status.toLowerCase() === statusFilter;
         
-        const result = await response.json();
+        // Type filter - simplified for demo
+        const matchesType = !typeFilter || 
+            vehicle.name.toLowerCase().includes(typeFilter);
         
-        if (result.success) {
-            showNotification(result.message, 'success');
-            closeModal('vehicle-modal');
-            loadVehicles();
-        } else {
-            throw new Error(result.error || 'Failed to save vehicle');
-        }
-    } catch (error) {
-        console.error('Error saving vehicle:', error);
-        showNotification(error.message, 'error');
-    }
+        return matchesSearch && matchesStatus && matchesType;
+    });
+    
+    displayFleetTable();
+    console.log(`Filtered to ${filteredVehicles.length} vehicles`);
 }
 
+/**
+ * Open Add Vehicle Modal
+ */
+function openAddVehicleModal() {
+    console.log('Opening Add Vehicle Modal...');
+    
+    // For now, show a simple alert - in production this would open a proper modal
+    alert('Add Vehicle Modal would open here.\n\nThis would contain a form with:\n- Vehicle details (make, model, year)\n- License plate\n- Capacity\n- Status\n- Insurance information\n- Revision schedule\n- And more...');
+}
+
+/**
+ * Edit Vehicle
+ */
 function editVehicle(vehicleId) {
-    openVehicleModal(vehicleId);
-}
-
-async function deleteVehicle(vehicleId) {
-    if (!confirm('Are you sure you want to retire this vehicle? This action will set the vehicle status to "retired".')) {
+    const vehicle = vehicles.find(v => v.id === vehicleId);
+    
+    if (!vehicle) {
+        console.error('Vehicle not found:', vehicleId);
         return;
     }
     
-    try {
-        const response = await fetch(`api/vehicles/manage.php?id=${vehicleId}`, {
-            method: 'DELETE'
-        });
-        
-        const result = await response.json();
-        
-        if (result.success) {
-            showNotification(result.message, 'success');
-            loadVehicles();
-        } else {
-            throw new Error(result.error || 'Failed to delete vehicle');
-        }
-    } catch (error) {
-        console.error('Error deleting vehicle:', error);
-        showNotification(error.message, 'error');
-    }
+    console.log('Editing vehicle:', vehicle);
+    
+    // For now, show a simple alert - in production this would open a proper modal
+    alert(`Edit Vehicle: ${vehicle.name}\n\nThis would open a modal with the vehicle's current information pre-filled for editing.`);
 }
-
-// Maintenance Management
-async function loadMaintenanceLogs() {
-    try {
-        const response = await fetch('api/vehicles/maintenance.php');
-        const data = await response.json();
-        
-        if (data.success) {
-            currentMaintenanceLogs = data.logs;
-            displayMaintenanceLogs(data.logs);
-        } else {
-            throw new Error(data.error || 'Failed to load maintenance logs');
-        }
-    } catch (error) {
-        console.error('Error loading maintenance logs:', error);
-        showNotification('Failed to load maintenance logs', 'error');
-    }
-}
-
-function displayMaintenanceLogs(logs) {
-    const tbody = document.querySelector('#maintenance-table tbody');
-    
-    if (!logs || logs.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px; color: var(--text-light);">No maintenance logs found</td></tr>';
-        return;
-    }
-    
-    tbody.innerHTML = logs.map(log => `
-        <tr>
-            <td>${log.make} ${log.model} (${log.license_plate})</td>
-            <td><span class="badge badge-${log.maintenance_type}">${log.maintenance_type}</span></td>
-            <td>${log.description}</td>
-            <td>${formatDate(log.start_date)}</td>
-            <td>${log.end_date ? formatDate(log.end_date) : 'N/A'}</td>
-            <td>${log.cost ? '$' + parseFloat(log.cost).toFixed(2) : 'N/A'}</td>
-            <td><span class="badge badge-${log.status}">${log.status.replace('_', ' ')}</span></td>
-            <td>
-                <button class="action-btn btn-edit" onclick="editMaintenanceLog(${log.id})">Edit</button>
-                ${log.status !== 'completed' ? `<button class="action-btn btn-delete" onclick="deleteMaintenanceLog(${log.id})">Delete</button>` : ''}
-            </td>
-        </tr>
-    `).join('');
-}
-
-function openMaintenanceModal(maintenanceId = null) {
-    const modal = document.getElementById('maintenance-modal');
-    const title = document.getElementById('maintenance-modal-title');
-    const form = document.getElementById('maintenance-form');
-    
-    // Reset form
-    form.reset();
-    document.getElementById('maintenance-id').value = '';
-    
-    if (maintenanceId) {
-        title.textContent = 'Edit Maintenance Log';
-        const log = currentMaintenanceLogs.find(l => l.id == maintenanceId);
-        if (log) {
-            populateMaintenanceForm(log);
-        }
-    } else {
-        title.textContent = 'Schedule Maintenance';
-    }
-    
-    modal.style.display = 'block';
-}
-
-function scheduleMaintenanceForVehicle(vehicleId) {
-    openMaintenanceModal();
-    document.getElementById('maintenance-vehicle').value = vehicleId;
-}
-
-async function handleMaintenanceSubmit(e) {
-    e.preventDefault();
-    
-    const maintenanceId = document.getElementById('maintenance-id').value;
-    const isEdit = maintenanceId !== '';
-    
-    const maintenanceData = {
-        vehicle_id: parseInt(document.getElementById('maintenance-vehicle').value),
-        maintenance_type: document.getElementById('maintenance-type').value,
-        description: document.getElementById('maintenance-description').value,
-        start_date: document.getElementById('maintenance-start-date').value,
-        end_date: document.getElementById('maintenance-end-date').value || null,
-        cost: parseFloat(document.getElementById('maintenance-cost').value) || null,
-        mileage_at_service: parseInt(document.getElementById('maintenance-mileage').value) || null,
-        service_provider: document.getElementById('maintenance-provider').value,
-        invoice_number: document.getElementById('maintenance-invoice').value,
-        parts_replaced: document.getElementById('maintenance-parts').value,
-        next_service_due: document.getElementById('maintenance-next-due').value || null,
-        status: document.getElementById('maintenance-status').value
-    };
-    
-    if (isEdit) {
-        maintenanceData.id = maintenanceId;
-    }
-    
-    try {
-        const url = 'api/vehicles/maintenance.php';
-        const method = isEdit ? 'PUT' : 'POST';
-        
-        const response = await fetch(url, {
-            method: method,
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(maintenanceData)
-        });
-        
-        const result = await response.json();
-        
-        if (result.success) {
-            showNotification(result.message, 'success');
-            closeModal('maintenance-modal');
-            loadMaintenanceLogs();
-            loadVehicles(); // Refresh vehicles to update status
-        } else {
-            throw new Error(result.error || 'Failed to save maintenance log');
-        }
-    } catch (error) {
-        console.error('Error saving maintenance log:', error);
-        showNotification(error.message, 'error');
-    }
-}
-
-// Driver Logs Management
-async function loadDriverLogs() {
-    try {
-        const response = await fetch('api/vehicles/driver-logs.php');
-        const data = await response.json();
-        
-        if (data.success) {
-            currentDriverLogs = data.logs;
-            displayDriverLogs(data.logs);
-        } else {
-            throw new Error(data.error || 'Failed to load driver logs');
-        }
-    } catch (error) {
-        console.error('Error loading driver logs:', error);
-        showNotification('Failed to load driver logs', 'error');
-    }
-}
-
-function displayDriverLogs(logs) {
-    const tbody = document.querySelector('#driver-logs-table tbody');
-    
-    if (!logs || logs.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 40px; color: var(--text-light);">No driver logs found</td></tr>';
-        return;
-    }
-    
-    tbody.innerHTML = logs.map(log => `
-        <tr>
-            <td>${log.make} ${log.model} (${log.license_plate})</td>
-            <td>${log.driver_name}</td>
-            <td>${log.trip_title || 'N/A'}</td>
-            <td>${formatDate(log.start_date)}</td>
-            <td>${log.end_date ? formatDate(log.end_date) : 'Ongoing'}</td>
-            <td>${log.mileage_driven || 0} km</td>
-            <td>$${(parseFloat(log.total_expenses) || 0).toFixed(2)}</td>
-            <td><span class="badge badge-${log.status}">${log.status.replace('_', ' ')}</span></td>
-            <td>
-                <button class="action-btn btn-edit" onclick="editDriverLog(${log.id})">Edit</button>
-                ${log.status !== 'completed' ? `<button class="action-btn btn-delete" onclick="deleteDriverLog(${log.id})">Delete</button>` : ''}
-            </td>
-        </tr>
-    `).join('');
-}
-
-function openDriverLogModal(driverLogId = null) {
-    const modal = document.getElementById('driver-log-modal');
-    const title = document.getElementById('driver-log-modal-title');
-    const form = document.getElementById('driver-log-form');
-    
-    // Reset form
-    form.reset();
-    document.getElementById('driver-log-id').value = '';
-    
-    if (driverLogId) {
-        title.textContent = 'Edit Driver Log';
-        const log = currentDriverLogs.find(l => l.id == driverLogId);
-        if (log) {
-            populateDriverLogForm(log);
-        }
-    } else {
-        title.textContent = 'New Driver Log';
-    }
-    
-    modal.style.display = 'block';
-}
-
-async function handleDriverLogSubmit(e) {
-    e.preventDefault();
-    
-    const driverLogId = document.getElementById('driver-log-id').value;
-    const isEdit = driverLogId !== '';
-    
-    const driverLogData = {
-        vehicle_id: parseInt(document.getElementById('driver-log-vehicle').value),
-        driver_user_id: document.getElementById('driver-log-driver').value || null,
-        driver_name: document.getElementById('driver-log-name').value,
-        trip_id: document.getElementById('driver-log-trip').value || null,
-        start_date: document.getElementById('driver-log-start-date').value,
-        end_date: document.getElementById('driver-log-end-date').value || null,
-        start_mileage: parseInt(document.getElementById('driver-log-start-mileage').value) || null,
-        end_mileage: parseInt(document.getElementById('driver-log-end-mileage').value) || null,
-        fuel_cost: parseFloat(document.getElementById('driver-log-fuel-cost').value) || null,
-        toll_cost: parseFloat(document.getElementById('driver-log-toll-cost').value) || null,
-        other_expenses: parseFloat(document.getElementById('driver-log-other-expenses').value) || null,
-        route_description: document.getElementById('driver-log-route').value,
-        notes: document.getElementById('driver-log-notes').value,
-        damage_reported: document.getElementById('driver-log-damage').checked ? 1 : 0,
-        damage_description: document.getElementById('driver-log-damage-description').value,
-        status: document.getElementById('driver-log-status').value
-    };
-    
-    if (isEdit) {
-        driverLogData.id = driverLogId;
-    }
-    
-    try {
-        const url = 'api/vehicles/driver-logs.php';
-        const method = isEdit ? 'PUT' : 'POST';
-        
-        const response = await fetch(url, {
-            method: method,
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(driverLogData)
-        });
-        
-        const result = await response.json();
-        
-        if (result.success) {
-            showNotification(result.message, 'success');
-            closeModal('driver-log-modal');
-            loadDriverLogs();
-            loadVehicles(); // Refresh vehicles to update mileage
-        } else {
-            throw new Error(result.error || 'Failed to save driver log');
-        }
-    } catch (error) {
-        console.error('Error saving driver log:', error);
-        showNotification(error.message, 'error');
-    }
-}
-
-// Utility Functions
-async function loadUsers() {
-    try {
-        const response = await fetch('api/auth/list-users.php');
-        const data = await response.json();
-        
-        if (data.success) {
-            currentUsers = data.users;
-        }
-    } catch (error) {
-        console.error('Error loading users:', error);
-    }
-}
-
-async function loadTrips() {
-    try {
-        const response = await fetch('api/trips/list.php');
-        const data = await response.json();
-        
-        if (data.success) {
-            currentTrips = data.trips;
-        }
-    } catch (error) {
-        console.error('Error loading trips:', error);
-    }
-}
-
-function populateVehicleSelects() {
-    const selects = [
-        'maintenance-vehicle',
-        'driver-log-vehicle'
-    ];
-    
-    selects.forEach(selectId => {
-        const select = document.getElementById(selectId);
-        if (select) {
-            select.innerHTML = '<option value="">Select Vehicle</option>' + 
-                currentVehicles.map(vehicle => 
-                    `<option value="${vehicle.id}">${vehicle.make} ${vehicle.model} (${vehicle.license_plate})</option>`
-                ).join('');
-        }
-    });
-}
-
-function populateDriverSelects() {
-    const select = document.getElementById('driver-log-driver');
-    if (select) {
-        select.innerHTML = '<option value="">Select Driver</option>' + 
-            currentUsers.filter(user => user.role === 'admin' || user.role === 'employee')
-                .map(user => 
-                    `<option value="${user.id}">${user.name}</option>`
-                ).join('');
-    }
-    
-    // Populate trips select
-    const tripSelect = document.getElementById('driver-log-trip');
-    if (tripSelect) {
-        tripSelect.innerHTML = '<option value="">Select Trip (Optional)</option>' + 
-            currentTrips.filter(trip => trip.status === 'planned' || trip.status === 'active')
-                .map(trip => 
-                    `<option value="${trip.id}">${trip.title}</option>`
-                ).join('');
-    }
-}
-
-function calculateNextRevision() {
-    const lastRevision = document.getElementById('vehicle-last-revision').value;
-    const interval = parseInt(document.getElementById('vehicle-revision-interval').value) || 6;
-    
-    if (lastRevision) {
-        const nextDate = new Date(lastRevision);
-        nextDate.setMonth(nextDate.getMonth() + interval);
-        document.getElementById('vehicle-next-revision').value = nextDate.toISOString().split('T')[0];
-    }
-}
-
-function closeModal(modalId) {
-    document.getElementById(modalId).style.display = 'none';
-}
-
-// Filter Functions
-function applyFilters() {
-    const statusFilter = document.getElementById('status-filter').value;
-    const typeFilter = document.getElementById('type-filter').value;
-    const locationFilter = document.getElementById('location-filter').value.toLowerCase();
-    
-    let filteredVehicles = currentVehicles;
-    
-    if (statusFilter) {
-        filteredVehicles = filteredVehicles.filter(v => v.status === statusFilter);
-    }
-    
-    if (typeFilter) {
-        filteredVehicles = filteredVehicles.filter(v => v.vehicle_type === typeFilter);
-    }
-    
-    if (locationFilter) {
-        filteredVehicles = filteredVehicles.filter(v => 
-            v.location && v.location.toLowerCase().includes(locationFilter)
-        );
-    }
-    
-    displayVehicles(filteredVehicles);
-}
-
-function clearFilters() {
-    document.getElementById('status-filter').value = '';
-    document.getElementById('type-filter').value = '';
-    document.getElementById('location-filter').value = '';
-    displayVehicles(currentVehicles);
-}
-
-// Reports
-async function generateReport() {
-    const startDate = document.getElementById('report-start-date').value;
-    const endDate = document.getElementById('report-end-date').value;
-    
-    try {
-        let url = 'api/vehicles/driver-logs.php';
-        if (startDate) url += `?start_date=${startDate}`;
-        if (endDate) url += `${startDate ? '&' : '?'}end_date=${endDate}`;
-        
-        const response = await fetch(url);
-        const data = await response.json();
-        
-        if (data.success) {
-            updateReportSummary(data.summary);
-        }
-    } catch (error) {
-        console.error('Error generating report:', error);
-    }
-}
-
-function updateReportSummary(summary) {
-    document.getElementById('total-mileage').textContent = (summary.total_mileage || 0).toLocaleString();
-    document.getElementById('total-fuel-cost').textContent = '$' + (summary.total_fuel_cost || 0).toFixed(2);
-    document.getElementById('active-logs').textContent = summary.active || 0;
-    
-    // Get maintenance cost separately
-            fetch('api/vehicles/maintenance.php')
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                document.getElementById('total-maintenance-cost').textContent = '$' + (data.summary.total_cost || 0).toFixed(2);
-            }
-        });
-}
-
-// Utility Functions
-function formatDate(dateString) {
-    if (!dateString) return 'N/A';
-    return new Date(dateString).toLocaleDateString();
-}
-
-function showNotification(message, type = 'info') {
-    // Create notification element
-    const notification = document.createElement('div');
-    notification.className = `notification notification-${type}`;
-    notification.textContent = message;
-    
-    // Style the notification
-    Object.assign(notification.style, {
-        position: 'fixed',
-        top: '20px',
-        right: '20px',
-        padding: '15px 20px',
-        borderRadius: '5px',
-        color: 'white',
-        fontWeight: '500',
-        zIndex: '10000',
-        maxWidth: '400px',
-        backgroundColor: type === 'success' ? '#4CAF50' : type === 'error' ? '#F44336' : '#2196F3'
-    });
-    
-    document.body.appendChild(notification);
-    
-    // Remove after 5 seconds
-    setTimeout(() => {
-        if (notification.parentNode) {
-            notification.parentNode.removeChild(notification);
-        }
-    }, 5000);
-}
-
-// Event handlers for specific actions
-function editMaintenanceLog(id) {
-    openMaintenanceModal(id);
-}
-
-function editDriverLog(id) {
-    openDriverLogModal(id);
-}
-
-function viewVehicleLogs(vehicleId) {
-    showTab('driver-logs');
-    // Filter by vehicle
-    document.getElementById('driver-vehicle-filter').value = vehicleId;
-    // Apply filter (you'd need to implement this filtering)
-}
-
-async function deleteMaintenanceLog(id) {
-    if (!confirm('Are you sure you want to delete this maintenance log?')) {
-        return;
-    }
-    
-    try {
-        const response = await fetch(`api/vehicles/maintenance.php?id=${id}`, {
-            method: 'DELETE'
-        });
-        
-        const result = await response.json();
-        
-        if (result.success) {
-            showNotification(result.message, 'success');
-            loadMaintenanceLogs();
-            loadVehicles();
-        } else {
-            throw new Error(result.error);
-        }
-    } catch (error) {
-        showNotification(error.message, 'error');
-    }
-}
-
-async function deleteDriverLog(id) {
-    if (!confirm('Are you sure you want to delete this driver log?')) {
-        return;
-    }
-    
-    try {
-        const response = await fetch(`api/vehicles/driver-logs.php?id=${id}`, {
-            method: 'DELETE'
-        });
-        
-        const result = await response.json();
-        
-        if (result.success) {
-            showNotification(result.message, 'success');
-            loadDriverLogs();
-        } else {
-            throw new Error(result.error);
-        }
-    } catch (error) {
-        showNotification(error.message, 'error');
-    }
-}
-
-function populateMaintenanceForm(log) {
-    document.getElementById('maintenance-id').value = log.id;
-    document.getElementById('maintenance-vehicle').value = log.vehicle_id;
-    document.getElementById('maintenance-type').value = log.maintenance_type;
-    document.getElementById('maintenance-description').value = log.description;
-    document.getElementById('maintenance-start-date').value = log.start_date;
-    document.getElementById('maintenance-end-date').value = log.end_date || '';
-    document.getElementById('maintenance-cost').value = log.cost || '';
-    document.getElementById('maintenance-mileage').value = log.mileage_at_service || '';
-    document.getElementById('maintenance-provider').value = log.service_provider || '';
-    document.getElementById('maintenance-invoice').value = log.invoice_number || '';
-    document.getElementById('maintenance-parts').value = log.parts_replaced || '';
-    document.getElementById('maintenance-next-due').value = log.next_service_due || '';
-    document.getElementById('maintenance-status').value = log.status;
-}
-
-function populateDriverLogForm(log) {
-    document.getElementById('driver-log-id').value = log.id;
-    document.getElementById('driver-log-vehicle').value = log.vehicle_id;
-    document.getElementById('driver-log-driver').value = log.driver_user_id || '';
-    document.getElementById('driver-log-name').value = log.driver_name;
-    document.getElementById('driver-log-trip').value = log.trip_id || '';
-    document.getElementById('driver-log-start-date').value = log.start_date;
-    document.getElementById('driver-log-end-date').value = log.end_date || '';
-    document.getElementById('driver-log-start-mileage').value = log.start_mileage || '';
-    document.getElementById('driver-log-end-mileage').value = log.end_mileage || '';
-    document.getElementById('driver-log-fuel-cost').value = log.fuel_cost || '';
-    document.getElementById('driver-log-toll-cost').value = log.toll_cost || '';
-    document.getElementById('driver-log-other-expenses').value = log.other_expenses || '';
-    document.getElementById('driver-log-route').value = log.route_description || '';
-    document.getElementById('driver-log-notes').value = log.notes || '';
-    document.getElementById('driver-log-damage').checked = log.damage_reported == 1;
-    document.getElementById('driver-log-damage-description').value = log.damage_description || '';
-    document.getElementById('driver-log-status').value = log.status;
-    
-    // Toggle damage description visibility
-    const damageGroup = document.getElementById('damage-description-group');
-    damageGroup.style.display = log.damage_reported == 1 ? 'block' : 'none';
-}
-
-// Export functions
-function exportData() {
-    // This would export all vehicle data to CSV
-    console.log('Export functionality would be implemented here');
-}
-
-function exportReport() {
-    // This would export the current report data
-    console.log('Export report functionality would be implemented here');
-}
-
-// ============================================================================
-// 🚗 MOBILE NAVIGATION FOR ADMIN PAGES
-// ============================================================================
 
 /**
- * Toggle mobile navigation menu for admin pages
+ * Delete Vehicle
  */
-function toggleAdminMobileMenu() {
-    const hamburger = document.getElementById('hamburgerMenuAdmin');
-    const menu = document.getElementById('mobileNavMenuAdmin');
+function deleteVehicle(vehicleId) {
+    const vehicle = vehicles.find(v => v.id === vehicleId);
     
-    if (hamburger && menu) {
-        hamburger.classList.toggle('active');
-        menu.classList.toggle('active');
-        
-        // Close menu when clicking outside
-        if (menu.classList.contains('active')) {
-            document.addEventListener('click', closeAdminMobileMenuOnOutsideClick);
-        } else {
-            document.removeEventListener('click', closeAdminMobileMenuOnOutsideClick);
+    if (!vehicle) {
+        console.error('Vehicle not found:', vehicleId);
+        return;
+    }
+    
+    // Confirm deletion
+    if (confirm(`Are you sure you want to delete ${vehicle.name} (${vehicle.license})?\n\nThis action cannot be undone.`)) {
+        // Remove from vehicles array
+        const index = vehicles.findIndex(v => v.id === vehicleId);
+        if (index > -1) {
+            vehicles.splice(index, 1);
+            
+            // Refresh the filtered list and display
+            filterFleet();
+            
+            console.log('Vehicle deleted:', vehicle.name);
+            showNotification(`Vehicle ${vehicle.name} has been deleted successfully.`, 'success');
         }
     }
 }
 
 /**
- * Close admin mobile menu when clicking outside
+ * Go Back to Dashboard
  */
-function closeAdminMobileMenuOnOutsideClick(event) {
-    const hamburger = document.getElementById('hamburgerMenuAdmin');
-    const menu = document.getElementById('mobileNavMenuAdmin');
-    
-    if (hamburger && menu && 
-        !hamburger.contains(event.target) && 
-        !menu.contains(event.target)) {
-        hamburger.classList.remove('active');
-        menu.classList.remove('active');
-        document.removeEventListener('click', closeAdminMobileMenuOnOutsideClick);
-    }
-}
-
-/**
- * Logout function for admin pages
- */
-function logout() {
-    // Clear session storage
-    sessionStorage.removeItem('userSession');
-    localStorage.removeItem('wolthers_auth');
-    
-    // Redirect to login page
+function goBack() {
+    // Navigate back to main trips page
     window.location.href = 'index.html';
 }
 
 /**
- * Update admin navigation visibility based on user role
+ * Show Notification
  */
-function updateAdminNavigationVisibility() {
-    // Get current user from session
-    const session = sessionStorage.getItem('userSession');
-    if (!session) {
-        // Redirect to login if no session
-        window.location.href = 'index.html';
-        return;
+function showNotification(message, type = 'info') {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 15px 20px;
+        border-radius: 8px;
+        color: white;
+        font-weight: 500;
+        z-index: 10000;
+        max-width: 300px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+    `;
+    
+    // Set background color based on type
+    switch(type) {
+        case 'success':
+            notification.style.backgroundColor = '#4caf50';
+            break;
+        case 'error':
+            notification.style.backgroundColor = '#f44336';
+            break;
+        case 'warning':
+            notification.style.backgroundColor = '#ff9800';
+            break;
+        default:
+            notification.style.backgroundColor = '#2196f3';
     }
     
-    try {
-        const userData = JSON.parse(session);
-        const user = userData.user;
-        const role = user.role || 'employee';
-        const isAdmin = role === 'admin';
-        
-        // Show/hide accounts link based on admin status
-        const accountsNavLink = document.getElementById('accountsNavLink');
-        const mobileAccountsNavLink = document.getElementById('mobileAccountsNavLink');
-        
-        if (accountsNavLink) {
-            accountsNavLink.style.display = isAdmin ? 'block' : 'none';
-        }
-        
-        if (mobileAccountsNavLink) {
-            mobileAccountsNavLink.style.display = isAdmin ? 'flex' : 'none';
-        }
-        
-        console.log(`Admin navigation updated for ${user.name} (${role}):`, {
-            canAccessAccounts: isAdmin
-        });
-        
-    } catch (error) {
-        console.error('Error parsing user session:', error);
-        window.location.href = 'index.html';
-    }
-} 
+    notification.textContent = message;
+    
+    // Add to page
+    document.body.appendChild(notification);
+    
+    // Animate in
+    setTimeout(() => {
+        notification.style.transform = 'translateX(0)';
+    }, 100);
+    
+    // Remove after 5 seconds
+    setTimeout(() => {
+        notification.style.transform = 'translateX(100%)';
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 300);
+    }, 5000);
+}
+
+/**
+ * Clear all filters
+ */
+function clearFilters() {
+    document.getElementById('fleet-search').value = '';
+    document.getElementById('status-filter').value = '';
+    document.getElementById('type-filter').value = '';
+    
+    filteredVehicles = [...vehicles];
+    displayFleetTable();
+    
+    console.log('Filters cleared');
+}
+
+/**
+ * Export Fleet Data
+ */
+function exportFleetData() {
+    console.log('Exporting fleet data...');
+    
+    // Create CSV content
+    const headers = ['Fleet', 'Year', 'Capacity', 'License', 'Mileage', 'Status', 'Insurance', 'Revision', 'Last Trip', 'Next Trip'];
+    const csvContent = [
+        headers.join(','),
+        ...filteredVehicles.map(vehicle => [
+            `"${vehicle.name}"`,
+            vehicle.year,
+            `"${vehicle.capacity}"`,
+            vehicle.license,
+            `"${vehicle.mileage}"`,
+            vehicle.status,
+            vehicle.insurance,
+            vehicle.revision,
+            `"${vehicle.lastTrip}"`,
+            `"${vehicle.nextTrip}"`
+        ].join(','))
+    ].join('\n');
+    
+    // Create and download file
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `fleet-data-${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+    
+    showNotification('Fleet data exported successfully!', 'success');
+}
+
+// Global functions for easy access
+window.filterFleet = filterFleet;
+window.openAddVehicleModal = openAddVehicleModal;
+window.editVehicle = editVehicle;
+window.deleteVehicle = deleteVehicle;
+window.goBack = goBack;
+window.clearFilters = clearFilters;
+window.exportFleetData = exportFleetData; 
