@@ -2916,7 +2916,7 @@ body {
 
 @media (prefers-color-scheme: dark) {
     .header {
-        background: linear-gradient(135deg, #0a0f0b 0%, #1a2e1c 50%, #0f1510 100%);
+        background: linear-gradient(135deg, #121B13 0%, #0F1610 100%);
         color: #E3D6C0;
     }
     .header h1,
@@ -2924,7 +2924,9 @@ body {
         color: #ffffff;
     }
     .main-logo {
-        content: url('images/wolthers-logo-green.svg');
+        opacity: 0;
+        background: url('../images/wolthers-logo-green.svg') no-repeat center;
+        background-size: contain;
         filter: none;
     }
     .trip-date,
