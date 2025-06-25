@@ -253,10 +253,13 @@ const auth = {
     },
     
     logout: () => {
+        // Clear all session data
         sessionStorage.removeItem('userSession');
         localStorage.removeItem('wolthers_auth');
         currentUser = null;
-        ui.showLogin();
+        
+        // Reload the page to show login form (since login container was removed)
+        window.location.reload();
     }
 };
 
