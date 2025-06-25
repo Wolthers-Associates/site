@@ -2924,9 +2924,6 @@ body {
         color: #ffffff;
     }
     .main-logo {
-        opacity: 0;
-        background: url('../images/wolthers-logo-green.svg') no-repeat center;
-        background-size: contain;
         filter: none;
     }
     .trip-date,

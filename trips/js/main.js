@@ -13,6 +13,22 @@ let selectedTrip = null;
 let microsoftAuth = null;
 let USER_DATABASE = [];
 
+// Dark mode logo handling
+function updateLogoForColorScheme() {
+    const logo = document.querySelector('.main-logo');
+    if (!logo) return;
+    
+    const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    if (isDark) {
+        logo.src = 'images/wolthers-logo-green.svg';
+    } else {
+        logo.src = 'images/wolthers-logo-off-white.svg';
+    }
+}
+
+// Listen for color scheme changes
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateLogoForColorScheme);
+
 // Mock Data
 const MOCK_TRIPS = [
     // Add mock trips here or load from API
@@ -978,6 +994,9 @@ document.addEventListener('DOMContentLoaded', async function() {
     
     // Initialize user database for user management
     initializeUserDatabase();
+    
+    // Initialize logo for current color scheme
+    updateLogoForColorScheme();
     
     // Set up form event handlers
     const initialForm = document.getElementById('initialForm');
