@@ -3581,51 +3581,419 @@ function updateNavigationVisibility(user) {
     });
 }
 
-/**
- * Show Vehicle Management Modal
- */
-function showVehicleManagementModal() {
-    document.getElementById('vehicleManagementModal').style.display = 'flex';
-    document.body.style.overflow = 'hidden';
-    loadVehicleManagementData();
-}
+// ============================================================================
+// 🚗 FLEET MANAGEMENT SYSTEM
+// ============================================================================
+
+let fleetData = [];
+let filteredFleetData = [];
 
 /**
- * Hide Vehicle Management Modal
+ * Show Fleet Management Modal
  */
-function hideVehicleManagementModal() {
-    document.getElementById('vehicleManagementModal').style.display = 'none';
-    document.body.style.overflow = 'auto';
-}
-
-/**
- * Load Vehicle Management Data
- */
-async function loadVehicleManagementData() {
-    try {
-        // Show loading state
-        showLoadingState(true);
-        
-        // Load vehicles data
-        await loadModalVehicles();
-        
-        // Load maintenance and driver logs for other tabs
-        await loadModalMaintenance();
-        await loadModalDriverLogs();
-        
-        // Setup interactions
-        setupVehicleManagementInteractions();
-        
-    } catch (error) {
-        console.error('Failed to load vehicle management data:', error);
-        showToast('Failed to load vehicle data', 'error');
-    } finally {
-        showLoadingState(false);
+function showFleetManagementModal() {
+    console.log('Opening Fleet Management Modal...');
+    
+    const modal = document.getElementById('fleetManagementModal');
+    if (modal) {
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+        loadFleetManagementData();
     }
 }
 
 /**
- * Load Vehicles for Modal
+ * Hide Fleet Management Modal
+ */
+function hideFleetManagementModal() {
+    const modal = document.getElementById('fleetManagementModal');
+    if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+}
+
+/**
+ * Show Vehicle Management Modal (Legacy compatibility)
+ */
+function showVehicleManagementModal() {
+    showFleetManagementModal();
+}
+
+/**
+ * Hide Vehicle Management Modal (Legacy compatibility)
+ */
+function hideVehicleManagementModal() {
+    hideFleetManagementModal();
+}
+
+/**
+ * Load Fleet Management Data
+ */
+async function loadFleetManagementData() {
+    try {
+        console.log('Loading fleet data from database...');
+        
+        // Show loading state
+        const tableBody = document.getElementById('fleetTableBody');
+        if (tableBody) {
+            tableBody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 40px;">Loading fleet data...</td></tr>';
+        }
+        
+        // Load vehicles from API with trip information
+        const response = await fetch('api/vehicles/manage.php?include_trips=true&include_maintenance=true');
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            fleetData = data.vehicles;
+            filteredFleetData = [...fleetData];
+            
+            displayFleetData(filteredFleetData);
+            updateFleetSummary(data.summary);
+            setupFleetInteractions();
+            
+            console.log(`Loaded ${fleetData.length} vehicles from database`);
+        } else {
+            throw new Error(data.error || 'Failed to load fleet data');
+        }
+        
+    } catch (error) {
+        console.error('Error loading fleet data:', error);
+        
+        const tableBody = document.getElementById('fleetTableBody');
+        if (tableBody) {
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="9" style="text-align: center; padding: 40px; color: #f44336;">
+                        <strong>Failed to load fleet data</strong><br>
+                        <small>${error.message}</small><br>
+                        <button onclick="loadFleetManagementData()" style="margin-top: 10px; padding: 8px 16px; background: #2196f3; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                            Retry
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }
+        
+                 showToast('Failed to load fleet data: ' + error.message, 'error');
+    }
+}
+
+/**
+ * Display Fleet Data in Table
+ */
+function displayFleetData(vehicles) {
+    const tableBody = document.getElementById('fleetTableBody');
+    
+    if (!tableBody) {
+        console.error('Fleet table body not found!');
+        return;
+    }
+    
+    if (!vehicles || vehicles.length === 0) {
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="9" style="text-align: center; padding: 40px;">
+                    <h3 style="margin-bottom: 10px;">No vehicles found</h3>
+                    <p style="margin-bottom: 20px;">Try adjusting your search or filters, or add a new vehicle to get started.</p>
+                    <button onclick="showAddVehicleModal()" style="padding: 10px 20px; background: #DAA520; color: #000; border: none; border-radius: 6px; cursor: pointer;">
+                        + Add Your First Vehicle
+                    </button>
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    
+    tableBody.innerHTML = vehicles.map(vehicle => createFleetTableRow(vehicle)).join('');
+}
+
+/**
+ * Create Fleet Table Row
+ */
+function createFleetTableRow(vehicle) {
+    // Format vehicle name with details
+    const vehicleName = `${vehicle.make} ${vehicle.model}`;
+    const vehicleYear = vehicle.year || 'N/A';
+    const vehicleCapacity = vehicle.capacity ? `${vehicle.capacity} people` : 'N/A';
+    
+    // Format license plate
+    const licensePlate = vehicle.license_plate || 'N/A';
+    
+    // Format mileage
+    const mileage = vehicle.current_mileage ? `${parseInt(vehicle.current_mileage).toLocaleString()} km` : 'N/A';
+    
+    // Get status with proper styling
+    const status = vehicle.status || 'unknown';
+    const statusClass = getFleetStatusClass(status);
+    const statusDisplay = status.charAt(0).toUpperCase() + status.slice(1);
+    
+    // Get insurance status
+    const insuranceStatus = getInsuranceStatus(vehicle);
+    const insuranceClass = getInsuranceStatusClass(insuranceStatus);
+    
+    // Get revision status
+    const revisionStatus = getRevisionStatus(vehicle);
+    const revisionClass = getRevisionStatusClass(revisionStatus);
+    
+    // Get trip information
+    const lastTrip = formatLastTripInfo(vehicle.last_trip);
+    const nextTrip = formatNextTripInfo(vehicle.next_trip);
+    
+    return `
+        <tr>
+            <td>
+                <div style="display: flex; flex-direction: column; gap: 4px;">
+                    <div style="font-weight: 600; color: var(--dark-text, #333);">${vehicleName}</div>
+                    <div style="font-size: 13px; color: var(--dark-text-secondary, #666);">${vehicleYear}</div>
+                    <div style="font-size: 12px; color: var(--dark-text-secondary, #666); font-style: italic;">${vehicleCapacity}</div>
+                </div>
+            </td>
+            <td>
+                <span style="font-family: 'Courier New', monospace; font-weight: bold; background: var(--dark-bg, #f5f5f5); padding: 4px 8px; border-radius: 4px; color: var(--dark-text, #333);">
+                    ${licensePlate}
+                </span>
+            </td>
+            <td>
+                <span style="font-family: 'Courier New', monospace; font-weight: 500; color: var(--dark-text, #333);">
+                    ${mileage}
+                </span>
+            </td>
+            <td>
+                <span class="fluent-badge ${statusClass}">${statusDisplay}</span>
+            </td>
+            <td>
+                <span class="fluent-badge ${insuranceClass}">${insuranceStatus}</span>
+            </td>
+            <td>
+                <span class="fluent-badge ${revisionClass}">${revisionStatus}</span>
+            </td>
+            <td>
+                <span style="color: var(--dark-text-secondary, #666); font-size: 13px; ${lastTrip === 'None' ? 'font-style: italic;' : ''}">${lastTrip}</span>
+            </td>
+            <td>
+                <span style="color: var(--dark-text-secondary, #666); font-size: 13px; ${nextTrip.includes('None') ? 'font-style: italic;' : ''}">${nextTrip}</span>
+            </td>
+            <td>
+                <div style="display: flex; gap: 6px;">
+                    <button onclick="editFleetVehicle(${vehicle.id})" title="Edit Vehicle" style="width: 32px; height: 32px; border: none; border-radius: 6px; cursor: pointer; background: var(--dark-bg, #f5f5f5); color: var(--dark-text, #333); display: flex; align-items: center; justify-content: center;">
+                        ✏️
+                    </button>
+                    <button onclick="deleteFleetVehicle(${vehicle.id})" title="Delete Vehicle" style="width: 32px; height: 32px; border: none; border-radius: 6px; cursor: pointer; background: var(--dark-bg, #f5f5f5); color: var(--dark-text, #333); display: flex; align-items: center; justify-content: center;">
+                        🗑️
+                    </button>
+                </div>
+            </td>
+        </tr>
+    `;
+}
+
+/**
+ * Get Fleet Status CSS Class
+ */
+function getFleetStatusClass(status) {
+    switch(status.toLowerCase()) {
+        case 'available': return 'fluent-badge-success';
+        case 'maintenance': return 'fluent-badge-warning';
+        case 'retired': return 'fluent-badge-secondary';
+        default: return 'fluent-badge-secondary';
+    }
+}
+
+/**
+ * Get Insurance Status
+ */
+function getInsuranceStatus(vehicle) {
+    if (!vehicle.insurance_end_date) return 'Unknown';
+    
+    const endDate = new Date(vehicle.insurance_end_date);
+    const today = new Date();
+    const daysRemaining = Math.ceil((endDate - today) / (1000 * 60 * 60 * 24));
+    
+    if (daysRemaining < 0) return 'Expired';
+    if (daysRemaining < 30) return `${daysRemaining}d`;
+    return 'Active';
+}
+
+/**
+ * Get Insurance Status CSS Class
+ */
+function getInsuranceStatusClass(status) {
+    if (status === 'Expired') return 'fluent-badge-error';
+    if (status.includes('d')) return 'fluent-badge-warning';
+    if (status === 'Active') return 'fluent-badge-success';
+    return 'fluent-badge-secondary';
+}
+
+/**
+ * Get Revision Status
+ */
+function getRevisionStatus(vehicle) {
+    if (!vehicle.next_revision_due) return 'Unknown';
+    
+    const dueDate = new Date(vehicle.next_revision_due);
+    const today = new Date();
+    const daysRemaining = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
+    
+    if (daysRemaining < 0) return 'Overdue';
+    if (daysRemaining < 30) return `${daysRemaining}d`;
+    return 'Current';
+}
+
+/**
+ * Get Revision Status CSS Class
+ */
+function getRevisionStatusClass(status) {
+    if (status === 'Overdue') return 'fluent-badge-error';
+    if (status.includes('d')) return 'fluent-badge-warning';
+    if (status === 'Current') return 'fluent-badge-success';
+    return 'fluent-badge-secondary';
+}
+
+/**
+ * Format Last Trip Information
+ */
+function formatLastTripInfo(lastTrip) {
+    if (!lastTrip || !lastTrip.title) return 'None';
+    return lastTrip.title;
+}
+
+/**
+ * Format Next Trip Information
+ */
+function formatNextTripInfo(nextTrip) {
+    if (!nextTrip || !nextTrip.title) return 'None Scheduled';
+    return nextTrip.title;
+}
+
+/**
+ * Update Fleet Summary
+ */
+function updateFleetSummary(summary) {
+    if (!summary) return;
+    
+    document.getElementById('fleetTotalVehicles').textContent = summary.total || 0;
+    document.getElementById('fleetAvailableVehicles').textContent = summary.available || 0;
+    document.getElementById('fleetMaintenanceVehicles').textContent = summary.maintenance || 0;
+    document.getElementById('fleetRetiredVehicles').textContent = summary.retired || 0;
+}
+
+/**
+ * Setup Fleet Interactions
+ */
+function setupFleetInteractions() {
+    // Search functionality
+    const searchInput = document.getElementById('fleetSearchInput');
+    if (searchInput) {
+        searchInput.addEventListener('input', debounce(filterFleetData, 300));
+    }
+    
+    // Filter functionality
+    const statusFilter = document.getElementById('fleetStatusFilter');
+    const typeFilter = document.getElementById('fleetTypeFilter');
+    
+    if (statusFilter) statusFilter.addEventListener('change', filterFleetData);
+    if (typeFilter) typeFilter.addEventListener('change', filterFleetData);
+}
+
+/**
+ * Filter Fleet Data
+ */
+function filterFleetData() {
+    const searchTerm = document.getElementById('fleetSearchInput')?.value.toLowerCase() || '';
+    const statusFilter = document.getElementById('fleetStatusFilter')?.value.toLowerCase() || '';
+    const typeFilter = document.getElementById('fleetTypeFilter')?.value.toLowerCase() || '';
+    
+    filteredFleetData = fleetData.filter(vehicle => {
+        // Search filter
+        const matchesSearch = !searchTerm || 
+            `${vehicle.make} ${vehicle.model}`.toLowerCase().includes(searchTerm) ||
+            (vehicle.license_plate && vehicle.license_plate.toLowerCase().includes(searchTerm)) ||
+            (vehicle.year && vehicle.year.toString().includes(searchTerm));
+        
+        // Status filter
+        const matchesStatus = !statusFilter || 
+            (vehicle.status && vehicle.status.toLowerCase() === statusFilter);
+        
+        // Type filter
+        const matchesType = !typeFilter || 
+            (vehicle.vehicle_type && vehicle.vehicle_type.toLowerCase() === typeFilter);
+        
+        return matchesSearch && matchesStatus && matchesType;
+    });
+    
+    displayFleetData(filteredFleetData);
+    console.log(`Filtered to ${filteredFleetData.length} vehicles`);
+}
+
+/**
+ * Show Add Vehicle Modal
+ */
+function showAddVehicleModal() {
+    console.log('Opening Add Vehicle Modal...');
+    showToast('Add Vehicle functionality coming soon!', 'info');
+}
+
+/**
+ * Edit Fleet Vehicle
+ */
+function editFleetVehicle(vehicleId) {
+    const vehicle = fleetData.find(v => v.id === vehicleId);
+    if (!vehicle) {
+        console.error('Vehicle not found:', vehicleId);
+        return;
+    }
+    
+    console.log('Editing vehicle:', vehicle);
+    showToast(`Edit functionality for ${vehicle.make} ${vehicle.model} coming soon!`, 'info');
+}
+
+/**
+ * Delete Fleet Vehicle
+ */
+async function deleteFleetVehicle(vehicleId) {
+    const vehicle = fleetData.find(v => v.id === vehicleId);
+    if (!vehicle) {
+        console.error('Vehicle not found:', vehicleId);
+        return;
+    }
+    
+    const vehicleName = `${vehicle.make} ${vehicle.model}`;
+    const confirmed = await showConfirmDialog(
+        'Delete Vehicle',
+        `Are you sure you want to delete ${vehicleName}?\n\nThis action cannot be undone.`,
+        'Delete',
+        'error'
+    );
+    
+    if (confirmed) {
+        try {
+            const response = await fetch(`api/vehicles/manage.php?id=${vehicleId}`, {
+                method: 'DELETE'
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                showToast(`${vehicleName} has been deleted successfully.`, 'success');
+                loadFleetManagementData(); // Reload data
+            } else {
+                throw new Error(data.error || 'Failed to delete vehicle');
+            }
+        } catch (error) {
+            console.error('Error deleting vehicle:', error);
+            showToast('Failed to delete vehicle: ' + error.message, 'error');
+        }
+    }
+}
+
+/**
+ * Load Vehicles for Modal (Legacy compatibility)
  */
 async function loadModalVehicles() {
     try {
