@@ -4231,13 +4231,16 @@ body {
     width: 90vw;
     max-width: 600px;
     max-height: 85vh;
+    display: flex;
+    flex-direction: column;
 }
 
 .fluent-modal-body-form {
     padding: 24px 32px 32px;
     background: var(--white);
     overflow-y: auto;
-    max-height: calc(85vh - 120px);
+    flex: 1;
+    min-height: 0;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -4591,7 +4594,6 @@ body {
     
     .fluent-modal-body-form {
         padding: 20px 24px;
-        max-height: calc(90vh - 100px);
     }
     
     .fluent-form-actions {
@@ -4615,7 +4617,6 @@ body {
     
     .fluent-modal-body-form {
         padding: 16px 20px;
-        max-height: calc(100vh - 80px);
     }
     
     .fluent-toast {
