@@ -3406,14 +3406,12 @@ body {
     font-weight: 600;
     font-size: 1.5rem;
     border: 3px solid var(--white);
-    box-shadow: 0 4px 12px rgba(44, 85, 48, 0.2);
 }
 
 @media (prefers-color-scheme: dark) {
     .fluent-avatar-circle {
         background: var(--dark-accent);
         border-color: var(--dark-bg);
-        box-shadow: 0 4px 12px rgba(212, 175, 55, 0.2);
     }
 }
 
@@ -3759,6 +3757,11 @@ body {
     text-align: center;
 }
 
+.fluent-th-email {
+    width: 120px;
+    min-width: 120px;
+}
+
 .fluent-checkbox {
     width: 16px;
     height: 16px;
@@ -3768,6 +3771,63 @@ body {
 @media (prefers-color-scheme: dark) {
     .fluent-checkbox {
         accent-color: var(--dark-accent);
+    }
+}
+
+/* Email container styling */
+.email-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.email-text {
+    font-size: 0.875rem;
+    color: var(--text-primary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 80px;
+}
+
+.copy-email-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border: none;
+    border-radius: 4px;
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    opacity: 0.7;
+}
+
+.copy-email-btn:hover {
+    background: var(--hover-bg);
+    color: var(--accent-color);
+    opacity: 1;
+}
+
+.copy-email-btn svg {
+    width: 14px;
+    height: 14px;
+}
+
+@media (prefers-color-scheme: dark) {
+    .email-text {
+        color: var(--dark-text);
+    }
+    
+    .copy-email-btn {
+        color: var(--dark-text-secondary);
+    }
+    
+    .copy-email-btn:hover {
+        background: var(--dark-hover-bg);
+        color: var(--dark-accent);
     }
 }
 
