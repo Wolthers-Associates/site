@@ -28,7 +28,7 @@
                 background: var(--dark-bg) !important;
             }
             
-            /* Immediate modal dark mode to prevent white blink */
+            /* Immediate modal dark mode to prevent white blink - COMPREHENSIVE */
             .modal, .fluent-modal {
                 background: rgba(0,0,0,0.7) !important;
             }
@@ -36,6 +36,13 @@
                 background: var(--dark-bg-secondary) !important;
                 color: var(--dark-text-secondary) !important;
                 border: 1px solid #2d3136 !important;
+            }
+            .modal-content *, .fluent-modal-content *, .fluent-modal-content-small * {
+                background-color: inherit !important;
+                color: inherit !important;
+            }
+            .modal-content div, .fluent-modal-content div {
+                background: transparent !important;
             }
             .fluent-modal-header {
                 background: var(--dark-bg-secondary) !important;
@@ -69,6 +76,50 @@
             .fluent-profile-card-flat {
                 background: var(--dark-bg-secondary) !important;
                 border: 1px solid #2d3136 !important;
+            }
+            
+            /* Comprehensive modal body styling */
+            .fluent-modal-body {
+                background: var(--dark-bg-secondary) !important;
+                color: var(--dark-text-secondary) !important;
+            }
+            .fluent-modal-body * {
+                background-color: transparent !important;
+            }
+            .fluent-profile-section, .fluent-users-section {
+                background: transparent !important;
+            }
+            .fluent-section-header {
+                background: transparent !important;
+            }
+            .fluent-header-group {
+                background: transparent !important;
+            }
+            .fluent-section-controls {
+                background: transparent !important;
+            }
+            .fluent-search-box {
+                background: var(--dark-bg) !important;
+                border: 1px solid #2d3136 !important;
+            }
+            .fluent-search-input {
+                background: var(--dark-bg) !important;
+                color: var(--dark-text-secondary) !important;
+                border: none !important;
+            }
+            .fluent-select {
+                background: var(--dark-bg) !important;
+                color: var(--dark-text-secondary) !important;
+                border: 1px solid #2d3136 !important;
+            }
+            .fluent-btn {
+                background: var(--dark-bg) !important;
+                color: var(--dark-text-secondary) !important;
+                border: 1px solid #2d3136 !important;
+            }
+            .fluent-btn-primary {
+                background: #DAA520 !important;
+                color: #000 !important;
             }
             
             /* Vehicle Management Modal Styles */
@@ -755,9 +806,9 @@
     </div>
 
     <!-- Microsoft-Style User Management Modal -->
-    <div id="userManagementModal" class="modal fluent-modal" style="display: none;" role="dialog" aria-labelledby="user-management-title" aria-modal="true">
+    <div id="userManagementModal" class="modal fluent-modal" style="display: none; background: rgba(0,0,0,0.7);" role="dialog" aria-labelledby="user-management-title" aria-modal="true">
         <div class="modal-backdrop" onclick="hideUserManagementModal()" aria-label="Close user management"></div>
-        <div class="modal-content fluent-modal-content">
+        <div class="modal-content fluent-modal-content" style="background: #23272b; color: #e6edf3; border: 1px solid #2d3136;">
             <div class="fluent-modal-header">
                 <div class="fluent-header-content">
                     <h1 id="user-management-title" class="fluent-modal-title">People</h1>
@@ -1141,9 +1192,9 @@
     </div>
 
     <!-- Vehicle Management Modal -->
-    <div id="vehicleManagementModal" class="modal fluent-modal" style="display: none;" role="dialog" aria-labelledby="vehicle-management-title" aria-modal="true">
+    <div id="vehicleManagementModal" class="modal fluent-modal" style="display: none; background: rgba(0,0,0,0.7);" role="dialog" aria-labelledby="vehicle-management-title" aria-modal="true">
         <div class="modal-backdrop" onclick="hideVehicleManagementModal()" aria-label="Close vehicle management"></div>
-        <div class="modal-content fluent-modal-content">
+        <div class="modal-content fluent-modal-content" style="background: #23272b; color: #e6edf3; border: 1px solid #2d3136;">
             <div class="fluent-modal-header">
                 <div class="fluent-header-content">
                     <h1 id="vehicle-management-title" class="fluent-modal-title">Vehicle Management</h1>
