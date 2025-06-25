@@ -1175,14 +1175,20 @@ const trips = {
         const staffContainer = document.getElementById('staffSelectionContainer');
         const loadingMessage = document.getElementById('staffLoadingMessage');
 
-        if (!staffSelect || !staffContainer || !loadingMessage) return;
+        if (!staffSelect) return;
+
+        // Show loading message
+        if (loadingMessage) {
+            loadingMessage.textContent = 'Loading staff...';
+            loadingMessage.style.display = 'block';
+        }
 
         // Try to load from API first
         fetch('api/staff/availability.php')
             .then(response => response.json())
             .then(data => {
-                loadingMessage.style.display = 'none';
-                staffContainer.style.display = 'block';
+                if (loadingMessage) loadingMessage.style.display = 'none';
+                if (staffContainer) staffContainer.style.display = 'block';
                 
                 staffSelect.innerHTML = '';
                 if (data.success && data.staff) {
@@ -1204,15 +1210,18 @@ const trips = {
                 console.log('API not available, using mock data');
                 // Mock staff data
                 const mockStaff = [
-                    { id: 1, name: 'Daniel Wolthers', department: 'Management' },
-                    { id: 2, name: 'Christian Wolthers', department: 'Operations' },
-                    { id: 3, name: 'Svenn Wolthers', department: 'Business Development' },
-                    { id: 4, name: 'Patricia Arakaki', department: 'Operations' },
-                    { id: 5, name: 'Anderson Nunes', department: 'Logistics' }
+                    { id: 'daniel', name: 'Daniel Wolthers', department: 'Management' },
+                    { id: 'christian', name: 'Christian Wolthers', department: 'Operations' },
+                    { id: 'svenn', name: 'Svenn Wolthers', department: 'Business Development' },
+                    { id: 'patricia', name: 'Patricia Arakaki', department: 'Operations' },
+                    { id: 'anderson', name: 'Anderson Nunes', department: 'Logistics' },
+                    { id: 'edgar', name: 'Edgar Gomes', department: 'Farm Relations' },
+                    { id: 'kauan', name: 'Kauan Marcelino', department: 'Processing' },
+                    { id: 'matheus', name: 'Matheus Oliveira', department: 'Quality Control' }
                 ];
                 
-                loadingMessage.style.display = 'none';
-                staffContainer.style.display = 'block';
+                if (loadingMessage) loadingMessage.style.display = 'none';
+                if (staffContainer) staffContainer.style.display = 'block';
                 
                 staffSelect.innerHTML = '';
                 mockStaff.forEach(staff => {
@@ -1482,6 +1491,110 @@ const trips = {
         }
         
         return driversWithVehicles.join(', ');
+    },
+
+    // Simple AI formatting for itinerary
+    formatItinerary: () => {
+        const itineraryTextarea = document.getElementById('itineraryText');
+        const previewDiv = document.getElementById('itineraryPreview');
+        const previewActions = document.querySelector('.preview-actions');
+        
+        if (!itineraryTextarea || !previewDiv) return;
+        
+        const rawText = itineraryTextarea.value.trim();
+        if (!rawText) {
+            utils.showNotification('Please enter some itinerary text first.', 'warning');
+            return;
+        }
+        
+        // Show loading state
+        previewDiv.innerHTML = '<div class="preview-placeholder"><p>🤖 AI is formatting your itinerary...</p></div>';
+        
+        // Simulate AI processing
+        setTimeout(() => {
+            const formattedText = trips.processItineraryText(rawText);
+            previewDiv.innerHTML = formattedText;
+            
+            // Show preview actions
+            if (previewActions) {
+                previewActions.style.display = 'flex';
+            }
+        }, 1500);
+    },
+
+    // Process itinerary text with basic AI-like formatting
+    processItineraryText: (rawText) => {
+        const lines = rawText.split('\n').filter(line => line.trim());
+        let formattedHtml = '<div class="formatted-itinerary">';
+        
+        let currentDay = 0;
+        
+        lines.forEach(line => {
+            const trimmedLine = line.trim();
+            
+            // Check if it's a day header
+            if (trimmedLine.toLowerCase().includes('day ') || /^day\s*\d+/i.test(trimmedLine)) {
+                currentDay++;
+                const dayMatch = trimmedLine.match(/day\s*(\d+)/i);
+                const dayNumber = dayMatch ? dayMatch[1] : currentDay;
+                formattedHtml += `<div class="day-header"><h4>Day ${dayNumber}</h4></div>`;
+            } else if (trimmedLine) {
+                // Process activity line
+                let activity = trimmedLine;
+                
+                // Capitalize first letter
+                activity = activity.charAt(0).toUpperCase() + activity.slice(1);
+                
+                // Add period if missing
+                if (!activity.endsWith('.') && !activity.endsWith('!') && !activity.endsWith('?')) {
+                    activity += '.';
+                }
+                
+                // Format times
+                activity = activity.replace(/(\d{1,2})(am|pm)/gi, '$1:00 $2');
+                activity = activity.replace(/(\d{1,2}):(\d{2})(am|pm)/gi, '$1:$2 $3');
+                
+                // Add to formatted output
+                formattedHtml += `<div class="activity-item">• ${activity}</div>`;
+            }
+        });
+        
+        formattedHtml += '</div>';
+        
+        // Add some basic styling
+        formattedHtml += `
+        <style>
+        .formatted-itinerary { font-family: inherit; }
+        .day-header { margin: 15px 0 10px 0; padding: 8px 0; border-bottom: 2px solid #e9ecef; }
+        .day-header h4 { margin: 0; color: var(--dark-green); font-size: 16px; }
+        .activity-item { margin: 5px 0; padding: 3px 0; line-height: 1.5; }
+        </style>`;
+        
+        return formattedHtml;
+    },
+
+    // Clear itinerary
+    clearItinerary: () => {
+        const itineraryTextarea = document.getElementById('itineraryText');
+        const previewDiv = document.getElementById('itineraryPreview');
+        const previewActions = document.querySelector('.preview-actions');
+        
+        if (itineraryTextarea) {
+            itineraryTextarea.value = '';
+        }
+        
+        if (previewDiv) {
+            previewDiv.innerHTML = `
+                <div class="preview-placeholder">
+                    <p>✨ Your AI-enhanced itinerary will appear here</p>
+                    <p>Type or paste your itinerary, then click "AI Format & Enhance"</p>
+                </div>
+            `;
+        }
+        
+        if (previewActions) {
+            previewActions.style.display = 'none';
+        }
     },
 
     // Load vehicles from database
@@ -1787,14 +1900,23 @@ document.addEventListener('DOMContentLoaded', async function() {
     window.showAddTripModal = () => {
         ui.showAddTripModal();
         
-        // Load vehicles when modal opens
-        trips.loadVehicles();
-        
-        // Initialize staff assignments array
-        window.selectedStaffAssignments = [];
-        
-        // Load staff availability
-        trips.loadStaffAvailability();
+        // Load vehicles and staff immediately when modal opens
+        setTimeout(() => {
+            trips.loadVehicles();
+            trips.loadStaffAvailability();
+        }, 100);
+
+        // Initialize AI format button
+        const formatItineraryBtn = document.getElementById('formatItineraryBtn');
+        if (formatItineraryBtn) {
+            formatItineraryBtn.onclick = trips.formatItinerary;
+        }
+
+        // Initialize clear button
+        const clearItineraryBtn = document.getElementById('clearItineraryBtn');
+        if (clearItineraryBtn) {
+            clearItineraryBtn.onclick = trips.clearItinerary;
+        }
     };
     
     // Modal click handlers

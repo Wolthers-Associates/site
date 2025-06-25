@@ -752,157 +752,130 @@
             </div>
 
             <form id="addTripForm">
-                <div class="form-section">
-                    <div class="form-row">
-                        <div class="form-group">
+                <!-- Top Section: Title and Description -->
+                <div class="trip-header-section">
+                    <div class="header-row">
+                        <div class="header-field title-field">
                             <label for="tripTitle">Trip Title:</label>
-                            <input type="text" id="tripTitle" class="form-input" placeholder="e.g., Colombia Coffee Discovery" required>
+                            <input type="text" id="tripTitle" name="tripTitle" class="form-input large-input" placeholder="e.g., Colombia Coffee Discovery Adventure" required>
                         </div>
-                        <div class="form-group">
+                        <div class="header-field description-field">
                             <label for="tripDescription">Description:</label>
-                            <input type="text" id="tripDescription" class="form-input" placeholder="Brief trip description">
+                            <textarea id="tripDescription" name="tripDescription" class="form-textarea description-textarea" rows="3" placeholder="Brief description of the trip, its purpose, and key highlights for our guests..."></textarea>
                         </div>
                     </div>
-
-                    <!-- Dates will be automatically extracted from itinerary -->
-
-
-
-                    <div class="form-row full">
-                        <div class="form-group">
-                            <label for="guests">Guests:</label>
-                            <input type="text" id="guests" class="form-input" placeholder="e.g., International clients, VIP partners">
-                        </div>
+                    <div class="guests-row">
+                        <label for="guests">Guests:</label>
+                        <input type="text" id="guests" name="guests" class="form-input wide-input" placeholder="e.g., International clients, VIP partners, Coffee industry executives">
                     </div>
+                </div>
 
-                    <!-- Simple Vehicle Selection -->
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="vehicles">Vehicle(s):</label>
-                            <select id="vehicles" class="form-input" multiple>
-                                <option value="">Loading vehicles...</option>
-                            </select>
-                            <div class="input-help">Hold Ctrl (Windows) or Cmd (Mac) to select multiple vehicles</div>
-                        </div>
-                        <div class="form-group">
-                            <label for="driver">External Driver(s):</label>
-                            <input type="text" id="driver" class="form-input" placeholder="e.g., Carlos Silva, Maria Santos (comma-separated)">
-                            <div class="input-help">Leave blank if Wolthers staff will drive. For multiple drivers, separate with commas.</div>
-                        </div>
-                    </div>
-
-                    <!-- Simple Staff Selection -->
-                    <div class="form-row full">
-                        <div class="form-group">
-                            <label for="wolthersStaff">Wolthers Staff Attending:</label>
-                            <div id="staffLoadingMessage" class="loading-message">Checking staff availability...</div>
-                            <div id="staffSelectionContainer" style="display: none;">
-                                <div id="staffAvailabilityInfo" class="availability-info"></div>
-                                <select id="wolthersStaff" class="form-input" multiple>
-                                    <option value="">Loading staff...</option>
-                                </select>
-                            </div>
-                            <div class="input-help">Hold Ctrl (Windows) or Cmd (Mac) to select multiple staff members. System will check for conflicts automatically.</div>
-                        </div>
-                    </div>
-
-                    <div class="form-row full">
-                        <div class="form-group">
-                            <label for="tripMap">Trip Map (Image Upload):</label>
-                            <input type="file" id="tripMap" class="form-input" accept="image/*">
-                            <div class="input-help">Upload a map image (PNG, JPG, SVG)</div>
-                        </div>
-                    </div>
-
-                    <div class="form-row full">
-                        <div class="form-group">
-                            <label for="itineraryLanguage">Itinerary Language:</label>
-                            <select id="itineraryLanguage" class="form-input">
-                                <option value="en">English</option>
-                                <option value="pt">Portuguese</option>
-                            </select>
-                            <div class="input-help">Choose the language of your itinerary input and preview</div>
-                        </div>
-                    </div>
-
-                    <!-- AI-Enhanced Itinerary Management -->
-                    <div class="form-row full">
+                <!-- Main Content Section: Two-Column Layout -->
+                <div class="trip-main-section">
+                    <!-- Left Column: Itinerary & Settings -->
+                    <div class="left-column">
+                        <div class="section-title">📝 Trip Details & Itinerary</div>
+                        
                         <div class="form-group">
                             <label for="itineraryText">Smart Itinerary Input:</label>
                             <div class="itinerary-input-container">
-                                <textarea id="itineraryText" class="form-textarea smart-textarea" 
-                                    placeholder="Paste or type your itinerary here. AI will auto-format with proper punctuation, timing, and structure.
+                                <textarea id="itineraryText" name="itinerary" class="form-textarea smart-itinerary" rows="14" placeholder="Paste or type your itinerary here. AI will auto-format with proper punctuation, timing, and structure.
 
 Example input:
 day 1 arrive bogota airport pickup hotel check in
 afternoon coffee farm visit with carlos
 dinner at local restaurant
-day 2 morning departure to coffee region
-visit finca esperanza meet maria the owner
-cupping session 2pm
-evening return hotel
+
+day 2 morning plantation tour
+lunch at farm
+afternoon processing facility visit
 
 The system will automatically:
 • Add proper punctuation and capitalization
 • Format times consistently 
 • Structure activities logically
-• Add location details where missing
-• Suggest optimal timing between activities" 
-                                    rows="8"></textarea>
+• Add location details where missing"></textarea>
                                 <div class="textarea-actions">
                                     <button type="button" id="formatItineraryBtn" class="btn btn-secondary">🤖 AI Format & Enhance</button>
                                     <button type="button" id="clearItineraryBtn" class="btn btn-secondary">Clear</button>
                                 </div>
                             </div>
                             <div class="input-help">
-                                <strong>AI Features:</strong> Auto-punctuation, time formatting, location suggestions, activity sequencing, and grammar correction.
+                                <strong>AI Features:</strong> Auto-punctuation, time formatting, location suggestions, activity sequencing and grammar correction.
                                 <br><strong>Tip:</strong> Just type naturally - the AI will make it professional!
                             </div>
                         </div>
+
+                        <div class="settings-grid">
+                            <div class="form-group">
+                                <label for="itineraryLanguage">Language:</label>
+                                <select id="itineraryLanguage" class="form-input">
+                                    <option value="en">English</option>
+                                    <option value="es">Spanish</option>
+                                    <option value="pt">Portuguese</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="tripMap">Trip Map:</label>
+                                <input type="file" id="tripMap" name="tripMap" class="form-input" accept="image/*">
+                                <div class="input-help">Upload map image (PNG, JPG, SVG)</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="partnerEmails">Partner Email Access (Optional):</label>
+                            <textarea id="partnerEmails" name="partnerEmails" class="form-textarea" rows="4" placeholder="Enter partner email addresses (one per line)&#10;example@company.com&#10;partner@business.org"></textarea>
+                            <div class="input-help">Partners with these emails will automatically get access to this trip</div>
+                        </div>
                     </div>
 
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="itineraryExcel">Or Upload Itinerary (Excel/CSV):</label>
-                            <input type="file" id="itineraryExcel" class="form-input" accept=".xlsx,.csv">
-                            <div class="input-help">Upload structured itinerary data</div>
+                    <!-- Right Column: Staff & Vehicles -->
+                    <div class="right-column">
+                        <div class="section-title">👥 Team & Transportation</div>
+                        
+                        <!-- Staff Selection -->
+                        <div class="selection-section">
+                            <h4>Wolthers Staff Attending</h4>
+                            <div id="staffLoadingMessage" class="loading-message">Checking staff availability...</div>
+                            <div id="staffSelectionContainer" style="display: none;">
+                                <div id="staffAvailabilityInfo" class="availability-info"></div>
+                                <select id="wolthersStaff" class="form-input selection-list" multiple>
+                                    <option value="">Loading staff...</option>
+                                </select>
+                            </div>
+                            <div class="input-help">Hold Ctrl (Windows) or Cmd (Mac) to select multiple staff members</div>
                         </div>
-                        <div class="form-group">
-                            <label for="itineraryTemplate">Quick Templates:</label>
-                            <select id="itineraryTemplate" class="form-input">
-                                <option value="">Choose a template...</option>
-                                <option value="coffee-origin">Coffee Origin Tour (5 days)</option>
-                                <option value="city-coffee">City Coffee Experience (3 days)</option>
-                                <option value="farm-immersion">Farm Immersion (7 days)</option>
-                                <option value="cupping-workshop">Cupping Workshop (2 days)</option>
-                                <option value="custom">Custom Itinerary</option>
+
+                        <!-- Vehicle Selection -->
+                        <div class="selection-section">
+                            <h4>Vehicle Selection</h4>
+                            <select id="vehicles" class="form-input selection-list" multiple>
+                                <option value="">Loading vehicles...</option>
                             </select>
-                            <div class="input-help">Pre-built templates for common trip types</div>
+                            <div class="input-help">Hold Ctrl (Windows) or Cmd (Mac) to select multiple vehicles</div>
                         </div>
-                    </div>
 
-                    <div class="form-row full">
-                        <div class="form-group">
-                            <label>AI-Enhanced Itinerary Preview:</label>
-                            <div id="itineraryPreview" class="smart-preview" style="background:#f8f8f8; min-height:100px; border-radius:8px; padding:15px; margin-top:5px; font-size:0.95rem; border-left: 4px solid #4CAF50;">
+                        <!-- External Drivers -->
+                        <div class="selection-section">
+                            <h4>External Drivers (Optional)</h4>
+                            <input type="text" id="driver" class="form-input" placeholder="e.g., Carlos Silva, Maria Santos (comma-separated)">
+                            <div class="input-help">Leave blank if Wolthers staff will drive. For multiple drivers, separate with commas.</div>
+                        </div>
+
+                        <!-- AI Preview Section -->
+                        <div class="selection-section">
+                            <h4>AI-Enhanced Preview</h4>
+                            <div id="itineraryPreview" class="smart-preview">
                                 <div class="preview-placeholder">
-                                    <p style="color: #666; font-style: italic;">✨ Your AI-enhanced itinerary will appear here</p>
-                                    <p style="color: #888; font-size: 0.9em;">Type or paste your itinerary above, then click "AI Format & Enhance" to see the magic!</p>
+                                    <p>✨ Your AI-enhanced itinerary will appear here</p>
+                                    <p>Type or paste your itinerary, then click "AI Format & Enhance"</p>
                                 </div>
                             </div>
-                            <div class="preview-actions" style="margin-top: 10px; display: none;">
-                                <button type="button" id="approveItineraryBtn" class="btn btn-primary">✅ Use This Itinerary</button>
-                                <button type="button" id="editItineraryBtn" class="btn btn-secondary">✏️ Edit Further</button>
-                                <button type="button" id="regenerateItineraryBtn" class="btn btn-secondary">🔄 Regenerate</button>
+                            <div class="preview-actions" style="display: none;">
+                                <button type="button" id="approveItineraryBtn" class="btn btn-primary btn-sm">✅ Use This</button>
+                                <button type="button" id="regenerateItineraryBtn" class="btn btn-secondary btn-sm">🔄 Regenerate</button>
                             </div>
-                        </div>
-                    </div>
-
-                    <div class="form-row full">
-                        <div class="form-group">
-                            <label for="partnerEmails">Partner/Client Emails (For Future):</label>
-                            <textarea id="partnerEmails" class="form-textarea" placeholder="john@company.com&#10;sarah@business.org&#10;team@partners.net" rows="4"></textarea>
-                            <div class="input-help">These will be used when real authentication is implemented</div>
                         </div>
                     </div>
                 </div>
