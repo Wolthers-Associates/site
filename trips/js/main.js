@@ -11,6 +11,7 @@ let currentUser = null;
 let currentTrips = [];
 let selectedTrip = null;
 let microsoftAuth = null;
+let USER_DATABASE = [];
 
 // Mock Data
 const MOCK_TRIPS = [
@@ -144,6 +145,10 @@ const auth = {
                 // and stored the authenticated user data
                 sessionStorage.setItem('userSession', JSON.stringify(result));
                 currentUser = result.user;
+                
+                // Store user in system database for admin visibility
+                await addUserToSystemDatabase(result.user);
+                
                 utils.hideLoading();
                 ui.showDashboard();
                 await trips.loadTrips();
@@ -971,6 +976,9 @@ document.addEventListener('DOMContentLoaded', async function() {
         console.error('Failed to initialize authentication:', error);
     });
     
+    // Initialize user database for user management
+    initializeUserDatabase();
+    
     // Set up form event handlers
     const initialForm = document.getElementById('initialForm');
     if (initialForm) {
@@ -1195,20 +1203,25 @@ async function loadUserManagementData() {
             updateCurrentUserProfile(currentUser);
         }
         
+        // For admins: Load all users from all sources
+        if (currentUser && currentUser.role === 'admin') {
+            await loadAllUsersForAdmin();
+        }
+        
         // Load users list from API
         await loadModalUsersList();
         
-            // Setup search and filter functionality
-    setupUserManagementInteractions();
-    
-    // Setup Add User form handler
-    setupAddUserForm();
-    
-} catch (error) {
-    showToast('Failed to load user management data', 'error');
-} finally {
-    showLoadingState(false);
-}
+        // Setup search and filter functionality
+        setupUserManagementInteractions();
+        
+        // Setup Add User form handler
+        setupAddUserForm();
+        
+    } catch (error) {
+        showToast('Failed to load user management data', 'error');
+    } finally {
+        showLoadingState(false);
+    }
 }
 
 function updateCurrentUserProfile(user) {
@@ -1237,6 +1250,250 @@ function updateCurrentUserProfile(user) {
     }
 }
 
+// Load all users for admin view - combines multiple sources
+async function loadAllUsersForAdmin() {
+    try {
+        console.log('🔍 Admin loading all users from multiple sources...');
+        
+        // 1. Load users from backend API (if available)
+        try {
+            const response = await fetch('/api/auth/list-users.php');
+            if (response.ok) {
+                const apiUsers = await response.json();
+                if (apiUsers.success && Array.isArray(apiUsers.users)) {
+                    console.log(`📡 Loaded ${apiUsers.users.length} users from backend API`);
+                    // Merge API users with existing database
+                    mergeUsersIntoDatabase(apiUsers.users);
+                }
+            }
+        } catch (error) {
+            console.log('⚠️ Backend user API not available:', error.message);
+        }
+        
+        // 2. Load users from Microsoft Auth sessions (recent logins)
+        const recentMSUsers = loadRecentMicrosoftUsers();
+        if (recentMSUsers.length > 0) {
+            console.log(`🔐 Found ${recentMSUsers.length} recent Microsoft users`);
+            mergeUsersIntoDatabase(recentMSUsers);
+        }
+        
+        // 3. Load any additional users from localStorage backups
+        const backupUsers = loadBackupUsers();
+        if (backupUsers.length > 0) {
+            console.log(`💾 Found ${backupUsers.length} backup users`);
+            mergeUsersIntoDatabase(backupUsers);
+        }
+        
+        console.log(`✅ Total users loaded: ${USER_DATABASE.length}`);
+        
+    } catch (error) {
+        console.error('❌ Error loading all users for admin:', error);
+    }
+}
+
+// Merge users into database without duplicates
+function mergeUsersIntoDatabase(newUsers) {
+    newUsers.forEach(newUser => {
+        // Check if user already exists (by email)
+        const existingIndex = USER_DATABASE.findIndex(existing => 
+            existing.email.toLowerCase() === newUser.email.toLowerCase()
+        );
+        
+        if (existingIndex === -1) {
+            // Add new user
+            USER_DATABASE.push({
+                id: newUser.id || generateUserId(newUser.name || newUser.email),
+                name: newUser.name || newUser.displayName || newUser.email.split('@')[0],
+                email: newUser.email,
+                role: newUser.role || 'user',
+                avatar: newUser.avatar || (newUser.name || newUser.email).charAt(0).toUpperCase(),
+                memberSince: newUser.memberSince || newUser.createdAt || new Date().toISOString().split('T')[0],
+                tripPermissions: newUser.tripPermissions || [],
+                isCreator: newUser.isCreator || false,
+                lastActive: newUser.lastActive || new Date().toISOString(),
+                isWolthersTeam: newUser.isWolthersTeam || newUser.email?.endsWith('@wolthers.com') || false,
+                company: newUser.company || getUserCompanyFromEmail(newUser.email)
+            });
+        } else {
+            // Update existing user with newer information
+            const existing = USER_DATABASE[existingIndex];
+            USER_DATABASE[existingIndex] = {
+                ...existing,
+                name: newUser.name || newUser.displayName || existing.name,
+                lastActive: newUser.lastActive || new Date().toISOString(),
+                role: newUser.role || existing.role,
+                avatar: newUser.avatar || existing.avatar,
+                company: newUser.company || existing.company || getUserCompanyFromEmail(newUser.email)
+            };
+        }
+    });
+    
+    // Save updated database
+    saveUserDatabase();
+}
+
+// Load recent Microsoft authentication users
+function loadRecentMicrosoftUsers() {
+    const recentUsers = [];
+    
+    try {
+        // Check for Microsoft user data in localStorage
+        const msUserData = localStorage.getItem('microsoft_user_sessions');
+        if (msUserData) {
+            const sessions = JSON.parse(msUserData);
+            if (Array.isArray(sessions)) {
+                recentUsers.push(...sessions);
+            }
+        }
+        
+        // Check for recent login data
+        const recentLogins = localStorage.getItem('recent_microsoft_logins');
+        if (recentLogins) {
+            const logins = JSON.parse(recentLogins);
+            if (Array.isArray(logins)) {
+                recentUsers.push(...logins);
+            }
+        }
+    } catch (error) {
+        console.log('No recent Microsoft users found');
+    }
+    
+    return recentUsers;
+}
+
+// Load backup users from various localStorage keys
+function loadBackupUsers() {
+    const backupUsers = [];
+    
+    try {
+        // Check various backup locations
+        const backupKeys = [
+            'wolthers_all_users',
+            'backup_users_database',
+            'registered_users',
+            'trip_participants'
+        ];
+        
+        backupKeys.forEach(key => {
+            const data = localStorage.getItem(key);
+            if (data) {
+                const users = JSON.parse(data);
+                if (Array.isArray(users)) {
+                    backupUsers.push(...users);
+                }
+            }
+        });
+    } catch (error) {
+        console.log('No backup users found');
+    }
+    
+    return backupUsers;
+}
+
+// Helper function to get company from email
+function getUserCompanyFromEmail(email) {
+    const emailDomain = email?.split('@')[1];
+    if (emailDomain) {
+        const domainToCompany = {
+            'gmail.com': 'Personal',
+            'yahoo.com': 'Personal', 
+            'hotmail.com': 'Personal',
+            'outlook.com': 'Personal',
+            'wolthers.com': 'Wolthers & Associates'
+        };
+        
+        if (domainToCompany[emailDomain]) {
+            return domainToCompany[emailDomain];
+        }
+        
+        // Convert domain to company name
+        return emailDomain.split('.')[0].charAt(0).toUpperCase() + emailDomain.split('.')[0].slice(1);
+    }
+    
+    return 'Unknown';
+}
+
+// Helper function to generate user ID
+function generateUserId(name) {
+    return name.toLowerCase()
+        .replace(/[^a-z0-9\s]/g, '')
+        .replace(/\s+/g, '-') + '-' + Date.now().toString().slice(-4);
+}
+
+// Add user to system database for admin visibility
+async function addUserToSystemDatabase(user) {
+    try {
+        // Check if user already exists in USER_DATABASE
+        const existingUser = USER_DATABASE.find(u => 
+            u.email.toLowerCase() === user.email.toLowerCase()
+        );
+        
+        if (!existingUser) {
+            const newUser = {
+                id: generateUserId(user.name || user.email),
+                name: user.name || user.displayName || user.email.split('@')[0],
+                email: user.email,
+                role: user.role || 'user',
+                avatar: user.avatar || (user.name || user.email).charAt(0).toUpperCase(),
+                memberSince: new Date().toISOString().split('T')[0],
+                tripPermissions: [],
+                isCreator: false,
+                lastActive: new Date().toISOString(),
+                isWolthersTeam: user.email?.endsWith('@wolthers.com') || false,
+                company: getUserCompanyFromEmail(user.email),
+                authMethod: 'microsoft'
+            };
+            
+            USER_DATABASE.push(newUser);
+            saveUserDatabase();
+            
+            console.log(`✅ Added new user to system database: ${newUser.name} (${newUser.email})`);
+            
+            // Also save to recent Microsoft users for future admin loading
+            saveRecentMicrosoftUser(user);
+        } else {
+            // Update last active time
+            existingUser.lastActive = new Date().toISOString();
+            saveUserDatabase();
+            console.log(`🔄 Updated last active for user: ${existingUser.name}`);
+        }
+    } catch (error) {
+        console.error('Error adding user to system database:', error);
+    }
+}
+
+// Save recent Microsoft user for admin loading
+function saveRecentMicrosoftUser(user) {
+    try {
+        let recentUsers = [];
+        const existing = localStorage.getItem('recent_microsoft_logins');
+        if (existing) {
+            recentUsers = JSON.parse(existing);
+        }
+        
+        // Add user if not already in recent list
+        const userExists = recentUsers.find(u => 
+            u.email.toLowerCase() === user.email.toLowerCase()
+        );
+        
+        if (!userExists) {
+            recentUsers.push({
+                ...user,
+                loginTime: new Date().toISOString()
+            });
+            
+            // Keep only last 50 recent users
+            if (recentUsers.length > 50) {
+                recentUsers = recentUsers.slice(-50);
+            }
+            
+            localStorage.setItem('recent_microsoft_logins', JSON.stringify(recentUsers));
+        }
+    } catch (error) {
+        console.error('Error saving recent Microsoft user:', error);
+    }
+}
+
 function loadModalUsersList() {
     const usersList = document.getElementById('modalUsersList');
     if (!usersList) {
@@ -1248,10 +1505,15 @@ function loadModalUsersList() {
     const users = getUsersFromDatabase();
     console.log('loadModalUsersList: Found', users.length, 'users:', users.map(u => u.name));
     
-    // Update pagination info
+    // Update pagination info with company breakdown for admins
     const paginationInfo = document.getElementById('paginationInfo');
     if (paginationInfo) {
-        paginationInfo.textContent = `Showing 1-${users.length} of ${users.length} users`;
+        if (currentUser && currentUser.role === 'admin') {
+            const companies = [...new Set(users.map(user => getUserCompany(user)))];
+            paginationInfo.textContent = `Showing 1-${users.length} of ${users.length} users from ${companies.length} companies`;
+        } else {
+            paginationInfo.textContent = `Showing 1-${users.length} of ${users.length} users`;
+        }
     }
     
     // Populate company filter dropdown
@@ -1631,8 +1893,6 @@ function escapeHtml(text) {
 }
 
 // User Database - Integrated from accounts.js
-let USER_DATABASE = [];
-
 // Initialize user database
 function initializeUserDatabase() {
     const savedUsers = localStorage.getItem('wolthers_users_database');
@@ -1642,13 +1902,13 @@ function initializeUserDatabase() {
             console.log(`Loaded ${USER_DATABASE.length} users from database`);
         } catch (e) {
             console.error('Error loading user database:', e);
-            USER_DATABASE = getDefaultWolthersTeam();
+            USER_DATABASE = getDefaultUsersWithMultipleCompanies();
             saveUserDatabase();
         }
     } else {
-        USER_DATABASE = getDefaultWolthersTeam();
+        USER_DATABASE = getDefaultUsersWithMultipleCompanies();
         saveUserDatabase();
-        console.log('Initialized user database with Wolthers team');
+        console.log('Initialized user database with Wolthers team and sample company users');
     }
     
     // Make globally accessible for compatibility
@@ -1708,6 +1968,113 @@ function getDefaultWolthersTeam() {
             isWolthersTeam: true
         }
     ];
+}
+
+// Enhanced user database with multiple companies for admin demonstration
+function getDefaultUsersWithMultipleCompanies() {
+    const wolthersTeam = getDefaultWolthersTeam();
+    
+    // Add sample users from different companies
+    const sampleUsers = [
+        // Coffee company partners
+        {
+            id: "maria-santos-finca",
+            name: "Maria Santos",
+            email: "maria.santos@fincaelparaiso.com",
+            role: "user",
+            avatar: "MS",
+            memberSince: "2024-02-15",
+            tripPermissions: ["brazil-coffee-origins-tour"],
+            isCreator: false,
+            lastActive: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+            isWolthersTeam: false,
+            company: "Finca El Paraiso"
+        },
+        {
+            id: "carlos-rodriguez-cafe",
+            name: "Carlos Rodriguez",
+            email: "carlos@cafecooperativa.co",
+            role: "user",
+            avatar: "CR",
+            memberSince: "2024-03-01",
+            tripPermissions: ["colombia-coffee-regions"],
+            isCreator: false,
+            lastActive: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+            isWolthersTeam: false,
+            company: "Cafe Cooperativa"
+        },
+        // Business clients
+        {
+            id: "sarah-johnson-roasters",
+            name: "Sarah Johnson",
+            email: "sarah.johnson@premiumroasters.com",
+            role: "user",
+            avatar: "SJ",
+            memberSince: "2024-01-20",
+            tripPermissions: ["brazil-coffee-origins-tour", "colombia-coffee-regions"],
+            isCreator: false,
+            lastActive: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+            isWolthersTeam: false,
+            company: "Premium Roasters"
+        },
+        {
+            id: "james-mitchell-imports",
+            name: "James Mitchell",
+            email: "j.mitchell@specialtyimports.com",
+            role: "editor",
+            avatar: "JM",
+            memberSince: "2024-02-01",
+            tripPermissions: ["ethiopia-coffee-journey"],
+            isCreator: false,
+            lastActive: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+            isWolthersTeam: false,
+            company: "Specialty Imports"
+        },
+        // Microsoft/Office 365 users
+        {
+            id: "emily-chen-outlook",
+            name: "Emily Chen",
+            email: "emily.chen@outlook.com",
+            role: "user",
+            avatar: "EC",
+            memberSince: "2024-03-10",
+            tripPermissions: [],
+            isCreator: false,
+            lastActive: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(),
+            isWolthersTeam: false,
+            company: "Personal",
+            authMethod: "microsoft"
+        },
+        {
+            id: "alex-thompson-gmail",
+            name: "Alex Thompson",
+            email: "alex.thompson@gmail.com",
+            role: "user",
+            avatar: "AT",
+            memberSince: "2024-03-05",
+            tripPermissions: ["brazil-coffee-origins-tour"],
+            isCreator: false,
+            lastActive: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
+            isWolthersTeam: false,
+            company: "Personal"
+        },
+        // Corporate client
+        {
+            id: "jennifer-davis-corp",
+            name: "Jennifer Davis", 
+            email: "jennifer.davis@globalcoffecorp.com",
+            role: "user",
+            avatar: "JD",
+            memberSince: "2024-01-15",
+            tripPermissions: ["colombia-coffee-regions", "ethiopia-coffee-journey"],
+            isCreator: false,
+            lastActive: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+            isWolthersTeam: false,
+            company: "Global Coffee Corp"
+        }
+    ];
+    
+    return [...wolthersTeam, ...sampleUsers];
 }
 
 // Save user database to localStorage
