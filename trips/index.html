@@ -189,6 +189,17 @@
                         </div>
                     </div>
 
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="startDate">Start Date:</label>
+                            <input type="date" id="startDate" name="startDate" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="endDate">End Date:</label>
+                            <input type="date" id="endDate" name="endDate" class="form-input" required>
+                        </div>
+                    </div>
+
 
 
                     <div class="form-row full">
@@ -200,26 +211,28 @@
 
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="cars">Vehicle(s):</label>
-                            <input type="text" id="cars" class="form-input" placeholder="e.g., Toyota Land Cruiser, Jeep Wrangler">
+                            <label for="vehicles">Vehicle(s):</label>
+                            <select id="vehicles" class="form-input" multiple>
+                                <option value="">Loading vehicles...</option>
+                            </select>
+                            <div class="input-help">Hold Ctrl (Windows) or Cmd (Mac) to select multiple vehicles</div>
                         </div>
                         <div class="form-group">
-                            <label for="driver">Driver:</label>
-                            <input type="text" id="driver" class="form-input" placeholder="e.g., Carlos Silva">
+                            <label for="driver">External Driver:</label>
+                            <input type="text" id="driver" class="form-input" placeholder="e.g., Carlos Silva (if not Wolthers staff)">
+                            <div class="input-help">Leave blank if Wolthers staff will drive</div>
                         </div>
                     </div>
 
                     <div class="form-row full">
                         <div class="form-group">
                             <label for="wolthersStaff">Wolthers Staff Attending:</label>
-                            <select id="wolthersStaff" class="form-input" multiple>
-                                <option>Daniel Wolthers</option>
-                                <option>Svenn Wolthers</option>
-                                <option>Tom Wolthers</option>
-                                <option>Rasmus Wolthers</option>
-                                <option>Other...</option>
-                            </select>
-                            <div class="input-help">Hold Ctrl (Windows) or Cmd (Mac) to select multiple</div>
+                            <div id="staffLoadingMessage" class="loading-message">Checking staff availability...</div>
+                            <div id="staffSelectionContainer" style="display: none;">
+                                <div id="staffAvailabilityInfo" class="availability-info"></div>
+                                <div id="staffList" class="staff-list"></div>
+                            </div>
+                            <div class="input-help">Select staff members and their roles. System will check for conflicts automatically.</div>
                         </div>
                     </div>
 

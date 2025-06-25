@@ -4991,4 +4991,222 @@ body {
 
 #tripCodeModal.modal[style*="flex"] .modal-content {
     animation: tripCodeSlideIn 0.4s ease-out;
+}
+
+/* Staff and Vehicle Selection Styles */
+.loading-message {
+    color: #666;
+    font-style: italic;
+    padding: 10px;
+    text-align: center;
+}
+
+.availability-info {
+    background: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 15px;
+    font-size: 0.9em;
+}
+
+.availability-info.has-conflicts {
+    background: #fff3cd;
+    border-color: #ffeaa7;
+    color: #856404;
+}
+
+.availability-info.all-available {
+    background: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+}
+
+.staff-list {
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #ffffff;
+}
+
+.staff-member {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+    transition: background-color 0.2s ease;
+}
+
+.staff-member:last-child {
+    border-bottom: none;
+}
+
+.staff-member:hover {
+    background: #f8f9fa;
+}
+
+.staff-member.unavailable {
+    background: #f8f9fa;
+    opacity: 0.7;
+}
+
+.staff-checkbox {
+    margin-right: 12px;
+    transform: scale(1.1);
+}
+
+.staff-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.staff-name {
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 2px;
+}
+
+.staff-department {
+    font-size: 0.85em;
+    color: #666;
+    margin-bottom: 4px;
+}
+
+.staff-availability {
+    font-size: 0.8em;
+    padding: 2px 8px;
+    border-radius: 12px;
+    display: inline-block;
+}
+
+.staff-availability.available {
+    background: #d4edda;
+    color: #155724;
+}
+
+.staff-availability.busy {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.staff-conflicts {
+    font-size: 0.75em;
+    color: #dc3545;
+    margin-top: 4px;
+    line-height: 1.3;
+}
+
+.staff-role-selector {
+    margin-left: 12px;
+    min-width: 120px;
+}
+
+.staff-role-selector select {
+    font-size: 0.85em;
+    padding: 4px 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background: #ffffff;
+    color: #333;
+}
+
+.staff-date-range {
+    margin-left: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 200px;
+}
+
+.staff-date-range input {
+    font-size: 0.8em;
+    padding: 4px 6px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background: #ffffff;
+    color: #333;
+}
+
+.date-range-label {
+    font-size: 0.7em;
+    color: #666;
+    margin-bottom: 2px;
+}
+
+@media (prefers-color-scheme: dark) {
+    .loading-message {
+        color: var(--dark-text-secondary);
+    }
+
+    .availability-info {
+        background: var(--dark-bg-secondary);
+        border-color: var(--dark-border);
+        color: var(--dark-text-secondary);
+    }
+
+    .staff-list {
+        background: var(--dark-bg);
+        border-color: var(--dark-border);
+    }
+
+    .staff-member {
+        border-bottom-color: var(--dark-border);
+    }
+
+    .staff-member:hover {
+        background: var(--dark-bg-secondary);
+    }
+
+    .staff-member.unavailable {
+        background: #2a2d31;
+        opacity: 0.7;
+    }
+
+    .staff-name {
+        color: var(--dark-text);
+    }
+
+    .staff-department {
+        color: var(--dark-text-secondary);
+    }
+
+    .staff-role-selector select {
+        background: var(--dark-bg);
+        border-color: var(--dark-border);
+        color: var(--dark-text);
+    }
+
+    .staff-date-range input {
+        background: var(--dark-bg);
+        border-color: var(--dark-border);
+        color: var(--dark-text);
+    }
+
+    .date-range-label {
+        color: var(--dark-text-secondary);
+    }
+}
+
+@media (max-width: 768px) {
+    .staff-member {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .staff-role-selector,
+    .staff-date-range {
+        margin-left: 0;
+        width: 100%;
+    }
+    
+    .staff-date-range {
+        flex-direction: row;
+        gap: 8px;
+    }
+    
+    .staff-date-range input {
+        flex: 1;
+    }
 } 

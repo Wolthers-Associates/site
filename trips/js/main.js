@@ -1190,18 +1190,25 @@ const trips = {
         }
     },
 
-    // Create new trip with AI-generated codes
-    createTrip: (formData) => {
+    // Create new trip with AI-generated codes and real staff/vehicle assignments
+    createTrip: async (formData) => {
         utils.showLoading();
         
-        // Simulate API call delay
-        setTimeout(() => {
+        try {
             // Extract form data
             const tripTitle = formData.get('tripTitle');
             const guestName = formData.get('guests') || '';
             const partnerEmailsText = formData.get('partnerEmails') || '';
             const partnerEmails = partnerEmailsText ? 
                 partnerEmailsText.split('\n').map(e => e.trim()).filter(e => e) : [];
+            
+            // Get selected staff and vehicles from the new system
+            const selectedStaff = window.selectedStaffAssignments || [];
+            const selectedVehicles = Array.from(document.getElementById('vehicles').selectedOptions)
+                .map(option => ({ 
+                    id: option.value, 
+                    displayName: option.textContent 
+                })).filter(v => v.id);
             
             // Extract company name from partner emails (smart detection)
             let companyName = '';
@@ -1210,29 +1217,17 @@ const trips = {
                 companyName = trips.extractCompanyFromEmail(emailDomain);
             }
             
-            // Extract dates from itinerary or set defaults
-            const itineraryText = formData.get('itineraryText') || '';
-            let startDate, endDate;
+            // Get dates from form fields
+            const startDate = formData.get('startDate');
+            const endDate = formData.get('endDate');
             
-            if (itineraryText) {
-                // Try to extract dates from itinerary (simplified)
-                const dateMatches = itineraryText.match(/\d{4}-\d{2}-\d{2}/g);
-                if (dateMatches && dateMatches.length >= 2) {
-                    startDate = dateMatches[0];
-                    endDate = dateMatches[dateMatches.length - 1];
-                } else {
-                    // Default dates if no dates found in itinerary
-                    const today = new Date();
-                    const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, today.getDate());
-                    startDate = nextMonth.toISOString().split('T')[0];
-                    endDate = new Date(nextMonth.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-                }
-            } else {
-                // Default dates if no itinerary
-                const today = new Date();
-                const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, today.getDate());
-                startDate = nextMonth.toISOString().split('T')[0];
-                endDate = new Date(nextMonth.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+            // Validate dates
+            if (!startDate || !endDate) {
+                throw new Error('Please select both start and end dates');
+            }
+            
+            if (new Date(startDate) >= new Date(endDate)) {
+                throw new Error('End date must be after start date');
             }
 
             // 🤖 Generate AI Trip Code
@@ -1248,7 +1243,7 @@ const trips = {
                 .replace(/[^a-z0-9\s]/g, '')
                 .replace(/\s+/g, '-') + '-2025';
 
-            // Create new trip object
+            // Create new trip object with real staff and vehicle data
             const newTrip = {
                 id: tripId,
                 title: tripTitle,
@@ -1256,8 +1251,9 @@ const trips = {
                 date: startDate,
                 endDate: endDate,
                 guests: guestName,
-                cars: formData.get('cars') || '',
-                driver: formData.get('driver') || '',
+                vehicles: selectedVehicles,
+                externalDriver: formData.get('driver') || '',
+                staffAssignments: selectedStaff,
                 status: 'upcoming',
                 partnerEmails: partnerEmails,
                 partnerCodes: [tripCodeData.code], // AI-generated code
@@ -1267,21 +1263,42 @@ const trips = {
                 meals: '', // Would be added later
                 // Trip code metadata
                 tripCodeData: tripCodeData,
-                companyName: companyName
+                companyName: companyName,
+                // Formatted display for compatibility
+                cars: selectedVehicles.map(v => v.displayName).join(', ') || 'TBD',
+                driver: selectedStaff.find(s => s.role === 'driver')?.name || formData.get('driver') || 'TBD',
+                wolthersStaff: selectedStaff.map(s => `${s.name} (${s.role})`).join(', ') || 'TBD'
             };
             
-            // Add to mock data (at the beginning for upcoming trips)
-            MOCK_TRIPS.unshift(newTrip);
+            // Simulate API delay for realism
+            setTimeout(() => {
+                // Add to mock data (at the beginning for upcoming trips)
+                MOCK_TRIPS.unshift(newTrip);
+                
+                utils.hideLoading();
+                ui.hideAddTripModal();
+                
+                // Reset form state
+                window.selectedStaffAssignments = [];
+                
+                // 🎉 Show Trip Code Success Modal
+                trips.showTripCodeModal(newTrip);
+                
+                // Refresh display in background
+                trips.loadTrips();
+                
+                console.log('✅ Trip created with staff and vehicle assignments:', {
+                    title: newTrip.title,
+                    staff: selectedStaff,
+                    vehicles: selectedVehicles
+                });
+            }, 1500);
             
+        } catch (error) {
+            console.error('Error creating trip:', error);
             utils.hideLoading();
-            ui.hideAddTripModal();
-            
-            // 🎉 Show Trip Code Success Modal
-            trips.showTripCodeModal(newTrip);
-            
-            // Refresh display in background
-            trips.loadTrips();
-        }, 1500);
+            utils.showNotification('Failed to create trip. Please try again.', 'error');
+        }
     },
 
     // Extract company name from email domain
@@ -1301,6 +1318,192 @@ const trips = {
         
         // Capitalize first letter
         return companyName.charAt(0).toUpperCase() + companyName.slice(1);
+    },
+
+    // Load vehicles from database
+    loadVehicles: async () => {
+        try {
+            const response = await fetch('api/vehicles/list.php');
+            const data = await response.json();
+            
+            if (data.success) {
+                const vehicleSelect = document.getElementById('vehicles');
+                if (vehicleSelect) {
+                    vehicleSelect.innerHTML = '';
+                    
+                    data.vehicles.forEach(vehicle => {
+                        const option = document.createElement('option');
+                        option.value = vehicle.id;
+                        option.textContent = `${vehicle.displayName} (${vehicle.capacity} seats)`;
+                        option.className = vehicle.isAvailable ? 'available' : 'unavailable';
+                        option.disabled = !vehicle.isAvailable;
+                        option.title = vehicle.isAvailable ? 
+                            `Available - Location: ${vehicle.location}` : 
+                            `Unavailable - ${vehicle.upcomingTrips.join(', ')}`;
+                        vehicleSelect.appendChild(option);
+                    });
+                    
+                    console.log(`✅ Loaded ${data.vehicles.length} vehicles (${data.summary.available} available)`);
+                }
+            }
+        } catch (error) {
+            console.error('Failed to load vehicles:', error);
+            const vehicleSelect = document.getElementById('vehicles');
+            if (vehicleSelect) {
+                vehicleSelect.innerHTML = '<option value="">Failed to load vehicles</option>';
+            }
+        }
+    },
+
+    // Load staff availability for date range
+    loadStaffAvailability: async (startDate, endDate) => {
+        try {
+            const staffContainer = document.getElementById('staffSelectionContainer');
+            const loadingMessage = document.getElementById('staffLoadingMessage');
+            const availabilityInfo = document.getElementById('staffAvailabilityInfo');
+            const staffList = document.getElementById('staffList');
+            
+            if (!startDate || !endDate) {
+                loadingMessage.textContent = 'Please set trip dates to check staff availability';
+                return;
+            }
+            
+            loadingMessage.style.display = 'block';
+            staffContainer.style.display = 'none';
+            
+            const params = new URLSearchParams({
+                start_date: startDate,
+                end_date: endDate
+            });
+            
+            const response = await fetch(`api/staff/availability.php?${params}`);
+            const data = await response.json();
+            
+            if (data.success) {
+                // Update availability info
+                const { available, busy, total } = data.summary;
+                availabilityInfo.className = `availability-info ${busy > 0 ? 'has-conflicts' : 'all-available'}`;
+                availabilityInfo.innerHTML = `
+                    <strong>Staff Availability for ${startDate} to ${endDate}:</strong><br>
+                    ${available} of ${total} staff members available ${busy > 0 ? `(${busy} have conflicts)` : ''}
+                `;
+                
+                // Render staff list
+                staffList.innerHTML = data.staff.map(staff => `
+                    <div class="staff-member ${staff.isAvailable ? '' : 'unavailable'}">
+                        <input type="checkbox" 
+                               class="staff-checkbox" 
+                               data-staff-id="${staff.id}"
+                               ${staff.isAvailable ? '' : 'disabled'}
+                               onchange="trips.toggleStaffMember(${staff.id}, '${staff.name}', this.checked)">
+                        
+                        <div class="staff-info">
+                            <div class="staff-name">${staff.name}</div>
+                            <div class="staff-department">${staff.displayName}</div>
+                            <span class="staff-availability ${staff.statusIndicator}">
+                                ${staff.isAvailable ? 'Available' : 'Busy'}
+                            </span>
+                            ${staff.conflictingAssignments.length > 0 ? `
+                                <div class="staff-conflicts">
+                                    Conflicts: ${staff.conflictingAssignments.join('; ')}
+                                </div>
+                            ` : ''}
+                        </div>
+                        
+                        <div class="staff-role-selector" style="display: none;">
+                            <select onchange="trips.updateStaffRole(${staff.id}, this.value)">
+                                <option value="guide">Guide</option>
+                                <option value="driver">Driver</option>
+                                <option value="coordinator">Coordinator</option>
+                                <option value="translator">Translator</option>
+                                <option value="specialist">Specialist</option>
+                            </select>
+                        </div>
+                        
+                        <div class="staff-date-range" style="display: none;">
+                            <div class="date-range-label">Custom dates (optional):</div>
+                            <input type="date" 
+                                   placeholder="Start date" 
+                                   value="${startDate}"
+                                   onchange="trips.updateStaffDateRange(${staff.id}, 'start', this.value)">
+                            <input type="date" 
+                                   placeholder="End date" 
+                                   value="${endDate}"
+                                   onchange="trips.updateStaffDateRange(${staff.id}, 'end', this.value)">
+                        </div>
+                    </div>
+                `).join('');
+                
+                loadingMessage.style.display = 'none';
+                staffContainer.style.display = 'block';
+                
+                console.log(`✅ Loaded ${total} staff members (${available} available, ${busy} busy)`);
+            }
+        } catch (error) {
+            console.error('Failed to load staff availability:', error);
+            document.getElementById('staffLoadingMessage').textContent = 'Failed to load staff availability';
+        }
+    },
+
+    // Toggle staff member selection
+    toggleStaffMember: (staffId, staffName, isSelected) => {
+        if (!window.selectedStaffAssignments) {
+            window.selectedStaffAssignments = [];
+        }
+        
+        const roleSelector = document.querySelector(`[data-staff-id="${staffId}"]`)
+            .closest('.staff-member').querySelector('.staff-role-selector');
+        const dateRange = document.querySelector(`[data-staff-id="${staffId}"]`)
+            .closest('.staff-member').querySelector('.staff-date-range');
+        
+        if (isSelected) {
+            // Add staff member with default role
+            window.selectedStaffAssignments.push({
+                id: staffId,
+                name: staffName,
+                role: 'guide',
+                startDate: null, // Will use trip dates
+                endDate: null    // Will use trip dates
+            });
+            
+            roleSelector.style.display = 'block';
+            dateRange.style.display = 'block';
+        } else {
+            // Remove staff member
+            window.selectedStaffAssignments = window.selectedStaffAssignments
+                .filter(staff => staff.id !== staffId);
+            
+            roleSelector.style.display = 'none';
+            dateRange.style.display = 'none';
+        }
+        
+        console.log('Selected staff assignments:', window.selectedStaffAssignments);
+    },
+
+    // Update staff member role
+    updateStaffRole: (staffId, role) => {
+        if (window.selectedStaffAssignments) {
+            const staff = window.selectedStaffAssignments.find(s => s.id === staffId);
+            if (staff) {
+                staff.role = role;
+                console.log(`Updated ${staff.name} role to ${role}`);
+            }
+        }
+    },
+
+    // Update staff member date range
+    updateStaffDateRange: (staffId, type, date) => {
+        if (window.selectedStaffAssignments) {
+            const staff = window.selectedStaffAssignments.find(s => s.id === staffId);
+            if (staff) {
+                if (type === 'start') {
+                    staff.startDate = date;
+                } else if (type === 'end') {
+                    staff.endDate = date;
+                }
+                console.log(`Updated ${staff.name} ${type} date to ${date}`);
+            }
+        }
     },
 
     // Show Trip Code Success Modal
@@ -1415,6 +1618,57 @@ document.addEventListener('DOMContentLoaded', async function() {
         e.preventDefault();
         trips.createTrip(new FormData(this));
     });
+
+    // Initialize staff and vehicle management when modal opens
+    window.showAddTripModal = () => {
+        ui.showAddTripModal();
+        
+        // Load vehicles when modal opens
+        trips.loadVehicles();
+        
+        // Initialize staff assignments array
+        window.selectedStaffAssignments = [];
+        
+        // Set up date change handlers for staff availability
+        const setupDateHandlers = () => {
+            const startDateInput = document.getElementById('startDate');
+            const endDateInput = document.getElementById('endDate');
+            
+            if (!startDateInput || !endDateInput) {
+                // If date inputs don't exist, check again in 100ms
+                setTimeout(setupDateHandlers, 100);
+                return;
+            }
+            
+            const checkStaffAvailability = () => {
+                const startDate = startDateInput.value;
+                const endDate = endDateInput.value;
+                
+                if (startDate && endDate) {
+                    trips.loadStaffAvailability(startDate, endDate);
+                } else {
+                    document.getElementById('staffLoadingMessage').textContent = 'Please select trip dates to check staff availability';
+                    document.getElementById('staffSelectionContainer').style.display = 'none';
+                }
+            };
+            
+            startDateInput.addEventListener('change', checkStaffAvailability);
+            endDateInput.addEventListener('change', checkStaffAvailability);
+            
+            // Set default dates (next month)
+            const today = new Date();
+            const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, today.getDate());
+            const weekLater = new Date(nextMonth.getTime() + 7 * 24 * 60 * 60 * 1000);
+            
+            startDateInput.value = nextMonth.toISOString().split('T')[0];
+            endDateInput.value = weekLater.toISOString().split('T')[0];
+            
+            // Initial check with default dates
+            setTimeout(checkStaffAvailability, 500);
+        };
+        
+        setupDateHandlers();
+    };
     
     // Modal click handlers
     window.addEventListener('click', function(event) {

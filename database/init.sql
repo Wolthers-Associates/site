@@ -195,6 +195,78 @@ CREATE TABLE `audit_logs` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
+-- Table structure for vehicles
+-- --------------------------------------------------------
+
+CREATE TABLE `vehicles` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `make` varchar(100) NOT NULL,
+  `model` varchar(100) NOT NULL,
+  `year` int(4) DEFAULT NULL,
+  `license_plate` varchar(20) DEFAULT NULL,
+  `vehicle_type` enum('suv','pickup','van','car','bus') NOT NULL DEFAULT 'suv',
+  `capacity` int(11) NOT NULL DEFAULT 4,
+  `status` enum('available','maintenance','retired') NOT NULL DEFAULT 'available',
+  `location` varchar(255) DEFAULT NULL,
+  `notes` text,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `vehicle_type` (`vehicle_type`),
+  KEY `status` (`status`),
+  KEY `location` (`location`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+-- Table structure for staff assignments
+-- --------------------------------------------------------
+
+CREATE TABLE `trip_staff_assignments` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `trip_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `role` enum('guide','driver','coordinator','translator','specialist') NOT NULL DEFAULT 'guide',
+  `start_date` date DEFAULT NULL,
+  `end_date` date DEFAULT NULL,
+  `notes` text,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unique_staff_trip_role` (`trip_id`, `user_id`, `role`),
+  KEY `trip_id` (`trip_id`),
+  KEY `user_id` (`user_id`),
+  KEY `start_date` (`start_date`),
+  KEY `end_date` (`end_date`),
+  CONSTRAINT `trip_staff_assignments_ibfk_1` FOREIGN KEY (`trip_id`) REFERENCES `trips` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `trip_staff_assignments_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+-- Table structure for vehicle assignments
+-- --------------------------------------------------------
+
+CREATE TABLE `trip_vehicle_assignments` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `trip_id` int(11) NOT NULL,
+  `vehicle_id` int(11) NOT NULL,
+  `start_date` date DEFAULT NULL,
+  `end_date` date DEFAULT NULL,
+  `driver_user_id` int(11) DEFAULT NULL,
+  `notes` text,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `trip_id` (`trip_id`),
+  KEY `vehicle_id` (`vehicle_id`),
+  KEY `driver_user_id` (`driver_user_id`),
+  KEY `start_date` (`start_date`),
+  KEY `end_date` (`end_date`),
+  CONSTRAINT `trip_vehicle_assignments_ibfk_1` FOREIGN KEY (`trip_id`) REFERENCES `trips` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `trip_vehicle_assignments_ibfk_2` FOREIGN KEY (`vehicle_id`) REFERENCES `vehicles` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `trip_vehicle_assignments_ibfk_3` FOREIGN KEY (`driver_user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
 -- Insert sample data for development
 -- --------------------------------------------------------
 
@@ -240,6 +312,27 @@ INSERT INTO `trip_itinerary` (`trip_id`, `day_number`, `date`, `start_time`, `en
 INSERT INTO `trip_logistics` (`trip_id`, `vehicle_type`, `driver_name`, `driver_contact`, `budget_estimate`, `currency`) VALUES
 (1, 'Toyota Land Cruiser', 'Carlos Silva', '+55 11 99999-9999', 15000.00, 'USD'),
 (2, 'Jeep Wrangler', 'Miguel Santos', '+57 300 123-4567', 12000.00, 'USD');
+
+-- Sample vehicles
+INSERT INTO `vehicles` (`make`, `model`, `year`, `license_plate`, `vehicle_type`, `capacity`, `status`, `location`, `notes`) VALUES
+('Toyota', 'Land Cruiser', 2022, 'ABC-1234', 'suv', 7, 'available', 'Santos Office', 'Primary vehicle for coffee farm visits'),
+('Toyota', 'Hilux', 2021, 'DEF-5678', 'pickup', 5, 'available', 'Santos Office', 'Good for rough terrain'),
+('Chevrolet', 'Spin', 2020, 'GHI-9012', 'van', 8, 'available', 'São Paulo Office', 'Ideal for city tours and larger groups'),
+('Honda', 'CR-V', 2019, 'JKL-3456', 'suv', 5, 'maintenance', 'Santos Office', 'In maintenance until next week'),
+('Ford', 'Ranger', 2022, 'MNO-7890', 'pickup', 5, 'available', 'Campinas', 'Available for inland trips');
+
+-- Sample staff assignments for existing trips
+INSERT INTO `trip_staff_assignments` (`trip_id`, `user_id`, `role`, `start_date`, `end_date`, `notes`) VALUES
+(1, 1, 'guide', '2025-07-15', '2025-07-22', 'Lead guide for Brazil coffee origins tour'),
+(1, 3, 'coordinator', '2025-07-15', '2025-07-22', 'Local coordination and logistics'),
+(2, 2, 'guide', '2025-08-10', '2025-08-17', 'Guide for Colombian highland discovery'),
+(3, 1, 'guide', '2025-09-05', '2025-09-12', 'Ethiopia coffee birthplace journey leader');
+
+-- Sample vehicle assignments
+INSERT INTO `trip_vehicle_assignments` (`trip_id`, `vehicle_id`, `start_date`, `end_date`, `driver_user_id`, `notes`) VALUES
+(1, 1, '2025-07-15', '2025-07-22', 3, 'Toyota Land Cruiser for farm visits'),
+(1, 2, '2025-07-15', '2025-07-22', NULL, 'Backup vehicle for luggage/equipment'),
+(2, 3, '2025-08-10', '2025-08-17', 2, 'Chevrolet Spin for Colombian tour');
 
 COMMIT;
 
@@ -291,4 +384,43 @@ LEFT JOIN trip_participants tp ON t.id = tp.trip_id AND tp.confirmed = 1
 LEFT JOIN trip_itinerary ti ON t.id = ti.trip_id
 LEFT JOIN trip_logistics tl ON t.id = tl.trip_id
 GROUP BY t.id
-ORDER BY t.start_date DESC; 
+ORDER BY t.start_date DESC;
+
+-- --------------------------------------------------------
+-- Create views for availability checking
+-- --------------------------------------------------------
+
+CREATE VIEW staff_availability AS
+SELECT 
+    u.id,
+    u.name,
+    u.email,
+    u.department,
+    tsa.trip_id,
+    tsa.start_date,
+    tsa.end_date,
+    tsa.role,
+    t.title as trip_title
+FROM users u
+LEFT JOIN trip_staff_assignments tsa ON u.id = tsa.user_id
+LEFT JOIN trips t ON tsa.trip_id = t.id
+WHERE u.role IN ('admin', 'employee');
+
+CREATE VIEW vehicle_availability AS
+SELECT 
+    v.id,
+    v.make,
+    v.model,
+    v.vehicle_type,
+    v.capacity,
+    v.status,
+    v.location,
+    tva.trip_id,
+    tva.start_date,
+    tva.end_date,
+    t.title as trip_title,
+    u.name as driver_name
+FROM vehicles v
+LEFT JOIN trip_vehicle_assignments tva ON v.id = tva.vehicle_id
+LEFT JOIN trips t ON tva.trip_id = t.id
+LEFT JOIN users u ON tva.driver_user_id = u.id; 
