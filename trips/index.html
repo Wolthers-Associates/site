@@ -789,12 +789,15 @@
                     <button class="admin-icon-btn" onclick="showAdminPanel()" title="Admin Settings">
                         <img src="images/gear.svg" alt="Admin Settings" class="admin-icon">
                     </button>
-                                    <button class="admin-icon-btn" onclick="showUserManagementModal()" title="User Management">
-                    <img src="images/user-LM.svg" alt="User Management" class="admin-icon">
-                </button>
-                <button class="admin-icon-btn" onclick="showFleetManagementModal()" title="Fleet Management">
-                    <img src="images/car.svg" alt="Fleet Management" class="admin-icon">
-                </button>
+                    <button class="admin-icon-btn" onclick="showCompanyManagementModal()" title="Company Management">
+                        <img src="images/building.svg" alt="Company Management" class="admin-icon">
+                    </button>
+                    <button class="admin-icon-btn" onclick="showUserManagementModal()" title="User Management">
+                        <img src="images/user-LM.svg" alt="User Management" class="admin-icon">
+                    </button>
+                    <button class="admin-icon-btn" onclick="showFleetManagementModal()" title="Fleet Management">
+                        <img src="images/car.svg" alt="Fleet Management" class="admin-icon">
+                    </button>
                 </div>
                 <div class="mobile-nav">
                     <button class="hamburger-menu" id="hamburgerMenu" onclick="toggleMobileMenu()">
@@ -811,10 +814,14 @@
                             <span class="nav-icon">👥</span>
                             <span class="nav-text">Accounts</span>
                         </a>
-                                            <a href="#" onclick="showFleetManagementModal()" class="mobile-nav-link" id="mobileCarsLink" style="display: none;">
-                        <span class="nav-icon">🚗</span>
-                        <span class="nav-text">Fleet</span>
-                    </a>
+                        <a href="#" onclick="showCompanyManagementModal()" class="mobile-nav-link" id="mobileCompaniesLink" style="display: none;">
+                            <span class="nav-icon">🏢</span>
+                            <span class="nav-text">Companies</span>
+                        </a>
+                        <a href="#" onclick="showFleetManagementModal()" class="mobile-nav-link" id="mobileCarsLink" style="display: none;">
+                            <span class="nav-icon">🚗</span>
+                            <span class="nav-text">Fleet</span>
+                        </a>
                         <a href="#" onclick="showAdminPanel()" class="mobile-nav-link" id="mobileAdminLink" style="display: none;">
                             <span class="nav-icon">⚙️</span>
                             <span class="nav-text">Settings</span>

@@ -2987,6 +2987,12 @@ function hideUserManagementModal() {
     document.body.style.overflow = 'auto';
 }
 
+function showCompanyManagementModal() {
+    console.log('Opening Company Management Modal...');
+    // For now, open the Add Company Modal which has the full company registration system
+    showAddCompanyModal();
+}
+
 async function loadUserManagementData() {
     try {
         showLoadingState(true);
@@ -4727,6 +4733,7 @@ function updateNavigationVisibility(user) {
     
     // Mobile navigation elements
     const mobileAccountsLink = document.getElementById('mobileAccountsLink');
+    const mobileCompaniesLink = document.getElementById('mobileCompaniesLink');
     const mobileCarsLink = document.getElementById('mobileCarsLink');
     const mobileAdminLink = document.getElementById('mobileAdminLink');
     
@@ -4738,6 +4745,10 @@ function updateNavigationVisibility(user) {
     // Update mobile navigation
     if (mobileAccountsLink) {
         mobileAccountsLink.style.display = isAdmin ? 'flex' : 'none';
+    }
+    
+    if (mobileCompaniesLink) {
+        mobileCompaniesLink.style.display = isAdmin ? 'flex' : 'none';
     }
     
     if (mobileCarsLink) {
