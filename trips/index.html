@@ -122,6 +122,39 @@
                 color: #000 !important;
             }
             
+            /* Company Selector Dark Mode */
+            .fluent-btn-icon {
+                background: var(--dark-bg) !important;
+                color: var(--dark-text-secondary) !important;
+                border: 1px solid #2d3136 !important;
+            }
+            
+            .fluent-btn-icon:hover {
+                background: #2d3136 !important;
+                border-color: #DAA520 !important;
+            }
+            
+            .fluent-toggle-btn {
+                color: #DAA520 !important;
+            }
+            
+            .fluent-toggle-btn:hover {
+                color: #B8860B !important;
+            }
+            
+            .fluent-subsection-title {
+                color: var(--dark-text) !important;
+                border-bottom: 1px solid #2d3136 !important;
+            }
+            
+            .fluent-help-text {
+                color: #888 !important;
+            }
+            
+            .fluent-checkbox-label {
+                color: var(--dark-text-secondary) !important;
+            }
+            
             /* Vehicle Management Modal Styles */
             .vehicle-summary-section {
                 margin-bottom: 25px !important;
@@ -201,6 +234,93 @@
     </style>
     
     <style>
+        /* Company Selector Styles */
+        .fluent-company-selector {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        
+        .fluent-company-selector select {
+            flex: 1;
+        }
+        
+        .fluent-btn-icon {
+            padding: 8px;
+            border: 1px solid #e1e5e9;
+            background: #fff;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+        
+        .fluent-btn-icon:hover {
+            background: #f5f5f5;
+            border-color: #D4AF37;
+        }
+        
+        .fluent-form-toggle {
+            margin: 20px 0;
+        }
+        
+        .fluent-toggle-btn {
+            border: none;
+            background: none;
+            color: #2C5530;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            padding: 8px 0;
+            transition: all 0.2s ease;
+        }
+        
+        .fluent-toggle-btn:hover {
+            color: #1e3b21;
+        }
+        
+        .fluent-toggle-btn.expanded .toggle-icon {
+            transform: rotate(45deg);
+        }
+        
+        .fluent-subsection-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2C5530;
+            margin: 20px 0 10px 0;
+            border-bottom: 1px solid #e1e5e9;
+            padding-bottom: 5px;
+        }
+        
+        .fluent-help-text {
+            color: #757575;
+            font-size: 12px;
+            margin-top: 4px;
+            display: block;
+        }
+        
+        .fluent-checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .fluent-checkbox-label {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .fluent-checkbox {
+            margin-top: 2px;
+        }
+
         /* Vehicle Management Modal Styles for Light Mode */
         .vehicle-summary-section {
             margin-bottom: 25px;
@@ -1639,29 +1759,68 @@ The system will automatically:
                             </div>
                         </div>
                         
+                        <!-- Company Selection with Add Option -->
                         <div class="fluent-form-row">
                             <div class="fluent-form-group">
-                                <label for="newUserCompany" class="fluent-label">Company</label>
-                                <input type="text" id="newUserCompany" class="fluent-input" placeholder="Enter company name">
+                                <label for="newUserCompany" class="fluent-label">Company *</label>
+                                <div class="fluent-company-selector">
+                                    <select id="newUserCompany" class="fluent-input" required>
+                                        <option value="">Select a company</option>
+                                        <!-- Companies will be loaded dynamically -->
+                                    </select>
+                                    <button type="button" class="fluent-btn fluent-btn-icon" onclick="showAddCompanyModal()" title="Add new company">
+                                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                                            <path d="M8.75 3.75a.75.75 0 00-1.5 0v3.5h-3.5a.75.75 0 000 1.5h3.5v3.5a.75.75 0 001.5 0v-3.5h3.5a.75.75 0 000-1.5h-3.5v-3.5z"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Company Role -->
+                        <div class="fluent-form-row">
+                            <div class="fluent-form-group">
+                                <label for="newUserCompanyRole" class="fluent-label">Company Role *</label>
+                                <select id="newUserCompanyRole" class="fluent-select" required>
+                                    <option value="">Select company role</option>
+                                    <option value="staff">Staff - Regular employee</option>
+                                    <option value="senior">Senior - Senior-level employee</option>
+                                    <option value="admin">Admin - Can manage company users and trips</option>
+                                </select>
+                                <small class="fluent-help-text">Admins can see all company trips and manage team members</small>
                             </div>
                         </div>
                         
                         <div class="fluent-form-row">
                             <div class="fluent-form-group">
-                                <label for="newUserRole" class="fluent-label">User type *</label>
+                                <label for="newUserRole" class="fluent-label">System Role *</label>
                                 <select id="newUserRole" class="fluent-select" required>
-                                    <option value="">Select user type</option>
+                                    <option value="">Select system role</option>
                                     <option value="guest">Guest - View only access</option>
                                     <option value="user">User - Standard access</option>
                                     <option value="editor">Editor - Can modify content</option>
-                                    <option value="admin">Administrator - Full access</option>
+                                    <option value="admin">System Admin - Full system access</option>
                                 </select>
                             </div>
                         </div>
                         
+                        <!-- Trip Visibility Settings -->
                         <div class="fluent-form-row">
                             <div class="fluent-form-group">
-                                <label class="fluent-label">Options</label>
+                                <label class="fluent-label">Trip Permissions</label>
+                                <div class="fluent-checkbox-group">
+                                    <label class="fluent-checkbox-label">
+                                        <input type="checkbox" id="canSeeCompanyTrips" class="fluent-checkbox">
+                                        <span>Can view other company trips (when not participating)</span>
+                                    </label>
+                                    <small class="fluent-help-text">If unchecked, user will only see trips they are participating in</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="fluent-form-row">
+                            <div class="fluent-form-group">
+                                <label class="fluent-label">Account Options</label>
                                 <div class="fluent-checkbox-group">
                                     <label class="fluent-checkbox-label">
                                         <input type="checkbox" id="sendWelcomeEmail" class="fluent-checkbox" checked>
@@ -1680,6 +1839,143 @@ The system will automatically:
                         <button type="button" class="fluent-btn fluent-btn-secondary" onclick="hideAddUserModal()">Cancel</button>
                         <button type="submit" class="fluent-btn fluent-btn-primary" id="addUserSubmitBtn">
                             <span class="btn-text">Add person</span>
+                            <div class="fluent-spinner" style="display: none;"></div>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Company Modal -->
+    <div id="addCompanyModal" class="modal fluent-modal" style="display: none;" role="dialog" aria-labelledby="add-company-title" aria-modal="true">
+        <div class="modal-backdrop" onclick="hideAddCompanyModal()"></div>
+        <div class="modal-content fluent-modal-content-small">
+            <div class="fluent-modal-header">
+                <div class="fluent-header-content">
+                    <h1 id="add-company-title" class="fluent-modal-title">Add New Company</h1>
+                    <p class="fluent-modal-subtitle">Register a new company in the system</p>
+                </div>
+                <button class="fluent-close-btn" onclick="hideAddCompanyModal()">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M11.41 10l4.3-4.29a1 1 0 10-1.42-1.42L10 8.59l-4.29-4.3a1 1 0 00-1.42 1.42L8.59 10l-4.3 4.29a1 1 0 001.42 1.42L10 11.41l4.29 4.3a1 1 0 001.42-1.42L11.41 10z"/>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="fluent-modal-body-form">
+                <form id="addCompanyForm" class="fluent-form">
+                    <div class="fluent-form-section">
+                        <!-- Required Fields -->
+                        <div class="fluent-form-row">
+                            <div class="fluent-form-group">
+                                <label for="companyFullName" class="fluent-label">Legal Company Name *</label>
+                                <input type="text" id="companyFullName" class="fluent-input" placeholder="e.g., Mitsui & Co. Ltd." required>
+                                <small class="fluent-help-text">Official registered company name</small>
+                            </div>
+                        </div>
+                        
+                        <div class="fluent-form-row">
+                            <div class="fluent-form-group">
+                                <label for="companyFantasyName" class="fluent-label">Trade/Fantasy Name</label>
+                                <input type="text" id="companyFantasyName" class="fluent-input" placeholder="e.g., Mitsui Coffee">
+                                <small class="fluent-help-text">Brand or trade name (if different from legal name)</small>
+                            </div>
+                        </div>
+                        
+                        <div class="fluent-form-row">
+                            <div class="fluent-form-group">
+                                <label for="companyType" class="fluent-label">Company Type *</label>
+                                <select id="companyType" class="fluent-select" required>
+                                    <option value="">Select company type</option>
+                                    <option value="importer">Importer</option>
+                                    <option value="exporter">Exporter</option>
+                                    <option value="roaster">Coffee Roaster</option>
+                                    <option value="distributor">Distributor</option>
+                                    <option value="retailer">Retailer</option>
+                                    <option value="consultant">Consultant</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <!-- Optional Fields (Expandable) -->
+                        <div class="fluent-form-toggle">
+                            <button type="button" class="fluent-toggle-btn" id="toggleCompanyDetails" onclick="toggleCompanyDetailsForm()">
+                                <span>+ Add additional details (optional)</span>
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" class="toggle-icon">
+                                    <path d="M8.75 3.75a.75.75 0 00-1.5 0v3.5h-3.5a.75.75 0 000 1.5h3.5v3.5a.75.75 0 001.5 0v-3.5h3.5a.75.75 0 000-1.5h-3.5v-3.5z"/>
+                                </svg>
+                            </button>
+                        </div>
+                        
+                        <div id="companyDetailsSection" class="fluent-form-section" style="display: none;">
+                            <!-- Address Information -->
+                            <h4 class="fluent-subsection-title">Address Information</h4>
+                            <div class="fluent-form-row">
+                                <div class="fluent-form-group">
+                                    <label for="companyAddress" class="fluent-label">Street Address</label>
+                                    <textarea id="companyAddress" class="fluent-input" rows="2" placeholder="Street address, suite/building number"></textarea>
+                                </div>
+                            </div>
+                            
+                            <div class="fluent-form-row">
+                                <div class="fluent-form-group">
+                                    <label for="companyCity" class="fluent-label">City</label>
+                                    <input type="text" id="companyCity" class="fluent-input" placeholder="e.g., São Paulo">
+                                </div>
+                                <div class="fluent-form-group">
+                                    <label for="companyCountry" class="fluent-label">Country</label>
+                                    <input type="text" id="companyCountry" class="fluent-input" placeholder="e.g., Brazil">
+                                </div>
+                            </div>
+                            
+                            <div class="fluent-form-row">
+                                <div class="fluent-form-group">
+                                    <label for="companyPostalCode" class="fluent-label">Postal Code</label>
+                                    <input type="text" id="companyPostalCode" class="fluent-input" placeholder="e.g., 01310-100">
+                                </div>
+                            </div>
+                            
+                            <!-- Contact Information -->
+                            <h4 class="fluent-subsection-title">Contact Information</h4>
+                            <div class="fluent-form-row">
+                                <div class="fluent-form-group">
+                                    <label for="companyPhone" class="fluent-label">Phone</label>
+                                    <input type="tel" id="companyPhone" class="fluent-input" placeholder="+55 11 1234-5678">
+                                </div>
+                                <div class="fluent-form-group">
+                                    <label for="companyEmail" class="fluent-label">Email</label>
+                                    <input type="email" id="companyEmail" class="fluent-input" placeholder="info@company.com">
+                                </div>
+                            </div>
+                            
+                            <div class="fluent-form-row">
+                                <div class="fluent-form-group">
+                                    <label for="companyWebsite" class="fluent-label">Website</label>
+                                    <input type="url" id="companyWebsite" class="fluent-input" placeholder="https://www.company.com">
+                                </div>
+                            </div>
+                            
+                            <!-- Legal Information -->
+                            <h4 class="fluent-subsection-title">Legal Information</h4>
+                            <div class="fluent-form-row">
+                                <div class="fluent-form-group">
+                                    <label for="companyRegistrationNumber" class="fluent-label">Registration Number</label>
+                                    <input type="text" id="companyRegistrationNumber" class="fluent-input" placeholder="Company registration number">
+                                </div>
+                                <div class="fluent-form-group">
+                                    <label for="companyTaxId" class="fluent-label">Tax ID</label>
+                                    <input type="text" id="companyTaxId" class="fluent-input" placeholder="Tax identification number">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="fluent-form-actions">
+                        <button type="button" class="fluent-btn fluent-btn-secondary" onclick="hideAddCompanyModal()">Cancel</button>
+                        <button type="submit" class="fluent-btn fluent-btn-primary" id="addCompanySubmitBtn">
+                            <span class="btn-text">Add Company</span>
                             <div class="fluent-spinner" style="display: none;"></div>
                         </button>
                     </div>

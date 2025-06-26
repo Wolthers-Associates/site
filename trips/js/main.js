@@ -3392,6 +3392,9 @@ function showAddUserModal() {
         
         // Clear any previous error states
         clearFormErrors();
+        
+        // Setup enhanced form handling with company integration
+        setupEnhancedAddUserForm();
     }
 }
 
@@ -3811,7 +3814,7 @@ function getDefaultWolthersTeam() {
 function getDefaultUsersWithMultipleCompanies() {
     const wolthersTeam = getDefaultWolthersTeam();
     
-    // Add sample users from different companies
+    // Add sample users from different companies with new structure
     const sampleUsers = [
         // Coffee company partners
         {
@@ -3825,7 +3828,11 @@ function getDefaultUsersWithMultipleCompanies() {
             isCreator: false,
             lastActive: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
             isWolthersTeam: false,
-            company: "Finca El Paraiso"
+            company_id: 3,
+            company_name: "Colombian Coffee Exports S.A.",
+            company_role: "admin",
+            can_see_company_trips: true,
+            status: "active"
         },
         {
             id: "carlos-rodriguez-cafe",
@@ -3838,7 +3845,11 @@ function getDefaultUsersWithMultipleCompanies() {
             isCreator: false,
             lastActive: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
             isWolthersTeam: false,
-            company: "Cafe Cooperativa"
+            company_id: 3,
+            company_name: "Colombian Coffee Exports S.A.",
+            company_role: "staff",
+            can_see_company_trips: false,
+            status: "active"
         },
         // Business clients
         {
@@ -3852,7 +3863,11 @@ function getDefaultUsersWithMultipleCompanies() {
             isCreator: false,
             lastActive: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
             isWolthersTeam: false,
-            company: "Premium Roasters"
+            company_id: 4,
+            company_name: "Premium Roasters International",
+            company_role: "admin",
+            can_see_company_trips: true,
+            status: "active"
         },
         {
             id: "james-mitchell-imports",
@@ -3865,9 +3880,48 @@ function getDefaultUsersWithMultipleCompanies() {
             isCreator: false,
             lastActive: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
             isWolthersTeam: false,
-            company: "Specialty Imports"
+            company_id: 4,
+            company_name: "Premium Roasters International",
+            company_role: "senior",
+            can_see_company_trips: true,
+            status: "active"
         },
-        // Microsoft/Office 365 users
+        // Mitsui users with hierarchy
+        {
+            id: "takeshi-yamamoto-mitsui",
+            name: "Takeshi Yamamoto",
+            email: "t.yamamoto@mitsui.co.jp",
+            role: "user",
+            avatar: "TY",
+            memberSince: "2024-01-10",
+            tripPermissions: ["brazil-coffee-origins-tour", "colombia-coffee-regions"],
+            isCreator: false,
+            lastActive: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+            isWolthersTeam: false,
+            company_id: 2,
+            company_name: "Mitsui & Co. Ltd.",
+            company_role: "admin",
+            can_see_company_trips: true,
+            status: "active"
+        },
+        {
+            id: "hiroshi-sato-mitsui",
+            name: "Hiroshi Sato",
+            email: "h.sato@mitsui.co.jp",
+            role: "user",
+            avatar: "HS",
+            memberSince: "2024-02-05",
+            tripPermissions: ["brazil-coffee-origins-tour"],
+            isCreator: false,
+            lastActive: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+            isWolthersTeam: false,
+            company_id: 2,
+            company_name: "Mitsui & Co. Ltd.",
+            company_role: "staff",
+            can_see_company_trips: false,
+            status: "active"
+        },
+        // Personal users
         {
             id: "emily-chen-outlook",
             name: "Emily Chen",
@@ -3879,7 +3933,11 @@ function getDefaultUsersWithMultipleCompanies() {
             isCreator: false,
             lastActive: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(),
             isWolthersTeam: false,
-            company: "Personal",
+            company_id: null,
+            company_name: "Personal",
+            company_role: "staff",
+            can_see_company_trips: false,
+            status: "active",
             authMethod: "microsoft"
         },
         {
@@ -3893,21 +3951,11 @@ function getDefaultUsersWithMultipleCompanies() {
             isCreator: false,
             lastActive: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
             isWolthersTeam: false,
-            company: "Personal"
-        },
-        // Corporate client
-        {
-            id: "jennifer-davis-corp",
-            name: "Jennifer Davis", 
-            email: "jennifer.davis@globalcoffecorp.com",
-            role: "user",
-            avatar: "JD",
-            memberSince: "2024-01-15",
-            tripPermissions: ["colombia-coffee-regions", "ethiopia-coffee-journey"],
-            isCreator: false,
-            lastActive: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-            isWolthersTeam: false,
-            company: "Global Coffee Corp"
+            company_id: null,
+            company_name: "Personal",
+            company_role: "staff",
+            can_see_company_trips: false,
+            status: "active"
         }
     ];
     
@@ -3989,11 +4037,25 @@ function removeUserFromDatabase(userId) {
 }
 
 function getUserCompany(user) {
+    // Check if user has company_name from new structure
+    if (user.company_name) {
+        return user.company_name;
+    }
+    
+    // Check if user has company_id and lookup in companiesData
+    if (user.company_id && companiesData) {
+        const company = companiesData.find(c => c.id == user.company_id);
+        if (company) {
+            return company.fantasy_name || company.full_name;
+        }
+    }
+    
+    // Legacy handling
     if (user.isWolthersTeam) {
         return 'Wolthers & Associates';
     }
     
-    // Extract company from email domain
+    // Extract company from email domain as fallback
     const emailDomain = user.email.split('@')[1];
     if (emailDomain) {
         // Common company domain mappings
@@ -4690,6 +4752,525 @@ function updateNavigationVisibility(user) {
         canAccessFleet: isAdminOrDriver,
         canAccessAdmin: isAdmin
     });
+}
+
+// ============================================================================
+// 🏢 COMPANY MANAGEMENT SYSTEM
+// ============================================================================
+
+let companiesData = [];
+
+/**
+ * Show Add Company Modal
+ */
+function showAddCompanyModal() {
+    console.log('Opening Add Company Modal...');
+    const modal = document.getElementById('addCompanyModal');
+    if (modal) {
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+        setupAddCompanyForm();
+    }
+}
+
+/**
+ * Hide Add Company Modal
+ */
+function hideAddCompanyModal() {
+    const modal = document.getElementById('addCompanyModal');
+    if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+        clearCompanyForm();
+    }
+}
+
+/**
+ * Setup Add Company Form
+ */
+function setupAddCompanyForm() {
+    const form = document.getElementById('addCompanyForm');
+    if (form) {
+        form.addEventListener('submit', handleAddCompanySubmit);
+    }
+    
+    // Clear any existing errors
+    clearCompanyFormErrors();
+}
+
+/**
+ * Toggle Company Details Form Section
+ */
+function toggleCompanyDetailsForm() {
+    const section = document.getElementById('companyDetailsSection');
+    const button = document.getElementById('toggleCompanyDetails');
+    const isExpanded = section.style.display !== 'none';
+    
+    if (isExpanded) {
+        section.style.display = 'none';
+        button.innerHTML = `
+            <span>+ Add additional details (optional)</span>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" class="toggle-icon">
+                <path d="M8.75 3.75a.75.75 0 00-1.5 0v3.5h-3.5a.75.75 0 000 1.5h3.5v3.5a.75.75 0 001.5 0v-3.5h3.5a.75.75 0 000-1.5h-3.5v-3.5z"/>
+            </svg>
+        `;
+        button.classList.remove('expanded');
+    } else {
+        section.style.display = 'block';
+        button.innerHTML = `
+            <span>- Hide additional details</span>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" class="toggle-icon">
+                <path d="M8.75 3.75a.75.75 0 00-1.5 0v3.5h-3.5a.75.75 0 000 1.5h3.5v3.5a.75.75 0 001.5 0v-3.5h3.5a.75.75 0 000-1.5h-3.5v-3.5z"/>
+            </svg>
+        `;
+        button.classList.add('expanded');
+    }
+}
+
+/**
+ * Handle Add Company Form Submit
+ */
+async function handleAddCompanySubmit(event) {
+    event.preventDefault();
+    
+    const submitBtn = document.getElementById('addCompanySubmitBtn');
+    const spinner = submitBtn.querySelector('.fluent-spinner');
+    const btnText = submitBtn.querySelector('.btn-text');
+    
+    try {
+        // Show loading state
+        submitBtn.disabled = true;
+        spinner.style.display = 'inline-block';
+        btnText.textContent = 'Adding Company...';
+        
+        // Collect form data
+        const formData = collectCompanyFormData();
+        
+        // Validate data
+        const validation = validateCompanyFormData(formData);
+        if (!validation.isValid) {
+            displayCompanyFormErrors(validation.errors);
+            return;
+        }
+        
+        // Clear previous errors
+        clearCompanyFormErrors();
+        
+        // Submit to API
+        const response = await fetch('api/companies/manage.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            // Add company to local data
+            companiesData.push(result.company);
+            
+            // Update company dropdown in user modal
+            updateCompanyDropdown();
+            
+            // Select the newly created company
+            const companySelect = document.getElementById('newUserCompany');
+            if (companySelect) {
+                companySelect.value = result.company.id;
+            }
+            
+            showToast(`Company "${result.company.full_name}" created successfully!`, 'success');
+            hideAddCompanyModal();
+            
+        } else {
+            throw new Error(result.error || 'Failed to create company');
+        }
+        
+    } catch (error) {
+        console.error('Error creating company:', error);
+        showToast('Failed to create company: ' + error.message, 'error');
+        
+    } finally {
+        // Reset button state
+        submitBtn.disabled = false;
+        spinner.style.display = 'none';
+        btnText.textContent = 'Add Company';
+    }
+}
+
+/**
+ * Collect Company Form Data
+ */
+function collectCompanyFormData() {
+    return {
+        full_name: document.getElementById('companyFullName')?.value?.trim() || '',
+        fantasy_name: document.getElementById('companyFantasyName')?.value?.trim() || '',
+        company_type: document.getElementById('companyType')?.value || '',
+        address: document.getElementById('companyAddress')?.value?.trim() || '',
+        city: document.getElementById('companyCity')?.value?.trim() || '',
+        country: document.getElementById('companyCountry')?.value?.trim() || '',
+        postal_code: document.getElementById('companyPostalCode')?.value?.trim() || '',
+        phone: document.getElementById('companyPhone')?.value?.trim() || '',
+        email: document.getElementById('companyEmail')?.value?.trim() || '',
+        website: document.getElementById('companyWebsite')?.value?.trim() || '',
+        registration_number: document.getElementById('companyRegistrationNumber')?.value?.trim() || '',
+        tax_id: document.getElementById('companyTaxId')?.value?.trim() || '',
+        status: 'active'
+    };
+}
+
+/**
+ * Validate Company Form Data
+ */
+function validateCompanyFormData(formData) {
+    const errors = {};
+    
+    // Required fields
+    if (!formData.full_name) {
+        errors.full_name = 'Legal company name is required';
+    } else if (formData.full_name.length < 2) {
+        errors.full_name = 'Company name must be at least 2 characters';
+    }
+    
+    if (!formData.company_type) {
+        errors.company_type = 'Company type is required';
+    }
+    
+    // Optional email validation
+    if (formData.email && !validateEmail(formData.email)) {
+        errors.email = 'Please enter a valid email address';
+    }
+    
+    // Optional website validation
+    if (formData.website && !isValidUrl(formData.website)) {
+        errors.website = 'Please enter a valid website URL';
+    }
+    
+    return {
+        isValid: Object.keys(errors).length === 0,
+        errors: errors
+    };
+}
+
+/**
+ * Display Company Form Errors
+ */
+function displayCompanyFormErrors(errors) {
+    // Clear previous errors
+    clearCompanyFormErrors();
+    
+    Object.keys(errors).forEach(fieldName => {
+        const field = document.getElementById(`company${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)}`);
+        const errorElement = document.createElement('span');
+        errorElement.className = 'fluent-error-message';
+        errorElement.textContent = errors[fieldName];
+        
+        if (field) {
+            field.classList.add('error');
+            field.parentNode.appendChild(errorElement);
+        }
+    });
+}
+
+/**
+ * Clear Company Form Errors
+ */
+function clearCompanyFormErrors() {
+    const form = document.getElementById('addCompanyForm');
+    if (form) {
+        // Remove error classes
+        form.querySelectorAll('.error').forEach(el => el.classList.remove('error'));
+        
+        // Remove error messages
+        form.querySelectorAll('.fluent-error-message').forEach(el => el.remove());
+    }
+}
+
+/**
+ * Clear Company Form
+ */
+function clearCompanyForm() {
+    const form = document.getElementById('addCompanyForm');
+    if (form) {
+        form.reset();
+        clearCompanyFormErrors();
+        
+        // Reset expanded state
+        const section = document.getElementById('companyDetailsSection');
+        const button = document.getElementById('toggleCompanyDetails');
+        if (section && button) {
+            section.style.display = 'none';
+            button.classList.remove('expanded');
+            button.innerHTML = `
+                <span>+ Add additional details (optional)</span>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" class="toggle-icon">
+                    <path d="M8.75 3.75a.75.75 0 00-1.5 0v3.5h-3.5a.75.75 0 000 1.5h3.5v3.5a.75.75 0 001.5 0v-3.5h3.5a.75.75 0 000-1.5h-3.5v-3.5z"/>
+                </svg>
+            `;
+        }
+    }
+}
+
+/**
+ * Load Companies for Dropdown
+ */
+async function loadCompanies() {
+    try {
+        const response = await fetch('api/companies/manage.php?status=active&limit=100');
+        const result = await response.json();
+        
+        if (result.companies) {
+            companiesData = result.companies;
+            updateCompanyDropdown();
+        } else {
+            console.error('Failed to load companies:', result.error);
+            // Initialize with mock data for development
+            companiesData = getDefaultCompanies();
+            updateCompanyDropdown();
+        }
+        
+    } catch (error) {
+        console.error('Error loading companies:', error);
+        // Initialize with mock data for development
+        companiesData = getDefaultCompanies();
+        updateCompanyDropdown();
+    }
+}
+
+/**
+ * Update Company Dropdown
+ */
+function updateCompanyDropdown() {
+    const companySelect = document.getElementById('newUserCompany');
+    if (companySelect && companiesData) {
+        // Clear existing options except the first one
+        companySelect.innerHTML = '<option value="">Select a company</option>';
+        
+        // Add companies
+        companiesData.forEach(company => {
+            const option = document.createElement('option');
+            option.value = company.id;
+            option.textContent = company.fantasy_name || company.full_name;
+            option.setAttribute('data-type', company.company_type);
+            companySelect.appendChild(option);
+        });
+    }
+}
+
+/**
+ * Get Default Companies (Mock Data)
+ */
+function getDefaultCompanies() {
+    return [
+        {
+            id: 1,
+            full_name: 'Wolthers & Associates Ltd.',
+            fantasy_name: 'Wolthers & Associates',
+            company_type: 'consultant',
+            city: 'São Paulo',
+            country: 'Brazil',
+            status: 'active'
+        },
+        {
+            id: 2,
+            full_name: 'Mitsui & Co. Ltd.',
+            fantasy_name: 'Mitsui Coffee',
+            company_type: 'importer',
+            city: 'Tokyo',
+            country: 'Japan',
+            status: 'active'
+        },
+        {
+            id: 3,
+            full_name: 'Colombian Coffee Exports S.A.',
+            fantasy_name: 'ColCoffee',
+            company_type: 'exporter',
+            city: 'Bogotá',
+            country: 'Colombia',
+            status: 'active'
+        },
+        {
+            id: 4,
+            full_name: 'Premium Roasters International',
+            fantasy_name: 'Premium Roasters',
+            company_type: 'roaster',
+            city: 'New York',
+            country: 'USA',
+            status: 'active'
+        }
+    ];
+}
+
+/**
+ * Enhanced User Management with Company Integration
+ */
+
+/**
+ * Enhanced Setup Add User Form with Company Integration
+ */
+function setupEnhancedAddUserForm() {
+    const form = document.getElementById('addUserForm');
+    if (form) {
+        form.addEventListener('submit', handleEnhancedAddUserSubmit);
+        
+        // Load companies
+        loadCompanies();
+        
+        // Setup company role dependencies
+        setupCompanyRoleDependencies();
+    }
+}
+
+/**
+ * Setup Company Role Dependencies
+ */
+function setupCompanyRoleDependencies() {
+    const companyRoleSelect = document.getElementById('newUserCompanyRole');
+    const canSeeTripsCheckbox = document.getElementById('canSeeCompanyTrips');
+    
+    if (companyRoleSelect && canSeeTripsCheckbox) {
+        companyRoleSelect.addEventListener('change', (e) => {
+            const role = e.target.value;
+            
+            // Admins automatically get trip visibility
+            if (role === 'admin') {
+                canSeeTripsCheckbox.checked = true;
+                canSeeTripsCheckbox.disabled = true;
+            } else {
+                canSeeTripsCheckbox.disabled = false;
+            }
+        });
+    }
+}
+
+/**
+ * Enhanced Handle Add User Submit with Company Data
+ */
+async function handleEnhancedAddUserSubmit(event) {
+    event.preventDefault();
+    
+    const submitBtn = document.getElementById('addUserSubmitBtn');
+    const spinner = submitBtn.querySelector('.fluent-spinner');
+    const btnText = submitBtn.querySelector('.btn-text');
+    
+    try {
+        // Show loading state
+        submitBtn.disabled = true;
+        spinner.style.display = 'inline-block';
+        btnText.textContent = 'Adding User...';
+        
+        // Collect enhanced form data
+        const formData = collectEnhancedUserFormData();
+        
+        // Validate data
+        const validation = validateEnhancedUserFormData(formData);
+        if (!validation.isValid) {
+            displayUserFormErrors(validation.errors);
+            return;
+        }
+        
+        // Clear previous errors
+        clearFormErrors();
+        
+        // Generate user ID
+        formData.id = generateUserId(formData.name);
+        
+        // Add to mock database
+        addUserToDatabase(formData);
+        
+        // Refresh user list
+        loadModalUsersList();
+        
+        showToast(`User "${formData.name}" added successfully!`, 'success');
+        hideAddUserModal();
+        
+    } catch (error) {
+        console.error('Error adding user:', error);
+        showToast('Failed to add user: ' + error.message, 'error');
+        
+    } finally {
+        // Reset button state
+        submitBtn.disabled = false;
+        spinner.style.display = 'none';
+        btnText.textContent = 'Add person';
+    }
+}
+
+/**
+ * Collect Enhanced User Form Data
+ */
+function collectEnhancedUserFormData() {
+    const companyId = document.getElementById('newUserCompany')?.value;
+    const selectedCompany = companiesData.find(c => c.id == companyId);
+    
+    return {
+        name: document.getElementById('newUserName')?.value?.trim() || '',
+        email: document.getElementById('newUserEmail')?.value?.trim() || '',
+        company_id: companyId || null,
+        company_name: selectedCompany?.full_name || selectedCompany?.fantasy_name || '',
+        company_role: document.getElementById('newUserCompanyRole')?.value || 'staff',
+        role: document.getElementById('newUserRole')?.value || 'user',
+        can_see_company_trips: document.getElementById('canSeeCompanyTrips')?.checked || false,
+        status: 'active',
+        memberSince: new Date().toISOString().split('T')[0],
+        lastLogin: null,
+        tripCount: 0,
+        upcomingTrip: null
+    };
+}
+
+/**
+ * Validate Enhanced User Form Data
+ */
+function validateEnhancedUserFormData(formData) {
+    const errors = {};
+    
+    // Required fields
+    if (!formData.name) {
+        errors.name = 'Full name is required';
+    }
+    
+    if (!formData.email) {
+        errors.email = 'Email address is required';
+    } else if (!validateEmail(formData.email)) {
+        errors.email = 'Please enter a valid email address';
+    }
+    
+    if (!formData.company_id) {
+        errors.company = 'Company selection is required';
+    }
+    
+    if (!formData.company_role) {
+        errors.company_role = 'Company role is required';
+    }
+    
+    if (!formData.role) {
+        errors.role = 'System role is required';
+    }
+    
+    // Check for duplicate email
+    const users = getUsersFromDatabase();
+    if (users.some(user => user.email.toLowerCase() === formData.email.toLowerCase())) {
+        errors.email = 'User with this email already exists';
+    }
+    
+    return {
+        isValid: Object.keys(errors).length === 0,
+        errors: errors
+    };
+}
+
+/**
+ * Helper function to validate URL
+ */
+function isValidUrl(string) {
+    try {
+        new URL(string);
+        return true;
+    } catch (_) {
+        return false;
+    }
 }
 
 // ============================================================================
