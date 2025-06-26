@@ -3684,9 +3684,20 @@ async function loadAllUsersForAdmin() {
                     console.log(`📡 Loaded ${apiData.users.length} users from database API`);
                     console.log('📊 Database statistics:', apiData.statistics);
                     
+                    // Map API data to the frontend user model to ensure all fields match
+                    const mappedUsers = apiData.users.map(user => ({
+                        ...user,
+                        memberSince: user.created_at,
+                        lastLoginDisplay: user.last_login_at ? new Date(user.last_login_at).toLocaleString() : 'Never',
+                        company_name: user.company_fantasy_name || user.company_full_name,
+                        isWolthersTeam: user.email?.endsWith('@wolthers.com') || false,
+                        avatar: user.name?.charAt(0).toUpperCase() || '?'
+                    }));
+
                     // Replace USER_DATABASE with real database users
-                    USER_DATABASE = apiData.users;
+                    USER_DATABASE = mappedUsers;
                     saveUserDatabase();
+                    localStorage.setItem('wolthers_users_database_source', 'true');
                     
                     console.log(`✅ Real database users loaded: ${USER_DATABASE.length}`);
                     console.log('👥 Users from database:', USER_DATABASE.map(u => `${u.name} (${u.email})`));
@@ -3703,11 +3714,13 @@ async function loadAllUsersForAdmin() {
         console.log('⚠️ Database API unavailable, initializing empty user database...');
         USER_DATABASE = [];
         saveUserDatabase();
+        localStorage.setItem('wolthers_users_database_source', 'false');
         
     } catch (error) {
         console.error('❌ Error loading all users for admin:', error);
         USER_DATABASE = [];
         saveUserDatabase();
+        localStorage.setItem('wolthers_users_database_source', 'false');
     }
 }
 
