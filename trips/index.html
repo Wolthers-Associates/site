@@ -400,6 +400,54 @@
             margin-bottom: 15px;
         }
         
+        /* Company Type Badge Styles */
+        .company-type-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .type-importer { background: #e3f2fd; color: #1565c0; }
+        .type-exporter { background: #fff3e0; color: #ef6c00; }
+        .type-roaster { background: #e8f5e8; color: #2e7d32; }
+        .type-distributor { background: #f3e5f5; color: #7b1fa2; }
+        .type-retailer { background: #ffebee; color: #c62828; }
+        .type-consultant { background: #e0f2f1; color: #00695c; }
+        .type-other { background: #f5f5f5; color: #616161; }
+        
+        /* Company Info Styles */
+        .company-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .company-name {
+            font-weight: 600;
+            color: #2C5530;
+            font-size: 0.9em;
+        }
+        
+        .company-legal-name {
+            font-size: 0.8em;
+            color: #666;
+            font-style: italic;
+        }
+        
+        .user-count {
+            font-weight: 600;
+            color: #2C5530;
+        }
+        
+        .user-count-detail {
+            font-size: 0.8em;
+            color: #666;
+            margin-left: 4px;
+        }
+
         /* Vehicle Badge Styles */
         .badge-suv { background: #e3f2fd; color: #1565c0; }
         .badge-pickup { background: #fff3e0; color: #ef6c00; }
@@ -1964,6 +2012,166 @@ The system will automatically:
                         </button>
                     </div>
                 </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Company Management Modal -->
+    <div id="companyManagementModal" class="modal fluent-modal" style="display: none; background: rgba(0,0,0,0.7);" role="dialog" aria-labelledby="company-management-title" aria-modal="true">
+        <div class="modal-backdrop" onclick="hideCompanyManagementModal()" aria-label="Close company management"></div>
+        <div class="modal-content fluent-modal-content" style="background: #23272b; color: #e6edf3; border: 1px solid #2d3136;">
+            <div class="fluent-modal-header">
+                <div class="fluent-header-content">
+                    <h1 id="company-management-title" class="fluent-modal-title">Company Management</h1>
+                    <p class="fluent-modal-subtitle">Manage companies and business partners in your system</p>
+                </div>
+                <button class="fluent-close-btn" onclick="hideCompanyManagementModal()" aria-label="Close company management">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M11.41 10l4.3-4.29a1 1 0 10-1.42-1.42L10 8.59l-4.29-4.3a1 1 0 00-1.42 1.42L8.59 10l-4.3 4.29a1 1 0 001.42 1.42L10 11.41l4.29 4.3a1 1 0 001.42-1.42L11.41 10z"/>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="fluent-modal-body">
+                <!-- Company Summary Section -->
+                <section class="company-summary-section">
+                    <div class="summary-cards">
+                        <div class="summary-card">
+                            <div class="summary-number" id="totalCompaniesCount">0</div>
+                            <div class="summary-label">Total Companies</div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="summary-number" id="activeCompaniesCount">0</div>
+                            <div class="summary-label">Active</div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="summary-number" id="importerCompaniesCount">0</div>
+                            <div class="summary-label">Importers</div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="summary-number" id="exporterCompaniesCount">0</div>
+                            <div class="summary-label">Exporters</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Companies Management Section -->
+                <section class="fluent-users-section">
+                    <div class="fluent-section-header">
+                        <div class="fluent-header-group">
+                            <h2 class="fluent-section-title">All companies</h2>
+                            <div class="fluent-section-controls">
+                                <div class="fluent-search-box">
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" class="fluent-search-icon">
+                                        <path d="M11.742 10.344a6.5 6.5 0 10-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 001.415-1.414l-3.85-3.85a1.007 1.007 0 00-.115-.1zM12 6.5a5.5 5.5 0 11-11 0 5.5 5.5 0 0111 0z"/>
+                                    </svg>
+                                    <input type="text" id="companySearchInput" placeholder="Search companies" class="fluent-search-input">
+                                </div>
+                                <div class="fluent-filter-dropdown">
+                                    <select id="companyTypeFilter" class="fluent-select">
+                                        <option value="">All types</option>
+                                        <option value="importer">Importer</option>
+                                        <option value="exporter">Exporter</option>
+                                        <option value="roaster">Roaster</option>
+                                        <option value="distributor">Distributor</option>
+                                        <option value="retailer">Retailer</option>
+                                        <option value="consultant">Consultant</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                                <div class="fluent-filter-dropdown">
+                                    <select id="companyStatusFilter" class="fluent-select">
+                                        <option value="">All status</option>
+                                        <option value="active">Active</option>
+                                        <option value="inactive">Inactive</option>
+                                        <option value="suspended">Suspended</option>
+                                    </select>
+                                </div>
+                                <button class="fluent-btn fluent-btn-primary" onclick="showAddCompanyModal()">
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                                        <path d="M8.75 3.75a.75.75 0 00-1.5 0v3.5h-3.5a.75.75 0 000 1.5h3.5v3.5a.75.75 0 001.5 0v-3.5h3.5a.75.75 0 000-1.5h-3.5v-3.5z"/>
+                                    </svg>
+                                    Add Company
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Companies Table -->
+                    <div class="fluent-table-container">
+                        <table class="fluent-table" id="modalCompaniesTable">
+                            <thead>
+                                <tr>
+                                    <th class="fluent-th-checkbox">
+                                        <input type="checkbox" class="fluent-checkbox" id="selectAllCompanies">
+                                    </th>
+                                    <th class="fluent-th-sortable" data-sort="name">
+                                        <span>Company Name</span>
+                                        <svg width="12" height="12" viewBox="0 0 12 12" class="fluent-sort-icon">
+                                            <path d="M6 2L4.5 3.5h3L6 2zM6 10l1.5-1.5h-3L6 10z"/>
+                                        </svg>
+                                    </th>
+                                    <th class="fluent-th-sortable" data-sort="type">
+                                        <span>Type</span>
+                                        <svg width="12" height="12" viewBox="0 0 12 12" class="fluent-sort-icon">
+                                            <path d="M6 2L4.5 3.5h3L6 2zM6 10l1.5-1.5h-3L6 10z"/>
+                                        </svg>
+                                    </th>
+                                    <th class="fluent-th-sortable" data-sort="location">
+                                        <span>Location</span>
+                                        <svg width="12" height="12" viewBox="0 0 12 12" class="fluent-sort-icon">
+                                            <path d="M6 2L4.5 3.5h3L6 2zM6 10l1.5-1.5h-3L6 10z"/>
+                                        </svg>
+                                    </th>
+                                    <th class="fluent-th-sortable" data-sort="users">
+                                        <span>Users</span>
+                                        <svg width="12" height="12" viewBox="0 0 12 12" class="fluent-sort-icon">
+                                            <path d="M6 2L4.5 3.5h3L6 2zM6 10l1.5-1.5h-3L6 10z"/>
+                                        </svg>
+                                    </th>
+                                    <th class="fluent-th-sortable" data-sort="status">
+                                        <span>Status</span>
+                                        <svg width="12" height="12" viewBox="0 0 12 12" class="fluent-sort-icon">
+                                            <path d="M6 2L4.5 3.5h3L6 2zM6 10l1.5-1.5h-3L6 10z"/>
+                                        </svg>
+                                    </th>
+                                    <th class="fluent-th-sortable" data-sort="created">
+                                        <span>Added</span>
+                                        <svg width="12" height="12" viewBox="0 0 12 12" class="fluent-sort-icon">
+                                            <path d="M6 2L4.5 3.5h3L6 2zM6 10l1.5-1.5h-3L6 10z"/>
+                                        </svg>
+                                    </th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="modalCompaniesList">
+                                <!-- Companies will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Pagination -->
+                    <div class="fluent-pagination">
+                        <div class="fluent-pagination-info">
+                            <span id="companyPaginationInfo">Showing companies</span>
+                        </div>
+                        <div class="fluent-pagination-controls">
+                            <button class="fluent-pagination-btn" id="prevCompanyPageBtn" disabled>
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                                    <path d="M9.78 12.78a.75.75 0 01-1.06 0L4.47 8.53a.75.75 0 010-1.06l4.25-4.25a.75.75 0 011.06 1.06L6.06 8l3.72 3.72a.75.75 0 010 1.06z"/>
+                                </svg>
+                            </button>
+                            <span class="fluent-page-numbers" id="companyPageNumbers">
+                                <button class="fluent-page-btn fluent-page-active">1</button>
+                            </span>
+                            <button class="fluent-pagination-btn" id="nextCompanyPageBtn" disabled>
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                                    <path d="M6.22 3.22a.75.75 0 011.06 0l4.25 4.25a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06-1.06L9.94 8 6.22 4.28a.75.75 0 010-1.06z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </section>
             </div>
         </div>
     </div>

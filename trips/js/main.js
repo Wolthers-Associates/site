@@ -2989,8 +2989,329 @@ function hideUserManagementModal() {
 
 function showCompanyManagementModal() {
     console.log('Opening Company Management Modal...');
-    // For now, open the Add Company Modal which has the full company registration system
-    showAddCompanyModal();
+    const modal = document.getElementById('companyManagementModal');
+    if (modal) {
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+        
+        // Load company management data
+        loadCompanyManagementData();
+    }
+}
+
+function hideCompanyManagementModal() {
+    const modal = document.getElementById('companyManagementModal');
+    if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+}
+
+async function loadCompanyManagementData() {
+    try {
+        console.log('Loading company management data...');
+        
+        // Load companies first
+        await loadCompanies();
+        
+        // Load company table
+        loadCompanyTable();
+        
+        // Setup search and filter interactions
+        setupCompanyManagementInteractions();
+        
+    } catch (error) {
+        console.error('Error loading company management data:', error);
+        showToast('Failed to load company data', 'error');
+    }
+}
+
+function loadCompanyTable() {
+    const companiesList = document.getElementById('modalCompaniesList');
+    if (!companiesList || !companiesData) return;
+    
+    // Get users for counting
+    const users = getUsersFromDatabase();
+    
+    // Clear existing content
+    companiesList.innerHTML = '';
+    
+    // Calculate summary statistics
+    updateCompanySummary();
+    
+    // Render companies
+    companiesData.forEach(company => {
+        const row = createCompanyTableRow(company, users);
+        companiesList.appendChild(row);
+    });
+    
+    // Update pagination info
+    updateCompanyPaginationInfo();
+}
+
+function createCompanyTableRow(company, users) {
+    const row = document.createElement('tr');
+    row.className = 'fluent-table-row';
+    
+    // Count users in this company
+    const companyUsers = users.filter(u => u.company_id == company.id);
+    const userCount = companyUsers.length;
+    
+    // Format location
+    const location = [company.city, company.country].filter(Boolean).join(', ') || '-';
+    
+    // Format company type
+    const typeDisplay = company.company_type ? 
+        company.company_type.charAt(0).toUpperCase() + company.company_type.slice(1) : 
+        'Other';
+    
+    // Format creation date
+    const createdDate = company.created_at ? 
+        formatTableDate(company.created_at) : 
+        'Unknown';
+    
+    row.innerHTML = `
+        <td class="fluent-td-checkbox">
+            <input type="checkbox" class="fluent-checkbox company-checkbox" data-company-id="${company.id}">
+        </td>
+        <td class="fluent-td-company-info">
+            <div class="company-info">
+                <div class="company-name">${escapeHtml(company.fantasy_name || company.full_name)}</div>
+                ${company.fantasy_name && company.fantasy_name !== company.full_name ? 
+                    `<div class="company-legal-name">${escapeHtml(company.full_name)}</div>` : 
+                    ''
+                }
+            </div>
+        </td>
+        <td class="fluent-td-type">
+            <span class="company-type-badge ${getCompanyTypeClass(company.company_type)}">${typeDisplay}</span>
+        </td>
+        <td class="fluent-td-location">${escapeHtml(location)}</td>
+        <td class="fluent-td-users">
+            <span class="user-count">${userCount}</span>
+            ${userCount > 0 ? `<span class="user-count-detail">user${userCount !== 1 ? 's' : ''}</span>` : ''}
+        </td>
+        <td class="fluent-td-status">
+            <span class="status-badge ${getCompanyStatusClass(company.status || 'active')}">${(company.status || 'active').charAt(0).toUpperCase() + (company.status || 'active').slice(1)}</span>
+        </td>
+        <td class="fluent-td-date">${createdDate}</td>
+        <td class="fluent-td-actions">
+            <div class="fluent-action-buttons">
+                <button class="fluent-action-btn" onclick="editCompany('${company.id}')" title="Edit company">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M11.013 1.427a1.75 1.75 0 012.474 0l1.086 1.086a1.75 1.75 0 010 2.474l-8.61 8.61c-.21.21-.47.364-.756.445l-3.251.93a.75.75 0 01-.927-.928l.929-3.25a1.75 1.75 0 01.445-.758l8.61-8.61zm1.414 1.06a.25.25 0 00-.354 0L10.811 3.75l1.439 1.44 1.263-1.263a.25.25 0 000-.354L12.427 2.487zM12.25 6.25L10.811 4.81 9.53 6.091a.25.25 0 00-.064.108l-.85 2.972 2.972-.85a.25.25 0 00.108-.064L12.25 6.25z"/>
+                    </svg>
+                </button>
+                <button class="fluent-action-btn" onclick="viewCompanyUsers('${company.id}')" title="View company users">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M8 8a3 3 0 100-6 3 3 0 000 6zM12.5 9a.5.5 0 01.5.5c0 1.5-1.5 3-4.5 3s-4.5-1.5-4.5-3a.5.5 0 01.5-.5h8z"/>
+                        <path d="M14 8a.5.5 0 01.5.5c0 1.5-1.5 3-4.5 3-.5 0-1-.1-1.4-.2a6.5 6.5 0 003.4-2.3h2z"/>
+                    </svg>
+                </button>
+                <button class="fluent-action-btn" onclick="deleteCompany('${company.id}')" title="Delete company">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M5.5 5.5A.5.5 0 016 6v6a.5.5 0 01-1 0V6a.5.5 0 01.5-.5zm2.5 0a.5.5 0 01.5.5v6a.5.5 0 01-1 0V6a.5.5 0 01.5-.5zm3 .5a.5.5 0 00-1 0v6a.5.5 0 001 0V6z"/>
+                        <path fill-rule="evenodd" d="M14.5 3a1 1 0 01-1 1H13v9a2 2 0 01-2 2H5a2 2 0 01-2-2V4h-.5a1 1 0 01-1-1V2a1 1 0 011-1H5a1 1 0 011-1h4a1 1 0 011 1h2.5a1 1 0 011 1v1zM4.118 4L4 4.059V13a1 1 0 001 1h6a1 1 0 001-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                    </svg>
+                </button>
+            </div>
+        </td>
+    `;
+    
+    return row;
+}
+
+function updateCompanySummary() {
+    if (!companiesData) return;
+    
+    const totalCount = companiesData.length;
+    const activeCount = companiesData.filter(c => (c.status || 'active') === 'active').length;
+    const importerCount = companiesData.filter(c => c.company_type === 'importer').length;
+    const exporterCount = companiesData.filter(c => c.company_type === 'exporter').length;
+    
+    // Update summary cards
+    const totalElement = document.getElementById('totalCompaniesCount');
+    const activeElement = document.getElementById('activeCompaniesCount');
+    const importerElement = document.getElementById('importerCompaniesCount');
+    const exporterElement = document.getElementById('exporterCompaniesCount');
+    
+    if (totalElement) totalElement.textContent = totalCount;
+    if (activeElement) activeElement.textContent = activeCount;
+    if (importerElement) importerElement.textContent = importerCount;
+    if (exporterElement) exporterElement.textContent = exporterCount;
+}
+
+function updateCompanyPaginationInfo() {
+    const paginationInfo = document.getElementById('companyPaginationInfo');
+    if (paginationInfo && companiesData) {
+        const count = companiesData.length;
+        paginationInfo.textContent = `Showing ${count} of ${count} companies`;
+    }
+}
+
+function getCompanyTypeClass(type) {
+    const typeClasses = {
+        'importer': 'type-importer',
+        'exporter': 'type-exporter', 
+        'roaster': 'type-roaster',
+        'distributor': 'type-distributor',
+        'retailer': 'type-retailer',
+        'consultant': 'type-consultant',
+        'other': 'type-other'
+    };
+    return typeClasses[type] || 'type-other';
+}
+
+function getCompanyStatusClass(status) {
+    const statusClasses = {
+        'active': 'status-active',
+        'inactive': 'status-inactive',
+        'suspended': 'status-suspended'
+    };
+    return statusClasses[status] || 'status-active';
+}
+
+function setupCompanyManagementInteractions() {
+    // Search functionality
+    const searchInput = document.getElementById('companySearchInput');
+    if (searchInput) {
+        searchInput.addEventListener('input', debounce(() => {
+            filterCompanies();
+        }, 300));
+    }
+    
+    // Filter functionality
+    const typeFilter = document.getElementById('companyTypeFilter');
+    const statusFilter = document.getElementById('companyStatusFilter');
+    
+    if (typeFilter) {
+        typeFilter.addEventListener('change', filterCompanies);
+    }
+    
+    if (statusFilter) {
+        statusFilter.addEventListener('change', filterCompanies);
+    }
+}
+
+function filterCompanies() {
+    if (!companiesData) return;
+    
+    const searchTerm = document.getElementById('companySearchInput')?.value.toLowerCase() || '';
+    const typeFilter = document.getElementById('companyTypeFilter')?.value || '';
+    const statusFilter = document.getElementById('companyStatusFilter')?.value || '';
+    
+    let filteredCompanies = companiesData.filter(company => {
+        // Search filter
+        const matchesSearch = !searchTerm || 
+            (company.full_name && company.full_name.toLowerCase().includes(searchTerm)) ||
+            (company.fantasy_name && company.fantasy_name.toLowerCase().includes(searchTerm)) ||
+            (company.city && company.city.toLowerCase().includes(searchTerm)) ||
+            (company.country && company.country.toLowerCase().includes(searchTerm));
+        
+        // Type filter
+        const matchesType = !typeFilter || company.company_type === typeFilter;
+        
+        // Status filter
+        const matchesStatus = !statusFilter || (company.status || 'active') === statusFilter;
+        
+        return matchesSearch && matchesType && matchesStatus;
+    });
+    
+    // Re-render table with filtered data
+    renderFilteredCompanies(filteredCompanies);
+}
+
+function renderFilteredCompanies(companies) {
+    const companiesList = document.getElementById('modalCompaniesList');
+    const users = getUsersFromDatabase();
+    
+    if (!companiesList) return;
+    
+    companiesList.innerHTML = '';
+    
+    companies.forEach(company => {
+        const row = createCompanyTableRow(company, users);
+        companiesList.appendChild(row);
+    });
+    
+    // Update pagination info
+    const paginationInfo = document.getElementById('companyPaginationInfo');
+    if (paginationInfo) {
+        paginationInfo.textContent = `Showing ${companies.length} of ${companiesData.length} companies`;
+    }
+}
+
+function editCompany(companyId) {
+    const company = companiesData.find(c => c.id == companyId);
+    if (company) {
+        showEditCompanyModal(company);
+    } else {
+        showToast('Company not found', 'error');
+    }
+}
+
+function viewCompanyUsers(companyId) {
+    // Close company management modal and open user management with company filter
+    hideCompanyManagementModal();
+    
+    setTimeout(() => {
+        showUserManagementModal();
+        
+        // Set company filter after modal loads
+        setTimeout(() => {
+            const companyFilter = document.getElementById('userCompanyFilter');
+            if (companyFilter) {
+                companyFilter.value = companyId;
+                applyFiltersAndSearch();
+            }
+        }, 100);
+    }, 200);
+}
+
+function deleteCompany(companyId) {
+    const company = companiesData.find(c => c.id == companyId);
+    if (!company) return;
+    
+    const users = getUsersFromDatabase();
+    const companyUsers = users.filter(u => u.company_id == companyId);
+    
+    let confirmMessage = `Are you sure you want to delete "${company.fantasy_name || company.full_name}"?`;
+    
+    if (companyUsers.length > 0) {
+        confirmMessage += `\n\nThis company has ${companyUsers.length} user${companyUsers.length !== 1 ? 's' : ''} assigned. They will be unlinked from this company.`;
+    }
+    
+    if (confirm(confirmMessage)) {
+        // Remove company from companiesData
+        const companyIndex = companiesData.findIndex(c => c.id == companyId);
+        if (companyIndex !== -1) {
+            companiesData.splice(companyIndex, 1);
+        }
+        
+        // Unlink users from this company
+        companyUsers.forEach(user => {
+            user.company_id = null;
+            user.company_name = null;
+            user.company_role = 'staff';
+            user.can_see_company_trips = false;
+        });
+        
+        // Save changes
+        window.USER_DATABASE = users;
+        saveUserDatabase();
+        
+        // Refresh company table and dropdowns
+        loadCompanyTable();
+        updateCompanyDropdown();
+        
+        showToast(`Company "${company.fantasy_name || company.full_name}" deleted successfully`, 'success');
+    }
+}
+
+function showEditCompanyModal(company) {
+    // For now, show a simple edit notification
+    // In the future, this could open a full edit modal
+    showToast('Company editing will be available in the next update', 'info');
 }
 
 async function loadUserManagementData() {
