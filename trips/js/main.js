@@ -7441,47 +7441,47 @@ function setTheme(theme) {
     document.body.setAttribute('data-theme', theme);
     localStorage.setItem('theme', theme);
     updateThemeIcon(theme);
-    updateMicrosoftLoginButton(theme);
-    document.querySelectorAll('style[data-prefers-dark]').forEach(el => {
-        el.disabled = theme === 'light';
-    });
-    // Ensure background color is set for light mode
-    if (theme === 'light') {
-        document.body.style.background = '#E5D5BE';
-        document.documentElement.style.background = '#E5D5BE';
-    } else {
-        document.body.style.background = '';
-        document.documentElement.style.background = '';
-    }
+    updateMicrosoftButton(theme);
 }
 
 function updateThemeIcon(theme) {
-    const iconSpan = document.getElementById('themeToggleIcon');
-    if (!iconSpan) return;
-    if (theme === 'dark') {
-        // Show sun for light mode (white)
-        iconSpan.innerHTML = `<svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="11" cy="11" r="6" fill="#fff"/><g stroke="#fff" stroke-width="1.5" stroke-linecap="round"><line x1="11" y1="2" x2="11" y2="5"/><line x1="11" y1="17" x2="11" y2="20"/><line x1="2" y1="11" x2="5" y2="11"/><line x1="17" y1="11" x2="20" y2="11"/><line x1="4.22" y1="4.22" x2="6.34" y2="6.34"/><line x1="15.66" y1="15.66" x2="17.78" y2="17.78"/><line x1="4.22" y1="17.78" x2="6.34" y2="15.66"/><line x1="15.66" y1="6.34" x2="17.78" y2="4.22"/></g></svg>`;
-    } else {
-        // Show moon for dark mode (white)
-        iconSpan.innerHTML = `<svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16.5 14.5A7 7 0 0 1 7.5 5.5a7 7 0 1 0 9 9z" fill="#fff" stroke="#fff" stroke-width="1.5"/></svg>`;
+    const icon = document.getElementById('themeToggleIcon');
+    if (icon) {
+        if (theme === 'dark') {
+            icon.innerHTML = '☀️'; // Sun for switching to light
+        } else {
+            icon.innerHTML = '🌙'; // Moon for switching to dark
+        }
     }
 }
 
-function updateMicrosoftLoginButton(theme) {
-    // Update all Microsoft login images (in case there are multiple)
-    var imgs = document.querySelectorAll('.microsoft-login-img');
-    imgs.forEach(function(img) {
-        if (theme === 'dark') {
-            img.src = 'images/ms_signin_dark_short.svg';
+function updateMicrosoftButton(theme) {
+    const msBtn = document.getElementById('microsoftBtnImg');
+    if (msBtn) {
+        if (theme === 'light') {
+            msBtn.src = 'images/ms_signin_light_short.svg';
         } else {
-            img.src = 'images/ms_signin_light_short.svg';
+            msBtn.src = 'images/ms_signin_dark_short.svg';
         }
-    });
+    }
 }
 
 function toggleTheme() {
-    const current = document.documentElement.getAttribute('data-theme');
-    setTheme(current === 'dark' ? 'light' : 'dark');
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    
+    // Apply theme to both html and body
+    document.documentElement.setAttribute('data-theme', newTheme);
+    document.body.setAttribute('data-theme', newTheme);
+    
+    // Store theme preference
+    localStorage.setItem('theme', newTheme);
+    
+    // Update Microsoft button
+    updateMicrosoftButton(newTheme);
+    
+    // Update theme toggle icon
+    updateThemeIcon(newTheme);
 }
 
 // On page load, set theme from localStorage or system
@@ -7490,11 +7490,15 @@ function toggleTheme() {
     if (!theme) {
         theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     }
-    setTheme(theme);
-    updateMicrosoftLoginButton(theme);
-    // Ensure background color is set for light mode
-    if (theme === 'light') {
-        document.body.style.background = '#E5D5BE';
-        document.documentElement.style.background = '#E5D5BE';
+    document.documentElement.setAttribute('data-theme', theme);
+    document.body.setAttribute('data-theme', theme);
+    
+    // Set Microsoft button immediately
+    const msBtn = document.getElementById('microsoftBtnImg');
+    if (msBtn) {
+        msBtn.src = theme === 'light' ? 'images/ms_signin_light_short.svg' : 'images/ms_signin_dark_short.svg';
     }
+    
+    // Update theme icon
+    updateThemeIcon(theme);
 })();

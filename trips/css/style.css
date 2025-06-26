@@ -6,6 +6,26 @@
 }
 
 :root {
+    /* Light Mode - CREAM BACKGROUNDS */
+    --light-bg: #E5D5BE;
+    --light-bg-secondary: #E5D5BE;
+    --light-card: #E5D5BE;
+    --light-modal: #E5D5BE;
+    --light-border: #d2b48c;
+    --light-text: #23272b;
+    --light-text-secondary: #2C5530;
+    --light-accent: #2C5530;
+    --light-gold: #DAA520;
+    
+    /* Dark Mode - ORIGINAL DARK THEME */
+    --dark-bg: #181c1f;
+    --dark-bg-secondary: #23272b;
+    --dark-border: #2d3136;
+    --dark-text: #ffffff;
+    --dark-text-secondary: #e6edf3;
+    --dark-accent: #DAA520;
+    
+    /* Legacy variables for compatibility */
     --dark-green: #2C5530;
     --medium-green: #2d5a47;
     --light-green: #325C36;
@@ -20,29 +40,52 @@
     --text-dark: #212121;
     --text-light: #757575;
     --light-gray: #e0e0e0;
-    
-    /* Dark mode colors */
-    --dark-bg: #181c1f;
-    --dark-bg-secondary: #23272b;
-    --dark-border: #2d3136;
-    --dark-text: #ffffff;
-    --dark-text-secondary: #e6edf3;
-    --dark-accent: #DAA520;
 }
 
+/* Default Light Mode Styles */
 body {
     font-family: 'Source Sans Pro', sans-serif;
-    background: linear-gradient(135deg, var(--cream) 0%, var(--light-brown) 100%);
+    background: var(--light-bg) !important;
+    color: var(--light-text) !important;
     min-height: 100vh;
     line-height: 1.6;
     transition: background 0.3s ease, color 0.3s ease;
 }
 
-@media (prefers-color-scheme: dark) {
-    body {
-        background: linear-gradient(135deg, var(--dark-bg) 0%, var(--dark-bg-secondary) 100%);
-        color: var(--dark-text-secondary);
-    }
+/* Light Mode Styles */
+[data-theme="light"] body, 
+[data-theme="light"] html {
+    background: var(--light-bg) !important;
+    color: var(--light-text) !important;
+}
+
+[data-theme="light"] .login-box,
+[data-theme="light"] .main-container,
+[data-theme="light"] .trip-card,
+[data-theme="light"] .modal-content,
+[data-theme="light"] .fluent-modal-content,
+[data-theme="light"] .fluent-profile-card-flat {
+    background: var(--light-card) !important;
+    color: var(--light-text) !important;
+    border: 1px solid var(--light-border) !important;
+}
+
+/* Dark Mode Styles - RESTORE ORIGINAL */
+[data-theme="dark"] body,
+[data-theme="dark"] html {
+    background: var(--dark-bg) !important;
+    color: var(--dark-text-secondary) !important;
+}
+
+[data-theme="dark"] .login-box,
+[data-theme="dark"] .main-container,
+[data-theme="dark"] .trip-card,
+[data-theme="dark"] .modal-content,
+[data-theme="dark"] .fluent-modal-content,
+[data-theme="dark"] .fluent-profile-card-flat {
+    background: var(--dark-bg-secondary) !important;
+    color: var(--dark-text-secondary) !important;
+    border: 1px solid var(--dark-border) !important;
 }
 
 /* Development Notice */
@@ -102,14 +145,7 @@ body {
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-@media (prefers-color-scheme: dark) {
-    .login-box {
-        background: var(--dark-bg);
-        color: var(--dark-text);
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        border: 1px solid var(--dark-border);
-    }
-}
+/* Removed: @media (prefers-color-scheme: dark) conflicts with data-theme */
 
 .login-logo {
     margin-bottom: 20px;
@@ -127,11 +163,7 @@ body {
     margin-bottom: 10px;
 }
 
-@media (prefers-color-scheme: dark) {
-    .login-title {
-        color: var(--dark-accent);
-    }
-}
+/* Removed: @media (prefers-color-scheme: dark) conflicts with data-theme */
 
 .login-subtitle {
     color: #666;
@@ -139,11 +171,7 @@ body {
     margin-bottom: 30px;
 }
 
-@media (prefers-color-scheme: dark) {
-    .login-subtitle {
-        color: var(--dark-text-secondary);
-    }
-}
+/* Removed: @media (prefers-color-scheme: dark) conflicts with data-theme */
 
 .form-group {
     margin-bottom: 20px;
@@ -223,13 +251,7 @@ body {
     }
 }
 
-@media (prefers-color-scheme: dark) {
-    .error-message {
-        background-color: rgba(231, 76, 60, 0.2);
-        border-color: #e74c3c;
-        color: #ff6b6b;
-    }
-}
+/* Removed: @media (prefers-color-scheme: dark) conflicts with data-theme */
 
 .test-credentials {
     margin-top: 30px;
@@ -240,12 +262,7 @@ body {
     color: #666;
 }
 
-@media (prefers-color-scheme: dark) {
-    .test-credentials {
-        border-top-color: var(--dark-border);
-        color: var(--dark-text-secondary);
-    }
-}
+/* Removed: @media (prefers-color-scheme: dark) conflicts with data-theme */
 
 .test-credentials p {
     margin-bottom: 5px;
@@ -255,11 +272,7 @@ body {
     color: var(--dark-green);
 }
 
-@media (prefers-color-scheme: dark) {
-    .test-credentials strong {
-        color: var(--dark-accent);
-    }
-}
+/* Removed: @media (prefers-color-scheme: dark) conflicts with data-theme */
 
 .test-credentials em {
     background: #f0f0f0;
@@ -269,12 +282,7 @@ body {
     font-family: monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-    .test-credentials em {
-        background: var(--dark-bg-secondary);
-        color: var(--dark-text);
-    }
-}
+/* Removed: @media (prefers-color-scheme: dark) conflicts with data-theme */
 
 /* Simple Login Interface Styles */
 .simple-login {
@@ -323,23 +331,7 @@ body {
     box-shadow: 0 0 0 4px rgba(44, 85, 48, 0.1);
 }
 
-@media (prefers-color-scheme: dark) {
-    .input-group input {
-        background: var(--dark-bg-secondary);
-        border-color: var(--dark-border);
-        color: var(--dark-text);
-    }
-    
-    .input-group input:focus {
-        border-color: var(--dark-accent) !important;
-        box-shadow: 0 0 0 4px rgba(218, 165, 32, 0.2) !important;
-    }
-    
-    .input-group input::placeholder {
-        color: var(--dark-text-secondary);
-        opacity: 0.7;
-    }
-}
+/* Removed: @media (prefers-color-scheme: dark) conflicts with data-theme */
 
 /* Buttons */
 .continue-btn, .sign-in-btn, .create-account-btn, .verify-btn {
@@ -364,17 +356,7 @@ body {
     transform: translateY(0);
 }
 
-@media (prefers-color-scheme: dark) {
-    .continue-btn, .sign-in-btn, .create-account-btn, .verify-btn {
-        background: var(--dark-accent);
-        color: var(--dark-bg);
-    }
-    
-    .continue-btn:hover, .sign-in-btn:hover, .create-account-btn:hover, .verify-btn:hover {
-        background: #B8860B;
-        color: var(--dark-bg);
-    }
-}
+/* Removed: @media (prefers-color-scheme: dark) conflicts with data-theme */
 
 /* Divider Section */
 .divider-section {
@@ -397,15 +379,7 @@ body {
     padding: 0 8px;
 }
 
-@media (prefers-color-scheme: dark) {
-    .divider-line {
-        background: var(--dark-border);
-    }
-    
-    .divider-text {
-        color: var(--dark-text-secondary);
-    }
-}
+/* Removed: @media (prefers-color-scheme: dark) conflicts with data-theme */
 
 /* Microsoft Sign-in Button */
 .microsoft-signin-btn {
@@ -445,15 +419,7 @@ body {
     color: var(--medium-green);
 }
 
-@media (prefers-color-scheme: dark) {
-    .back-button {
-        color: var(--dark-accent);
-    }
-    
-    .back-button:hover {
-        color: #B8860B;
-    }
-}
+/* Removed: @media (prefers-color-scheme: dark) conflicts with data-theme */
 
 /* Welcome Message */
 .welcome-message {
@@ -474,15 +440,7 @@ body {
     margin: 0;
 }
 
-@media (prefers-color-scheme: dark) {
-    .welcome-message h3 {
-        color: var(--dark-accent);
-    }
-    
-    .welcome-message p {
-        color: var(--dark-text-secondary);
-    }
-}
+/* Removed: @media (prefers-color-scheme: dark) conflicts with data-theme */
 
 /* Account Creation Message */
 .account-creation-message, .code-message {
@@ -503,15 +461,7 @@ body {
     margin: 0;
 }
 
-@media (prefers-color-scheme: dark) {
-    .account-creation-message h3, .code-message h3 {
-        color: var(--dark-accent);
-    }
-    
-    .account-creation-message p, .code-message p {
-        color: var(--dark-text-secondary);
-    }
-}
+/* Removed: @media (prefers-color-scheme: dark) conflicts with data-theme */
 
 /* Auth Options */
 .auth-options {
@@ -536,15 +486,7 @@ body {
     color: var(--medium-green);
 }
 
-@media (prefers-color-scheme: dark) {
-    .link-btn {
-        color: var(--dark-accent);
-    }
-    
-    .link-btn:hover {
-        color: #B8860B;
-    }
-}
+/* Removed: @media (prefers-color-scheme: dark) conflicts with data-theme */
 
 /* Mobile Responsive Styles */
 @media (max-width: 768px) {
@@ -1163,53 +1105,7 @@ body {
     margin-top: 8px;
 }
 
-@media (prefers-color-scheme: dark) {
-    .trip-card {
-        background: #181c1f;
-        box-shadow: 0 5px 20px rgba(0,0,0,0.4);
-        border: 1px solid #23272b;
-    }
-    .trip-card-header {
-        border-bottom: 1px solid #23272b;
-    }
-    .trip-title {
-        color: #e6edf3;
-    }
-    .trip-date {
-        color: #b5d6c3;
-    }
-    .trip-description {
-        color: #b0b8c1;
-    }
-    .trip-guests,
-    .trip-cars,
-    .trip-driver {
-        color: #b0b8c1;
-    }
-    .trip-footer {
-        border-top: 1px solid #23272b;
-    }
-    .trip-wolthers-staff {
-        color: #b0b8c1;
-    }
-    .trip-wolthers-staff strong {
-        color: #b5d6c3;
-    }
-    .trip-codes {
-        color: #b0b8c1;
-    }
-    .trip-codes strong {
-        color: #b5d6c3;
-    }
-    .status-upcoming {
-        background: rgba(212, 175, 55, 0.12);
-        color: #ffe082;
-    }
-    .status-past {
-        background: rgba(136, 136, 136, 0.12);
-        color: #b0b8c1;
-    }
-}
+/* Removed: @media (prefers-color-scheme: dark) conflicts with data-theme */
 
 /* Modal Styles */
 .modal {
@@ -1440,11 +1336,7 @@ body {
     animation: modalSlideIn 0.3s ease;
 }
 
-@media (prefers-color-scheme: dark) {
-    .trip-preview-content {
-        background: #23272b;
-    }
-}
+/* Removed: @media (prefers-color-scheme: dark) conflicts with data-theme */
 
 @keyframes modalSlideIn {
     from {
@@ -1556,11 +1448,7 @@ body {
     padding: 20px;
 }
 
-@media (prefers-color-scheme: dark) {
-    .trip-preview-body {
-        background: #2d3136;
-    }
-}
+/* Removed: @media (prefers-color-scheme: dark) conflicts with data-theme */
 
 .trip-preview-info {
     background: #2C573B;
@@ -1586,20 +1474,7 @@ body {
     box-shadow: none;
 }
 
-@media (prefers-color-scheme: dark) {
-    .trip-preview-info {
-        background: #23272b;
-        color: #fff;
-        border: none;
-        box-shadow: none;
-    }
-    .preview-info-item {
-        color: #fff;
-        background: none;
-        border: none;
-        box-shadow: none;
-    }
-}
+/* Removed: @media (prefers-color-scheme: dark) conflicts with data-theme */
 
 .trip-preview-highlights {
     margin-bottom: 18px;
@@ -1608,11 +1483,7 @@ body {
     padding: 12px;
 }
 
-@media (prefers-color-scheme: dark) {
-    .trip-preview-highlights {
-        background: #2a2e33;
-    }
-}
+/* Removed: @media (prefers-color-scheme: dark) conflicts with data-theme */
 
 .preview-section-title {
     font-family: 'Playfair Display', serif;
@@ -1624,11 +1495,7 @@ body {
     font-weight: 600;
 }
 
-@media (prefers-color-scheme: dark) {
-    .preview-section-title {
-        color: var(--gold);
-    }
-}
+/* Removed: @media (prefers-color-scheme: dark) conflicts with data-theme */
 
 .preview-highlight-item {
     padding: 8px 12px;
@@ -1648,17 +1515,7 @@ body {
     background: transparent;
 }
 
-@media (prefers-color-scheme: dark) {
-    .preview-highlight-item {
-        color: #fff;
-    }
-    .preview-highlight-item:nth-child(odd) {
-        background: #2d3136;
-    }
-    .preview-highlight-item:nth-child(even) {
-        background: #2a2e33;
-    }
-}
+/* Removed: @media (prefers-color-scheme: dark) conflicts with data-theme */
 
 .trip-preview-days {
     margin-bottom: 15px;
@@ -1686,21 +1543,7 @@ body {
     transform: translateY(-1px);
 }
 
-@media (prefers-color-scheme: dark) {
-    .preview-day-item {
-        border: none;
-        border-radius: 8px;
-    }
-    .preview-day-item:nth-child(odd) {
-        background: #2d3136;
-    }
-    .preview-day-item:nth-child(even) {
-        background: #2a2e33;
-    }
-    .preview-day-item:hover {
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-    }
-}
+/* Removed: @media (prefers-color-scheme: dark) conflicts with data-theme */
 
 .preview-day-header {
     display: flex;
@@ -1740,18 +1583,7 @@ body {
     line-height: 1.3;
 }
 
-@media (prefers-color-scheme: dark) {
-    .preview-day-title {
-        color: #D4AF37;
-    }
-    .preview-day-date {
-        color: #D4AF37;
-    }
-    .preview-day-summary {
-        color: #fff;
-        opacity: 0.85;
-    }
-}
+/* Removed: @media (prefers-color-scheme: dark) conflicts with data-theme */
 
 /* Trip Itinerary Content (for full page) */
 .trip-itinerary-content {
@@ -2922,370 +2754,7 @@ body {
     color: #dc2626;
 }
 
-@media (prefers-color-scheme: dark) {
-    .header {
-        background: linear-gradient(135deg, #121B13 0%, #0F1610 100%);
-        color: #E3D6C0;
-    }
-    .header h1 {
-        color: var(--gold);
-    }
-    .header p {
-        color: #FFE082;
-    }
-    .main-logo {
-        filter: none;
-    }
-    .trip-date,
-    .trip-total-days {
-        color: #ffffff;
-    }
-    .section-title {
-        color: #FFE082;
-        border-bottom-color: #FFE082;
-    }
-    .trip-preview-header {
-        background: #23272b;
-        color: #e6edf3;
-        border-radius: 12px 12px 0 0;
-    }
-    .trip-preview-header .trip-total-days {
-        color: #fff !important;
-    }
-    .trip-preview-highlights {
-        background: #2d3136;
-        color: #D4AF37;
-        border: none;
-        box-shadow: none;
-    }
-    .trip-preview-title {
-        color: #D4AF37;
-    }
-    .daily-itinerary .day-item {
-        background: #2d3136;
-        border: none;
-        border-radius: 0;
-        color: #D4AF37;
-    }
-    .day-title, .day-date {
-        color: #D4AF37;
-    }
-    .day-summary-text, .activity-description {
-        color: #fff;
-        opacity: 0.85;
-    }
-    .modal-content {
-        background: #181c1f;
-        border: 1px solid #23272b;
-    }
-    .modal-header {
-        border-bottom-color: #23272b;
-    }
-    .modal-title,
-    .modal h2 {
-        color: #FFE082;
-    }
-    .close-btn {
-        color: #b0b8c1;
-    }
-    .close-btn:hover {
-        background: #23272b;
-        color: #ffffff;
-    }
-    .form-section {
-        background: #181c1f;
-    }
-    .form-input,
-    .form-textarea {
-        background: #23272b;
-        border-color: #2d3136;
-        color: #ffffff;
-    }
-    .form-input:focus,
-    .form-textarea:focus {
-        border-color: #FFE082 !important;
-        box-shadow: 0 0 0 2px rgba(255, 224, 130, 0.2) !important;
-    }
-    .form-input::placeholder,
-    .form-textarea::placeholder {
-        color: #b0b8c1;
-    }
-    .form-group label {
-        color: #ffffff;
-    }
-    .input-help {
-        color: #b0b8c1;
-    }
-    .modal-actions {
-        border-top-color: #23272b;
-        background: #181c1f;
-    }
-    .btn-primary {
-        background: #FFE082;
-        color: #181c1f;
-    }
-    .btn-primary:hover {
-        background: #ffd54f;
-    }
-    .btn-secondary {
-        background: #23272b;
-        color: #ffffff;
-        border-color: #2d3136;
-    }
-    .btn-secondary:hover {
-        background: #2d3136;
-        border-color: #FFE082;
-    }
-    .admin-settings {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-    }
-    .admin-btn {
-        background: #FFE082;
-        color: #181c1f;
-        border: none;
-        padding: 8px 16px;
-        border-radius: 6px;
-        font-size: 0.9rem;
-        cursor: pointer;
-        transition: all 0.2s ease;
-    }
-    .admin-btn:hover {
-        background: #ffd54f;
-        transform: translateY(-1px);
-    }
-    .admin-panel-content {
-        padding: 20px;
-        max-height: 70vh;
-        overflow-y: auto;
-    }
-    .admin-section {
-        margin-bottom: 30px;
-        padding-bottom: 20px;
-        border-bottom: 1px solid #e0e0e0;
-    }
-    .admin-section:last-child {
-        border-bottom: none;
-    }
-    .admin-section h3 {
-        color: #2C573B;
-        font-size: 1.1rem;
-        margin-bottom: 15px;
-        font-weight: 600;
-    }
-    .admin-actions {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 12px;
-    }
-    .admin-actions .btn {
-        justify-content: flex-start;
-        padding: 12px 16px;
-        text-align: left;
-        font-size: 0.9rem;
-    }
-    @media (prefers-color-scheme: dark) {
-        .admin-section {
-            border-bottom-color: #23272b;
-        }
-        .admin-section h3 {
-            color: #FFE082;
-        }
-        .admin-icon-btn {
-            background: transparent;
-        }
-        .admin-icon {
-            filter: brightness(0) invert(1);
-        }
-        .user-profile-section {
-            border-bottom-color: #23272b;
-        }
-        .section-header h3 {
-            color: #FFE082;
-        }
-        .section-description {
-            color: #b0b8c1;
-        }
-        .user-profile-card {
-            background: #23272b;
-            border-color: #2d3136;
-        }
-        .profile-details h4 {
-            color: #FFE082;
-        }
-        .profile-details p {
-            color: #b0b8c1;
-        }
-        
-        .profile-avatar {
-            background: #DAA520;
-        }
-        
-        .profile-avatar-icon {
-            filter: brightness(0) invert(1);
-        }
-        .role-badge.admin {
-            background: rgba(255, 224, 130, 0.2);
-            color: #FFE082;
-        }
-        .user-item {
-            background: #23272b;
-            border-color: #2d3136;
-        }
-        .user-details h5 {
-            color: #FFE082;
-        }
-        .user-details p {
-            color: #b0b8c1;
-        }
-        .trip-checkbox {
-            background: #23272b;
-            border-color: #2d3136;
-            color: #ffffff;
-        }
-        
-        /* Modern User Management Dark Mode */
-        .modern-user-card {
-            background: #23272b;
-            border-color: #2d3136;
-            color: #e6edf3;
-        }
-        
-        .modern-user-card:hover {
-            border-color: #DAA520;
-            box-shadow: 0 2px 8px rgba(218, 165, 32, 0.25);
-        }
-        
-        .user-name {
-            color: #ffffff;
-        }
-        
-        .user-email {
-            color: #b0b8c1;
-        }
-        
-        .user-meta {
-            color: #7d8590;
-        }
-        
-        .btn-icon {
-            background: #2d3136;
-            color: #b0b8c1;
-        }
-        
-        .btn-icon:hover {
-            background: #373e47;
-            color: #ffffff;
-        }
-        
-        .btn-icon.btn-danger:hover {
-            background: rgba(248, 81, 73, 0.15);
-            color: #f85149;
-        }
-        
-        /* Database Info Dark Mode */
-        .database-info {
-            background: #2d3136;
-            border-color: #373e47;
-        }
-        
-        .database-info h4 {
-            color: #DAA520;
-        }
-        
-        .database-info p {
-            color: #b0b8c1;
-        }
-        
-        .team-badge {
-            background: rgba(34, 197, 94, 0.15);
-            color: #4ade80;
-            border-color: rgba(34, 197, 94, 0.3);
-        }
-        
-        /* Users Table Dark Mode */
-        .users-table-container {
-            background: #23272b;
-            border-color: #2d3136;
-        }
-        
-        .users-table thead {
-            background: #2d3136;
-            border-bottom-color: #373e47;
-        }
-        
-        .users-table th {
-            color: #DAA520;
-            border-bottom-color: #373e47;
-        }
-        
-        .users-table td {
-            border-bottom-color: #2d3136;
-        }
-        
-        .user-row.even-row {
-            background: #2a2e33;
-        }
-        
-        .user-row.odd-row {
-            background: #23272b;
-        }
-        
-        .user-row:hover {
-            background: #2d3136 !important;
-        }
-        
-        .user-name {
-            color: #ffffff;
-        }
-        
-        .user-email {
-            color: #b0b8c1;
-        }
-        
-        .user-company {
-            color: #e6edf3;
-        }
-        
-        .member-since, .last-trip-date {
-            color: #b0b8c1;
-        }
-        
-        .trip-count {
-            color: #ffffff;
-        }
-        
-        .trip-link {
-            color: #DAA520;
-        }
-        
-        .trip-link:hover {
-            color: #B8860B;
-        }
-        
-        .table-team-badge {
-            background: rgba(34, 197, 94, 0.15);
-            color: #4ade80;
-            border-color: rgba(34, 197, 94, 0.3);
-        }
-        
-        .table-btn {
-            background: #2d3136;
-            color: #b0b8c1;
-        }
-        
-        .table-btn:hover {
-            background: #373e47;
-            color: #ffffff;
-        }
-        
-        .table-btn.btn-danger:hover {
-            background: rgba(248, 81, 73, 0.15);
-            color: #f85149;
-        }
-    }
-}
+/* Removed: @media (prefers-color-scheme: dark) conflicts with data-theme */
 
 /* Microsoft Fluent Design User Management Styles */
 .fluent-modal {
@@ -3311,12 +2780,7 @@ body {
     align-items: flex-start;
 }
 
-@media (prefers-color-scheme: dark) {
-    .fluent-modal-header {
-        background: var(--dark-bg);
-        border-bottom: 1px solid var(--dark-border);
-    }
-}
+/* Removed: @media (prefers-color-scheme: dark) conflicts with data-theme */
 
 .fluent-header-content h1.fluent-modal-title {
     font-family: 'Playfair Display', serif;
@@ -3333,15 +2797,7 @@ body {
     font-weight: 400;
 }
 
-@media (prefers-color-scheme: dark) {
-    .fluent-header-content h1.fluent-modal-title {
-        color: var(--dark-accent);
-    }
-    
-    .fluent-modal-subtitle {
-        color: var(--dark-text-secondary);
-    }
-}
+/* Removed: @media (prefers-color-scheme: dark) conflicts with data-theme */
 
 .fluent-close-btn {
     background: none;
@@ -3361,16 +2817,7 @@ body {
     color: var(--dark-green);
 }
 
-@media (prefers-color-scheme: dark) {
-    .fluent-close-btn {
-        color: var(--dark-text-secondary);
-    }
-    
-    .fluent-close-btn:hover {
-        background: var(--dark-border);
-        color: var(--dark-accent);
-    }
-}
+/* Removed: @media (prefers-color-scheme: dark) conflicts with data-theme */
 
 .fluent-modal-body {
     display: flex;
@@ -3379,11 +2826,7 @@ body {
     background: var(--white);
 }
 
-@media (prefers-color-scheme: dark) {
-    .fluent-modal-body {
-        background: var(--dark-bg);
-    }
-}
+/* Removed: @media (prefers-color-scheme: dark) conflicts with data-theme */
 
 /* Profile Section (30%) */
 .fluent-profile-section {
@@ -3393,12 +2836,7 @@ body {
     padding: 24px 32px;
 }
 
-@media (prefers-color-scheme: dark) {
-    .fluent-profile-section {
-        background: var(--dark-bg-secondary);
-        border-bottom: 1px solid var(--dark-border);
-    }
-}
+/* Removed: @media (prefers-color-scheme: dark) conflicts with data-theme */
 
 .fluent-profile-card {
     display: flex;
@@ -3420,12 +2858,7 @@ body {
     transition: all 0.2s ease;
 }
 
-@media (prefers-color-scheme: dark) {
-    .fluent-profile-card-flat {
-        background: var(--dark-card);
-        border-color: var(--dark-border);
-    }
-}
+/* Removed: @media (prefers-color-scheme: dark) conflicts with data-theme */
 
 .fluent-profile-info {
     display: flex;
@@ -3452,12 +2885,7 @@ body {
     border: 3px solid var(--white);
 }
 
-@media (prefers-color-scheme: dark) {
-    .fluent-avatar-circle {
-        background: var(--dark-accent);
-        border-color: var(--dark-bg);
-    }
-}
+/* Removed: @media (prefers-color-scheme: dark) conflicts with data-theme */
 
 .fluent-profile-details {
     min-width: 0;
@@ -3507,29 +2935,7 @@ body {
     margin: 0;
 }
 
-@media (prefers-color-scheme: dark) {
-    .fluent-profile-name {
-        color: var(--dark-text);
-    }
-    
-    .fluent-profile-email {
-        color: var(--dark-text-secondary);
-    }
-    
-    .fluent-profile-meta {
-        color: #8b949e;
-    }
-    
-    .fluent-badge-admin {
-        background: var(--dark-accent);
-        color: var(--dark-bg);
-    }
-    
-    .fluent-badge-team {
-        background: var(--medium-green);
-        color: var(--white);
-    }
-}
+/* Removed: @media (prefers-color-scheme: dark) conflicts with data-theme */
 
 /* Buttons */
 .fluent-btn {
@@ -3571,29 +2977,7 @@ body {
     color: var(--medium-green);
 }
 
-@media (prefers-color-scheme: dark) {
-    .fluent-btn-primary {
-        background: var(--dark-accent);
-        color: var(--dark-bg);
-        border-color: var(--dark-accent);
-    }
-    
-    .fluent-btn-primary:hover {
-        background: #f0c040;
-        border-color: #f0c040;
-    }
-    
-    .fluent-btn-secondary {
-        color: var(--dark-text);
-        border-color: var(--dark-border);
-    }
-    
-    .fluent-btn-secondary:hover {
-        background: var(--dark-border);
-        border-color: var(--dark-accent);
-        color: var(--dark-accent);
-    }
-}
+/* Removed: @media (prefers-color-scheme: dark) conflicts with data-theme */
 
 /* Users Section (70%) */
 .fluent-users-section {
@@ -3622,11 +3006,7 @@ body {
     margin: 0;
 }
 
-@media (prefers-color-scheme: dark) {
-    .fluent-section-title {
-        color: var(--dark-text);
-    }
-}
+/* Removed: @media (prefers-color-scheme: dark) conflicts with data-theme */
 
 .fluent-section-controls {
     display: flex;
@@ -3679,33 +3059,7 @@ body {
     box-shadow: 0 0 0 2px rgba(45, 90, 71, 0.1);
 }
 
-@media (prefers-color-scheme: dark) {
-    .fluent-search-icon {
-        color: var(--dark-text-secondary);
-    }
-    
-    .fluent-search-input {
-        background: var(--dark-bg-secondary);
-        border-color: var(--dark-border);
-        color: var(--dark-text);
-    }
-    
-    .fluent-search-input:focus {
-        border-color: var(--dark-accent);
-        box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.1);
-    }
-    
-    .fluent-select {
-        background: var(--dark-bg-secondary);
-        border-color: var(--dark-border);
-        color: var(--dark-text);
-    }
-    
-    .fluent-select:focus {
-        border-color: var(--dark-accent);
-        box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.1);
-    }
-}
+/* Removed: @media (prefers-color-scheme: dark) conflicts with data-theme */
 
 /* Table Styles */
 .fluent-table-container {
@@ -3716,12 +3070,7 @@ body {
     background: var(--white);
 }
 
-@media (prefers-color-scheme: dark) {
-    .fluent-table-container {
-        border-color: var(--dark-border);
-        background: var(--dark-bg);
-    }
-}
+/* Removed: @media (prefers-color-scheme: dark) conflicts with data-theme */
 
 .fluent-table {
     width: 100%;
@@ -3755,25 +3104,7 @@ body {
     background: #f8f9fa;
 }
 
-@media (prefers-color-scheme: dark) {
-    .fluent-table thead {
-        background: var(--dark-bg-secondary);
-        border-bottom-color: var(--dark-border);
-    }
-    
-    .fluent-table th {
-        color: var(--dark-text-secondary);
-    }
-    
-    .fluent-table td {
-        border-bottom-color: var(--dark-border);
-        color: var(--dark-text);
-    }
-    
-    .fluent-table tbody tr:hover {
-        background: var(--dark-bg-secondary);
-    }
-}
+/* Removed: @media (prefers-color-scheme: dark) conflicts with data-theme */
 
 .fluent-th-sortable {
     cursor: pointer;
@@ -3785,11 +3116,7 @@ body {
     background: #f0f0f0;
 }
 
-@media (prefers-color-scheme: dark) {
-    .fluent-th-sortable:hover {
-        background: var(--dark-border);
-    }
-}
+/* Removed: @media (prefers-color-scheme: dark) conflicts with data-theme */
 
 .fluent-sort-icon {
     margin-left: 4px;
@@ -3812,11 +3139,7 @@ body {
     accent-color: var(--dark-green);
 }
 
-@media (prefers-color-scheme: dark) {
-    .fluent-checkbox {
-        accent-color: var(--dark-accent);
-    }
-}
+/* Removed: @media (prefers-color-scheme: dark) conflicts with data-theme */
 
 /* Email container styling */
 .email-container {
@@ -3860,20 +3183,7 @@ body {
     height: 14px;
 }
 
-@media (prefers-color-scheme: dark) {
-    .email-text {
-        color: var(--dark-text);
-    }
-    
-    .copy-email-btn {
-        color: var(--dark-text-secondary);
-    }
-    
-    .copy-email-btn:hover {
-        background: var(--dark-hover-bg);
-        color: var(--dark-accent);
-    }
-}
+/* Removed: @media (prefers-color-scheme: dark) conflicts with data-theme */
 
 /* Table Cell Styles */
 .fluent-user-cell {
@@ -3909,15 +3219,7 @@ body {
     color: #666;
 }
 
-@media (prefers-color-scheme: dark) {
-    .fluent-user-info h4 {
-        color: var(--dark-text);
-    }
-    
-    .fluent-user-info p {
-        color: var(--dark-text-secondary);
-    }
-}
+/* Removed: @media (prefers-color-scheme: dark) conflicts with data-theme */
 
 .fluent-badge-table {
     padding: 2px 8px;
@@ -4001,33 +3303,7 @@ body {
     color: var(--text-color);
 }
 
-@media (prefers-color-scheme: dark) {
-    .trip-name {
-        color: var(--dark-accent);
-    }
-    
-    .trip-date {
-        color: var(--dark-text-secondary);
-    }
-    
-    .fluent-trip-count {
-        color: var(--dark-accent);
-    }
-    
-    .fluent-user-name {
-        color: var(--dark-text);
-    }
-    
-    .fluent-action-btn:hover {
-        background: var(--dark-border);
-        color: var(--dark-accent);
-    }
-    
-    .fluent-action-btn.danger:hover {
-        background: rgba(220, 53, 69, 0.1);
-        color: #ff6b7d;
-    }
-}
+/* Removed: @media (prefers-color-scheme: dark) conflicts with data-theme */
 
 /* Pagination */
 .fluent-pagination {
@@ -4039,22 +3315,14 @@ body {
     border-top: 1px solid #e5e5e5;
 }
 
-@media (prefers-color-scheme: dark) {
-    .fluent-pagination {
-        border-top-color: var(--dark-border);
-    }
-}
+/* Removed: @media (prefers-color-scheme: dark) conflicts with data-theme */
 
 .fluent-pagination-info {
     color: #666;
     font-size: 0.9rem;
 }
 
-@media (prefers-color-scheme: dark) {
-    .fluent-pagination-info {
-        color: var(--dark-text-secondary);
-    }
-}
+/* Removed: @media (prefers-color-scheme: dark) conflicts with data-theme */
 
 .fluent-pagination-controls {
     display: flex;
@@ -4104,35 +3372,7 @@ body {
     border-color: var(--dark-green);
 }
 
-@media (prefers-color-scheme: dark) {
-    .fluent-pagination-btn {
-        background: var(--dark-bg-secondary);
-        border-color: var(--dark-border);
-        color: var(--dark-text);
-    }
-    
-    .fluent-pagination-btn:hover:not(:disabled) {
-        background: var(--dark-border);
-        border-color: var(--dark-accent);
-    }
-    
-    .fluent-page-btn {
-        background: var(--dark-bg-secondary);
-        border-color: var(--dark-border);
-        color: var(--dark-text);
-    }
-    
-    .fluent-page-btn:hover {
-        background: var(--dark-border);
-        border-color: var(--dark-accent);
-    }
-    
-    .fluent-page-active {
-        background: var(--dark-accent);
-        color: var(--dark-bg);
-        border-color: var(--dark-accent);
-    }
-}
+/* Removed: @media (prefers-color-scheme: dark) conflicts with data-theme */
 
 /* Responsive Design */
 @media (max-width: 1024px) {
@@ -4243,11 +3483,7 @@ body {
     min-height: 0;
 }
 
-@media (prefers-color-scheme: dark) {
-    .fluent-modal-body-form {
-        background: var(--dark-bg);
-    }
-}
+/* Removed: @media (prefers-color-scheme: dark) conflicts with data-theme */
 
 .fluent-form {
     width: 100%;
@@ -4276,11 +3512,7 @@ body {
     margin: 0;
 }
 
-@media (prefers-color-scheme: dark) {
-    .fluent-label {
-        color: var(--dark-text);
-    }
-}
+/* Removed: @media (prefers-color-scheme: dark) conflicts with data-theme */
 
 .fluent-input,
 .fluent-select {
@@ -4306,24 +3538,7 @@ body {
     color: #999;
 }
 
-@media (prefers-color-scheme: dark) {
-    .fluent-input,
-    .fluent-select {
-        background: var(--dark-bg-secondary);
-        border-color: var(--dark-border);
-        color: var(--dark-text);
-    }
-    
-    .fluent-input:focus,
-    .fluent-select:focus {
-        border-color: var(--dark-accent);
-        box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.1);
-    }
-    
-    .fluent-input::placeholder {
-        color: var(--dark-text-secondary);
-    }
-}
+/* Removed: @media (prefers-color-scheme: dark) conflicts with data-theme */
 
 .fluent-checkbox-group {
     display: flex;
@@ -4344,15 +3559,7 @@ body {
     color: var(--medium-green);
 }
 
-@media (prefers-color-scheme: dark) {
-    .fluent-checkbox-label {
-        color: var(--dark-text);
-    }
-    
-    .fluent-checkbox-label:hover {
-        color: var(--dark-accent);
-    }
-}
+/* Removed: @media (prefers-color-scheme: dark) conflicts with data-theme */
 
 .fluent-form-actions {
     display: flex;
@@ -4363,11 +3570,7 @@ body {
     border-top: 1px solid #e5e5e5;
 }
 
-@media (prefers-color-scheme: dark) {
-    .fluent-form-actions {
-        border-top-color: var(--dark-border);
-    }
-}
+/* Removed: @media (prefers-color-scheme: dark) conflicts with data-theme */
 
 /* Loading Spinner */
 .fluent-spinner {
@@ -4421,17 +3624,7 @@ body {
     100% { transform: rotate(360deg); }
 }
 
-@media (prefers-color-scheme: dark) {
-    .fluent-input.error,
-    .fluent-input-error {
-        border-color: #e74c3c !important;
-        box-shadow: 0 0 0 2px rgba(231, 76, 60, 0.1) !important;
-    }
-    
-    .fluent-error-message {
-        color: #e74c3c;
-    }
-}
+/* Removed: @media (prefers-color-scheme: dark) conflicts with data-theme */
 
 /* Status Indicators */
 .fluent-status-active {
@@ -4477,22 +3670,7 @@ body {
     background: currentColor;
 }
 
-@media (prefers-color-scheme: dark) {
-    .fluent-status-active {
-        background: rgba(40, 167, 69, 0.2);
-        color: #5cb85c;
-    }
-    
-    .fluent-status-inactive {
-        background: rgba(220, 53, 69, 0.2);
-        color: #f56565;
-    }
-    
-    .fluent-status-pending {
-        background: rgba(255, 193, 7, 0.2);
-        color: #ffc107;
-    }
-}
+/* Removed: @media (prefers-color-scheme: dark) conflicts with data-theme */
 
 /* Toast Notifications */
 .fluent-toast {
@@ -4531,13 +3709,7 @@ body {
     border-left: 4px solid #17a2b8;
 }
 
-@media (prefers-color-scheme: dark) {
-    .fluent-toast {
-        background: var(--dark-bg-secondary);
-        border-color: var(--dark-border);
-        color: var(--dark-text);
-    }
-}
+/* Removed: @media (prefers-color-scheme: dark) conflicts with data-theme */
 
 .fluent-toast-content {
     display: flex;
@@ -4566,11 +3738,7 @@ body {
     color: #666;
 }
 
-@media (prefers-color-scheme: dark) {
-    .fluent-toast-text {
-        color: var(--dark-text-secondary);
-    }
-}
+/* Removed: @media (prefers-color-scheme: dark) conflicts with data-theme */
 
 .fluent-toast-close {
     background: none;
@@ -4585,11 +3753,7 @@ body {
     color: var(--dark-green);
 }
 
-@media (prefers-color-scheme: dark) {
-    .fluent-toast-close:hover {
-        color: var(--dark-accent);
-    }
-}
+/* Removed: @media (prefers-color-scheme: dark) conflicts with data-theme */
 
 /* Responsive Form Design */
 @media (max-width: 768px) {
@@ -4657,14 +3821,7 @@ body {
     border: 1px solid rgba(68, 162, 68, 0.1);
 }
 
-@media (prefers-color-scheme: dark) {
-    .trip-code-section,
-    .qr-code-section,
-    .trip-summary-section {
-        background: rgba(68, 162, 68, 0.05);
-        border-color: rgba(68, 162, 68, 0.15);
-    }
-}
+/* Removed: @media (prefers-color-scheme: dark) conflicts with data-theme */
 
 .trip-code-header,
 .qr-code-header,
@@ -4682,13 +3839,7 @@ body {
     font-weight: 600;
 }
 
-@media (prefers-color-scheme: dark) {
-    .trip-code-header h3,
-    .qr-code-header h3,
-    .trip-summary-header h3 {
-        color: var(--dark-accent);
-    }
-}
+/* Removed: @media (prefers-color-scheme: dark) conflicts with data-theme */
 
 .trip-code-subtitle,
 .qr-code-header p {
@@ -4697,12 +3848,7 @@ body {
     margin: 0;
 }
 
-@media (prefers-color-scheme: dark) {
-    .trip-code-subtitle,
-    .qr-code-header p {
-        color: var(--dark-text-secondary);
-    }
-}
+/* Removed: @media (prefers-color-scheme: dark) conflicts with data-theme */
 
 /* AI-Generated Trip Code Display */
 .trip-code-display {
@@ -4764,12 +3910,7 @@ body {
     border: 1px solid rgba(44, 85, 48, 0.1);
 }
 
-@media (prefers-color-scheme: dark) {
-    .trip-code-breakdown {
-        background: rgba(255, 255, 255, 0.05);
-        border-color: rgba(255, 255, 255, 0.1);
-    }
-}
+/* Removed: @media (prefers-color-scheme: dark) conflicts with data-theme */
 
 .code-component {
     text-align: center;
@@ -4784,11 +3925,7 @@ body {
     font-weight: 500;
 }
 
-@media (prefers-color-scheme: dark) {
-    .component-label {
-        color: var(--dark-text-secondary);
-    }
-}
+/* Removed: @media (prefers-color-scheme: dark) conflicts with data-theme */
 
 .component-value {
     display: block;
@@ -4799,11 +3936,7 @@ body {
     letter-spacing: 1px;
 }
 
-@media (prefers-color-scheme: dark) {
-    .component-value {
-        color: var(--dark-accent);
-    }
-}
+/* Removed: @media (prefers-color-scheme: dark) conflicts with data-theme */
 
 /* QR Code Section */
 .qr-code-display {
@@ -4839,11 +3972,7 @@ body {
     word-break: break-all;
 }
 
-@media (prefers-color-scheme: dark) {
-    .qr-url {
-        color: var(--dark-text-secondary);
-    }
-}
+/* Removed: @media (prefers-color-scheme: dark) conflicts with data-theme */
 
 /* Trip Summary Section */
 .trip-summary-grid {
@@ -4862,12 +3991,7 @@ body {
     border: 1px solid rgba(44, 85, 48, 0.1);
 }
 
-@media (prefers-color-scheme: dark) {
-    .summary-item {
-        background: rgba(255, 255, 255, 0.05);
-        border-color: rgba(255, 255, 255, 0.1);
-    }
-}
+/* Removed: @media (prefers-color-scheme: dark) conflicts with data-theme */
 
 .summary-label {
     font-size: 0.85rem;
@@ -4875,11 +3999,7 @@ body {
     font-weight: 500;
 }
 
-@media (prefers-color-scheme: dark) {
-    .summary-label {
-        color: var(--dark-text-secondary);
-    }
-}
+/* Removed: @media (prefers-color-scheme: dark) conflicts with data-theme */
 
 .summary-value {
     font-size: 1rem;
@@ -4887,11 +4007,7 @@ body {
     font-weight: 600;
 }
 
-@media (prefers-color-scheme: dark) {
-    .summary-value {
-        color: var(--dark-text);
-    }
-}
+/* Removed: @media (prefers-color-scheme: dark) conflicts with data-theme */
 
 /* Action Buttons */
 .trip-code-actions {
@@ -4905,11 +4021,7 @@ body {
     margin-top: 24px;
 }
 
-@media (prefers-color-scheme: dark) {
-    .trip-code-actions {
-        background: rgba(255, 255, 255, 0.03);
-    }
-}
+/* Removed: @media (prefers-color-scheme: dark) conflicts with data-theme */
 
 .trip-code-actions .btn {
     display: flex;
@@ -5163,59 +4275,7 @@ body {
     margin-bottom: 2px;
 }
 
-@media (prefers-color-scheme: dark) {
-    .loading-message {
-        color: var(--dark-text-secondary);
-    }
-
-    .availability-info {
-        background: var(--dark-bg-secondary);
-        border-color: var(--dark-border);
-        color: var(--dark-text-secondary);
-    }
-
-    .staff-list {
-        background: var(--dark-bg);
-        border-color: var(--dark-border);
-    }
-
-    .staff-member {
-        border-bottom-color: var(--dark-border);
-    }
-
-    .staff-member:hover {
-        background: var(--dark-bg-secondary);
-    }
-
-    .staff-member.unavailable {
-        background: #2a2d31;
-        opacity: 0.7;
-    }
-
-    .staff-name {
-        color: var(--dark-text);
-    }
-
-    .staff-department {
-        color: var(--dark-text-secondary);
-    }
-
-    .staff-role-selector select {
-        background: var(--dark-bg);
-        border-color: var(--dark-border);
-        color: var(--dark-text);
-    }
-
-    .staff-date-range input {
-        background: var(--dark-bg);
-        border-color: var(--dark-border);
-        color: var(--dark-text);
-    }
-
-    .date-range-label {
-        color: var(--dark-text-secondary);
-    }
-}
+/* Removed: @media (prefers-color-scheme: dark) conflicts with data-theme */
 
 @media (max-width: 768px) {
     .staff-member {
@@ -5635,31 +4695,7 @@ body {
 }
 
 /* Dark mode Fleet Management badges */
-@media (prefers-color-scheme: dark) {
-    .fluent-badge-success {
-        background: rgba(40, 167, 69, 0.2);
-        color: #4caf50;
-        border-color: rgba(40, 167, 69, 0.3);
-    }
-    
-    .fluent-badge-warning {
-        background: rgba(255, 193, 7, 0.2);
-        color: #ffc107;
-        border-color: rgba(255, 193, 7, 0.3);
-    }
-    
-    .fluent-badge-error {
-        background: rgba(220, 53, 69, 0.2);
-        color: #f44336;
-        border-color: rgba(220, 53, 69, 0.3);
-    }
-    
-    .fluent-badge-secondary {
-        background: rgba(108, 117, 125, 0.2);
-        color: #9e9e9e;
-        border-color: rgba(108, 117, 125, 0.3);
-    }
-}
+/* Removed: @media (prefers-color-scheme: dark) conflicts with data-theme */
 
 /* ============================================================================
    ENHANCED TRIP CREATION STYLES
@@ -6156,110 +5192,7 @@ body {
 }
 
 /* Dark Mode Support */
-@media (prefers-color-scheme: dark) {
-    .selected-vehicle-item,
-    .selected-staff-item {
-        background: var(--dark-bg-secondary);
-        border-color: var(--dark-border);
-        color: var(--dark-text-secondary);
-    }
-
-    .vehicle-name,
-    .staff-name {
-        color: var(--dark-accent);
-    }
-
-    .vehicle-license,
-    .driver-help,
-    .vehicle-info-details {
-        color: #8b949e;
-    }
-
-    .driver-assignment label,
-    .attendance-field label {
-        color: var(--dark-text-secondary);
-    }
-
-    .driver-input,
-    .attendance-field select,
-    .attendance-field input {
-        background: var(--dark-bg);
-        border-color: var(--dark-border);
-        color: var(--dark-text-secondary);
-    }
-
-    .driver-input:focus,
-    .attendance-field select:focus,
-    .attendance-field input:focus {
-        border-color: var(--dark-accent);
-        box-shadow: 0 0 0 2px rgba(218, 165, 32, 0.1);
-    }
-
-    .available-vehicles-list {
-        background: var(--dark-bg-secondary);
-        border-color: var(--dark-border);
-    }
-
-    .available-vehicle-item:hover {
-        background: var(--dark-bg);
-    }
-
-    .vehicle-info-name {
-        color: var(--dark-accent);
-    }
-
-    .ai-day-section {
-        background: var(--dark-bg-secondary);
-        border-left-color: var(--dark-accent);
-    }
-
-    .ai-day-header {
-        color: var(--dark-accent);
-    }
-
-    .ai-day-number {
-        background: var(--dark-accent);
-        color: var(--dark-bg);
-    }
-
-    .ai-time {
-        color: var(--dark-accent);
-    }
-
-    .ai-activity-text {
-        color: var(--dark-text-secondary);
-    }
-
-    .ai-location {
-        color: #8b949e;
-    }
-
-    .attendance-preview {
-        background: rgba(218, 165, 32, 0.1);
-        color: var(--dark-accent);
-    }
-
-    .template-preview {
-        background: var(--dark-bg-secondary);
-        border-color: var(--dark-border);
-    }
-
-    .template-title {
-        color: var(--dark-accent);
-    }
-
-    .template-description {
-        color: #8b949e;
-    }
-
-    .template-highlights li {
-        color: var(--dark-text-secondary);
-    }
-
-    .template-highlights li:before {
-        color: var(--dark-accent);
-    }
-}
+/* Removed: @media (prefers-color-scheme: dark) conflicts with data-theme */
 
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
@@ -6501,69 +5434,7 @@ body {
 }
 
 /* Dark Mode Support */
-@media (prefers-color-scheme: dark) {
-    .trip-header-section {
-        background: #2d2d2d;
-        border-left-color: var(--medium-green);
-    }
-    
-    .left-column, .right-column {
-        background: #2d2d2d;
-        border-color: #444;
-    }
-    
-    .section-title {
-        color: var(--gold);
-        border-bottom-color: #444;
-    }
-    
-    .header-field label,
-    .guests-row label,
-    .selection-section h4 {
-        color: var(--gold);
-    }
-    
-    .smart-itinerary,
-    .selection-list {
-        background: #1a1a1a;
-        border-color: #444;
-        color: white;
-    }
-    
-    .selection-list option {
-        background: #1a1a1a;
-        color: white;
-        border-bottom-color: #333;
-    }
-    
-    .selection-list option:hover {
-        background: #333;
-    }
-    
-    .selection-list option:checked {
-        background: var(--medium-green);
-        color: white;
-    }
-    
-    .smart-preview {
-        background: #1a1a1a;
-        border-color: #444;
-    }
-    
-    .preview-placeholder p {
-        color: #999;
-    }
-    
-    .availability-info {
-        background: rgba(46, 125, 50, 0.2);
-        color: #4caf50;
-    }
-    
-    .loading-message,
-    .input-help {
-        color: #999;
-    }
-}
+/* Removed: @media (prefers-color-scheme: dark) conflicts with data-theme */
 
 /* Responsive Design */
 @media (max-width: 1200px) {
@@ -6607,4 +5478,282 @@ body {
         width: 95%;
         max-width: none;
     }
+}
+
+/* Comprehensive Light Mode Styles */
+[data-theme="light"] .error-message {
+    background-color: rgba(231, 76, 60, 0.1);
+    border-color: #e74c3c;
+    color: #e74c3c;
+}
+
+[data-theme="light"] .test-credentials {
+    border-top-color: var(--light-border);
+    color: var(--light-text-secondary);
+}
+
+[data-theme="light"] .test-credentials strong {
+    color: var(--light-accent);
+}
+
+[data-theme="light"] .test-credentials em {
+    background: #f0f0f0;
+    color: var(--light-text);
+}
+
+[data-theme="light"] .input-group input {
+    background: var(--light-card);
+    border-color: var(--light-border);
+    color: var(--light-text);
+}
+
+[data-theme="light"] .input-group input:focus {
+    border-color: var(--light-accent) !important;
+    box-shadow: 0 0 0 4px rgba(44, 85, 48, 0.1) !important;
+}
+
+[data-theme="light"] .input-group input::placeholder {
+    color: var(--light-text-secondary);
+    opacity: 0.7;
+}
+
+[data-theme="light"] .continue-btn, 
+[data-theme="light"] .sign-in-btn, 
+[data-theme="light"] .create-account-btn, 
+[data-theme="light"] .verify-btn {
+    background: var(--light-accent);
+    color: white;
+}
+
+[data-theme="light"] .continue-btn:hover, 
+[data-theme="light"] .sign-in-btn:hover, 
+[data-theme="light"] .create-account-btn:hover, 
+[data-theme="light"] .verify-btn:hover {
+    background: var(--medium-green);
+    color: white;
+}
+
+[data-theme="light"] .divider-line {
+    background: var(--light-border);
+}
+
+[data-theme="light"] .divider-text {
+    color: var(--light-text-secondary);
+}
+
+[data-theme="light"] .back-button {
+    color: var(--light-accent);
+    background: transparent;
+}
+
+[data-theme="light"] .back-button:hover {
+    background: rgba(44, 85, 48, 0.1);
+}
+
+[data-theme="light"] .welcome-message h3,
+[data-theme="light"] .account-creation-message h3, 
+[data-theme="light"] .code-message h3 {
+    color: var(--light-accent);
+}
+
+[data-theme="light"] .welcome-message p,
+[data-theme="light"] .account-creation-message p, 
+[data-theme="light"] .code-message p {
+    color: var(--light-text-secondary);
+}
+
+[data-theme="light"] .link-btn {
+    color: var(--light-accent);
+}
+
+[data-theme="light"] .link-btn:hover {
+    color: var(--medium-green);
+}
+
+[data-theme="light"] .login-title {
+    color: var(--light-accent);
+}
+
+[data-theme="light"] .login-subtitle {
+    color: var(--light-text-secondary);
+}
+
+/* Comprehensive Dark Mode Styles */
+[data-theme="dark"] .error-message {
+    background-color: rgba(231, 76, 60, 0.2);
+    border-color: #e74c3c;
+    color: #ff6b6b;
+}
+
+[data-theme="dark"] .test-credentials {
+    border-top-color: var(--dark-border);
+    color: var(--dark-text-secondary);
+}
+
+[data-theme="dark"] .test-credentials strong {
+    color: var(--dark-accent);
+}
+
+[data-theme="dark"] .test-credentials em {
+    background: var(--dark-bg-secondary);
+    color: var(--dark-text);
+}
+
+[data-theme="dark"] .input-group input {
+    background: var(--dark-bg-secondary);
+    border-color: var(--dark-border);
+    color: var(--dark-text);
+}
+
+[data-theme="dark"] .input-group input:focus {
+    border-color: var(--dark-accent) !important;
+    box-shadow: 0 0 0 4px rgba(218, 165, 32, 0.2) !important;
+}
+
+[data-theme="dark"] .input-group input::placeholder {
+    color: var(--dark-text-secondary);
+    opacity: 0.7;
+}
+
+[data-theme="dark"] .continue-btn, 
+[data-theme="dark"] .sign-in-btn, 
+[data-theme="dark"] .create-account-btn, 
+[data-theme="dark"] .verify-btn {
+    background: var(--dark-accent);
+    color: var(--dark-bg);
+}
+
+[data-theme="dark"] .continue-btn:hover, 
+[data-theme="dark"] .sign-in-btn:hover, 
+[data-theme="dark"] .create-account-btn:hover, 
+[data-theme="dark"] .verify-btn:hover {
+    background: #B8860B;
+    color: var(--dark-bg);
+}
+
+[data-theme="dark"] .divider-line {
+    background: var(--dark-border);
+}
+
+[data-theme="dark"] .divider-text {
+    color: var(--dark-text-secondary);
+}
+
+[data-theme="dark"] .back-button {
+    color: var(--dark-accent);
+    background: transparent;
+}
+
+[data-theme="dark"] .back-button:hover {
+    background: var(--dark-bg-secondary);
+}
+
+[data-theme="dark"] .welcome-message h3,
+[data-theme="dark"] .account-creation-message h3, 
+[data-theme="dark"] .code-message h3 {
+    color: var(--dark-accent);
+}
+
+[data-theme="dark"] .welcome-message p,
+[data-theme="dark"] .account-creation-message p, 
+[data-theme="dark"] .code-message p {
+    color: var(--dark-text-secondary);
+}
+
+[data-theme="dark"] .link-btn {
+    color: var(--dark-accent);
+}
+
+[data-theme="dark"] .link-btn:hover {
+    color: #B8860B;
+}
+
+[data-theme="dark"] .login-title {
+    color: var(--dark-accent);
+}
+
+[data-theme="dark"] .login-subtitle {
+    color: var(--dark-text-secondary);
+}
+
+/* Trip cards, modals, and other components for both themes */
+[data-theme="dark"] .trip-card {
+    background: var(--dark-bg-secondary) !important;
+    border: 1px solid var(--dark-border) !important;
+    color: var(--dark-text-secondary) !important;
+}
+
+[data-theme="dark"] .trip-card-header,
+[data-theme="dark"] .trip-title,
+[data-theme="dark"] .trip-date,
+[data-theme="dark"] .trip-description,
+[data-theme="dark"] .trip-guests,
+[data-theme="dark"] .trip-footer,
+[data-theme="dark"] .trip-wolthers-staff,
+[data-theme="dark"] .trip-codes {
+    color: var(--dark-text-secondary) !important;
+}
+
+[data-theme="dark"] .trip-preview-content,
+[data-theme="dark"] .trip-preview-body,
+[data-theme="dark"] .fluent-modal-content,
+[data-theme="dark"] .fluent-modal-body,
+[data-theme="dark"] .fluent-table-container {
+    background: var(--dark-bg-secondary) !important;
+    color: var(--dark-text-secondary) !important;
+    border: 1px solid var(--dark-border) !important;
+}
+
+[data-theme="dark"] .fluent-modal-header {
+    background: var(--dark-bg-secondary) !important;
+    border-bottom: 1px solid var(--dark-border) !important;
+}
+
+[data-theme="dark"] .fluent-modal-title {
+    color: var(--dark-accent) !important;
+}
+
+[data-theme="dark"] .fluent-modal-subtitle {
+    color: var(--dark-text-secondary) !important;
+}
+
+[data-theme="dark"] .fluent-table {
+    background: var(--dark-bg-secondary) !important;
+}
+
+[data-theme="dark"] .fluent-table thead {
+    background: var(--dark-bg) !important;
+}
+
+[data-theme="dark"] .fluent-table th {
+    background: var(--dark-bg) !important;
+    color: var(--dark-text) !important;
+    border-bottom: 1px solid var(--dark-border) !important;
+}
+
+[data-theme="dark"] .fluent-table td {
+    border-bottom: 1px solid var(--dark-border) !important;
+    color: var(--dark-text-secondary) !important;
+}
+
+[data-theme="dark"] .fluent-table tbody tr:hover {
+    background: var(--dark-bg) !important;
+}
+
+[data-theme="dark"] .fluent-search-input,
+[data-theme="dark"] .fluent-select {
+    background: var(--dark-bg) !important;
+    color: var(--dark-text-secondary) !important;
+    border: 1px solid var(--dark-border) !important;
+}
+
+[data-theme="dark"] .fluent-btn-primary {
+    background: var(--dark-accent) !important;
+    color: #000 !important;
+}
+
+[data-theme="dark"] .fluent-btn-secondary {
+    background: var(--dark-bg) !important;
+    color: var(--dark-text-secondary) !important;
+    border: 1px solid var(--dark-border) !important;
 }
