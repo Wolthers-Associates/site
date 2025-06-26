@@ -2176,6 +2176,158 @@ The system will automatically:
         </div>
     </div>
 
+    <!-- Edit Company Modal -->
+    <div id="editCompanyModal" class="modal fluent-modal" style="display: none;" role="dialog" aria-labelledby="edit-company-title" aria-modal="true">
+        <div class="modal-backdrop" onclick="hideEditCompanyModal()"></div>
+        <div class="modal-content fluent-modal-content-small">
+            <div class="fluent-modal-header">
+                <div class="fluent-header-content">
+                    <h1 id="edit-company-title" class="fluent-modal-title">Edit Company</h1>
+                    <p class="fluent-modal-subtitle">Update company information</p>
+                </div>
+                <button class="fluent-close-btn" onclick="hideEditCompanyModal()">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M11.41 10l4.3-4.29a1 1 0 10-1.42-1.42L10 8.59l-4.29-4.3a1 1 0 00-1.42 1.42L8.59 10l-4.3 4.29a1 1 0 001.42 1.42L10 11.41l4.29 4.3a1 1 0 001.42-1.42L11.41 10z"/>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="fluent-modal-body-form">
+                <form id="editCompanyForm" class="fluent-form">
+                    <input type="hidden" id="editCompanyId">
+                    
+                    <div class="fluent-form-section">
+                        <!-- Required Fields -->
+                        <div class="fluent-form-row">
+                            <div class="fluent-form-group">
+                                <label for="editCompanyFullName" class="fluent-label">Legal Company Name *</label>
+                                <input type="text" id="editCompanyFullName" class="fluent-input" required>
+                                <small class="fluent-help-text">Official registered company name</small>
+                            </div>
+                        </div>
+                        
+                        <div class="fluent-form-row">
+                            <div class="fluent-form-group">
+                                <label for="editCompanyFantasyName" class="fluent-label">Trade/Fantasy Name</label>
+                                <input type="text" id="editCompanyFantasyName" class="fluent-input">
+                                <small class="fluent-help-text">Brand or trade name (if different from legal name)</small>
+                            </div>
+                        </div>
+                        
+                        <div class="fluent-form-row">
+                            <div class="fluent-form-group">
+                                <label for="editCompanyType" class="fluent-label">Company Type *</label>
+                                <select id="editCompanyType" class="fluent-select" required>
+                                    <option value="">Select company type</option>
+                                    <option value="importer">Importer</option>
+                                    <option value="exporter">Exporter</option>
+                                    <option value="roaster">Coffee Roaster</option>
+                                    <option value="distributor">Distributor</option>
+                                    <option value="retailer">Retailer</option>
+                                    <option value="consultant">Consultant</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <!-- Expandable Details Section -->
+                        <div class="fluent-form-toggle">
+                            <button type="button" class="fluent-toggle-btn" id="toggleEditCompanyDetails" onclick="toggleEditCompanyDetailsForm()">
+                                <span>+ Edit additional details</span>
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" class="toggle-icon">
+                                    <path d="M8.75 3.75a.75.75 0 00-1.5 0v3.5h-3.5a.75.75 0 000 1.5h3.5v3.5a.75.75 0 001.5 0v-3.5h3.5a.75.75 0 000-1.5h-3.5v-3.5z"/>
+                                </svg>
+                            </button>
+                        </div>
+                        
+                        <div id="editCompanyDetailsSection" class="fluent-form-section" style="display: none;">
+                            <!-- Address Information -->
+                            <h4 class="fluent-subsection-title">Address Information</h4>
+                            <div class="fluent-form-row">
+                                <div class="fluent-form-group">
+                                    <label for="editCompanyAddress" class="fluent-label">Street Address</label>
+                                    <textarea id="editCompanyAddress" class="fluent-input" rows="2"></textarea>
+                                </div>
+                            </div>
+                            
+                            <div class="fluent-form-row">
+                                <div class="fluent-form-group">
+                                    <label for="editCompanyCity" class="fluent-label">City</label>
+                                    <input type="text" id="editCompanyCity" class="fluent-input">
+                                </div>
+                                <div class="fluent-form-group">
+                                    <label for="editCompanyCountry" class="fluent-label">Country</label>
+                                    <input type="text" id="editCompanyCountry" class="fluent-input">
+                                </div>
+                            </div>
+                            
+                            <div class="fluent-form-row">
+                                <div class="fluent-form-group">
+                                    <label for="editCompanyPostalCode" class="fluent-label">Postal Code</label>
+                                    <input type="text" id="editCompanyPostalCode" class="fluent-input">
+                                </div>
+                            </div>
+                            
+                            <!-- Contact Information -->
+                            <h4 class="fluent-subsection-title">Contact Information</h4>
+                            <div class="fluent-form-row">
+                                <div class="fluent-form-group">
+                                    <label for="editCompanyPhone" class="fluent-label">Phone</label>
+                                    <input type="tel" id="editCompanyPhone" class="fluent-input">
+                                </div>
+                                <div class="fluent-form-group">
+                                    <label for="editCompanyEmail" class="fluent-label">Email</label>
+                                    <input type="email" id="editCompanyEmail" class="fluent-input">
+                                </div>
+                            </div>
+                            
+                            <div class="fluent-form-row">
+                                <div class="fluent-form-group">
+                                    <label for="editCompanyWebsite" class="fluent-label">Website</label>
+                                    <input type="url" id="editCompanyWebsite" class="fluent-input">
+                                </div>
+                            </div>
+                            
+                            <!-- Legal Information -->
+                            <h4 class="fluent-subsection-title">Legal Information</h4>
+                            <div class="fluent-form-row">
+                                <div class="fluent-form-group">
+                                    <label for="editCompanyRegistrationNumber" class="fluent-label">Registration Number</label>
+                                    <input type="text" id="editCompanyRegistrationNumber" class="fluent-input">
+                                </div>
+                                <div class="fluent-form-group">
+                                    <label for="editCompanyTaxId" class="fluent-label">Tax ID</label>
+                                    <input type="text" id="editCompanyTaxId" class="fluent-input">
+                                </div>
+                            </div>
+                            
+                            <!-- Status -->
+                            <h4 class="fluent-subsection-title">Status</h4>
+                            <div class="fluent-form-row">
+                                <div class="fluent-form-group">
+                                    <label for="editCompanyStatus" class="fluent-label">Company Status</label>
+                                    <select id="editCompanyStatus" class="fluent-select">
+                                        <option value="active">Active</option>
+                                        <option value="inactive">Inactive</option>
+                                        <option value="suspended">Suspended</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="fluent-form-actions">
+                        <button type="button" class="fluent-btn fluent-btn-secondary" onclick="hideEditCompanyModal()">Cancel</button>
+                        <button type="submit" class="fluent-btn fluent-btn-primary" id="editCompanySubmitBtn">
+                            <span class="btn-text">Update Company</span>
+                            <div class="fluent-spinner" style="display: none;"></div>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Add Company Modal -->
     <div id="addCompanyModal" class="modal fluent-modal" style="display: none;" role="dialog" aria-labelledby="add-company-title" aria-modal="true">
         <div class="modal-backdrop" onclick="hideAddCompanyModal()"></div>

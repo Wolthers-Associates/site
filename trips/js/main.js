@@ -3268,7 +3268,7 @@ function viewCompanyUsers(companyId) {
     }, 200);
 }
 
-function deleteCompany(companyId) {
+async function deleteCompany(companyId) {
     const company = companiesData.find(c => c.id == companyId);
     if (!company) return;
     
@@ -3281,37 +3281,269 @@ function deleteCompany(companyId) {
         confirmMessage += `\n\nThis company has ${companyUsers.length} user${companyUsers.length !== 1 ? 's' : ''} assigned. They will be unlinked from this company.`;
     }
     
+    confirmMessage += '\n\nThis action cannot be undone.';
+    
     if (confirm(confirmMessage)) {
-        // Remove company from companiesData
-        const companyIndex = companiesData.findIndex(c => c.id == companyId);
-        if (companyIndex !== -1) {
-            companiesData.splice(companyIndex, 1);
+        try {
+            // Try to delete via API first
+            try {
+                const response = await fetch('api/companies/manage.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'delete',
+                        id: companyId
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Remove from local data
+                    removeCompanyFromLocalData(companyId, company);
+                    
+                    showToast(`Company "${company.fantasy_name || company.full_name}" deleted successfully!`, 'success');
+                    return;
+                } else {
+                    throw new Error(data.error || 'Failed to delete company');
+                }
+            } catch (apiError) {
+                console.warn('API deletion failed, using fallback:', apiError);
+                
+                // Fallback: Remove from local data
+                removeCompanyFromLocalData(companyId, company);
+                
+                showToast(`Company "${company.fantasy_name || company.full_name}" deleted locally`, 'success');
+            }
+            
+        } catch (error) {
+            console.error('Error deleting company:', error);
+            showToast('Failed to delete company: ' + error.message, 'error');
         }
-        
-        // Unlink users from this company
-        companyUsers.forEach(user => {
-            user.company_id = null;
-            user.company_name = null;
-            user.company_role = 'staff';
-            user.can_see_company_trips = false;
-        });
-        
-        // Save changes
-        window.USER_DATABASE = users;
-        saveUserDatabase();
-        
-        // Refresh company table and dropdowns
-        loadCompanyTable();
-        updateCompanyDropdown();
-        
-        showToast(`Company "${company.fantasy_name || company.full_name}" deleted successfully`, 'success');
+    }
+}
+
+function removeCompanyFromLocalData(companyId, company) {
+    // Remove company from companiesData
+    const companyIndex = companiesData.findIndex(c => c.id == companyId);
+    if (companyIndex !== -1) {
+        companiesData.splice(companyIndex, 1);
+    }
+    
+    // Unlink users from this company
+    const users = getUsersFromDatabase();
+    const companyUsers = users.filter(u => u.company_id == companyId);
+    
+    companyUsers.forEach(user => {
+        user.company_id = null;
+        user.company_name = null;
+        user.company_role = 'staff';
+        user.can_see_company_trips = false;
+    });
+    
+    // Save user changes
+    window.USER_DATABASE = users;
+    saveUserDatabase();
+    
+    // Refresh company table and dropdowns
+    loadCompanyTable();
+    updateCompanyDropdown();
+    
+    // Refresh user displays if modal is open
+    if (document.getElementById('userManagementModal').style.display !== 'none') {
+        loadUsersTable();
     }
 }
 
 function showEditCompanyModal(company) {
-    // For now, show a simple edit notification
-    // In the future, this could open a full edit modal
-    showToast('Company editing will be available in the next update', 'info');
+    const modal = document.getElementById('editCompanyModal');
+    if (modal && company) {
+        // Populate form with company data
+        document.getElementById('editCompanyId').value = company.id;
+        document.getElementById('editCompanyFullName').value = company.full_name || '';
+        document.getElementById('editCompanyFantasyName').value = company.fantasy_name || '';
+        document.getElementById('editCompanyType').value = company.company_type || '';
+        document.getElementById('editCompanyAddress').value = company.address || '';
+        document.getElementById('editCompanyCity').value = company.city || '';
+        document.getElementById('editCompanyCountry').value = company.country || '';
+        document.getElementById('editCompanyPostalCode').value = company.postal_code || '';
+        document.getElementById('editCompanyPhone').value = company.phone || '';
+        document.getElementById('editCompanyEmail').value = company.email || '';
+        document.getElementById('editCompanyWebsite').value = company.website || '';
+        document.getElementById('editCompanyRegistrationNumber').value = company.registration_number || '';
+        document.getElementById('editCompanyTaxId').value = company.tax_id || '';
+        document.getElementById('editCompanyStatus').value = company.status || 'active';
+        
+        // Show modal
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+        
+        // Setup form submission
+        const form = document.getElementById('editCompanyForm');
+        form.onsubmit = handleEditCompanySubmit;
+        
+        // Reset details section
+        const detailsSection = document.getElementById('editCompanyDetailsSection');
+        const toggleBtn = document.getElementById('toggleEditCompanyDetails');
+        if (detailsSection && toggleBtn) {
+            // Show details if any optional fields have data
+            const hasOptionalData = company.address || company.city || company.phone || 
+                                   company.email || company.website || company.registration_number;
+            
+            if (hasOptionalData) {
+                detailsSection.style.display = 'block';
+                toggleBtn.querySelector('span').textContent = '- Hide additional details';
+                toggleBtn.querySelector('.toggle-icon').style.transform = 'rotate(45deg)';
+                toggleBtn.classList.add('expanded');
+            } else {
+                detailsSection.style.display = 'none';
+                toggleBtn.querySelector('span').textContent = '+ Edit additional details';
+                toggleBtn.querySelector('.toggle-icon').style.transform = 'rotate(0deg)';
+                toggleBtn.classList.remove('expanded');
+            }
+        }
+    }
+}
+
+function hideEditCompanyModal() {
+    const modal = document.getElementById('editCompanyModal');
+    if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+}
+
+function toggleEditCompanyDetailsForm() {
+    const detailsSection = document.getElementById('editCompanyDetailsSection');
+    const toggleBtn = document.getElementById('toggleEditCompanyDetails');
+    const toggleText = toggleBtn.querySelector('span');
+    const toggleIcon = toggleBtn.querySelector('.toggle-icon');
+    
+    if (detailsSection.style.display === 'none' || detailsSection.style.display === '') {
+        detailsSection.style.display = 'block';
+        toggleText.textContent = '- Hide additional details';
+        toggleIcon.style.transform = 'rotate(45deg)';
+        toggleBtn.classList.add('expanded');
+    } else {
+        detailsSection.style.display = 'none';
+        toggleText.textContent = '+ Edit additional details';
+        toggleIcon.style.transform = 'rotate(0deg)';
+        toggleBtn.classList.remove('expanded');
+    }
+}
+
+async function handleEditCompanySubmit(event) {
+    event.preventDefault();
+    
+    const submitBtn = document.getElementById('editCompanySubmitBtn');
+    const spinner = submitBtn.querySelector('.fluent-spinner');
+    const btnText = submitBtn.querySelector('.btn-text');
+    
+    try {
+        // Show loading state
+        submitBtn.disabled = true;
+        spinner.style.display = 'inline-block';
+        btnText.textContent = 'Updating...';
+        
+        // Collect form data
+        const companyId = document.getElementById('editCompanyId').value;
+        const formData = {
+            id: companyId,
+            full_name: document.getElementById('editCompanyFullName').value.trim(),
+            fantasy_name: document.getElementById('editCompanyFantasyName').value.trim(),
+            company_type: document.getElementById('editCompanyType').value,
+            address: document.getElementById('editCompanyAddress').value.trim(),
+            city: document.getElementById('editCompanyCity').value.trim(),
+            country: document.getElementById('editCompanyCountry').value.trim(),
+            postal_code: document.getElementById('editCompanyPostalCode').value.trim(),
+            phone: document.getElementById('editCompanyPhone').value.trim(),
+            email: document.getElementById('editCompanyEmail').value.trim(),
+            website: document.getElementById('editCompanyWebsite').value.trim(),
+            registration_number: document.getElementById('editCompanyRegistrationNumber').value.trim(),
+            tax_id: document.getElementById('editCompanyTaxId').value.trim(),
+            status: document.getElementById('editCompanyStatus').value
+        };
+        
+        // Validate required fields
+        if (!formData.full_name || !formData.company_type) {
+            throw new Error('Please fill in all required fields');
+        }
+        
+        // Try to update via API first
+        try {
+            const response = await fetch('api/companies/manage.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'update',
+                    company: formData
+                })
+            });
+
+            const data = await response.json();
+            
+            if (data.success) {
+                // Update local data
+                updateCompanyInLocalData(formData);
+                
+                showToast(`Company "${formData.fantasy_name || formData.full_name}" updated successfully!`, 'success');
+                hideEditCompanyModal();
+                return;
+            } else {
+                throw new Error(data.error || 'Failed to update company');
+            }
+        } catch (apiError) {
+            console.warn('API update failed, using fallback:', apiError);
+            
+            // Fallback: Update local data
+            updateCompanyInLocalData(formData);
+            
+            showToast(`Company "${formData.fantasy_name || formData.full_name}" updated locally`, 'success');
+            hideEditCompanyModal();
+        }
+        
+    } catch (error) {
+        console.error('Error updating company:', error);
+        showToast('Failed to update company: ' + error.message, 'error');
+        
+    } finally {
+        // Reset button state
+        submitBtn.disabled = false;
+        spinner.style.display = 'none';
+        btnText.textContent = 'Update Company';
+    }
+}
+
+function updateCompanyInLocalData(updatedCompany) {
+    if (!companiesData) return;
+    
+    // Find and update the company in local data
+    const companyIndex = companiesData.findIndex(c => c.id == updatedCompany.id);
+    if (companyIndex !== -1) {
+        // Preserve original creation date
+        const originalCompany = companiesData[companyIndex];
+        companiesData[companyIndex] = {
+            ...originalCompany,
+            ...updatedCompany,
+            updated_at: new Date().toISOString()
+        };
+        
+        // Update any users with this company
+        const users = getUsersFromDatabase();
+        users.forEach(user => {
+            if (user.company_id == updatedCompany.id) {
+                user.company_name = updatedCompany.fantasy_name || updatedCompany.full_name;
+            }
+        });
+        
+        // Save user changes
+        window.USER_DATABASE = users;
+        saveUserDatabase();
+        
+        // Refresh displays
+        loadCompanyTable();
+        updateCompanyDropdown();
+    }
 }
 
 async function loadUserManagementData() {
