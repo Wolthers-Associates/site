@@ -10,8 +10,9 @@ This is a professional trip management system for **Wolthers & Associates** coff
 ## ✨ Features
 
 ### 🔐 Authentication System (Production)
-- **Microsoft Office 365 Login**: Secure employee authentication
-- **Partner Access**: Email/code validation with real-time API checks
+- **Microsoft Office 365 Login**: Secure authentication for both employees and partners
+- **Partner Access**: Partners can log in with Microsoft if their email is registered, has been invited, or has received a trip itinerary
+- **Auto-creation**: If a partner logs in with Microsoft and their email is found in invitations or trip participation, a partner account is auto-created
 - **Session Management**: Secure tokens and session handling
 - **Access Control**: Role-based permissions for users and partners
 
