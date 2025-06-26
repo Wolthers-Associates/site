@@ -5529,10 +5529,10 @@ body {
 [data-theme="light"] .sign-in-btn:hover, 
 [data-theme="light"] .create-account-btn:hover, 
 [data-theme="light"] .verify-btn:hover {
-    background: var(--medium-green);
-    color: white;
-}
-
+        background: var(--medium-green);
+        color: white;
+    }
+    
 [data-theme="light"] .divider-line {
     background: var(--light-border);
 }
@@ -5756,4 +5756,12 @@ body {
     background: var(--dark-bg) !important;
     color: var(--dark-text-secondary) !important;
     border: 1px solid var(--dark-border) !important;
+}
+
+/* --- FINAL DARK MODE OVERRIDE FOR LOGIN BOX --- */
+[data-theme="dark"] .login-box {
+    background: var(--dark-bg-secondary) !important;
+    color: var(--dark-text) !important;
+    border: 1px solid var(--dark-border) !important;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3) !important;
 }
