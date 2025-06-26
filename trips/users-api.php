@@ -101,36 +101,49 @@ function handleGetUsers() {
     
     $whereConditions = ['1=1'];
     $params = [];
+    $whereConditionsForCount = ['1=1'];
+    $paramsForCount = [];
     
     if (!empty($search)) {
-        $whereConditions[] = "(name LIKE ? OR email LIKE ? OR phone LIKE ?)";
+        $whereConditions[] = "(u.name LIKE ? OR u.email LIKE ? OR u.phone LIKE ?)";
+        $whereConditionsForCount[] = "(name LIKE ? OR email LIKE ? OR phone LIKE ?)";
         $searchTerm = "%{$search}%";
         $params[] = $searchTerm;
         $params[] = $searchTerm;
         $params[] = $searchTerm;
+        $paramsForCount[] = $searchTerm;
+        $paramsForCount[] = $searchTerm;
+        $paramsForCount[] = $searchTerm;
     }
     
     if (!empty($role)) {
-        $whereConditions[] = "role = ?";
+        $whereConditions[] = "u.role = ?";
+        $whereConditionsForCount[] = "role = ?";
         $params[] = $role;
+        $paramsForCount[] = $role;
     }
     
     if (!empty($status)) {
         $whereConditions[] = "u.status = ?";
+        $whereConditionsForCount[] = "status = ?";
         $params[] = $status;
+        $paramsForCount[] = $status;
     }
     
     if (!empty($company_id)) {
-        $whereConditions[] = "company_id = ?";
+        $whereConditions[] = "u.company_id = ?";
+        $whereConditionsForCount[] = "company_id = ?";
         $params[] = $company_id;
+        $paramsForCount[] = $company_id;
     }
     
     $whereClause = implode(' AND ', $whereConditions);
+    $whereClauseForCount = implode(' AND ', $whereConditionsForCount);
     
     // Get total count
-    $countSql = "SELECT COUNT(*) as total FROM users WHERE {$whereClause}";
+    $countSql = "SELECT COUNT(*) as total FROM users WHERE {$whereClauseForCount}";
     $countStmt = $pdo->prepare($countSql);
-    $countStmt->execute($params);
+    $countStmt->execute($paramsForCount);
     $total = $countStmt->fetch()['total'];
     
     // Get users with company information
