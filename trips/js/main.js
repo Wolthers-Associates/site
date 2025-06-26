@@ -3348,7 +3348,7 @@ async function deleteCompany(companyId) {
         try {
             // Try to delete via API first
             try {
-                const response = await fetch('/companies-api.php', {
+                const response = await fetch('https://trips.wolthers.com/companies-api.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -3533,7 +3533,7 @@ async function handleEditCompanySubmit(event) {
         
         // Try to update via API first
         try {
-            const response = await fetch('/companies-api.php', {
+            const response = await fetch('https://trips.wolthers.com/companies-api.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -3677,7 +3677,7 @@ async function loadAllUsersForAdmin() {
         
         // Load users from real database API
         try {
-            const response = await fetch('/users-api.php?auth_check=1&limit=100');
+            const response = await fetch('https://trips.wolthers.com/users-api.php?auth_check=1&limit=100');
             if (response.ok) {
                 const apiData = await response.json();
                 if (apiData.success && Array.isArray(apiData.users)) {
@@ -4066,7 +4066,7 @@ async function deleteUser(userId) {
     
     if (confirmed) {
         try {
-            const response = await fetch('/users-api.php', {
+            const response = await fetch('https://trips.wolthers.com/users-api.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -4274,7 +4274,7 @@ async function handleEditUserSubmit(event) {
         }
         
         // Submit to real users API
-        const response = await fetch('/users-api.php', {
+        const response = await fetch('https://trips.wolthers.com/users-api.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -5705,7 +5705,7 @@ async function handleAddCompanySubmit(event) {
         clearCompanyFormErrors();
         
         // Submit to API
-        const response = await fetch('/companies-api.php', {
+        const response = await fetch('https://trips.wolthers.com/companies-api.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -5861,7 +5861,7 @@ function clearCompanyForm() {
  */
 async function loadCompanies() {
     try {
-        const response = await fetch('/companies-api.php?status=active&limit=100');
+        const response = await fetch('https://trips.wolthers.com/companies-api.php?status=active&limit=100');
         const result = await response.json();
         
         if (result.companies) {
@@ -6044,7 +6044,7 @@ async function handleEnhancedAddUserSubmit(event) {
         clearFormErrors();
         
         // Submit to real users API
-        const response = await fetch('/users-api.php', {
+        const response = await fetch('https://trips.wolthers.com/users-api.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

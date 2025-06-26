@@ -116,7 +116,7 @@ function handleGetUsers() {
     }
     
     if (!empty($status)) {
-        $whereConditions[] = "status = ?";
+        $whereConditions[] = "u.status = ?";
         $params[] = $status;
     }
     
