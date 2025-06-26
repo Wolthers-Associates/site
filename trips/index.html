@@ -2288,7 +2288,7 @@ The system will automatically:
                             <div class="fluent-form-row">
                                 <div class="fluent-form-group">
                                     <label for="editCompanyWebsite" class="fluent-label">Website</label>
-                                    <input type="url" id="editCompanyWebsite" class="fluent-input">
+                                    <input type="text" id="editCompanyWebsite" class="fluent-input" placeholder="e.g., wolthers.com or https://wolthers.com">
                                 </div>
                             </div>
                             
@@ -2296,8 +2296,8 @@ The system will automatically:
                             <h4 class="fluent-subsection-title">Legal Information</h4>
                             <div class="fluent-form-row">
                                 <div class="fluent-form-group">
-                                    <label for="editCompanyRegistrationNumber" class="fluent-label">Registration Number</label>
-                                    <input type="text" id="editCompanyRegistrationNumber" class="fluent-input">
+                                    <label for="editCompanyRegistrationNumber" class="fluent-label" id="editCompanyRegistrationLabel">Registration Number</label>
+                                    <input type="text" id="editCompanyRegistrationNumber" class="fluent-input" placeholder="Company registration number">
                                 </div>
                                 <div class="fluent-form-group">
                                     <label for="editCompanyTaxId" class="fluent-label">Tax ID</label>
@@ -2371,7 +2371,7 @@ The system will automatically:
                         <div class="fluent-form-row">
                             <div class="fluent-form-group">
                                 <label for="companyType" class="fluent-label">Company Type *</label>
-                                <select id="companyType" class="fluent-select" required>
+                                <select id="companyType" class="fluent-select" required onchange="toggleServiceProviderSubtype()">
                                     <option value="">Select company type</option>
                                     <option value="importer">Importer</option>
                                     <option value="exporter">Exporter</option>
@@ -2379,6 +2379,9 @@ The system will automatically:
                                     <option value="distributor">Distributor</option>
                                     <option value="retailer">Retailer</option>
                                     <option value="consultant">Consultant</option>
+                                    <option value="service_provider">Service Provider</option>
+                                    <option value="general_warehouse">General Warehouse</option>
+                                    <option value="bonded_warehouse">Bonded Warehouse</option>
                                     <option value="other">Other</option>
                                 </select>
                             </div>
@@ -2442,7 +2445,7 @@ The system will automatically:
                             <div class="fluent-form-row">
                                 <div class="fluent-form-group">
                                     <label for="companyWebsite" class="fluent-label">Website</label>
-                                    <input type="url" id="companyWebsite" class="fluent-input" placeholder="https://www.company.com">
+                                    <input type="text" id="companyWebsite" class="fluent-input" placeholder="e.g., wolthers.com or https://wolthers.com">
                                 </div>
                             </div>
                             
@@ -2458,6 +2461,18 @@ The system will automatically:
                                     <input type="text" id="companyTaxId" class="fluent-input" placeholder="Tax identification number">
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                    
+                    <div id="serviceProviderSubtypeRow" class="fluent-form-row" style="display:none;">
+                        <div class="fluent-form-group">
+                            <label for="serviceProviderSubtype" class="fluent-label">Service Provider Type</label>
+                            <select id="serviceProviderSubtype" class="fluent-select">
+                                <option value="">Select subtype</option>
+                                <option value="broker">Broker</option>
+                                <option value="quality_lab">Quality Lab</option>
+                                <option value="broker_quality_lab">Broker and Quality Lab</option>
+                            </select>
                         </div>
                     </div>
                     

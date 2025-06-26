@@ -3471,6 +3471,9 @@ async function handleEditCompanySubmit(event) {
             throw new Error('Please fill in all required fields');
         }
         
+        // Normalize website
+        formData.website = normalizeWebsiteUrl(formData.website);
+        
         // Try to update via API first
         try {
             const response = await fetch('api/companies/manage.php', {
@@ -5667,7 +5670,8 @@ function collectCompanyFormData() {
     return {
         full_name: document.getElementById('companyFullName')?.value?.trim() || '',
         fantasy_name: document.getElementById('companyFantasyName')?.value?.trim() || '',
-        company_type: document.getElementById('companyType')?.value || '',
+        company_type: document.getElementById('companyType').value,
+        service_provider_subtype: document.getElementById('serviceProviderSubtype')?.value || '',
         address: document.getElementById('companyAddress')?.value?.trim() || '',
         city: document.getElementById('companyCity')?.value?.trim() || '',
         state: document.getElementById('companyState')?.value?.trim() || '',
