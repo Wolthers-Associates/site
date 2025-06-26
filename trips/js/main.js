@@ -1857,7 +1857,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     
     // Initialize Microsoft Authentication
     try {
-        const configResponse = await fetch('/trips/api/auth/microsoft-config.php');
+        const configResponse = await fetch('/api/auth/microsoft-config.php');
         const configData = await configResponse.json();
         
         if (configData.success && configData.config.clientId) {

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Quick MS Auth Test</title>
+</head>
+<body>
+    <h1>Microsoft Auth Quick Test</h1>
+    <button onclick="testAuth()">Test Microsoft Auth</button>
+    <div id="result"></div>
+    
+    <script>
+        async function testAuth() {
+            try {
+                // Get config
+                const response = await fetch('/api/auth/microsoft-config.php');
+                const data = await response.json();
+                console.log('Config:', data);
+                
+                if (data.success && data.config.clientId) {
+                    // Generate auth URL
+                    const authUrl = `https://login.microsoftonline.com/${data.config.tenantId}/oauth2/v2.0/authorize?` +
+                        `client_id=${data.config.clientId}&` +
+                        `response_type=token&` +
+                        `redirect_uri=${encodeURIComponent(data.config.redirectUri)}&` +
+                        `scope=${encodeURIComponent('openid profile email User.Read')}&` +
+                        `response_mode=fragment&` +
+                        `state=test123&` +
+                        `nonce=nonce123`;
+                    
+                    console.log('Auth URL:', authUrl);
+                    document.getElementById('result').innerHTML = `
+                        <p>Config loaded successfully!</p>
+                        <p>Client ID: ${data.config.clientId}</p>
+                        <p>Redirect URI: ${data.config.redirectUri}</p>
+                        <p><a href="${authUrl}" target="_blank">Test Auth URL</a></p>
+                    `;
+                    
+                    // Try to open popup
+                    const popup = window.open(authUrl, 'msauth', 'width=500,height=600');
+                    if (!popup) {
+                        alert('Popup blocked! Please allow popups and try again.');
+                    }
+                } else {
+                    document.getElementById('result').innerHTML = '<p>Config failed: ' + JSON.stringify(data) + '</p>';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('result').innerHTML = '<p>Error: ' + error.message + '</p>';
+            }
+        }
+    </script>
+</body>
+</html>
