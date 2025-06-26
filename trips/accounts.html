@@ -28,19 +28,6 @@
             }
         }
     </style>
-    <script>
-      (function() {
-        let theme = localStorage.getItem('theme');
-        if (!theme) {
-          theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-        }
-        document.documentElement.setAttribute('data-theme', theme);
-        document.body.setAttribute('data-theme', theme);
-        document.querySelectorAll('style[data-prefers-dark]').forEach(el => {
-          el.disabled = theme === 'light';
-        });
-      })();
-    </script>
 
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/accounts.css">
@@ -263,6 +250,6 @@
         </div>
     </div>
 
-    <script src="assets/js/accounts.js"></script>
+    <script type="module" src="../js/pages/accounts.bootstrap.js"></script>
 </body>
-</html> 
+</html>
