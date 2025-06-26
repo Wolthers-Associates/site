@@ -1,4 +1,10 @@
 // Production Configuration - NO DEVELOPMENT MODE
+function normalizeWebsiteUrl(url) {
+    if (!url) return '';
+    if (/^https?:\/\//i.test(url)) return url;
+    return 'https://' + url.replace(/^\/+/, '');
+}
+
 const CONFIG = {
     DEVELOPMENT_MODE: false,
     DOMAIN: 'trips.wolthers.com',
