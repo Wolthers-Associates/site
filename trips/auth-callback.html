@@ -12,7 +12,7 @@
     <link rel="manifest" href="favicon_io/site.webmanifest">
     <link rel="shortcut icon" href="favicon_io/favicon.ico">
     
-    <style>
+    <style data-prefers-dark>
         :root {
             --primary-green: #2C5530;
             --medium-green: #2d5a47;
@@ -216,6 +216,19 @@
             }
         }
     </style>
+    <script>
+      (function() {
+        let theme = localStorage.getItem('theme');
+        if (!theme) {
+          theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        document.documentElement.setAttribute('data-theme', theme);
+        document.body.setAttribute('data-theme', theme);
+        document.querySelectorAll('style[data-prefers-dark]').forEach(el => {
+          el.disabled = theme === 'light';
+        });
+      })();
+    </script>
 </head>
 <body>
     <div class="container">
@@ -241,8 +254,9 @@
         // Update logo based on color scheme
         function updateLogo() {
             const logo = document.getElementById('companyLogo');
-            const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            
+            const theme = document.documentElement.getAttribute('data-theme');
+            const isDark = theme === 'dark' || window.matchMedia('(prefers-color-scheme: dark)').matches;
+
             if (isDark) {
                 logo.src = 'images/wolthers-logo-green.svg';
             } else {
