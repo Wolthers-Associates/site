@@ -7441,7 +7441,7 @@ function setTheme(theme) {
     document.body.setAttribute('data-theme', theme);
     localStorage.setItem('theme', theme);
     updateThemeIcon(theme);
-    updateMicrosoftButton(theme);
+    
 }
 
 function updateThemeIcon(theme) {
@@ -7455,12 +7455,6 @@ function updateThemeIcon(theme) {
     }
 }
 
-function updateMicrosoftButton(theme) {
-    const msBtn = document.getElementById('microsoftBtnImg');
-    if (msBtn) {
-        if (theme === 'light') {
-            msBtn.src = 'images/ms_signin_light_short.svg';
-        } else {
             msBtn.src = 'images/ms_signin_dark_short.svg';
         }
     }
@@ -7478,7 +7472,7 @@ function toggleTheme() {
     localStorage.setItem('theme', newTheme);
     
     // Update Microsoft button
-    updateMicrosoftButton(newTheme);
+    
     
     // Update theme toggle icon
     updateThemeIcon(newTheme);
@@ -7493,11 +7487,6 @@ function toggleTheme() {
     document.documentElement.setAttribute('data-theme', theme);
     document.body.setAttribute('data-theme', theme);
     
-    // Set Microsoft button immediately
-    const msBtn = document.getElementById('microsoftBtnImg');
-    if (msBtn) {
-        msBtn.src = theme === 'light' ? 'images/ms_signin_light_short.svg' : 'images/ms_signin_dark_short.svg';
-    }
     
     // Update theme icon
     updateThemeIcon(theme);

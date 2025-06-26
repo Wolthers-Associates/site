@@ -6,6 +6,13 @@
     <meta name="description" content="Trip Itineraries Management System - Wolthers & Associates">
     <title>Trip Itineraries - Wolthers & Associates</title>
     
+    <!-- Force dark mode for login screen -->
+    <script>
+        // Force dark mode for login screen, regardless of previous theme
+        document.documentElement.setAttribute('data-theme', 'dark');
+        document.body.setAttribute('data-theme', 'dark');
+    </script>
+    
     <!-- Immediate dark mode support to prevent white blink -->
     <style>
         /* Immediate dark mode styles to prevent FOUC (Flash of Unstyled Content) */
@@ -1020,7 +1027,7 @@
                     </div>
                     
                     <button type="button" id="microsoftLoginBtn" class="microsoft-signin-btn">
-                        <img id="microsoftBtnImg" class="microsoft-login-img" src="images/ms_signin_dark_short.svg" alt="Sign in with Microsoft" class="ms-signin-image">
+                        <img src="images/ms_signin_dark_short.svg" alt="Sign in with Microsoft">
                     </button>
                 </div>
 
