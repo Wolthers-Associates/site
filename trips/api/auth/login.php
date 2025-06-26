@@ -44,35 +44,47 @@ try {
     if ($loginType === 'office365') {
         $userInfo = validateOffice365Token($accessToken);
         if ($userInfo) {
-            // Check if user exists in our system
+            // Check if user exists in our system (any role)
             $stmt = $pdo->prepare("SELECT id, name, email, role, office365_id FROM users WHERE email = ? AND status = 'active'");
             $stmt->execute([$userInfo['email']]);
             $user = $stmt->fetch();
             
             if (!$user) {
-                // Auto-create user from Office 365 if they don't exist
-                try {
-                    $stmt = $pdo->prepare("
-                        INSERT INTO users (email, name, role, office365_id, status, last_login_at) 
-                        VALUES (?, ?, 'employee', ?, 'active', NOW())
-                    ");
-                    $stmt->execute([$userInfo['email'], $userInfo['name'], $userInfo['id']]);
-                } catch (Exception $e) {
-                    // Fallback if last_login_at column doesn't exist
-                    $stmt = $pdo->prepare("
-                        INSERT INTO users (email, name, role, office365_id, status) 
-                        VALUES (?, ?, 'employee', ?, 'active')
-                    ");
-                    $stmt->execute([$userInfo['email'], $userInfo['name'], $userInfo['id']]);
-                }
-                $userId = $pdo->lastInsertId();
+                // Check if this email has been invited or received a trip itinerary
+                // 1. Check one_time_codes (login, registration, email_verification)
+                $inviteStmt = $pdo->prepare("SELECT id FROM one_time_codes WHERE email = ? AND purpose IN ('login', 'registration', 'email_verification') LIMIT 1");
+                $inviteStmt->execute([$userInfo['email']]);
+                $invited = $inviteStmt->fetch();
+                // 2. Check trip_participants
+                $tripStmt = $pdo->prepare("SELECT id FROM trip_participants WHERE email = ? LIMIT 1");
+                $tripStmt->execute([$userInfo['email']]);
+                $isTripParticipant = $tripStmt->fetch();
                 
-                $user = [
-                    'id' => $userId,
-                    'name' => $userInfo['name'],
-                    'email' => $userInfo['email'],
-                    'role' => 'employee'
-                ];
+                if ($invited || $isTripParticipant) {
+                    // Auto-create user as partner
+                    try {
+                        $stmt = $pdo->prepare("
+                            INSERT INTO users (email, name, role, office365_id, status, last_login_at) 
+                            VALUES (?, ?, 'partner', ?, 'active', NOW())
+                        ");
+                        $stmt->execute([$userInfo['email'], $userInfo['name'], $userInfo['id']]);
+                    } catch (Exception $e) {
+                        $stmt = $pdo->prepare("
+                            INSERT INTO users (email, name, role, office365_id, status) 
+                            VALUES (?, ?, 'partner', ?, 'active')
+                        ");
+                        $stmt->execute([$userInfo['email'], $userInfo['name'], $userInfo['id']]);
+                    }
+                    $userId = $pdo->lastInsertId();
+                    $user = [
+                        'id' => $userId,
+                        'name' => $userInfo['name'],
+                        'email' => $userInfo['email'],
+                        'role' => 'partner'
+                    ];
+                } else {
+                    sendError('No account found for this Microsoft account. Please register or contact support.', 404);
+                }
             } else {
                 // Update existing user with Office 365 ID and last login (if columns exist)
                 try {
@@ -83,7 +95,6 @@ try {
                     ");
                     $updateStmt->execute([$userInfo['id'], $user['id']]);
                 } catch (Exception $e) {
-                    // Fallback if last_login_at or login_attempts columns don't exist
                     $updateStmt = $pdo->prepare("
                         UPDATE users 
                         SET office365_id = ?, updated_at = NOW()
