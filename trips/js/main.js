@@ -7435,3 +7435,33 @@ function showTripDetailsModal(trip) {
         document.body.style.overflow = 'auto';
     });
 }
+
+function setTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+    updateThemeIcon(theme);
+}
+
+function updateThemeIcon(theme) {
+    const iconSpan = document.getElementById('themeToggleIcon');
+    if (!iconSpan) return;
+    if (theme === 'dark') {
+        iconSpan.innerHTML = `<svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="11" cy="11" r="7" fill="#FFD600"/><path d="M11 2v2M11 18v2M4.22 4.22l1.42 1.42M16.36 16.36l1.42 1.42M2 11h2M18 11h2M4.22 17.78l1.42-1.42M16.36 5.64l1.42-1.42" stroke="#FFD600" stroke-width="1.5" stroke-linecap="round"/></svg>`;
+    } else {
+        iconSpan.innerHTML = `<svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M17.657 16.243A8 8 0 0 1 5.757 4.343a8.001 8.001 0 1 0 11.9 11.9z" fill="#333" stroke="#FFD600" stroke-width="1.5"/></svg>`;
+    }
+}
+
+function toggleTheme() {
+    const current = document.documentElement.getAttribute('data-theme');
+    setTheme(current === 'dark' ? 'light' : 'dark');
+}
+
+// On page load, set theme from localStorage or system
+(function() {
+    let theme = localStorage.getItem('theme');
+    if (!theme) {
+        theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    setTheme(theme);
+})();
