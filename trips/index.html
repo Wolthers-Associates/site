@@ -7,7 +7,7 @@
     <title>Trip Itineraries - Wolthers & Associates</title>
     
     <!-- Immediate dark mode support to prevent white blink -->
-    <style data-prefers-dark>
+    <style>
         /* Immediate dark mode styles to prevent FOUC (Flash of Unstyled Content) */
         :root {
             --dark-bg: #181c1f;
@@ -233,7 +233,7 @@
         }
     </style>
     
-    <style data-prefers-dark>
+    <style>
         /* Company Selector Styles */
         .fluent-company-selector {
             display: flex;
@@ -984,13 +984,10 @@
       (function() {
         let theme = localStorage.getItem('theme');
         if (!theme) {
-      theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-      }
-      document.documentElement.setAttribute('data-theme', theme);
-      document.body.setAttribute('data-theme', theme);
-      document.querySelectorAll('style[data-prefers-dark]').forEach(el => {
-        el.disabled = theme === 'light';
-      });
+          theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        document.documentElement.setAttribute('data-theme', theme);
+        document.body.setAttribute('data-theme', theme);
       })();
     </script>
 </head>
@@ -3109,5 +3106,10 @@ The system will automatically:
     </div>
 
     <script src="js/main.js"></script>
+    <script>
+      // Force dark mode for login screen, regardless of previous theme
+      document.documentElement.setAttribute('data-theme', 'dark');
+      document.body.setAttribute('data-theme', 'dark');
+    </script>
 </body>
 </html> 
