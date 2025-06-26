@@ -1,5 +1,7 @@
 import { initTheme } from '../modules/theme.js';
 initTheme();
 
-import('../../trips/js/microsoft-auth.js');
-import('../../trips/js/main.js');
+(async () => {
+  await import('../../trips/js/microsoft-auth.js');
+  await import('../../trips/js/main.js');
+})();
