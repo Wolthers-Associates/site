@@ -3332,7 +3332,7 @@ async function deleteCompany(companyId) {
         try {
             // Try to delete via API first
             try {
-                const response = await fetch('api/companies/manage.php', {
+                const response = await fetch('/companies-api.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -3517,12 +3517,12 @@ async function handleEditCompanySubmit(event) {
         
         // Try to update via API first
         try {
-            const response = await fetch('api/companies/manage.php', {
+            const response = await fetch('/companies-api.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     action: 'update',
-                    company: formData
+                    ...formData
                 })
             });
 
@@ -5668,12 +5668,15 @@ async function handleAddCompanySubmit(event) {
         clearCompanyFormErrors();
         
         // Submit to API
-        const response = await fetch('api/companies/manage.php', {
+        const response = await fetch('/companies-api.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(formData)
+            body: JSON.stringify({
+                action: 'create',
+                ...formData
+            })
         });
         
         const result = await response.json();
@@ -5821,7 +5824,7 @@ function clearCompanyForm() {
  */
 async function loadCompanies() {
     try {
-        const response = await fetch('api/companies/manage.php?status=active&limit=100');
+        const response = await fetch('/companies-api.php?status=active&limit=100');
         const result = await response.json();
         
         if (result.companies) {
@@ -5889,11 +5892,14 @@ function getDefaultCompanies() {
         {
             id: 1,
             full_name: 'Wolthers & Associates Ltd.',
-            fantasy_name: 'Wolthers & Associates',
+            fantasy_name: 'W & A',
             company_type: 'consultant',
-            city: 'São Paulo',
+            address: 'Rua XV de Novembro, 96',
+            city: 'Santos',
             state: 'SP',
             country: 'Brazil',
+            postal_code: '11010-151',
+            registration_number: '62.298.006/0001-91',
             status: 'active'
         },
         {
