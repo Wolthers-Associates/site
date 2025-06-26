@@ -7440,6 +7440,7 @@ function setTheme(theme) {
     document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem('theme', theme);
     updateThemeIcon(theme);
+    updateMicrosoftLoginButton(theme);
 }
 
 function updateThemeIcon(theme) {
@@ -7451,6 +7452,16 @@ function updateThemeIcon(theme) {
     } else {
         // Show moon for dark mode (white)
         iconSpan.innerHTML = `<svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16.5 14.5A7 7 0 0 1 7.5 5.5a7 7 0 1 0 9 9z" fill="#fff" stroke="#fff" stroke-width="1.5"/></svg>`;
+    }
+}
+
+function updateMicrosoftLoginButton(theme) {
+    var img = document.getElementById('microsoftBtnImg');
+    if (!img) return;
+    if (theme === 'dark') {
+        img.src = 'images/ms_signin_dark_short.svg';
+    } else {
+        img.src = 'images/ms_signin_light_short.svg';
     }
 }
 
@@ -7466,4 +7477,5 @@ function toggleTheme() {
         theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     }
     setTheme(theme);
+    updateMicrosoftLoginButton(theme);
 })();
