@@ -12,24 +12,41 @@
     <link rel="manifest" href="favicon_io/site.webmanifest">
     <link rel="shortcut icon" href="favicon_io/favicon.ico">
     
-    <style>
+    <style data-prefers-dark>
         :root {
             --primary-green: #2C5530;
             --medium-green: #2d5a47;
             --light-green: #325C36;
             --gold: #D4AF37;
-            --bg-color: #0f1510;
-            --card-bg: #1a2e1c;
-            --text-primary: #E3D6C0;
-            --text-secondary: #FFE082;
-            --border-color: #2d3136;
-            --shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-            --success-bg: #1e3a1e;
-            --success-color: #4caf50;
-            --error-bg: #3d1a1a;
-            --error-color: #f44336;
-            --loading-bg: #1a2a3d;
-            --loading-color: #64b5f6;
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-primary: #333333;
+            --text-secondary: #666666;
+            --border-color: #e0e0e0;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --success-bg: #e8f5e8;
+            --success-color: #2e7d32;
+            --error-bg: #ffebee;
+            --error-color: #c62828;
+            --loading-bg: #e3f2fd;
+            --loading-color: #1976d2;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #0f1510;
+                --card-bg: #1a2e1c;
+                --text-primary: #E3D6C0;
+                --text-secondary: #FFE082;
+                --border-color: #2d3136;
+                --shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+                --success-bg: #1e3a1e;
+                --success-color: #4caf50;
+                --error-bg: #3d1a1a;
+                --error-color: #f44336;
+                --loading-bg: #1a2a3d;
+                --loading-color: #64b5f6;
+            }
         }
 
         * {
@@ -70,15 +87,27 @@
             height: auto;
             margin: 0 auto 20px;
             display: block;
-            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .logo {
+                filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+            }
         }
 
         .company-name {
-            color: var(--gold);
+            color: var(--primary-green);
             font-size: 1.5rem;
             font-weight: 600;
             margin-bottom: 8px;
             letter-spacing: -0.5px;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .company-name {
+                color: var(--gold);
+            }
         }
 
         .page-title {
@@ -170,7 +199,20 @@
 
         @media (max-width: 480px) {
             .container {
-                padding: 20px;
+                padding: 30px 20px;
+                margin: 10px;
+            }
+            
+            .logo {
+                width: 100px;
+            }
+            
+            .company-name {
+                font-size: 1.25rem;
+            }
+            
+            .page-title {
+                font-size: 1.1rem;
             }
         }
     </style>

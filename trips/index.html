@@ -6,13 +6,6 @@
     <meta name="description" content="Trip Itineraries Management System - Wolthers & Associates">
     <title>Trip Itineraries - Wolthers & Associates</title>
     
-    <!-- Force dark mode for login screen -->
-    <script>
-        // Force dark mode for login screen, regardless of previous theme
-        document.documentElement.setAttribute('data-theme', 'dark');
-        document.body.setAttribute('data-theme', 'dark');
-    </script>
-    
     <!-- Immediate dark mode support to prevent white blink -->
     <style>
         /* Immediate dark mode styles to prevent FOUC (Flash of Unstyled Content) */
@@ -735,268 +728,6 @@
     <link rel="shortcut icon" href="favicon_io/favicon.ico">
     <!-- Microsoft Authentication -->
     <script src="js/microsoft-auth.js"></script>
-
-    <style>
-    html, body {
-      transition: background 0.4s cubic-bezier(.4,0,.2,1), color 0.4s cubic-bezier(.4,0,.2,1);
-    }
-    .admin-icon-btn#themeToggleBtn {
-      background: none;
-      border: none;
-      padding: 6px;
-      margin-left: 6px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 50%;
-      transition: background 0.2s;
-    }
-    .admin-icon-btn#themeToggleBtn:hover, .admin-icon-btn#themeToggleBtn:focus {
-      background: rgba(255,255,255,0.12);
-    }
-    #themeToggleIcon svg {
-      display: block;
-      width: 22px;
-      height: 22px;
-    }
-    </style>
-
-    <style>
-    [data-theme="dark"] body, [data-theme="dark"] html {
-      background: var(--dark-bg, #181c1f) !important;
-      color: var(--dark-text-secondary, #e6edf3) !important;
-    }
-    [data-theme="light"] body, [data-theme="light"] html {
-      background: #fff !important;
-      color: #23272b !important;
-    }
-    </style>
-
-    <style>
-    :root {
-      --light-bg: #E5D5BE;
-      --light-bg-secondary: #fff;
-      --light-card: #fff;
-      --light-modal: #fff;
-      --light-border: #e1e5e9;
-      --light-text: #23272b;
-      --light-text-secondary: #2C5530;
-      --light-accent: #2C5530;
-      --light-gold: #DAA520;
-      --light-muted: #757575;
-      --light-table-header: #f5f5f5;
-      --light-table-row: #fff;
-      --light-table-row-alt: #f7f7f5;
-    }
-    [data-theme="light"] body, [data-theme="light"] html {
-      background: var(--light-bg) !important;
-      color: var(--light-text) !important;
-    }
-    [data-theme="light"] .main-container,
-    [data-theme="light"] .main-content,
-    [data-theme="light"] .fluent-modal-content,
-    [data-theme="light"] .modal-content,
-    [data-theme="light"] .fluent-modal-content-small {
-      background: var(--light-modal) !important;
-      color: var(--light-text) !important;
-      border: 1px solid var(--light-border) !important;
-    }
-    [data-theme="light"] .fluent-table-container,
-    [data-theme="light"] .fluent-table {
-      background: var(--light-card) !important;
-      color: var(--light-text) !important;
-      border: 1px solid var(--light-border) !important;
-    }
-    [data-theme="light"] .fluent-table th {
-      background: var(--light-table-header) !important;
-      color: var(--light-text-secondary) !important;
-      border-bottom: 1px solid var(--light-border) !important;
-    }
-    [data-theme="light"] .fluent-table td {
-      background: var(--light-table-row) !important;
-      color: var(--light-text) !important;
-      border-bottom: 1px solid var(--light-border) !important;
-    }
-    [data-theme="light"] .fluent-table tr:nth-child(even) td {
-      background: var(--light-table-row-alt) !important;
-    }
-    [data-theme="light"] .fluent-profile-card-flat,
-    [data-theme="light"] .fluent-profile-section {
-      background: var(--light-card) !important;
-      color: var(--light-text) !important;
-      border: 1px solid var(--light-border) !important;
-    }
-    [data-theme="light"] .fluent-modal-header,
-    [data-theme="light"] .modal-header {
-      background: var(--light-bg-secondary) !important;
-      color: var(--light-accent) !important;
-      border-bottom: 1px solid var(--light-border) !important;
-    }
-    [data-theme="light"] .fluent-modal-title,
-    [data-theme="light"] .modal-title {
-      color: var(--light-gold) !important;
-    }
-    [data-theme="light"] .fluent-btn,
-    [data-theme="light"] .btn {
-      background: var(--light-bg-secondary) !important;
-      color: var(--light-accent) !important;
-      border: 1px solid var(--light-border) !important;
-    }
-    [data-theme="light"] .fluent-btn-primary,
-    [data-theme="light"] .btn-primary {
-      background: var(--light-gold) !important;
-      color: #fff !important;
-      border: none !important;
-    }
-    [data-theme="light"] .fluent-btn-secondary,
-    [data-theme="light"] .btn-secondary {
-      background: var(--light-accent) !important;
-      color: #fff !important;
-      border: none !important;
-    }
-    [data-theme="light"] .fluent-section-title,
-    [data-theme="light"] .section-title {
-      color: var(--light-accent) !important;
-    }
-    [data-theme="light"] .summary-card {
-      background: var(--light-card) !important;
-      color: var(--light-text) !important;
-      border: 1px solid var(--light-border) !important;
-    }
-    [data-theme="light"] .summary-label {
-      color: var(--light-muted) !important;
-    }
-    [data-theme="light"] .summary-number {
-      color: var(--light-gold) !important;
-    }
-    [data-theme="light"] .company-type-badge,
-    [data-theme="light"] .status-badge,
-    [data-theme="light"] .status-indicator {
-      background: var(--light-table-header) !important;
-      color: var(--light-accent) !important;
-      border: 1px solid var(--light-border) !important;
-    }
-    [data-theme="light"] .fluent-badge-admin {
-      background: var(--light-gold) !important;
-      color: #fff !important;
-    }
-    [data-theme="light"] .fluent-badge-team {
-      background: var(--light-accent) !important;
-      color: #fff !important;
-    }
-    [data-theme="light"] .fluent-search-box {
-      background: var(--light-bg-secondary) !important;
-      border: 1px solid var(--light-border) !important;
-    }
-    [data-theme="light"] .fluent-search-input {
-      background: var(--light-bg-secondary) !important;
-      color: var(--light-text) !important;
-      border: none !important;
-    }
-    [data-theme="light"] .fluent-select {
-      background: var(--light-bg-secondary) !important;
-      color: var(--light-text) !important;
-      border: 1px solid var(--light-border) !important;
-    }
-    [data-theme="light"] .fluent-checkbox-label {
-      color: var(--light-text) !important;
-    }
-    [data-theme="light"] .fluent-help-text {
-      color: var(--light-muted) !important;
-    }
-    [data-theme="light"] .modal-backdrop {
-      background: rgba(0,0,0,0.15) !important;
-    }
-    [data-theme="light"] .fluent-table thead {
-      background: var(--light-table-header) !important;
-    }
-    [data-theme="light"] .fluent-table th,
-    [data-theme="light"] .fluent-table td {
-      border-bottom: 1px solid var(--light-border) !important;
-    }
-    [data-theme="light"] .fluent-action-btn {
-      background: var(--light-bg-secondary) !important;
-      color: var(--light-accent) !important;
-      border: 1px solid var(--light-border) !important;
-    }
-    [data-theme="light"] .fluent-action-btn:hover {
-      background: var(--light-gold) !important;
-      color: #fff !important;
-    }
-    [data-theme="light"] .fluent-pagination-btn,
-    [data-theme="light"] .fluent-page-btn {
-      background: var(--light-bg-secondary) !important;
-      color: var(--light-accent) !important;
-      border: 1px solid var(--light-border) !important;
-    }
-    [data-theme="light"] .fluent-page-active {
-      background: var(--light-gold) !important;
-      color: #fff !important;
-    }
-    [data-theme="light"] .fluent-modal-subtitle {
-      color: var(--light-muted) !important;
-    }
-    [data-theme="light"] .fluent-toggle-btn {
-      color: var(--light-gold) !important;
-    }
-    [data-theme="light"] .fluent-toggle-btn:hover {
-      color: #B8860B !important;
-    }
-    [data-theme="light"] .fluent-subsection-title {
-      color: var(--light-accent) !important;
-      border-bottom: 1px solid var(--light-border) !important;
-    }
-    [data-theme="light"] .fluent-profile-meta {
-      color: var(--light-muted) !important;
-    }
-    [data-theme="light"] .fluent-profile-badges .fluent-badge {
-      background: var(--light-gold) !important;
-      color: #fff !important;
-    }
-    [data-theme="light"] .fluent-profile-badges .fluent-badge-team {
-      background: var(--light-accent) !important;
-      color: #fff !important;
-    }
-    [data-theme="light"] .fluent-form-group label {
-      color: var(--light-accent) !important;
-    }
-    [data-theme="light"] .fluent-form-group input,
-    [data-theme="light"] .fluent-form-group textarea,
-    [data-theme="light"] .fluent-form-group select {
-      background: var(--light-bg-secondary) !important;
-      color: var(--light-text) !important;
-      border: 1px solid var(--light-border) !important;
-    }
-    [data-theme="light"] .fluent-form-group input:focus,
-    [data-theme="light"] .fluent-form-group textarea:focus,
-    [data-theme="light"] .fluent-form-group select:focus {
-      border-color: var(--light-gold) !important;
-      outline: none !important;
-    }
-    [data-theme="light"] .fluent-spinner {
-      border-top: 2px solid var(--light-gold) !important;
-    }
-    </style>
-
-    <style id="early-theme-style">
-      html[data-theme="light"], body[data-theme="light"] {
-        background: #E5D5BE !important;
-      }
-      html[data-theme="dark"], body[data-theme="dark"] {
-        background: #181c1f !important;
-      }
-    </style>
-    <script>
-      (function() {
-        let theme = localStorage.getItem('theme');
-        if (!theme) {
-          theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-        }
-        document.documentElement.setAttribute('data-theme', theme);
-        document.body.setAttribute('data-theme', theme);
-      })();
-    </script>
 </head>
 <body>
 
@@ -1027,7 +758,7 @@
                     </div>
                     
                     <button type="button" id="microsoftLoginBtn" class="microsoft-signin-btn">
-                        <img src="images/ms_signin_dark_short.svg" alt="Sign in with Microsoft">
+                        <img id="microsoftBtnImg" src="images/ms_signin_dark_short.svg" alt="Sign in with Microsoft" class="ms-signin-image">
                     </button>
                 </div>
 
@@ -1150,9 +881,6 @@
                     </div>
                 </div>
                 <button class="logout-btn" onclick="logout()">Logout</button>
-                <button class="admin-icon-btn" id="themeToggleBtn" title="Toggle dark/light mode" onclick="toggleTheme()">
-                  <span id="themeToggleIcon"></span>
-                </button>
             </div>
             <div class="header-logo">
                 <img src="images/wolthers-logo-off-white.svg" alt="Wolthers & Associates" class="main-logo">
@@ -3113,10 +2841,5 @@ The system will automatically:
     </div>
 
     <script src="js/main.js"></script>
-    <script>
-      // Force dark mode for login screen, regardless of previous theme
-      document.documentElement.setAttribute('data-theme', 'dark');
-      document.body.setAttribute('data-theme', 'dark');
-    </script>
 </body>
 </html> 
