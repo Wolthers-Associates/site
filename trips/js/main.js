@@ -3376,7 +3376,6 @@ function showEditCompanyModal(company) {
         document.getElementById('editCompanyPostalCode').value = company.postal_code || '';
         document.getElementById('editCompanyPhone').value = company.phone || '';
         document.getElementById('editCompanyEmail').value = company.email || '';
-        document.getElementById('editCompanyWebsite').value = company.website || '';
         document.getElementById('editCompanyRegistrationNumber').value = company.registration_number || '';
         document.getElementById('editCompanyTaxId').value = company.tax_id || '';
         document.getElementById('editCompanyStatus').value = company.status || 'active';
@@ -3395,7 +3394,7 @@ function showEditCompanyModal(company) {
         if (detailsSection && toggleBtn) {
             // Show details if any optional fields have data
             const hasOptionalData = company.address || company.city || company.phone || 
-                                   company.email || company.website || company.registration_number;
+                                   company.email || company.registration_number;
             
             if (hasOptionalData) {
                 detailsSection.style.display = 'block';
@@ -3459,6 +3458,7 @@ async function handleEditCompanySubmit(event) {
             full_name: document.getElementById('editCompanyFullName').value.trim(),
             fantasy_name: document.getElementById('editCompanyFantasyName').value.trim(),
             company_type: document.getElementById('editCompanyType').value,
+            service_provider_subtype: document.getElementById('editServiceProviderSubtype')?.value || '',
             address: document.getElementById('editCompanyAddress').value.trim(),
             city: document.getElementById('editCompanyCity').value.trim(),
             state: document.getElementById('editCompanyState').value.trim(),
@@ -3466,7 +3466,6 @@ async function handleEditCompanySubmit(event) {
             postal_code: document.getElementById('editCompanyPostalCode').value.trim(),
             phone: document.getElementById('editCompanyPhone').value.trim(),
             email: document.getElementById('editCompanyEmail').value.trim(),
-            website: document.getElementById('editCompanyWebsite').value.trim(),
             registration_number: document.getElementById('editCompanyRegistrationNumber').value.trim(),
             tax_id: document.getElementById('editCompanyTaxId').value.trim(),
             status: document.getElementById('editCompanyStatus').value
@@ -3476,9 +3475,6 @@ async function handleEditCompanySubmit(event) {
         if (!formData.full_name || !formData.company_type) {
             throw new Error('Please fill in all required fields');
         }
-        
-        // Normalize website
-        formData.website = normalizeWebsiteUrl(formData.website);
         
         // Try to update via API first
         try {
@@ -5615,7 +5611,6 @@ async function handleAddCompanySubmit(event) {
         
         // Collect form data
         const formData = collectCompanyFormData();
-        formData.website = normalizeWebsiteUrl(formData.website);
         
         // Validate data
         const validation = validateCompanyFormData(formData);
@@ -5686,7 +5681,6 @@ function collectCompanyFormData() {
         postal_code: document.getElementById('companyPostalCode')?.value?.trim() || '',
         phone: document.getElementById('companyPhone')?.value?.trim() || '',
         email: document.getElementById('companyEmail')?.value?.trim() || '',
-        website: document.getElementById('companyWebsite')?.value?.trim() || '',
         registration_number: document.getElementById('companyRegistrationNumber')?.value?.trim() || '',
         tax_id: document.getElementById('companyTaxId')?.value?.trim() || '',
         status: 'active'
@@ -5713,11 +5707,6 @@ function validateCompanyFormData(formData) {
     // Optional email validation
     if (formData.email && !validateEmail(formData.email)) {
         errors.email = 'Please enter a valid email address';
-    }
-    
-    // Optional website validation
-    if (formData.website && !isValidUrl(formData.website)) {
-        errors.website = 'Please enter a valid website URL';
     }
     
     return {
