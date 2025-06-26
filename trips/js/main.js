@@ -7441,6 +7441,11 @@ function setTheme(theme) {
     localStorage.setItem('theme', theme);
     updateThemeIcon(theme);
     updateMicrosoftLoginButton(theme);
+    // Ensure background color is set for light mode
+    if (theme === 'light') {
+        document.body.style.background = '#E5D5BE';
+        document.documentElement.style.background = '#E5D5BE';
+    }
 }
 
 function updateThemeIcon(theme) {
@@ -7456,13 +7461,15 @@ function updateThemeIcon(theme) {
 }
 
 function updateMicrosoftLoginButton(theme) {
-    var img = document.getElementById('microsoftBtnImg');
-    if (!img) return;
-    if (theme === 'dark') {
-        img.src = 'images/ms_signin_dark_short.svg';
-    } else {
-        img.src = 'images/ms_signin_light_short.svg';
-    }
+    // Update all Microsoft login images (in case there are multiple)
+    var imgs = document.querySelectorAll('.microsoft-login-img');
+    imgs.forEach(function(img) {
+        if (theme === 'dark') {
+            img.src = 'images/ms_signin_dark_short.svg';
+        } else {
+            img.src = 'images/ms_signin_light_short.svg';
+        }
+    });
 }
 
 function toggleTheme() {
@@ -7478,4 +7485,9 @@ function toggleTheme() {
     }
     setTheme(theme);
     updateMicrosoftLoginButton(theme);
+    // Ensure background color is set for light mode
+    if (theme === 'light') {
+        document.body.style.background = '#E5D5BE';
+        document.documentElement.style.background = '#E5D5BE';
+    }
 })();
