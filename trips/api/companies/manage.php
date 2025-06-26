@@ -6,7 +6,8 @@
  * Handles CRUD operations for companies
  */
 
-require_once '../config.php';
+// Include database configuration and helper functions
+require_once '../database.php';
 
 // Initialize companies table if it doesn't exist
 function initializeCompaniesTable() {
