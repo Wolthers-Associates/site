@@ -3305,8 +3305,8 @@ async function deleteCompany(companyId) {
                 const data = await response.json();
                 
                 if (data.success) {
-                    // Remove from local data
-                    removeCompanyFromLocalData(companyId, company);
+                    // Reload companies from backend
+                    await loadCompanies();
                     
                     showToast(`Company "${company.fantasy_name || company.full_name}" deleted successfully!`, 'success');
                     return;
@@ -3317,7 +3317,7 @@ async function deleteCompany(companyId) {
                 console.warn('API deletion failed, using fallback:', apiError);
                 
                 // Fallback: Remove from local data
-                removeCompanyFromLocalData(companyId, company);
+                await loadCompanies();
                 
                 showToast(`Company "${company.fantasy_name || company.full_name}" deleted locally`, 'success');
             }
@@ -3490,8 +3490,8 @@ async function handleEditCompanySubmit(event) {
             const data = await response.json();
             
             if (data.success) {
-                // Update local data
-                updateCompanyInLocalData(formData);
+                // Reload companies from backend
+                await loadCompanies();
                 
                 showToast(`Company "${formData.fantasy_name || formData.full_name}" updated successfully!`, 'success');
                 hideEditCompanyModal();
@@ -3503,7 +3503,7 @@ async function handleEditCompanySubmit(event) {
             console.warn('API update failed, using fallback:', apiError);
             
             // Fallback: Update local data
-            updateCompanyInLocalData(formData);
+            await loadCompanies();
             
             showToast(`Company "${formData.fantasy_name || formData.full_name}" updated locally`, 'success');
             hideEditCompanyModal();
@@ -5634,8 +5634,8 @@ async function handleAddCompanySubmit(event) {
         const result = await response.json();
         
         if (result.success) {
-            // Add company to local data
-            companiesData.push(result.company);
+            // Reload companies from backend
+            await loadCompanies();
             
             // Update company dropdown in user modal
             updateCompanyDropdown();
