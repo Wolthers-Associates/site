@@ -19,6 +19,7 @@ function initializeCompaniesTable() {
         fantasy_name VARCHAR(255),
         address TEXT,
         city VARCHAR(100),
+        state VARCHAR(100),
         country VARCHAR(100),
         postal_code VARCHAR(20),
         phone VARCHAR(50),
@@ -180,15 +181,16 @@ function handleCreateCompanyAction($input) {
     }
     
     $sql = "INSERT INTO companies (
-        full_name, fantasy_name, address, city, country, postal_code,
+        full_name, fantasy_name, address, city, state, country, postal_code,
         phone, email, website, company_type, registration_number, tax_id, status
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     
     $params = [
         $input['full_name'],
         $input['fantasy_name'] ?? null,
         $input['address'] ?? null,
         $input['city'] ?? null,
+        $input['state'] ?? null,
         $input['country'] ?? null,
         $input['postal_code'] ?? null,
         $input['phone'] ?? null,
@@ -251,7 +253,7 @@ function handleUpdateCompanyAction($input) {
     $params = [];
     
     $allowedFields = [
-        'full_name', 'fantasy_name', 'address', 'city', 'country', 'postal_code',
+        'full_name', 'fantasy_name', 'address', 'city', 'state', 'country', 'postal_code',
         'phone', 'email', 'website', 'company_type', 'registration_number', 'tax_id', 'status'
     ];
     

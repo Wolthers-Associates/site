@@ -3058,7 +3058,7 @@ function createCompanyTableRow(company, users) {
     const userCount = companyUsers.length;
     
     // Format location
-    const location = [company.city, company.country].filter(Boolean).join(', ') || '-';
+    const location = [company.city, company.state, company.country].filter(Boolean).join(', ') || '-';
     
     // Format company type
     const typeDisplay = company.company_type ? 
@@ -3365,6 +3365,7 @@ function showEditCompanyModal(company) {
         document.getElementById('editCompanyType').value = company.company_type || '';
         document.getElementById('editCompanyAddress').value = company.address || '';
         document.getElementById('editCompanyCity').value = company.city || '';
+        document.getElementById('editCompanyState').value = company.state || '';
         document.getElementById('editCompanyCountry').value = company.country || '';
         document.getElementById('editCompanyPostalCode').value = company.postal_code || '';
         document.getElementById('editCompanyPhone').value = company.phone || '';
@@ -3454,6 +3455,7 @@ async function handleEditCompanySubmit(event) {
             company_type: document.getElementById('editCompanyType').value,
             address: document.getElementById('editCompanyAddress').value.trim(),
             city: document.getElementById('editCompanyCity').value.trim(),
+            state: document.getElementById('editCompanyState').value.trim(),
             country: document.getElementById('editCompanyCountry').value.trim(),
             postal_code: document.getElementById('editCompanyPostalCode').value.trim(),
             phone: document.getElementById('editCompanyPhone').value.trim(),
@@ -4957,7 +4959,6 @@ function formatMemberSince(dateString) {
     const date = new Date(dateString);
     const now = new Date();
     const diffTime = Math.abs(now - date);
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     
     if (diffDays < 30) {
         return `${diffDays} day${diffDays === 1 ? '' : 's'} ago`;
@@ -5669,6 +5670,7 @@ function collectCompanyFormData() {
         company_type: document.getElementById('companyType')?.value || '',
         address: document.getElementById('companyAddress')?.value?.trim() || '',
         city: document.getElementById('companyCity')?.value?.trim() || '',
+        state: document.getElementById('companyState')?.value?.trim() || '',
         country: document.getElementById('companyCountry')?.value?.trim() || '',
         postal_code: document.getElementById('companyPostalCode')?.value?.trim() || '',
         phone: document.getElementById('companyPhone')?.value?.trim() || '',
@@ -5848,6 +5850,7 @@ function getDefaultCompanies() {
             fantasy_name: 'Wolthers & Associates',
             company_type: 'consultant',
             city: 'São Paulo',
+            state: 'SP',
             country: 'Brazil',
             status: 'active'
         },
@@ -5857,6 +5860,7 @@ function getDefaultCompanies() {
             fantasy_name: 'Mitsui Coffee',
             company_type: 'importer',
             city: 'Tokyo',
+            state: 'Tokyo',
             country: 'Japan',
             status: 'active'
         },
@@ -5866,6 +5870,7 @@ function getDefaultCompanies() {
             fantasy_name: 'ColCoffee',
             company_type: 'exporter',
             city: 'Bogotá',
+            state: 'Cundinamarca',
             country: 'Colombia',
             status: 'active'
         },
@@ -5875,6 +5880,7 @@ function getDefaultCompanies() {
             fantasy_name: 'Premium Roasters',
             company_type: 'roaster',
             city: 'New York',
+            state: 'NY',
             country: 'USA',
             status: 'active'
         }
