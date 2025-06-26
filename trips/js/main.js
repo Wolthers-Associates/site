@@ -1836,6 +1836,1864 @@ const trips = {
         modal.style.display = 'flex';
         document.body.style.overflow = 'hidden';
     }
+  };
+
+/**
+ * Comprehensive Data Refresh Function
+ * Reloads both companies and users from backend and updates all UI components
+ */
+async function refreshAllData() {
+    try {
+        console.log('🔄 Refreshing all data from backend...');
+        
+        // 1. Load users fresh from backend (for user count accuracy)
+        if (currentUser && currentUser.role === 'admin') {
+            await loadAllUsersForAdmin();
+        }
+        
+        // 2. Load companies fresh from backend
+        await loadCompanies();
+        
+        // 3. Auto-link users to companies based on latest data
+        await autoLinkUsersToCompanies();
+        
+        // 4. Update all UI components
+        if (document.getElementById('companyManagementModal').style.display !== 'none') {
+            loadCompanyTable();
+        }
+        
+        if (document.getElementById('userManagementModal').style.display !== 'none') {
+            loadModalUsersList();
+        }
+        
+        // 5. Update dropdowns
+        updateCompanyDropdown();
+        
+        console.log('✅ All data refreshed successfully');
+        
+    } catch (error) {
+        console.error('❌ Error refreshing data:', error);
+        showToast('Failed to refresh data from backend', 'error');
+    }
+}
+
+// Dark mode logo handling
+function updateLogoForColorScheme() {
+    const logo = document.querySelector('.main-logo');
+    if (!logo) return;
+    
+    const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    if (isDark) {
+        logo.src = 'images/wolthers-logo-green.svg';
+    } else {
+        logo.src = 'images/wolthers-logo-off-white.svg';
+    }
+}
+
+// Listen for color scheme changes
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateLogoForColorScheme);
+
+// Mock data for development - will be replaced with API calls
+const MOCK_TRIPS = [
+    {
+        id: 'upcoming-sample-trip',
+        title: 'Upcoming Sample Trip',
+        description: 'This is a sample upcoming trip for testing purposes.',
+        date: '2025-02-15',
+        endDate: '2025-02-22',
+        guests: 'Sample Participants',
+        cars: '2 SUVs',
+        driver: 'Local Driver',
+        status: 'upcoming',
+        partnerEmails: ['sample@example.com'],
+        partnerCodes: ['BRAZIL2025', 'COLOMBIA2025', 'ETHIOPIA2025']
+    }
+    // Add mock trips here or load from API
+];
+
+const MOCK_CREDENTIALS = {
+    // Development credentials for testing
+    wolthers: ['daniel@wolthers.com', 'svenn@wolthers.com', 'tom@wolthers.com', 'rasmus@wolthers.com'],
+    tripCodes: ['BRAZIL2025', 'COLOMBIA2025', 'ETHIOPIA2025']
+};
+
+// ============================================================================
+// 🤖 AI TRIP CODE GENERATOR SYSTEM
+// ============================================================================
+
+/**
+ * Company Abbreviation Mapping System
+ * Handles intelligent abbreviation generation for company names
+ */
+const COMPANY_ABBREVIATIONS = {
+    // Pre-defined recognizable company mappings
+    'mitsui': 'MITSUI',
+    'mitsui & co': 'MITSUI',
+    'cape horn coffees': 'CHC',
+    'douqué': 'DQ',
+    'blaser': 'BT',
+    'blaser trading': 'BT',
+    'equatorial': 'EQT',
+    'equatorial coffee': 'EQT',
+    'volcafe': 'VOLC',
+    'neumann': 'NEUM',
+    'ed&f man': 'EDF',
+    'sucafina': 'SUCA',
+    'olam': 'OLAM',
+    'louis dreyfus': 'LDC',
+    'cargill': 'CARG',
+    'coffee holding': 'CHC',
+    'royal coffee': 'ROYAL',
+    'green coffee company': 'GCC',
+    'specialty coffee': 'SPEC',
+    'importers alliance': 'IMPA',
+    'atlantic specialty coffee': 'ASC',
+    'red fox coffee': 'RFX',
+    'genuine origin': 'GO',
+    'ally coffee': 'ALLY',
+    'coffee beans international': 'CBI',
+    'sustainable harvest': 'SH',
+    'wolthers & associates': 'WA',
+    'wolthers': 'WA'
+};
+
+/**
+ * AI Trip Code Generator Class
+ * Generates intelligent, memorable trip codes following business rules
+ */
+class TripCodeGenerator {
+    constructor() {
+        this.existingCodes = new Set();
+        this.loadExistingCodes();
+    }
+
+    /**
+     * Load existing trip codes to prevent duplicates
+     */
+    loadExistingCodes() {
+        // Load from mock data
+        MOCK_TRIPS.forEach(trip => {
+            if (trip.partnerCodes) {
+                trip.partnerCodes.forEach(code => this.existingCodes.add(code));
+            }
+        });
+        
+        // Add hardcoded existing codes
+        ['BRAZIL2025', 'COLOMBIA2025', 'ETHIOPIA2025', 'GUATEMALA2024'].forEach(code => {
+            this.existingCodes.add(code);
+        });
+    }
+
+    /**
+     * Generate company abbreviation with intelligent logic
+     * @param {string} companyName - Full company name
+     * @returns {string} - Company abbreviation (2-5 chars)
+     */
+    generateCompanyAbbreviation(companyName) {
+        if (!companyName) return 'GEN'; // Generic fallback
+        
+        const cleaned = companyName.toLowerCase().trim();
+        
+        // Check predefined mappings first
+        if (COMPANY_ABBREVIATIONS[cleaned]) {
+            return COMPANY_ABBREVIATIONS[cleaned];
+        }
+        
+        // Smart abbreviation generation
+        const words = cleaned
+            .replace(/[^a-z0-9\s]/g, '') // Remove special chars
+            .split(/\s+/)
+            .filter(word => word.length > 0);
+        
+        if (words.length === 1) {
+            // Single word: take first 3-4 characters
+            const word = words[0];
+            if (word.length <= 3) return word.toUpperCase();
+            if (word.length <= 5) return word.toUpperCase();
+            return word.substring(0, 4).toUpperCase();
+        } else if (words.length === 2) {
+            // Two words: take first 2-3 chars of each
+            const first = words[0].substring(0, 2);
+            const second = words[1].substring(0, 2);
+            return (first + second).toUpperCase();
+        } else {
+            // Multiple words: take first letter of each (max 5)
+            const initials = words.slice(0, 5).map(word => word[0]).join('');
+            return initials.toUpperCase();
+        }
+    }
+
+    /**
+     * Generate guest surname abbreviation
+     * @param {string} guestName - Main guest name or participant list
+     * @returns {string} - Surname abbreviation (3-4 chars)
+     */
+    generateGuestAbbreviation(guestName) {
+        if (!guestName) return 'ANON';
+        
+        // Extract surnames from participant list or single name
+        const names = guestName.split(/[,\n\r]+/).map(name => name.trim());
+        const mainName = names[0] || guestName;
+        
+        // Get surname (last word typically)
+        const nameParts = mainName.split(/\s+/).filter(part => part.length > 0);
+        const surname = nameParts.length > 1 ? nameParts[nameParts.length - 1] : nameParts[0];
+        
+        if (!surname) return 'ANON';
+        
+        // Clean and format surname
+        const cleaned = surname.replace(/[^a-zA-Z]/g, '');
+        if (cleaned.length <= 4) return cleaned.toUpperCase();
+        
+        return cleaned.substring(0, 4).toUpperCase();
+    }
+
+    /**
+     * Generate random month format
+     * @param {Date} date - Trip start date
+     * @returns {string} - Month in random format
+     */
+    generateMonthFormat(date) {
+        const month = date.getMonth();
+        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                           'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const monthNamesLong = ['January', 'February', 'March', 'April', 'May', 'June',
+                               'July', 'August', 'September', 'October', 'November', 'December'];
+        
+        const formats = [
+            monthNames[month],                           // "Jan"
+            String(month + 1).padStart(2, '0'),        // "01"
+            monthNamesLong[month]                       // "January"
+        ];
+        
+        return formats[Math.floor(Math.random() * formats.length)];
+    }
+
+    /**
+     * Generate random year format
+     * @param {Date} date - Trip start date
+     * @returns {string} - Year in random format
+     */
+    generateYearFormat(date) {
+        const year = date.getFullYear();
+        const formats = [
+            String(year).slice(-2),  // "25"
+            String(year)             // "2025"
+        ];
+        
+        return formats[Math.floor(Math.random() * formats.length)];
+    }
+
+    /**
+     * Generate unique suffix if needed
+     * @param {string} baseCode - Base code without suffix
+     * @returns {string} - Suffix (empty or 2-digit number)
+     */
+    generateUniqueSuffix(baseCode) {
+        if (!this.existingCodes.has(baseCode)) {
+            return '';
+        }
+        
+        // Try suffixes 01-99
+        for (let i = 1; i <= 99; i++) {
+            const suffix = String(i).padStart(2, '0');
+            const codeWithSuffix = `${baseCode}-${suffix}`;
+            if (!this.existingCodes.has(codeWithSuffix)) {
+                return `-${suffix}`;
+            }
+        }
+        
+        // Fallback: use random suffix
+        const randomSuffix = Math.floor(Math.random() * 99) + 1;
+        return `-${String(randomSuffix).padStart(2, '0')}`;
+    }
+
+    /**
+     * Main trip code generation function
+     * @param {Object} tripData - Trip information
+     * @returns {Object} - Generated code info
+     */
+    generateTripCode(tripData) {
+        const {
+            companyName = '',
+            guestName = '',
+            startDate = new Date(),
+            title = ''
+        } = tripData;
+
+        const tripDate = new Date(startDate);
+        
+        // Generate components
+        const companyAbbrev = this.generateCompanyAbbreviation(companyName);
+        const guestAbbrev = this.generateGuestAbbreviation(guestName);
+        const monthFormat = this.generateMonthFormat(tripDate);
+        const yearFormat = this.generateYearFormat(tripDate);
+        
+        // Build base code components
+        const components = [companyAbbrev, guestAbbrev, monthFormat];
+        
+        // Add year if total length allows
+        let baseCode = components.join('-');
+        if (baseCode.length + yearFormat.length + 1 <= 13) { // Leave room for suffix
+            baseCode += `-${yearFormat}`;
+        }
+        
+        // Ensure maximum 15 characters total
+        if (baseCode.length > 13) {
+            // Trim components if too long
+            const maxCompanyLen = Math.min(companyAbbrev.length, 4);
+            const maxGuestLen = Math.min(guestAbbrev.length, 3);
+            const trimmedCompany = companyAbbrev.substring(0, maxCompanyLen);
+            const trimmedGuest = guestAbbrev.substring(0, maxGuestLen);
+            baseCode = `${trimmedCompany}-${trimmedGuest}-${monthFormat}`;
+        }
+        
+        // Add unique suffix if needed
+        const suffix = this.generateUniqueSuffix(baseCode);
+        const finalCode = baseCode + suffix;
+        
+        // Add to existing codes set
+        this.existingCodes.add(finalCode);
+        
+        return {
+            code: finalCode,
+            components: {
+                company: companyAbbrev,
+                guest: guestAbbrev,
+                month: monthFormat,
+                year: yearFormat,
+                suffix: suffix.replace('-', '')
+            },
+            metadata: {
+                originalCompany: companyName,
+                originalGuest: guestName,
+                tripDate: tripDate.toISOString().split('T')[0],
+                generatedAt: new Date().toISOString()
+            }
+        };
+    }
+
+    /**
+     * Generate QR code data URL for a trip code
+     * @param {string} tripCode - The trip code
+     * @param {Object} tripData - Additional trip data for QR
+     * @returns {string} - QR code data URL
+     */
+    generateQRCode(tripCode, tripData = {}) {
+        // For now, return a placeholder. In production, use QR library
+        const qrData = {
+            code: tripCode,
+            trip: tripData.title || 'Wolthers Coffee Trip',
+            url: `${window.location.origin}/trips/?code=${tripCode}`,
+            company: 'Wolthers & Associates'
+        };
+        
+        // Placeholder QR code (in production, use a QR library like qrcode.js)
+        return `data:image/svg+xml,${encodeURIComponent(`
+            <svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+                <rect width="200" height="200" fill="white"/>
+                <rect x="20" y="20" width="160" height="160" fill="black"/>
+                <rect x="30" y="30" width="140" height="140" fill="white"/>
+                <text x="100" y="90" text-anchor="middle" font-size="12" font-family="monospace" fill="black">${tripCode}</text>
+                <text x="100" y="110" text-anchor="middle" font-size="8" font-family="Arial" fill="black">Wolthers Trips</text>
+                <text x="100" y="125" text-anchor="middle" font-size="6" font-family="Arial" fill="black">${qrData.url}</text>
+            </svg>
+        `)}`;
+    }
+}
+
+// Initialize the trip code generator
+const tripCodeGenerator = new TripCodeGenerator();
+
+// Utility Functions
+const utils = {
+    // Format date for display
+    formatDate: (dateString) => {
+        return new Date(dateString).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+    },
+
+    // Format date range
+    formatDateRange: (startDate, endDate) => {
+        const start = utils.formatDate(startDate);
+        const end = utils.formatDate(endDate);
+        return `${start} - ${end}`;
+    },
+
+    // Calculate trip duration
+    getTripDuration: (startDate, endDate) => {
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        const diffTime = Math.abs(end - start);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        return diffDays;
+    },
+
+    // Show loading spinner
+    showLoading: () => {
+        document.getElementById('loadingSpinner').style.display = 'flex';
+    },
+
+    // Hide loading spinner
+    hideLoading: () => {
+        document.getElementById('loadingSpinner').style.display = 'none';
+    },
+
+    // Show notification (simple alert for now)
+    showNotification: (message, type = 'info') => {
+        // In a real app, this would be a toast notification
+        const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️';
+        alert(`${icon} ${message}`);
+    },
+
+    // Show error message
+    showError: (message) => {
+        const errorDiv = document.getElementById('errorMessage');
+        if (errorDiv) {
+            errorDiv.textContent = message;
+            errorDiv.classList.add('show');
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                errorDiv.classList.remove('show');
+            }, 5000);
+        } else {
+            // Fallback to alert if error div not found
+            alert(`❌ ${message}`);
+        }
+    },
+
+    // Debounce function for search/filtering
+    debounce: (func, wait) => {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+};
+
+// Enhanced Authentication Functions
+const auth = {
+    // Real authentication only
+    init: async () => {
+        const session = sessionStorage.getItem('userSession');
+        if (session) {
+            try {
+                const userData = JSON.parse(session);
+                if (await auth.validateSession(userData)) {
+                                    currentUser = userData.user;
+                ui.showDashboard();
+                updateNavigationVisibility(currentUser);
+                await trips.loadTrips();
+                    return;
+                }
+            } catch (e) {
+                sessionStorage.removeItem('userSession');
+            }
+        }
+        ui.showLogin();
+    },
+
+    // Real session validation
+    validateSession: async (userData) => {
+        try {
+            const response = await fetch('/api/auth/validate.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ session_token: userData.token })
+            });
+            return response.ok;
+        } catch (error) {
+            return false;
+        }
+    },
+
+    // Real Office 365 authentication
+    signInWithMicrosoft: async () => {
+        try {
+            if (!microsoftAuth) {
+                throw new Error('Microsoft authentication not initialized. Please check Azure AD configuration.');
+            }
+            
+            utils.showLoading();
+            const result = await microsoftAuth.signIn();
+            
+            // The Microsoft auth returns data from auth-callback.html
+            // which already contains the authenticated user data
+            if (result && result.user) {
+                // The auth-callback.html already processed the Microsoft token
+                // and stored the authenticated user data
+                sessionStorage.setItem('userSession', JSON.stringify(result));
+                currentUser = result.user;
+                
+                // Store user in system database for admin visibility
+                await addUserToSystemDatabase(result.user);
+                
+                utils.hideLoading();
+                ui.showDashboard();
+                updateNavigationVisibility(currentUser);
+                await trips.loadTrips();
+            } else {
+                utils.hideLoading();
+                console.error('Microsoft auth result:', result);
+                throw new Error('Microsoft authentication was cancelled or failed');
+            }
+        } catch (error) {
+            utils.hideLoading();
+            console.error('Microsoft sign-in error:', error);
+            utils.showError('Microsoft sign-in failed: ' + error.message);
+        }
+    },
+
+    // Real email authentication
+    handleEmailLogin: async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('primaryInput').value.trim();
+        
+        if (!email || !email.includes('@')) {
+            utils.showError('Please enter a valid email address');
+            return;
+        }
+        
+        try {
+            const response = await fetch('/api/auth/check-user.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email })
+            });
+            
+            const data = await response.json();
+            if (data.success) {
+                auth.currentEmail = email;
+                if (data.user_type === 'employee') {
+                    auth.showStep2(data.user.name);
+            } else {
+                    auth.showStep3(email);
+                }
+            } else {
+                utils.showError(data.error || 'Email not found');
+            }
+        } catch (error) {
+            utils.showError('Authentication error: ' + error.message);
+        }
+    },
+
+    // Remove all mock functions (mockUserCheck, mockRegularLogin, mockPasscodeLogin)
+    
+    // Login step functions
+    showStep2: (userName) => {
+        document.getElementById('step1').classList.remove('active');
+        document.getElementById('step2').classList.add('active');
+        document.getElementById('welcomeMessage').innerHTML = `<h3>Welcome back, ${userName}!</h3>`;
+    },
+    
+    showStep3: (email) => {
+        document.getElementById('step1').classList.remove('active');
+        document.getElementById('step3').classList.add('active');
+        document.getElementById('emailToConfirm').textContent = email;
+    },
+    
+    showStep4: (email) => {
+        document.getElementById('step2').classList.remove('active');
+        document.getElementById('step4').classList.add('active');
+        document.getElementById('emailForCode').textContent = email;
+    },
+    
+    goBackToStep1: () => {
+        document.querySelectorAll('.login-step').forEach(step => step.classList.remove('active'));
+        document.getElementById('step1').classList.add('active');
+        document.getElementById('primaryInput').value = '';
+        document.getElementById('errorMessage').classList.remove('show');
+    },
+    
+    goBackToStep2: () => {
+        document.getElementById('step4').classList.remove('active');
+        document.getElementById('step2').classList.add('active');
+    },
+    
+    logout: () => {
+        // Clear all session data
+        sessionStorage.removeItem('userSession');
+        localStorage.removeItem('wolthers_auth');
+        currentUser = null;
+        
+        // Reload the page to show login form (since login container was removed)
+        window.location.reload();
+    }
+};
+
+// UI Management Functions
+const ui = {
+    // Show login screen
+    showLogin: () => {
+        document.getElementById('loginContainer').style.display = 'block';
+        document.getElementById('mainContainer').style.display = 'none';
+    },
+    
+    // Show dashboard/main content after authentication
+    showDashboard: () => {
+            ui.showMainContent();
+    },
+    
+    // Show main content after authentication
+    showMainContent: () => {
+        const loginContainer = document.getElementById('loginContainer');
+        const mainContainer = document.getElementById('mainContainer');
+        
+        if (loginContainer) {
+            loginContainer.style.display = 'none';
+            loginContainer.remove(); // Completely remove the login form from DOM
+        }
+        if (mainContainer) {
+            mainContainer.style.display = 'block';
+        }
+        
+            // Update user info
+    document.getElementById('userInfo').textContent = 
+        `Welcome, ${currentUser.name} | Wolthers & Associates - Internal Access Only`;
+    
+    // Show add trip button for employees (handled in renderTrips now)
+    console.log('✅ User can add trips:', currentUser.canAddTrips);
+    
+    // Update navigation visibility based on user role
+    updateNavigationVisibility(currentUser);
+    
+    // Load trips
+    trips.loadTrips();
+    },
+
+    // Create trip card HTML
+    createTripCard: (trip, status) => {
+        const startDate = utils.formatDate(trip.date);
+        const endDate = utils.formatDate(trip.endDate);
+        const duration = utils.getTripDuration(trip.date, trip.endDate);
+        const daysUntilStart = getDaysUntilStart(trip.date);
+        const daysLeft = getDaysLeft(trip.endDate);
+        const totalDays = getTotalDays(trip.date, trip.endDate);
+        const ongoing = isOngoing(trip.date, trip.endDate);
+        
+        // Get Wolthers staff attending
+        const wolthersStaff = trip.wolthersGuide || trip.createdBy || 'Daniel Wolthers';
+        
+        // Get trip codes for display
+        const tripCodes = trip.partnerCodes || [];
+
+        return `
+            <div class="trip-card ${status}" onclick="trips.openTrip('${trip.id}')" role="button" tabindex="0" onkeypress="if(event.key==='Enter') trips.openTrip('${trip.id}')">
+                <div class="trip-card-header">
+                    <div class="trip-title">${trip.title}</div>
+                    <div class="trip-date">${startDate} - ${endDate}</div>
+                    <div class="trip-total-days">Total trip duration: ${totalDays} days</div>
+                </div>
+                
+                <div class="trip-description">${trip.description}</div>
+                
+                <div class="trip-meta">
+                    ${trip.guests ? `<div class="trip-guests"><img src="images/user.svg" alt="User" style="height:18px;vertical-align:middle;margin-right:6px;"> ${trip.guests}</div>` : ''}
+                    ${trip.cars ? `
+                        <div class="trip-cars">
+                            <img src="images/disco-icon.png" alt="Vehicle" class="disco-icon-card">
+                            ${trip.cars}
+                        </div>
+                        ${trip.driver ? `
+                        <div class="trip-driver">
+                            Driver: ${trip.driver}
+                        </div>
+                        ` : ''}
+                    ` : ''}
+                </div>
+                
+                <div class="trip-status status-${status}">
+                    ${status === 'upcoming' ? (
+                      daysUntilStart > 0 ? `UPCOMING (${daysUntilStart} days to go)` : ongoing ? 'ONGOING' : 'UPCOMING (Starts today)'
+                    ) : status === 'completed' ? 'COMPLETED' : ongoing ? 'ONGOING' : 'COMPLETED'}
+                </div>
+                
+                <div class="trip-footer">
+                    <div class="trip-wolthers-staff">
+                        <strong>Wolthers Guide:</strong> ${wolthersStaff}
+                    </div>
+                    
+                    ${tripCodes.length > 0 ? `
+                        <div class="trip-codes">
+                            🔑 ${tripCodes.join(', ')}
+                        </div>
+                    ` : ''}
+                </div>
+            </div>
+        `;
+    },
+
+    // Create add trip card HTML
+    createAddTripCard: () => {
+        return `
+            <div class="trip-card add-trip-card" onclick="ui.showAddTripModal()" role="button" tabindex="0" onkeypress="if(event.key==='Enter') ui.showAddTripModal()" onmousemove="ui.moveTooltip(event)" onmouseleave="ui.hideTooltip(event)">
+                <div class="add-trip-content">
+                    <div class="add-trip-icon">+</div>
+                    <div class="add-trip-tooltip" id="addTripTooltip">Add New Trip</div>
+                </div>
+            </div>
+        `;
+    },
+
+    // Move tooltip with mouse
+    moveTooltip: (event) => {
+        const tooltip = document.getElementById('addTripTooltip');
+        if (tooltip) {
+            tooltip.style.left = event.clientX + 'px';
+            tooltip.style.top = (event.clientY - 45) + 'px';
+            tooltip.style.opacity = '1';
+            tooltip.style.visibility = 'visible';
+            tooltip.style.position = 'fixed';
+            tooltip.style.transform = 'translateX(-50%)';
+        }
+    },
+
+    // Hide tooltip
+    hideTooltip: (event) => {
+        const tooltip = document.getElementById('addTripTooltip');
+        if (tooltip) {
+            tooltip.style.opacity = '0';
+            tooltip.style.visibility = 'hidden';
+        }
+    },
+
+    // Render trips in container
+    renderTrips: (containerId, tripList, status) => {
+        const container = document.getElementById(containerId);
+        
+        let html = '';
+        
+        // Add the "Add Trip" button as first card for upcoming trips if user can add trips
+        const isWolthersAdmin = currentUser && currentUser.email && currentUser.email.endsWith('@wolthers.com');
+        if (containerId === 'upcomingTrips' && currentUser && (currentUser.canAddTrips || isWolthersAdmin)) {
+            html += ui.createAddTripCard();
+        }
+        
+        if (tripList.length === 0 && containerId !== 'upcomingTrips') {
+            container.innerHTML = `<div class="no-trips">No ${status} trips found</div>`;
+            return;
+        }
+        
+        if (tripList.length === 0 && containerId === 'upcomingTrips' && currentUser && (currentUser.canAddTrips || isWolthersAdmin)) {
+            // Show only the add trip card
+            container.innerHTML = html;
+            return;
+        }
+        
+        html += tripList
+            .map(trip => ui.createTripCard(trip, status))
+            .join('');
+            
+        container.innerHTML = html;
+    },
+
+    // Show add trip modal
+    showAddTripModal: () => {
+        document.getElementById('addTripModal').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+        
+        // Focus on title
+        setTimeout(() => document.getElementById('tripTitle').focus(), 100);
+    },
+
+    // Hide add trip modal
+    hideAddTripModal: () => {
+        document.getElementById('addTripModal').style.display = 'none';
+        document.body.style.overflow = 'auto';
+        document.getElementById('addTripForm').reset();
+    },
+
+    // Show trip preview sidebar
+    showTripPreview: (trip) => {
+        const sidebar = document.getElementById('tripPreviewSidebar');
+        const content = document.getElementById('tripPreviewContent');
+        
+        const duration = utils.getTripDuration(trip.date, trip.endDate);
+        const dateRange = utils.formatDateRange(trip.date, trip.endDate);
+        const daysUntilStart = getDaysUntilStart(trip.date);
+        const daysLeft = getDaysLeft(trip.endDate);
+        const totalDays = getTotalDays(trip.date, trip.endDate);
+        const ongoing = isOngoing(trip.date, trip.endDate);
+        
+        let daysHTML = '';
+        if (trip.itinerary && trip.itinerary.length > 0) {
+            daysHTML = `
+                <div class="trip-preview-days">
+                    <h4 class="preview-section-title">Daily Overview</h4>
+                    ${trip.itinerary.map(day => `
+                        <div class="preview-day-item">
+                            <div class="preview-day-header">
+                                <span class="preview-day-number">Day ${day.day}</span>
+                                <span class="preview-day-date">${utils.formatDate(day.date)}</span>
+                            </div>
+                            <div class="preview-day-title">${day.title}</div>
+                            <div class="preview-day-summary">${day.summary}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+        
+        let statusText = daysUntilStart > 0 ? `Starts in ${daysUntilStart} days` : ongoing ? 'Ongoing' : 'Completed';
+        
+        // Use light mode user icon for better visibility in overview
+        const userIcon = 'images/user-LM.svg';
+        
+        let overviewHTML = `
+            <div class="trip-preview-info">
+                ${trip.guests ? `
+                <div class="preview-info-item">
+                    <img src="${userIcon}" alt="User" style="height:18px;vertical-align:middle;margin-right:6px;">
+                    <span>${trip.guests}</span>
+                </div>
+                ` : ''}
+                ${trip.cars ? `
+                <div class="preview-info-item">
+                    <img src="images/disco-icon.png" alt="Car" style="height:18px;vertical-align:middle;margin-right:6px;">
+                    <span>${trip.cars}</span>
+                </div>
+                ` : ''}
+                </div>
+        `;
+        
+        content.innerHTML = `
+            <div class="trip-preview-header">
+                <h3 class="trip-preview-title">${trip.title}</h3>
+                <div class="trip-preview-dates">${dateRange}</div>
+                <div class="trip-total-days">Total trip duration: ${totalDays} days | ${statusText}</div>
+                ${overviewHTML}
+                ${trip.wolthersGuide ? `<div class="trip-preview-guide">Guided by: ${trip.wolthersGuide}</div>` : ''}
+                <div class="trip-preview-description">${trip.description}</div>
+                <div class="trip-preview-actions">
+                    <button class="preview-btn secondary" onclick="ui.hideTripPreview()">Close</button>
+                    <button class="preview-btn primary" onclick="trips.openFullTrip('${trip.id}')">Open Trip</button>
+                </div>
+            </div>
+            <div class="trip-preview-body">
+            ${trip.highlights && trip.highlights.length > 0 ? `
+            <div class="trip-preview-highlights">
+                <h4 class="preview-section-title">Highlights</h4>
+                ${trip.highlights.map(highlight => `
+                    <div class="preview-highlight-item">${highlight}</div>
+                `).join('')}
+            </div>
+            ` : ''}
+            ${daysHTML}
+            </div>
+        `;
+        
+        sidebar.classList.add('open');
+    },
+    
+    // Hide trip preview sidebar
+    hideTripPreview: () => {
+        const sidebar = document.getElementById('tripPreviewSidebar');
+        sidebar.classList.remove('open');
+        selectedTrip = null;
+    },
+
+    // Show trip itinerary modal
+    showTripItineraryModal: (trip) => {
+        const modal = document.getElementById('tripDetailModal');
+        const content = document.getElementById('tripDetailContent');
+        
+        const duration = utils.getTripDuration(trip.date, trip.endDate);
+        const dateRange = utils.formatDateRange(trip.date, trip.endDate);
+        
+        // Replace content class for itinerary styling
+        content.className = 'trip-itinerary-content';
+        
+        let itineraryHTML = '';
+        if (trip.itinerary && trip.itinerary.length > 0) {
+            itineraryHTML = `
+                <div class="itinerary-section">
+                    <h3 class="itinerary-section-title">Daily Itinerary</h3>
+                    <div class="daily-itinerary">
+                        ${trip.itinerary.map(day => `
+                            <div class="day-item">
+                                <div class="day-header">
+                                    <div class="day-title">
+                                        <div class="day-number">Day ${day.day}</div>
+                                        <div class="day-date">${utils.formatDate(day.date)}</div>
+                                        <h4 style="color: var(--dark-green); margin-top: 8px; font-size: 1.1rem;">${day.title}</h4>
+                                    </div>
+                                    <button class="day-calendar-btn" onclick="calendar.addDayToCalendar('${trip.id}', ${day.day})">
+                                        📅 Add to Calendar
+                                    </button>
+                                </div>
+                                
+                                <div class="day-activities">
+                                    ${day.activities.map(activity => `
+                                        <div class="activity-item">
+                                            <div class="activity-time">${activity.time}</div>
+                                            <div class="activity-content">
+                                                <div class="activity-title">${activity.title}</div>
+                                                <div class="activity-description">${activity.description}</div>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                                
+                                <div class="day-summary">
+                                    <div class="day-summary-title">Day Summary</div>
+                                    <div class="day-summary-text">${day.summary}</div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+        
+        content.innerHTML = `
+            <div class="trip-itinerary-header">
+                <h2 class="trip-itinerary-title">${trip.title}</h2>
+                <div class="trip-itinerary-dates">${dateRange}</div>
+                <div class="trip-itinerary-description">${trip.description}</div>
+                
+                <div class="trip-info-bar">
+                    ${trip.guests ? `
+                    <div class="trip-info-item">
+                        <img src="images/user.svg" alt="User" style="height:18px;vertical-align:middle;margin-right:6px;">
+                        <span>${trip.guests}</span>
+                    </div>
+                    ` : ''}
+                    
+                    ${trip.cars ? `
+                    <div class="trip-info-item">
+                        <img src="images/disco-icon.png" alt="Car" style="height:18px;vertical-align:middle;margin-right:6px;">
+                        <span>${trip.cars}</span>
+                    </div>
+                    ` : ''}
+                    
+                    <div class="trip-info-item">
+                        <span class="trip-info-icon">📅</span>
+                        <span>${duration} days</span>
+                    </div>
+                    
+                    <div class="trip-info-item">
+                        <span class="trip-info-icon">✨</span>
+                        <span>${trip.status === 'upcoming' ? 'Upcoming' : 'Completed'}</span>
+                    </div>
+                </div>
+                
+                <div class="trip-calendar-actions">
+                    <button class="calendar-btn primary" onclick="calendar.addTripToCalendar('${trip.id}')">
+                        📅 Add Entire Trip to Calendar
+                    </button>
+                    <button class="calendar-btn" onclick="calendar.downloadItinerary('${trip.id}')">
+                        📄 Download Itinerary
+                    </button>
+                    <button class="calendar-btn" onclick="calendar.shareTrip('${trip.id}')">
+                        📤 Share Trip
+                    </button>
+                </div>
+            </div>
+            
+            <div class="trip-itinerary-body">
+                ${itineraryHTML}
+                
+                ${trip.highlights && trip.highlights.length > 0 ? `
+                <div class="itinerary-section">
+                    <h3 class="itinerary-section-title">Trip Highlights</h3>
+                    <div class="trip-detail-grid">
+                        ${trip.highlights.map(highlight => `
+                            <div class="trip-detail-item">
+                                <div class="trip-detail-value">• ${highlight}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                ` : ''}
+                
+                <div class="itinerary-section">
+                    <h3 class="itinerary-section-title">Trip Information</h3>
+                    <div class="trip-detail-grid">
+                        ${trip.accommodations ? `
+                        <div class="trip-detail-item">
+                            <div class="trip-detail-label">Accommodations</div>
+                            <div class="trip-detail-value">${trip.accommodations}</div>
+                        </div>
+                        ` : ''}
+                        
+                        ${trip.meals ? `
+                        <div class="trip-detail-item">
+                            <div class="trip-detail-label">Dining</div>
+                            <div class="trip-detail-value">${trip.meals}</div>
+                        </div>
+                        ` : ''}
+                        
+                        <div class="trip-detail-item">
+                            <div class="trip-detail-label">Created By</div>
+                            <div class="trip-detail-value">${trip.createdBy}</div>
+                        </div>
+                        
+                        ${(currentUser.email && currentUser.email.endsWith('@wolthers.com')) || currentUser.role === 'admin' ? `
+                        <div class="trip-detail-item">
+                            <div class="trip-detail-label">Access Information</div>
+                            <div class="trip-detail-value">
+                                <strong>Partner Emails:</strong><br>
+                                ${trip.partnerEmails.join('<br>')}
+                                <br><br>
+                                <strong>Access Codes:</strong><br>
+                                ${trip.partnerCodes.join(', ')}
+                            </div>
+                        </div>
+                        ` : ''}
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    },
+
+    // Hide trip detail modal
+    hideTripDetailModal: () => {
+        const modal = document.getElementById('tripDetailModal');
+        const content = document.getElementById('tripDetailContent');
+        
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+        
+        // Reset content class
+        content.className = 'trip-detail-content';
+        selectedTrip = null;
+    }
+};
+
+// Calendar Integration Functions
+const calendar = {
+    // Add entire trip to calendar
+    addTripToCalendar: (tripId) => {
+        const trip = MOCK_TRIPS.find(t => t.id === tripId);
+        if (!trip) return;
+        
+        const startDate = new Date(trip.date);
+        const endDate = new Date(trip.endDate);
+        
+        // Format dates for calendar (YYYYMMDD)
+        const formatCalendarDate = (date) => {
+            return date.toISOString().slice(0, 10).replace(/-/g, '');
+        };
+        
+        const calendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE` +
+            `&text=${encodeURIComponent(trip.title)}` +
+            `&dates=${formatCalendarDate(startDate)}/${formatCalendarDate(new Date(endDate.getTime() + 24*60*60*1000))}` +
+            `&details=${encodeURIComponent(trip.description + '\n\nManaged by Wolthers & Associates')}` +
+            `&location=${encodeURIComponent('Brazil Coffee Regions')}`;
+        
+        window.open(calendarUrl, '_blank');
+        utils.showNotification('Opening calendar to add entire trip', 'info');
+    },
+    
+    // Add single day to calendar
+    addDayToCalendar: (tripId, dayNumber) => {
+        const trip = MOCK_TRIPS.find(t => t.id === tripId);
+        if (!trip || !trip.itinerary) return;
+        
+        const day = trip.itinerary.find(d => d.day === dayNumber);
+        if (!day) return;
+        
+        const dayDate = new Date(day.date);
+        const formatCalendarDate = (date) => {
+            return date.toISOString().slice(0, 10).replace(/-/g, '');
+        };
+        
+        // Create detailed description from activities
+        const activities = day.activities.map(activity => 
+            `${activity.time} - ${activity.title}: ${activity.description}`
+        ).join('\n');
+        
+        const description = `${trip.title} - Day ${day.day}\n\n${day.summary}\n\nSchedule:\n${activities}\n\nManaged by Wolthers & Associates`;
+        
+        const calendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE` +
+            `&text=${encodeURIComponent(`${trip.title} - Day ${day.day}: ${day.title}`)}` +
+            `&dates=${formatCalendarDate(dayDate)}/${formatCalendarDate(new Date(dayDate.getTime() + 24*60*60*1000))}` +
+            `&details=${encodeURIComponent(description)}` +
+            `&location=${encodeURIComponent('Brazil Coffee Regions')}`;
+        
+        window.open(calendarUrl, '_blank');
+        utils.showNotification(`Opening calendar to add Day ${day.day}`, 'info');
+    },
+    
+    // Download itinerary as text file
+    downloadItinerary: (tripId) => {
+        const trip = MOCK_TRIPS.find(t => t.id === tripId);
+        if (!trip) return;
+        
+        let content = `${trip.title}\n`;
+        content += `${utils.formatDateRange(trip.date, trip.endDate)}\n`;
+        content += `${trip.description}\n\n`;
+        
+        if (trip.guests) content += `Guests: ${trip.guests}\n`;
+        if (trip.cars) content += `Transportation: ${trip.cars}\n`;
+        if (trip.accommodations) content += `Accommodations: ${trip.accommodations}\n`;
+        if (trip.meals) content += `Dining: ${trip.meals}\n\n`;
+        
+        if (trip.itinerary) {
+            content += `DAILY ITINERARY\n${'='.repeat(50)}\n\n`;
+            trip.itinerary.forEach(day => {
+                content += `Day ${day.day} - ${utils.formatDate(day.date)}\n`;
+                content += `${day.title}\n`;
+                content += `-`.repeat(30) + '\n';
+                
+                day.activities.forEach(activity => {
+                    content += `${activity.time} - ${activity.title}\n`;
+                    content += `    ${activity.description}\n\n`;
+                });
+                
+                content += `Summary: ${day.summary}\n\n`;
+            });
+        }
+        
+        if (trip.highlights) {
+            content += `TRIP HIGHLIGHTS\n${'='.repeat(50)}\n`;
+            trip.highlights.forEach(highlight => {
+                content += `• ${highlight}\n`;
+            });
+        }
+        
+        content += `\n\nManaged by Wolthers & Associates\nwww.wolthers.com`;
+        
+        const blob = new Blob([content], { type: 'text/plain' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${trip.title.replace(/[^a-z0-9]/gi, '-').toLowerCase()}-itinerary.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+        
+        utils.showNotification('Itinerary downloaded successfully', 'success');
+    },
+    
+    // Share trip via email/social
+    shareTrip: (tripId) => {
+        const trip = MOCK_TRIPS.find(t => t.id === tripId);
+        if (!trip) return;
+        
+        const shareText = `Check out this amazing coffee trip: ${trip.title}\n\n${trip.description}\n\nDates: ${utils.formatDateRange(trip.date, trip.endDate)}\n\nManaged by Wolthers & Associates`;
+        const shareUrl = `mailto:?subject=${encodeURIComponent(trip.title)}&body=${encodeURIComponent(shareText)}`;
+        
+        window.location.href = shareUrl;
+        utils.showNotification('Opening email to share trip', 'info');
+    }
+};
+
+// Trip Management Functions
+const trips = {
+    // Load vehicles for simple dropdown
+    loadVehicles: () => {
+        const vehicleSelect = document.getElementById('vehicles');
+        if (!vehicleSelect) return;
+
+        // Try to load from API first
+        fetch('api/vehicles/list.php')
+            .then(response => response.json())
+            .then(data => {
+                vehicleSelect.innerHTML = '';
+                if (data.success && data.vehicles) {
+                    data.vehicles.forEach(vehicle => {
+                        const option = document.createElement('option');
+                        option.value = vehicle.id;
+                        option.textContent = `${vehicle.make} ${vehicle.model} (${vehicle.license_plate})`;
+                        vehicleSelect.appendChild(option);
+                    });
+                }
+            })
+            .catch(error => {
+                console.log('API not available, using mock data');
+                // Mock vehicle data
+                const mockVehicles = [
+                    { id: 1, make: 'Toyota', model: 'Land Cruiser', license_plate: 'ABC-123' },
+                    { id: 2, make: 'Ford', model: 'Transit', license_plate: 'DEF-456' },
+                    { id: 3, make: 'Chevrolet', model: 'Suburban', license_plate: 'GHI-789' },
+                    { id: 4, make: 'Nissan', model: 'Patrol', license_plate: 'JKL-012' }
+                ];
+                
+                vehicleSelect.innerHTML = '';
+                mockVehicles.forEach(vehicle => {
+                    const option = document.createElement('option');
+                    option.value = vehicle.id;
+                    option.textContent = `${vehicle.make} ${vehicle.model} (${vehicle.license_plate})`;
+                    vehicleSelect.appendChild(option);
+                });
+            });
+    },
+
+    // Load staff for simple dropdown - API ONLY
+    loadStaffAvailability: async () => {
+        const staffSelect = document.getElementById('wolthersStaff');
+        const staffContainer = document.getElementById('staffSelectionContainer');
+        const loadingMessage = document.getElementById('staffLoadingMessage');
+
+        if (!staffSelect) return;
+
+        // Show loading message
+        if (loadingMessage) {
+            loadingMessage.textContent = '🔄 Loading staff from database...';
+            loadingMessage.style.display = 'block';
+        }
+
+        try {
+            const response = await fetch('api/staff/mock-availability.php');
+            
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            
+            const data = await response.json();
+            
+            if (data.success && data.staff) {
+                if (loadingMessage) loadingMessage.style.display = 'none';
+                if (staffContainer) staffContainer.style.display = 'block';
+                
+                staffSelect.innerHTML = '';
+                data.staff.forEach(staff => {
+                    const option = document.createElement('option');
+                    option.value = staff.id;
+                    option.textContent = `${staff.name} - ${staff.role || staff.department}`;
+                    
+                    if (staff.available === false) {
+                        option.disabled = true;
+                        option.textContent += ' (Unavailable)';
+                    }
+                    
+                    staffSelect.appendChild(option);
+                });
+                
+                // Show availability info
+                const availabilityInfo = document.getElementById('staffAvailabilityInfo');
+                if (availabilityInfo) {
+                    availabilityInfo.textContent = `${data.staff.length} staff members loaded from database`;
+                }
+                
+                console.log(`✅ Loaded ${data.staff.length} staff members from API`);
+                utils.showNotification(`Loaded ${data.staff.length} staff members successfully`, 'success');
+            } else {
+                throw new Error('Invalid API response: ' + JSON.stringify(data));
+            }
+        } catch (error) {
+            console.error('❌ Failed to load staff from API:', error);
+            
+            if (loadingMessage) {
+                loadingMessage.textContent = '❌ Failed to load staff - Check database connection';
+                loadingMessage.style.display = 'block';
+            }
+            
+            staffSelect.innerHTML = '<option value="">❌ Failed to load staff</option>';
+            utils.showNotification('Failed to load staff. Please check your database connection.', 'error');
+        }
+    },
+
+    // Load and display trips
+    loadTrips: () => {
+        utils.showLoading();
+        
+        // Simulate loading delay
+        setTimeout(() => {
+            // Filter trips based on user access
+            let visibleTrips = MOCK_TRIPS;
+            
+            if (currentUser.type === 'partner') {
+                visibleTrips = MOCK_TRIPS.filter(trip => {
+                    if (currentUser.accessMethod === 'email') {
+                        return trip.partnerEmails.includes(currentUser.accessValue);
+                    } else {
+                        return trip.partnerCodes.includes(currentUser.accessValue);
+                    }
+                });
+            }
+            
+            currentTrips = visibleTrips;
+            
+            // Separate upcoming and past trips
+            const now = new Date();
+            const upcomingTrips = visibleTrips.filter(trip => new Date(trip.endDate) >= now);
+            const pastTrips = visibleTrips.filter(trip => new Date(trip.endDate) < now);
+            
+            // Render trips
+            ui.renderTrips('upcomingTrips', upcomingTrips, 'upcoming');
+            ui.renderTrips('pastTrips', pastTrips, 'past');
+            
+            utils.hideLoading();
+        }, 800);
+    },
+
+    // Open trip preview
+    openTrip: (tripId) => {
+        const trip = currentTrips.find(t => t.id === tripId);
+        if (trip) {
+            selectedTrip = trip;
+            ui.showTripPreview(trip);
+        }
+    },
+    
+    // Open full trip page
+    openFullTrip: (tripId) => {
+        const trip = currentTrips.find(t => t.id === tripId);
+        if (trip) {
+            // Close the preview sidebar first
+            ui.hideTripPreview();
+            
+            // Navigate to the dedicated trip page
+            const tripUrl = `trip-pages/${trip.id}.html`;
+            window.open(tripUrl, '_blank');
+        }
+    },
+
+    // Create new trip with simple form data
+    createTrip: async (formData) => {
+        utils.showLoading();
+        
+        try {
+            // Extract form data
+            const tripTitle = formData.get('tripTitle');
+            const guestName = formData.get('guests') || '';
+            const partnerEmailsText = formData.get('partnerEmails') || '';
+            const partnerEmails = partnerEmailsText ? 
+                partnerEmailsText.split('\n').map(e => e.trim()).filter(e => e) : [];
+            
+            // Get selected vehicles and staff from simple dropdowns
+            const vehicleSelect = document.getElementById('vehicles');
+            const staffSelect = document.getElementById('wolthersStaff');
+            const driverInput = document.getElementById('driver');
+            
+            const selectedVehicleIds = Array.from(vehicleSelect.selectedOptions).map(option => option.value);
+            const selectedStaffIds = Array.from(staffSelect.selectedOptions).map(option => option.value);
+            const externalDrivers = driverInput ? driverInput.value.trim() : '';
+            
+            // Get selected vehicle and staff names for display
+            const selectedVehicleNames = Array.from(vehicleSelect.selectedOptions).map(option => option.textContent);
+            const selectedStaffNames = Array.from(staffSelect.selectedOptions).map(option => option.textContent);
+            
+            // Extract company name from partner emails (smart detection)
+            let companyName = '';
+            if (partnerEmails.length > 0) {
+                const emailDomain = partnerEmails[0].split('@')[1] || '';
+                companyName = trips.extractCompanyFromEmail(emailDomain);
+            }
+            
+            // Auto-generate dates from itinerary if available
+            const itineraryText = formData.get('itinerary') || '';
+            let startDate = null;
+            let endDate = null;
+            
+            if (itineraryText) {
+                const extractedDates = trips.extractDatesFromItinerary(itineraryText);
+                startDate = extractedDates.startDate;
+                endDate = extractedDates.endDate;
+            }
+            
+            // If no dates extracted, use default 7-day trip starting tomorrow
+            if (!startDate || !endDate) {
+                const tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                startDate = tomorrow.toISOString().split('T')[0];
+                
+                const endDateObj = new Date(tomorrow);
+                endDateObj.setDate(endDateObj.getDate() + 6); // 7-day trip
+                endDate = endDateObj.toISOString().split('T')[0];
+            }
+
+            // 🤖 Generate AI Trip Code
+            const tripCodeData = tripCodeGenerator.generateTripCode({
+                companyName: companyName,
+                guestName: guestName,
+                startDate: startDate,
+                title: tripTitle
+            });
+
+            // Generate trip ID
+            const tripId = tripTitle.toLowerCase()
+                .replace(/[^a-z0-9\s]/g, '')
+                .replace(/\s+/g, '-') + '-2025';
+
+            // Create new trip object with simple data
+            const newTrip = {
+                id: tripId,
+                title: tripTitle,
+                description: formData.get('tripDescription') || '',
+                date: startDate,
+                endDate: endDate,
+                guests: guestName,
+                status: 'upcoming',
+                partnerEmails: partnerEmails,
+                partnerCodes: [tripCodeData.code],
+                createdBy: currentUser.name,
+                highlights: [],
+                accommodations: '',
+                meals: '',
+                // Trip code metadata
+                tripCodeData: tripCodeData,
+                companyName: companyName,
+                // Simple vehicle and staff data
+                selectedVehicleIds: selectedVehicleIds,
+                selectedStaffIds: selectedStaffIds,
+                externalDrivers: externalDrivers,
+                itinerary: itineraryText,
+                // Formatted display for compatibility with existing UI
+                cars: selectedVehicleNames.length > 0 ? selectedVehicleNames.join(', ') : 'TBD',
+                driver: externalDrivers || 'Wolthers Staff',
+                wolthersStaff: selectedStaffNames.length > 0 ? selectedStaffNames.join(', ') : 'TBD',
+                wolthersGuide: selectedStaffNames.length > 0 ? selectedStaffNames[0].split(' (')[0] : currentUser.name
+            };
+            
+            // Simulate API delay for realism
+            setTimeout(() => {
+            // Add to mock data (at the beginning for upcoming trips)
+            MOCK_TRIPS.unshift(newTrip);
+            
+            utils.hideLoading();
+            ui.hideAddTripModal();
+                
+                // Reset form
+                document.getElementById('addTripForm').reset();
+                
+                // 🎉 Show Trip Code Success Modal
+                trips.showTripCodeModal(newTrip);
+                
+                // Refresh display in background
+                trips.loadTrips();
+                
+                console.log('✅ Trip created successfully:', {
+                    title: newTrip.title,
+                    vehicles: selectedVehicleIds.length,
+                    staff: selectedStaffIds.length,
+                    hasItinerary: !!itineraryText,
+                    startDate: startDate,
+                    endDate: endDate
+                });
+        }, 1500);
+            
+        } catch (error) {
+            console.error('Error creating trip:', error);
+            utils.hideLoading();
+            utils.showNotification('Failed to create trip. Please try again.', 'error');
+        }
+    },
+
+    // Extract dates from itinerary text
+    extractDatesFromItinerary: (itinerary) => {
+        const datePatterns = [
+            /(\d{1,2}\/\d{1,2}\/\d{4})/g,      // MM/DD/YYYY or M/D/YYYY
+            /(\d{4}-\d{1,2}-\d{1,2})/g,        // YYYY-MM-DD
+            /(January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2},?\s+\d{4}/gi,
+            /(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+\d{1,2},?\s+\d{4}/gi
+        ];
+        
+        const dates = [];
+        datePatterns.forEach(pattern => {
+            const matches = itinerary.match(pattern);
+            if (matches) {
+                matches.forEach(match => {
+                    const date = new Date(match);
+                    if (!isNaN(date.getTime())) {
+                        dates.push(date);
+                    }
+                });
+            }
+        });
+        
+        if (dates.length === 0) {
+            return { startDate: null, endDate: null };
+        }
+        
+        dates.sort((a, b) => a - b);
+        const startDate = dates[0].toISOString().split('T')[0];
+        const endDate = dates[dates.length - 1].toISOString().split('T')[0];
+        
+        return { startDate, endDate };
+    },
+
+    // Extract company name from email domain
+    extractCompanyFromEmail: (domain) => {
+        // Remove common email providers
+        const commonProviders = ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'live.com', 'icloud.com'];
+        if (commonProviders.includes(domain.toLowerCase())) {
+            return '';
+        }
+        
+        // Extract company name from domain
+        const parts = domain.split('.');
+        let companyName = parts[0] || '';
+        
+        // Clean up common prefixes/suffixes
+        companyName = companyName.replace(/^(www|mail|email)$/, '');
+        
+        // Capitalize first letter
+        return companyName.charAt(0).toUpperCase() + companyName.slice(1);
+    },
+
+    // Helper function to format drivers display
+    formatDriversDisplay: (vehicles) => {
+        if (!vehicles || vehicles.length === 0) return 'TBD';
+        
+        const driversWithVehicles = vehicles
+            .filter(v => v.drivers && v.drivers.trim())
+            .map(v => `${v.drivers} (${v.name})`);
+            
+        if (driversWithVehicles.length === 0) {
+            return 'Wolthers Staff';
+        }
+        
+        return driversWithVehicles.join(', ');
+    },
+
+    // Simple AI formatting for itinerary
+    formatItinerary: () => {
+        const itineraryTextarea = document.getElementById('itineraryText');
+        const previewDiv = document.getElementById('itineraryPreview');
+        const previewActions = document.querySelector('.preview-actions');
+        
+        if (!itineraryTextarea || !previewDiv) return;
+        
+        const rawText = itineraryTextarea.value.trim();
+        if (!rawText) {
+            utils.showNotification('Please enter some itinerary text first.', 'warning');
+            return;
+        }
+        
+        // Show loading state
+        previewDiv.innerHTML = '<div class="preview-placeholder"><p>🤖 AI is formatting your itinerary...</p></div>';
+        
+        // Simulate AI processing
+        setTimeout(() => {
+            const formattedText = trips.processItineraryText(rawText);
+            previewDiv.innerHTML = formattedText;
+            
+            // Show preview actions
+            if (previewActions) {
+                previewActions.style.display = 'flex';
+            }
+        }, 1500);
+    },
+
+    // Process itinerary text with basic AI-like formatting
+    processItineraryText: (rawText) => {
+        const lines = rawText.split('\n').filter(line => line.trim());
+        let formattedHtml = '<div class="formatted-itinerary">';
+        
+        let currentDay = 0;
+        
+        lines.forEach(line => {
+            const trimmedLine = line.trim();
+            
+            // Check if it's a day header
+            if (trimmedLine.toLowerCase().includes('day ') || /^day\s*\d+/i.test(trimmedLine)) {
+                currentDay++;
+                const dayMatch = trimmedLine.match(/day\s*(\d+)/i);
+                const dayNumber = dayMatch ? dayMatch[1] : currentDay;
+                formattedHtml += `<div class="day-header"><h4>Day ${dayNumber}</h4></div>`;
+            } else if (trimmedLine) {
+                // Process activity line
+                let activity = trimmedLine;
+                
+                // Capitalize first letter
+                activity = activity.charAt(0).toUpperCase() + activity.slice(1);
+                
+                // Add period if missing
+                if (!activity.endsWith('.') && !activity.endsWith('!') && !activity.endsWith('?')) {
+                    activity += '.';
+                }
+                
+                // Format times
+                activity = activity.replace(/(\d{1,2})(am|pm)/gi, '$1:00 $2');
+                activity = activity.replace(/(\d{1,2}):(\d{2})(am|pm)/gi, '$1:$2 $3');
+                
+                // Add to formatted output
+                formattedHtml += `<div class="activity-item">• ${activity}</div>`;
+            }
+        });
+        
+        formattedHtml += '</div>';
+        
+        // Add some basic styling
+        formattedHtml += `
+        <style>
+        .formatted-itinerary { font-family: inherit; }
+        .day-header { margin: 15px 0 10px 0; padding: 8px 0; border-bottom: 2px solid #e9ecef; }
+        .day-header h4 { margin: 0; color: var(--dark-green); font-size: 16px; }
+        .activity-item { margin: 5px 0; padding: 3px 0; line-height: 1.5; }
+        </style>`;
+        
+        return formattedHtml;
+    },
+
+    // Clear itinerary
+    clearItinerary: () => {
+        const itineraryTextarea = document.getElementById('itineraryText');
+        const previewDiv = document.getElementById('itineraryPreview');
+        const previewActions = document.querySelector('.preview-actions');
+        
+        if (itineraryTextarea) {
+            itineraryTextarea.value = '';
+        }
+        
+        if (previewDiv) {
+            previewDiv.innerHTML = `
+                <div class="preview-placeholder">
+                    <p>✨ Your AI-enhanced itinerary will appear here</p>
+                    <p>Type or paste your itinerary, then click "AI Format & Enhance"</p>
+                </div>
+            `;
+        }
+        
+        if (previewActions) {
+            previewActions.style.display = 'none';
+        }
+    },
+
+    // Load vehicles from database - API ONLY
+    loadVehicles: async () => {
+        const vehicleSelect = document.getElementById('vehicles');
+        if (!vehicleSelect) return;
+
+        vehicleSelect.innerHTML = '<option value="">🔄 Loading vehicles from database...</option>';
+
+        try {
+            const response = await fetch('api/vehicles/mock-list.php');
+            
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            
+            const data = await response.json();
+            
+            if (data.success && data.vehicles) {
+                vehicleSelect.innerHTML = '';
+                
+                data.vehicles.forEach(vehicle => {
+                    const option = document.createElement('option');
+                    option.value = vehicle.id;
+                    option.textContent = `${vehicle.make} ${vehicle.model} (${vehicle.licensePlate}) - ${vehicle.capacity} seats`;
+                    
+                    if (!vehicle.isAvailable) {
+                        option.disabled = true;
+                        option.textContent += ` (${vehicle.status})`;
+                    }
+                    
+                    option.title = `Status: ${vehicle.status} | Location: ${vehicle.location || 'Unknown'} | Assignments: ${vehicle.currentAssignments}`;
+                    vehicleSelect.appendChild(option);
+                });
+                
+                console.log(`✅ Loaded ${data.vehicles.length} vehicles from API`);
+                utils.showNotification(`Loaded ${data.vehicles.length} vehicles successfully`, 'success');
+            } else {
+                throw new Error('Invalid API response: ' + JSON.stringify(data));
+            }
+        } catch (error) {
+            console.error('❌ Failed to load vehicles from API:', error);
+            vehicleSelect.innerHTML = '<option value="">❌ Failed to load vehicles - Check database connection</option>';
+            utils.showNotification('Failed to load vehicles. Please check your database connection.', 'error');
+        }
+    },
+
+    // Load staff availability for date range
+    loadStaffAvailability: async (startDate, endDate) => {
+        try {
+            const staffContainer = document.getElementById('staffSelectionContainer');
+            const loadingMessage = document.getElementById('staffLoadingMessage');
+            const availabilityInfo = document.getElementById('staffAvailabilityInfo');
+            const staffList = document.getElementById('staffList');
+            
+            if (!startDate || !endDate) {
+                loadingMessage.textContent = 'Please set trip dates to check staff availability';
+                return;
+            }
+            
+            loadingMessage.style.display = 'block';
+            staffContainer.style.display = 'none';
+            
+            const params = new URLSearchParams({
+                start_date: startDate,
+                end_date: endDate
+            });
+            
+            const response = await fetch(`api/staff/availability.php?${params}`);
+            const data = await response.json();
+            
+            if (data.success) {
+                // Update availability info
+                const { available, busy, total } = data.summary;
+                availabilityInfo.className = `availability-info ${busy > 0 ? 'has-conflicts' : 'all-available'}`;
+                availabilityInfo.innerHTML = `
+                    <strong>Staff Availability for ${startDate} to ${endDate}:</strong><br>
+                    ${available} of ${total} staff members available ${busy > 0 ? `(${busy} have conflicts)` : ''}
+                `;
+                
+                // Render staff list
+                staffList.innerHTML = data.staff.map(staff => `
+                    <div class="staff-member ${staff.isAvailable ? '' : 'unavailable'}">
+                        <input type="checkbox" 
+                               class="staff-checkbox" 
+                               data-staff-id="${staff.id}"
+                               ${staff.isAvailable ? '' : 'disabled'}
+                               onchange="trips.toggleStaffMember(${staff.id}, '${staff.name}', this.checked)">
+                        
+                        <div class="staff-info">
+                            <div class="staff-name">${staff.name}</div>
+                            <div class="staff-department">${staff.displayName}</div>
+                            <span class="staff-availability ${staff.statusIndicator}">
+                                ${staff.isAvailable ? 'Available' : 'Busy'}
+                            </span>
+                            ${staff.conflictingAssignments.length > 0 ? `
+                                <div class="staff-conflicts">
+                                    Conflicts: ${staff.conflictingAssignments.join('; ')}
+                                </div>
+                            ` : ''}
+                        </div>
+                        
+                        <div class="staff-role-selector" style="display: none;">
+                            <select onchange="trips.updateStaffRole(${staff.id}, this.value)">
+                                <option value="guide">Guide</option>
+                                <option value="driver">Driver</option>
+                                <option value="coordinator">Coordinator</option>
+                                <option value="translator">Translator</option>
+                                <option value="specialist">Specialist</option>
+                            </select>
+                        </div>
+                        
+                        <div class="staff-date-range" style="display: none;">
+                            <div class="date-range-label">Custom dates (optional):</div>
+                            <input type="date" 
+                                   placeholder="Start date" 
+                                   value="${startDate}"
+                                   onchange="trips.updateStaffDateRange(${staff.id}, 'start', this.value)">
+                            <input type="date" 
+                                   placeholder="End date" 
+                                   value="${endDate}"
+                                   onchange="trips.updateStaffDateRange(${staff.id}, 'end', this.value)">
+                        </div>
+                    </div>
+                `).join('');
+                
+                loadingMessage.style.display = 'none';
+                staffContainer.style.display = 'block';
+                
+                console.log(`✅ Loaded ${total} staff members (${available} available, ${busy} busy)`);
+            }
+        } catch (error) {
+            console.error('Failed to load staff availability:', error);
+            document.getElementById('staffLoadingMessage').textContent = 'Failed to load staff availability';
+        }
+    },
+
+    // Toggle staff member selection
+    toggleStaffMember: (staffId, staffName, isSelected) => {
+        if (!window.selectedStaffAssignments) {
+            window.selectedStaffAssignments = [];
+        }
+        
+        const roleSelector = document.querySelector(`[data-staff-id="${staffId}"]`)
+            .closest('.staff-member').querySelector('.staff-role-selector');
+        const dateRange = document.querySelector(`[data-staff-id="${staffId}"]`)
+            .closest('.staff-member').querySelector('.staff-date-range');
+        
+        if (isSelected) {
+            // Add staff member with default role
+            window.selectedStaffAssignments.push({
+                id: staffId,
+                name: staffName,
+                role: 'guide',
+                startDate: null, // Will use trip dates
+                endDate: null    // Will use trip dates
+            });
+            
+            roleSelector.style.display = 'block';
+            dateRange.style.display = 'block';
+        } else {
+            // Remove staff member
+            window.selectedStaffAssignments = window.selectedStaffAssignments
+                .filter(staff => staff.id !== staffId);
+            
+            roleSelector.style.display = 'none';
+            dateRange.style.display = 'none';
+        }
+        
+        console.log('Selected staff assignments:', window.selectedStaffAssignments);
+    },
+
+    // Update staff member role
+    updateStaffRole: (staffId, role) => {
+        if (window.selectedStaffAssignments) {
+            const staff = window.selectedStaffAssignments.find(s => s.id === staffId);
+            if (staff) {
+                staff.role = role;
+                console.log(`Updated ${staff.name} role to ${role}`);
+            }
+        }
+    },
+
+    // Update staff member date range
+    updateStaffDateRange: (staffId, type, date) => {
+        if (window.selectedStaffAssignments) {
+            const staff = window.selectedStaffAssignments.find(s => s.id === staffId);
+            if (staff) {
+                if (type === 'start') {
+                    staff.startDate = date;
+                } else if (type === 'end') {
+                    staff.endDate = date;
+                }
+                console.log(`Updated ${staff.name} ${type} date to ${date}`);
+            }
+        }
+    },
+
+    // Show Trip Code Success Modal
+    showTripCodeModal: (trip) => {
+        const modal = document.getElementById('tripCodeModal');
+        const tripCodeData = trip.tripCodeData;
+        
+        // Update trip code display
+        document.getElementById('generatedTripCode').textContent = tripCodeData.code;
+        
+        // Update code components
+        document.getElementById('codeCompanyPart').textContent = tripCodeData.components.company;
+        document.getElementById('codeGuestPart').textContent = tripCodeData.components.guest;
+        document.getElementById('codeDatePart').textContent = `${tripCodeData.components.month}${tripCodeData.components.year}`;
+        
+        // Show suffix if present
+        const suffixComponent = document.getElementById('codeSuffixComponent');
+        if (tripCodeData.components.suffix) {
+            document.getElementById('codeSuffixPart').textContent = tripCodeData.components.suffix;
+            suffixComponent.style.display = 'block';
+        } else {
+            suffixComponent.style.display = 'none';
+        }
+        
+        // Update QR code
+        const qrCodeImg = document.getElementById('tripQRCode');
+        const qrUrl = document.getElementById('tripQRUrl');
+        const qrData = tripCodeGenerator.generateQRCode(tripCodeData.code, trip);
+        qrCodeImg.src = qrData;
+        qrUrl.textContent = `${window.location.origin}/trips/?code=${tripCodeData.code}`;
+        
+        // Update trip summary
+        document.getElementById('summaryTripTitle').textContent = trip.title;
+        document.getElementById('summaryTripDates').textContent = formatDateRange(trip.date, trip.endDate);
+        document.getElementById('summaryTripGuests').textContent = trip.guests || 'TBD';
+        document.getElementById('summaryTripCompany').textContent = trip.companyName || 'Various Partners';
+        
+        // Store current trip for actions
+        window.currentTripCodeData = { trip, tripCodeData };
+        
+        // Show modal
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
 };
 
 // Event Listeners
@@ -3017,10 +4875,18 @@ async function loadCompanyManagementData() {
     try {
         console.log('Loading company management data...');
         
-        // Load companies first
+        // First, load users fresh from backend (for user count accuracy)
+        if (currentUser && currentUser.role === 'admin') {
+            await loadAllUsersForAdmin();
+        }
+        
+        // Then load companies fresh from backend
         await loadCompanies();
         
-        // Load company table
+        // Auto-link users to companies based on latest data
+        await autoLinkUsersToCompanies();
+        
+        // Load company table with fresh data
         loadCompanyTable();
         
         // Setup search and filter interactions
@@ -3308,6 +5174,12 @@ async function deleteCompany(companyId) {
                     // Reload companies from backend
                     await loadCompanies();
                     
+                    // Refresh company table with updated data
+                    loadCompanyTable();
+                    
+                    // Update company dropdown
+                    updateCompanyDropdown();
+                    
                     showToast(`Company "${company.fantasy_name || company.full_name}" deleted successfully!`, 'success');
                     return;
                 } else {
@@ -3318,6 +5190,12 @@ async function deleteCompany(companyId) {
                 
                 // Fallback: Remove from local data
                 await loadCompanies();
+                
+                // Refresh company table with updated data
+                loadCompanyTable();
+                
+                // Update company dropdown
+                updateCompanyDropdown();
                 
                 showToast(`Company "${company.fantasy_name || company.full_name}" deleted locally`, 'success');
             }
@@ -3493,6 +5371,12 @@ async function handleEditCompanySubmit(event) {
                 // Reload companies from backend
                 await loadCompanies();
                 
+                // Refresh company table with updated data
+                loadCompanyTable();
+                
+                // Update company dropdown
+                updateCompanyDropdown();
+                
                 showToast(`Company "${formData.fantasy_name || formData.full_name}" updated successfully!`, 'success');
                 hideEditCompanyModal();
                 return;
@@ -3567,7 +5451,13 @@ async function loadUserManagementData() {
             await loadAllUsersForAdmin();
         }
         
-        // Load users list from API
+        // Load companies fresh for user-company linking
+        await loadCompanies();
+        
+        // Auto-link users to companies based on latest data
+        await autoLinkUsersToCompanies();
+        
+        // Load users list from API with fresh data
         await loadModalUsersList();
         
         // Setup search and filter functionality
@@ -5636,6 +7526,9 @@ async function handleAddCompanySubmit(event) {
         if (result.success) {
             // Reload companies from backend
             await loadCompanies();
+            
+            // Refresh company table with new data
+            loadCompanyTable();
             
             // Update company dropdown in user modal
             updateCompanyDropdown();
