@@ -971,6 +971,25 @@
       border-top: 2px solid var(--light-gold) !important;
     }
     </style>
+
+    <style id="early-theme-style">
+      html[data-theme="light"], body[data-theme="light"] {
+        background: #E5D5BE !important;
+      }
+      html[data-theme="dark"], body[data-theme="dark"] {
+        background: #181c1f !important;
+      }
+    </style>
+    <script>
+      (function() {
+        let theme = localStorage.getItem('theme');
+        if (!theme) {
+          theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        document.documentElement.setAttribute('data-theme', theme);
+        document.body.setAttribute('data-theme', theme);
+      })();
+    </script>
 </head>
 <body>
 
