@@ -135,7 +135,7 @@ body {
 }
 
 .login-box {
-    background: var(--white);
+    /* background: var(--white); */
     padding: 40px;
     border-radius: 15px;
     box-shadow: 0 10px 30px rgba(26, 77, 58, 0.15);
