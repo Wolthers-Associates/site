@@ -1165,6 +1165,13 @@ The system will automatically:
                                         <!-- Companies will be populated dynamically -->
                                     </select>
                                 </div>
+                                <button class="fluent-btn fluent-btn-secondary" onclick="autoLinkUsersToCompanies()" title="Automatically link users to companies based on email domains">
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                                        <path d="M8.5 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8.5 8.943V3.5z"/>
+                                        <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/>
+                                    </svg>
+                                    Auto-Link
+                                </button>
                                 <button class="fluent-btn fluent-btn-primary" onclick="showAddUserModal()">
                                     <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
                                         <path d="M8.75 3.75a.75.75 0 00-1.5 0v3.5h-3.5a.75.75 0 000 1.5h3.5v3.5a.75.75 0 001.5 0v-3.5h3.5a.75.75 0 000-1.5h-3.5v-3.5z"/>
@@ -1846,6 +1853,113 @@ The system will automatically:
                         <button type="button" class="fluent-btn fluent-btn-secondary" onclick="hideAddUserModal()">Cancel</button>
                         <button type="submit" class="fluent-btn fluent-btn-primary" id="addUserSubmitBtn">
                             <span class="btn-text">Add person</span>
+                            <div class="fluent-spinner" style="display: none;"></div>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit User Modal -->
+    <div id="editUserModal" class="modal fluent-modal" style="display: none;" role="dialog" aria-labelledby="edit-user-title" aria-modal="true">
+        <div class="modal-backdrop" onclick="hideEditUserModal()"></div>
+        <div class="modal-content fluent-modal-content-small">
+            <div class="fluent-modal-header">
+                <div class="fluent-header-content">
+                    <h1 id="edit-user-title" class="fluent-modal-title">Edit User</h1>
+                    <p class="fluent-modal-subtitle">Update user information and company assignment</p>
+                </div>
+                <button class="fluent-close-btn" onclick="hideEditUserModal()">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M11.41 10l4.3-4.29a1 1 0 10-1.42-1.42L10 8.59l-4.29-4.3a1 1 0 00-1.42 1.42L8.59 10l-4.3 4.29a1 1 0 001.42 1.42L10 11.41l4.29 4.3a1 1 0 001.42-1.42L11.41 10z"/>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="fluent-modal-body-form">
+                <form id="editUserForm" class="fluent-form">
+                    <input type="hidden" id="editUserId">
+                    
+                    <div class="fluent-form-section">
+                        <div class="fluent-form-row">
+                            <div class="fluent-form-group">
+                                <label for="editUserName" class="fluent-label">Full name *</label>
+                                <input type="text" id="editUserName" class="fluent-input" required>
+                            </div>
+                        </div>
+                        
+                        <div class="fluent-form-row">
+                            <div class="fluent-form-group">
+                                <label for="editUserEmail" class="fluent-label">Email address *</label>
+                                <input type="email" id="editUserEmail" class="fluent-input" required>
+                            </div>
+                        </div>
+                        
+                        <!-- Company Selection -->
+                        <div class="fluent-form-row">
+                            <div class="fluent-form-group">
+                                <label for="editUserCompany" class="fluent-label">Company *</label>
+                                <div class="fluent-company-selector">
+                                    <select id="editUserCompany" class="fluent-input" required>
+                                        <option value="">Select a company</option>
+                                        <!-- Companies will be loaded dynamically -->
+                                    </select>
+                                    <button type="button" class="fluent-btn fluent-btn-icon" onclick="showAddCompanyModal()" title="Add new company">
+                                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                                            <path d="M8.75 3.75a.75.75 0 00-1.5 0v3.5h-3.5a.75.75 0 000 1.5h3.5v3.5a.75.75 0 001.5 0v-3.5h3.5a.75.75 0 000-1.5h-3.5v-3.5z"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Company Role -->
+                        <div class="fluent-form-row">
+                            <div class="fluent-form-group">
+                                <label for="editUserCompanyRole" class="fluent-label">Company Role *</label>
+                                <select id="editUserCompanyRole" class="fluent-select" required>
+                                    <option value="">Select company role</option>
+                                    <option value="staff">Staff - Regular employee</option>
+                                    <option value="senior">Senior - Senior-level employee</option>
+                                    <option value="admin">Admin - Can manage company users and trips</option>
+                                </select>
+                                <small class="fluent-help-text">Admins can see all company trips and manage team members</small>
+                            </div>
+                        </div>
+                        
+                        <div class="fluent-form-row">
+                            <div class="fluent-form-group">
+                                <label for="editUserRole" class="fluent-label">System Role *</label>
+                                <select id="editUserRole" class="fluent-select" required>
+                                    <option value="">Select system role</option>
+                                    <option value="guest">Guest - View only access</option>
+                                    <option value="user">User - Standard access</option>
+                                    <option value="editor">Editor - Can modify content</option>
+                                    <option value="admin">System Admin - Full system access</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <!-- Trip Visibility Settings -->
+                        <div class="fluent-form-row">
+                            <div class="fluent-form-group">
+                                <label class="fluent-label">Trip Permissions</label>
+                                <div class="fluent-checkbox-group">
+                                    <label class="fluent-checkbox-label">
+                                        <input type="checkbox" id="editCanSeeCompanyTrips" class="fluent-checkbox">
+                                        <span>Can view other company trips (when not participating)</span>
+                                    </label>
+                                    <small class="fluent-help-text">If unchecked, user will only see trips they are participating in</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="fluent-form-actions">
+                        <button type="button" class="fluent-btn fluent-btn-secondary" onclick="hideEditUserModal()">Cancel</button>
+                        <button type="submit" class="fluent-btn fluent-btn-primary" id="editUserSubmitBtn">
+                            <span class="btn-text">Update User</span>
                             <div class="fluent-spinner" style="display: none;"></div>
                         </button>
                     </div>

@@ -3429,7 +3429,15 @@ function clearFormErrors() {
 }
 
 function editUser(userId) {
-    utils.showNotification('Edit user feature coming soon', 'info');
+    console.log('Edit user:', userId);
+    const users = getUsersFromDatabase();
+    const user = users.find(u => u.id === userId);
+    
+    if (user) {
+        showEditUserModal(user);
+    } else {
+        showToast('User not found', 'error');
+    }
 }
 
 function deleteUser(userId) {
@@ -3542,8 +3550,196 @@ async function showConfirmDialog(title, message, confirmText = 'Confirm', type =
 }
 
 function showEditUserModal(user) {
-    // Simple edit modal implementation
-    showToast('Edit user functionality will be available in the next release', 'info');
+    const modal = document.getElementById('editUserModal');
+    if (modal) {
+        // Populate form with user data
+        document.getElementById('editUserId').value = user.id;
+        document.getElementById('editUserName').value = user.name || '';
+        document.getElementById('editUserEmail').value = user.email || '';
+        document.getElementById('editUserCompany').value = user.company_id || '';
+        document.getElementById('editUserCompanyRole').value = user.company_role || 'staff';
+        document.getElementById('editUserRole').value = user.role || 'user';
+        document.getElementById('editCanSeeCompanyTrips').checked = user.can_see_company_trips || false;
+        
+        // Setup company role dependencies for edit form
+        setupEditUserFormDependencies();
+        
+        // Show modal
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+        
+        // Setup form submission
+        const form = document.getElementById('editUserForm');
+        form.onsubmit = handleEditUserSubmit;
+    }
+}
+
+function hideEditUserModal() {
+    const modal = document.getElementById('editUserModal');
+    if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+}
+
+function setupEditUserFormDependencies() {
+    const companyRoleSelect = document.getElementById('editUserCompanyRole');
+    const canSeeTripsCheckbox = document.getElementById('editCanSeeCompanyTrips');
+    
+    if (companyRoleSelect && canSeeTripsCheckbox) {
+        companyRoleSelect.addEventListener('change', (e) => {
+            const role = e.target.value;
+            
+            // Admins automatically get trip visibility
+            if (role === 'admin') {
+                canSeeTripsCheckbox.checked = true;
+                canSeeTripsCheckbox.disabled = true;
+            } else {
+                canSeeTripsCheckbox.disabled = false;
+            }
+        });
+    }
+}
+
+async function handleEditUserSubmit(event) {
+    event.preventDefault();
+    
+    const submitBtn = document.getElementById('editUserSubmitBtn');
+    const spinner = submitBtn.querySelector('.fluent-spinner');
+    const btnText = submitBtn.querySelector('.btn-text');
+    
+    try {
+        // Show loading state
+        submitBtn.disabled = true;
+        spinner.style.display = 'inline-block';
+        btnText.textContent = 'Updating...';
+        
+        // Collect form data
+        const userId = document.getElementById('editUserId').value;
+        const formData = {
+            id: userId,
+            name: document.getElementById('editUserName').value.trim(),
+            email: document.getElementById('editUserEmail').value.trim(),
+            company_id: document.getElementById('editUserCompany').value,
+            company_role: document.getElementById('editUserCompanyRole').value,
+            role: document.getElementById('editUserRole').value,
+            can_see_company_trips: document.getElementById('editCanSeeCompanyTrips').checked
+        };
+        
+        // Get company name for display
+        const selectedCompany = companiesData.find(c => c.id == formData.company_id);
+        if (selectedCompany) {
+            formData.company_name = selectedCompany.fantasy_name || selectedCompany.full_name;
+        }
+        
+        // Update user in database
+        const users = getUsersFromDatabase();
+        const userIndex = users.findIndex(u => u.id === userId);
+        
+        if (userIndex !== -1) {
+            // Update existing user
+            users[userIndex] = { ...users[userIndex], ...formData };
+            window.USER_DATABASE = users;
+            saveUserDatabase();
+            
+            // Refresh user list
+            loadModalUsersList();
+            
+            showToast(`User "${formData.name}" updated successfully!`, 'success');
+            hideEditUserModal();
+        } else {
+            throw new Error('User not found');
+        }
+        
+    } catch (error) {
+        console.error('Error updating user:', error);
+        showToast('Failed to update user: ' + error.message, 'error');
+        
+    } finally {
+        // Reset button state
+        submitBtn.disabled = false;
+        spinner.style.display = 'none';
+        btnText.textContent = 'Update User';
+    }
+}
+
+async function autoLinkUsersToCompanies() {
+    if (!confirm('This will automatically link users to companies based on email domains and patterns. Continue?')) {
+        return;
+    }
+    
+    try {
+        showToast('Auto-linking users to companies...', 'info');
+        
+        // Fallback: Update mock data locally
+        autoLinkUsersFallback();
+        
+    } catch (error) {
+        console.error('Auto-link error:', error);
+        showToast('Auto-link failed: ' + error.message, 'error');
+    }
+}
+
+function autoLinkUsersFallback() {
+    const users = getUsersFromDatabase();
+    let linkedCount = 0;
+    
+    users.forEach(user => {
+        if (user.company_id) return; // Skip already linked users
+        
+        const email = user.email?.toLowerCase() || '';
+        let companyId = null;
+        let companyRole = 'staff';
+        let canSeeTrips = false;
+        
+        // Auto-link based on email domain
+        if (email.includes('@wolthers.com') || user.role === 'admin') {
+            const wolthersCompany = companiesData.find(c => c.full_name.includes('Wolthers'));
+            if (wolthersCompany) {
+                companyId = wolthersCompany.id;
+                companyRole = user.role === 'admin' ? 'admin' : 'senior';
+                canSeeTrips = true;
+            }
+        } else if (email.includes('@mitsui.com')) {
+            const mitsuiCompany = companiesData.find(c => c.full_name.includes('Mitsui'));
+            if (mitsuiCompany) {
+                companyId = mitsuiCompany.id;
+            }
+        } else if (email.includes('@cce.com.co')) {
+            const cceCompany = companiesData.find(c => c.full_name.includes('Colombian'));
+            if (cceCompany) {
+                companyId = cceCompany.id;
+            }
+        } else if (email.includes('@premiumroasters.com')) {
+            const premiumCompany = companiesData.find(c => c.full_name.includes('Premium'));
+            if (premiumCompany) {
+                companyId = premiumCompany.id;
+            }
+        }
+        
+        if (companyId) {
+            user.company_id = companyId;
+            user.company_role = companyRole;
+            user.can_see_company_trips = canSeeTrips;
+            
+            // Update company name for display
+            const company = companiesData.find(c => c.id == companyId);
+            if (company) {
+                user.company_name = company.fantasy_name || company.full_name;
+            }
+            
+            linkedCount++;
+        }
+    });
+    
+    // Save updated users
+    window.USER_DATABASE = users;
+    saveUserDatabase();
+    
+    // Refresh user list
+    loadModalUsersList();
+    
+    showToast(`Auto-linked ${linkedCount} users to companies`, 'success');
 }
 
 // Form validation helpers
@@ -5053,20 +5249,39 @@ async function loadCompanies() {
  * Update Company Dropdown
  */
 function updateCompanyDropdown() {
-    const companySelect = document.getElementById('newUserCompany');
-    if (companySelect && companiesData) {
-        // Clear existing options except the first one
-        companySelect.innerHTML = '<option value="">Select a company</option>';
-        
-        // Add companies
-        companiesData.forEach(company => {
-            const option = document.createElement('option');
-            option.value = company.id;
-            option.textContent = company.fantasy_name || company.full_name;
-            option.setAttribute('data-type', company.company_type);
-            companySelect.appendChild(option);
-        });
-    }
+    const companySelects = [
+        document.getElementById('newUserCompany'),
+        document.getElementById('editUserCompany'),
+        document.getElementById('userCompanyFilter')
+    ];
+    
+    companySelects.forEach(companySelect => {
+        if (companySelect && companiesData) {
+            // Store current value
+            const currentValue = companySelect.value;
+            
+            // Clear existing options except the first one
+            const isFilter = companySelect.id === 'userCompanyFilter';
+            companySelect.innerHTML = isFilter ? 
+                '<option value="">All companies</option>' : 
+                '<option value="">Select a company</option>';
+            
+            // Add companies (show fantasy name preferentially)
+            companiesData.forEach(company => {
+                const option = document.createElement('option');
+                option.value = company.id;
+                option.textContent = company.fantasy_name || company.full_name;
+                option.setAttribute('data-type', company.company_type);
+                option.setAttribute('data-full-name', company.full_name);
+                companySelect.appendChild(option);
+            });
+            
+            // Restore previous value
+            if (currentValue) {
+                companySelect.value = currentValue;
+            }
+        }
+    });
 }
 
 /**
