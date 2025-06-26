@@ -3675,9 +3675,9 @@ async function loadAllUsersForAdmin() {
     try {
         console.log('🔍 Admin loading users from database...');
         
-        // 1. Load users from backend database API (primary source)
+        // Load users from real database API
         try {
-            const response = await fetch('/api/auth/list-users.php?auth_check=1');
+            const response = await fetch('/users-api.php?auth_check=1&limit=100');
             if (response.ok) {
                 const apiData = await response.json();
                 if (apiData.success && Array.isArray(apiData.users)) {
@@ -3692,30 +3692,22 @@ async function loadAllUsersForAdmin() {
                     console.log('👥 Users from database:', USER_DATABASE.map(u => `${u.name} (${u.email})`));
                     return;
                 }
+            } else {
+                console.log('⚠️ Users API response not ok:', response.status);
             }
         } catch (error) {
-            console.log('⚠️ Backend database API error:', error.message);
+            console.log('⚠️ Users API error:', error.message);
         }
         
-        // 2. Fallback: Load users from Microsoft Auth sessions (recent logins)
-        console.log('⚠️ Database API unavailable, falling back to local sources...');
-        const recentMSUsers = loadRecentMicrosoftUsers();
-        if (recentMSUsers.length > 0) {
-            console.log(`🔐 Found ${recentMSUsers.length} recent Microsoft users`);
-            mergeUsersIntoDatabase(recentMSUsers);
-        }
-        
-        // 3. Fallback: Load any additional users from localStorage backups
-        const backupUsers = loadBackupUsers();
-        if (backupUsers.length > 0) {
-            console.log(`💾 Found ${backupUsers.length} backup users`);
-            mergeUsersIntoDatabase(backupUsers);
-        }
-        
-        console.log(`⚠️ Fallback: Total users loaded: ${USER_DATABASE.length}`);
+        // Fallback: Initialize with empty database if API fails
+        console.log('⚠️ Database API unavailable, initializing empty user database...');
+        USER_DATABASE = [];
+        saveUserDatabase();
         
     } catch (error) {
         console.error('❌ Error loading all users for admin:', error);
+        USER_DATABASE = [];
+        saveUserDatabase();
     }
 }
 
@@ -4061,15 +4053,43 @@ function editUser(userId) {
     }
 }
 
-function deleteUser(userId) {
+async function deleteUser(userId) {
     const user = getUsersFromDatabase().find(u => u.id === userId);
     if (!user) return;
     
-    if (confirm(`Are you sure you want to delete ${user.name}? This action cannot be undone.`)) {
-        if (removeUserFromDatabase(userId)) {
-            utils.showNotification(`User ${user.name} has been deleted successfully`, 'success');
-        } else {
-            utils.showNotification('Failed to delete user', 'error');
+    const confirmed = await showConfirmDialog(
+        'Delete User',
+        `Are you sure you want to delete ${user.name}? This action cannot be undone.`,
+        'Delete',
+        'danger'
+    );
+    
+    if (confirmed) {
+        try {
+            const response = await fetch('/users-api.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    action: 'delete',
+                    id: userId
+                })
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                // Refresh all data from backend
+                await refreshAllData();
+                
+                showToast(`User ${user.name} deleted successfully`, 'success');
+            } else {
+                throw new Error(result.error || 'Failed to delete user');
+            }
+        } catch (error) {
+            console.error('Error deleting user:', error);
+            showToast('Failed to delete user: ' + error.message, 'error');
         }
     }
 }
@@ -4253,23 +4273,28 @@ async function handleEditUserSubmit(event) {
             formData.company_name = selectedCompany.fantasy_name || selectedCompany.full_name;
         }
         
-        // Update user in database
-        const users = getUsersFromDatabase();
-        const userIndex = users.findIndex(u => u.id === userId);
+        // Submit to real users API
+        const response = await fetch('/users-api.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                action: 'update',
+                ...formData
+            })
+        });
         
-        if (userIndex !== -1) {
-            // Update existing user
-            users[userIndex] = { ...users[userIndex], ...formData };
-            window.USER_DATABASE = users;
-            saveUserDatabase();
+        const result = await response.json();
+        
+        if (result.success) {
+            // Refresh all data from backend
+            await refreshAllData();
             
-            // Refresh user list
-            loadModalUsersList();
-            
-            showToast(`User "${formData.name}" updated successfully!`, 'success');
+            showToast(`User "${result.user.name}" updated successfully!`, 'success');
             hideEditUserModal();
         } else {
-            throw new Error('User not found');
+            throw new Error(result.error || 'Failed to update user');
         }
         
     } catch (error) {
@@ -6018,17 +6043,29 @@ async function handleEnhancedAddUserSubmit(event) {
         // Clear previous errors
         clearFormErrors();
         
-        // Generate user ID
-        formData.id = generateUserId(formData.name);
+        // Submit to real users API
+        const response = await fetch('/users-api.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                action: 'create',
+                ...formData
+            })
+        });
         
-        // Add to mock database
-        addUserToDatabase(formData);
+        const result = await response.json();
         
-        // Refresh user list
-        loadModalUsersList();
-        
-        showToast(`User "${formData.name}" added successfully!`, 'success');
-        hideAddUserModal();
+        if (result.success) {
+            // Refresh all data from backend
+            await refreshAllData();
+            
+            showToast(`User "${result.user.name}" created successfully!`, 'success');
+            hideAddUserModal();
+        } else {
+            throw new Error(result.error || 'Failed to create user');
+        }
         
     } catch (error) {
         console.error('Error adding user:', error);
