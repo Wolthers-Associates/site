@@ -64,7 +64,7 @@ switch ($method) {
         handleGetCompanies();
         break;
     case 'POST':
-        handleCreateCompany();
+        handlePostRequest();
         break;
     case 'PUT':
         handleUpdateCompany();
@@ -74,6 +74,26 @@ switch ($method) {
         break;
     default:
         sendError('Method not allowed', 405);
+}
+
+function handlePostRequest() {
+    $input = json_decode(file_get_contents('php://input'), true);
+    
+    $action = $input['action'] ?? 'create';
+    
+    switch ($action) {
+        case 'create':
+            handleCreateCompanyAction($input);
+            break;
+        case 'update':
+            handleUpdateCompanyAction($input);
+            break;
+        case 'delete':
+            handleDeleteCompanyAction($input);
+            break;
+        default:
+            sendError('Invalid action');
+    }
 }
 
 function handleGetCompanies() {
@@ -141,8 +161,7 @@ function handleGetCompanies() {
     ]);
 }
 
-function handleCreateCompany() {
-    $input = json_decode(file_get_contents('php://input'), true);
+function handleCreateCompanyAction($input) {
     
     $required = ['full_name', 'company_type'];
     foreach ($required as $field) {
@@ -209,10 +228,11 @@ function handleCreateCompany() {
     }
 }
 
-function handleUpdateCompany() {
-    $input = json_decode(file_get_contents('php://input'), true);
+function handleUpdateCompanyAction($input) {
+    // Extract company data from nested structure
+    $companyData = $input['company'] ?? $input;
     
-    if (empty($input['id'])) {
+    if (empty($companyData['id'])) {
         sendError('Company ID is required');
     }
     
@@ -220,7 +240,7 @@ function handleUpdateCompany() {
     
     // Check if company exists
     $checkStmt = $pdo->prepare("SELECT * FROM companies WHERE id = ?");
-    $checkStmt->execute([$input['id']]);
+    $checkStmt->execute([$companyData['id']]);
     $existingCompany = $checkStmt->fetch();
     
     if (!$existingCompany) {
@@ -236,9 +256,9 @@ function handleUpdateCompany() {
     ];
     
     foreach ($allowedFields as $field) {
-        if (isset($input[$field])) {
+        if (isset($companyData[$field])) {
             $updateFields[] = "{$field} = ?";
-            $params[] = $input[$field];
+            $params[] = $companyData[$field];
         }
     }
     
@@ -246,7 +266,7 @@ function handleUpdateCompany() {
         sendError('No valid fields to update');
     }
     
-    $params[] = $input['id'];
+    $params[] = $companyData['id'];
     
     $sql = "UPDATE companies SET " . implode(', ', $updateFields) . " WHERE id = ?";
     
@@ -256,12 +276,12 @@ function handleUpdateCompany() {
         
         // Get updated company
         $getStmt = $pdo->prepare("SELECT * FROM companies WHERE id = ?");
-        $getStmt->execute([$input['id']]);
+        $getStmt->execute([$companyData['id']]);
         $company = $getStmt->fetch();
         
         logActivity(null, 'company_updated', [
-            'company_id' => $input['id'],
-            'updated_fields' => array_keys($input)
+            'company_id' => $companyData['id'],
+            'updated_fields' => array_keys($companyData)
         ]);
         
         sendResponse([
@@ -275,43 +295,64 @@ function handleUpdateCompany() {
     }
 }
 
-function handleDeleteCompany() {
-    $input = json_decode(file_get_contents('php://input'), true);
-    
+function handleDeleteCompanyAction($input) {
     if (empty($input['id'])) {
         sendError('Company ID is required');
     }
     
     $pdo = getDBConnection();
     
-    // Check if company has users
-    $userCheckStmt = $pdo->prepare("SELECT COUNT(*) as user_count FROM users WHERE company_id = ?");
-    $userCheckStmt->execute([$input['id']]);
-    $userCount = $userCheckStmt->fetch()['user_count'];
-    
-    if ($userCount > 0) {
-        sendError('Cannot delete company with active users. Please reassign or remove users first.');
-    }
-    
     try {
-        $stmt = $pdo->prepare("DELETE FROM companies WHERE id = ?");
-        $stmt->execute([$input['id']]);
+        // Start transaction
+        $pdo->beginTransaction();
         
-        if ($stmt->rowCount() === 0) {
+        // Check if company exists
+        $checkStmt = $pdo->prepare("SELECT * FROM companies WHERE id = ?");
+        $checkStmt->execute([$input['id']]);
+        $company = $checkStmt->fetch();
+        
+        if (!$company) {
+            $pdo->rollback();
             sendError('Company not found', 404);
         }
         
+        // Unlink all users from this company (set company_id to NULL)
+        $unlinkStmt = $pdo->prepare("UPDATE users SET company_id = NULL, company_role = 'staff', can_see_company_trips = FALSE WHERE company_id = ?");
+        $unlinkStmt->execute([$input['id']]);
+        $unlinkedUsers = $unlinkStmt->rowCount();
+        
+        // Delete the company
+        $deleteStmt = $pdo->prepare("DELETE FROM companies WHERE id = ?");
+        $deleteStmt->execute([$input['id']]);
+        
+        // Commit transaction
+        $pdo->commit();
+        
         logActivity(null, 'company_deleted', [
-            'company_id' => $input['id']
+            'company_id' => $input['id'],
+            'company_name' => $company['full_name'],
+            'unlinked_users' => $unlinkedUsers
         ]);
         
         sendResponse([
             'success' => true,
-            'message' => 'Company deleted successfully'
+            'message' => 'Company deleted successfully',
+            'unlinked_users' => $unlinkedUsers
         ]);
         
     } catch (Exception $e) {
+        $pdo->rollback();
         sendError('Failed to delete company: ' . $e->getMessage(), 500);
     }
+}
+
+function handleUpdateCompany() {
+    $input = json_decode(file_get_contents('php://input'), true);
+    handleUpdateCompanyAction($input);
+}
+
+function handleDeleteCompany() {
+    $input = json_decode(file_get_contents('php://input'), true);
+    handleDeleteCompanyAction($input);
 }
 ?> 
