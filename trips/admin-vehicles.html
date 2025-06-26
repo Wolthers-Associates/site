@@ -6,7 +6,7 @@
     <title>Fleet Management - Wolthers Coffee Travel Admin</title>
     
     <!-- Immediate dark mode support to prevent white blink -->
-    <style>
+    <style data-prefers-dark>
         :root {
             --dark-bg: #181c1f;
             --dark-bg-secondary: #23272b;
@@ -29,9 +29,9 @@
     </style>
     
     <link rel="stylesheet" href="css/style.css">
-    <link rel="shortcut icon" href="images/wolthers-logo-green.svg" type="image/x-icon">
+<link rel="shortcut icon" href="images/wolthers-logo-green.svg" type="image/x-icon">
     
-    <style>
+    <style data-prefers-dark>
         .fleet-container {
             max-width: 1400px;
             margin: 0 auto;
@@ -381,6 +381,19 @@
             }
         }
     </style>
+    <script>
+      (function() {
+        let theme = localStorage.getItem('theme');
+        if (!theme) {
+          theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        document.documentElement.setAttribute('data-theme', theme);
+        document.body.setAttribute('data-theme', theme);
+        document.querySelectorAll('style[data-prefers-dark]').forEach(el => {
+          el.disabled = theme === 'light';
+        });
+      })();
+    </script>
 </head>
 <body>
     <div class="fleet-container">

@@ -7438,13 +7438,20 @@ function showTripDetailsModal(trip) {
 
 function setTheme(theme) {
     document.documentElement.setAttribute('data-theme', theme);
+    document.body.setAttribute('data-theme', theme);
     localStorage.setItem('theme', theme);
     updateThemeIcon(theme);
     updateMicrosoftLoginButton(theme);
+    document.querySelectorAll('style[data-prefers-dark]').forEach(el => {
+        el.disabled = theme === 'light';
+    });
     // Ensure background color is set for light mode
     if (theme === 'light') {
         document.body.style.background = '#E5D5BE';
         document.documentElement.style.background = '#E5D5BE';
+    } else {
+        document.body.style.background = '';
+        document.documentElement.style.background = '';
     }
 }
 
