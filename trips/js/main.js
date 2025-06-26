@@ -5609,6 +5609,7 @@ async function handleAddCompanySubmit(event) {
         
         // Collect form data
         const formData = collectCompanyFormData();
+        formData.website = normalizeWebsiteUrl(formData.website);
         
         // Validate data
         const validation = validateCompanyFormData(formData);
