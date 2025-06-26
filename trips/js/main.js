@@ -3680,12 +3680,13 @@ async function loadAllUsersForAdmin() {
             const response = await fetch('https://trips.wolthers.com/users-api.php?auth_check=1&limit=100');
             if (response.ok) {
                 const apiData = await response.json();
-                if (apiData.success && Array.isArray(apiData.users)) {
-                    console.log(`📡 Loaded ${apiData.users.length} users from database API`);
+                const usersArray = apiData.users || apiData.raw_users;
+                if (Array.isArray(usersArray) && usersArray.length > 0) {
+                    console.log(`📡 Loaded ${usersArray.length} users from database API`);
                     console.log('📊 Database statistics:', apiData.statistics);
                     
                     // Map API data to the frontend user model to ensure all fields match
-                    const mappedUsers = apiData.users.map(user => ({
+                    const mappedUsers = usersArray.map(user => ({
                         ...user,
                         memberSince: user.created_at,
                         lastLoginDisplay: user.last_login_at ? new Date(user.last_login_at).toLocaleString() : 'Never',
@@ -3693,14 +3694,9 @@ async function loadAllUsersForAdmin() {
                         isWolthersTeam: user.email?.endsWith('@wolthers.com') || false,
                         avatar: user.name?.charAt(0).toUpperCase() || '?'
                     }));
-
-                    // Replace USER_DATABASE with real database users
                     USER_DATABASE = mappedUsers;
                     saveUserDatabase();
                     localStorage.setItem('wolthers_users_database_source', 'true');
-                    
-                    console.log(`✅ Real database users loaded: ${USER_DATABASE.length}`);
-                    console.log('👥 Users from database:', USER_DATABASE.map(u => `${u.name} (${u.email})`));
                     return;
                 }
             } else {
