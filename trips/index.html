@@ -2076,6 +2076,11 @@ The system will automatically:
                                         <option value="distributor">Distributor</option>
                                         <option value="retailer">Retailer</option>
                                         <option value="consultant">Consultant</option>
+                                        <option value="service_provider_broker">Service Provider (Broker)</option>
+                                        <option value="service_provider_broker_qc">Service Provider (Broker and Quality Control)</option>
+                                        <option value="service_provider_qc">Service Provider (Quality Control)</option>
+                                        <option value="general_warehouse">General Warehouse</option>
+                                        <option value="bonded_warehouse">Bonded Warehouse</option>
                                         <option value="other">Other</option>
                                     </select>
                                 </div>
@@ -2225,6 +2230,11 @@ The system will automatically:
                                     <option value="distributor">Distributor</option>
                                     <option value="retailer">Retailer</option>
                                     <option value="consultant">Consultant</option>
+                                    <option value="service_provider_broker">Service Provider (Broker)</option>
+                                    <option value="service_provider_broker_qc">Service Provider (Broker and Quality Control)</option>
+                                    <option value="service_provider_qc">Service Provider (Quality Control)</option>
+                                    <option value="general_warehouse">General Warehouse</option>
+                                    <option value="bonded_warehouse">Bonded Warehouse</option>
                                     <option value="other">Other</option>
                                 </select>
                             </div>
@@ -2364,7 +2374,7 @@ The system will automatically:
                         <div class="fluent-form-row">
                             <div class="fluent-form-group">
                                 <label for="companyType" class="fluent-label">Company Type *</label>
-                                <select id="companyType" class="fluent-select" required onchange="toggleServiceProviderSubtype()">
+                                <select id="companyType" class="fluent-select" required>
                                     <option value="">Select company type</option>
                                     <option value="importer">Importer</option>
                                     <option value="exporter">Exporter</option>
@@ -2372,7 +2382,9 @@ The system will automatically:
                                     <option value="distributor">Distributor</option>
                                     <option value="retailer">Retailer</option>
                                     <option value="consultant">Consultant</option>
-                                    <option value="service_provider">Service Provider</option>
+                                    <option value="service_provider_broker">Service Provider (Broker)</option>
+                                    <option value="service_provider_broker_qc">Service Provider (Broker and Quality Control)</option>
+                                    <option value="service_provider_qc">Service Provider (Quality Control)</option>
                                     <option value="general_warehouse">General Warehouse</option>
                                     <option value="bonded_warehouse">Bonded Warehouse</option>
                                     <option value="other">Other</option>
@@ -2450,17 +2462,7 @@ The system will automatically:
                         </div>
                     </div>
                     
-                    <div id="serviceProviderSubtypeRow" class="fluent-form-row" style="display:none;">
-                        <div class="fluent-form-group">
-                            <label for="serviceProviderSubtype" class="fluent-label">Service Provider Type</label>
-                            <select id="serviceProviderSubtype" class="fluent-select">
-                                <option value="">Select subtype</option>
-                                <option value="broker">Broker</option>
-                                <option value="quality_lab">Quality Lab</option>
-                                <option value="broker_quality_lab">Broker and Quality Lab</option>
-                            </select>
-                        </div>
-                    </div>
+
                     
                     <div class="fluent-form-actions">
                         <button type="button" class="fluent-btn fluent-btn-secondary" onclick="hideAddCompanyModal()">Cancel</button>

@@ -3106,9 +3106,21 @@ function createCompanyTableRow(company, users) {
     const location = [company.city, company.state, company.country].filter(Boolean).join(', ') || '-';
     
     // Format company type
-    const typeDisplay = company.company_type ? 
-        company.company_type.charAt(0).toUpperCase() + company.company_type.slice(1) : 
-        'Other';
+    const typeDisplayMap = {
+        'importer': 'Importer',
+        'exporter': 'Exporter',
+        'roaster': 'Coffee Roaster',
+        'distributor': 'Distributor',
+        'retailer': 'Retailer',
+        'consultant': 'Consultant',
+        'service_provider_broker': 'Service Provider (Broker)',
+        'service_provider_broker_qc': 'Service Provider (Broker and Quality Control)',
+        'service_provider_qc': 'Service Provider (Quality Control)',
+        'general_warehouse': 'General Warehouse',
+        'bonded_warehouse': 'Bonded Warehouse',
+        'other': 'Other'
+    };
+    const typeDisplay = typeDisplayMap[company.company_type] || 'Other';
     
     // Format creation date
     const createdDate = company.created_at ? 
@@ -3134,7 +3146,6 @@ function createCompanyTableRow(company, users) {
         <td class="fluent-td-location">${escapeHtml(location)}</td>
         <td class="fluent-td-users">
             <span class="user-count">${userCount}</span>
-            ${userCount > 0 ? `<span class="user-count-detail">user${userCount !== 1 ? 's' : ''}</span>` : ''}
         </td>
         <td class="fluent-td-status">
             <span class="status-badge ${getCompanyStatusClass(company.status || 'active')}">${(company.status || 'active').charAt(0).toUpperCase() + (company.status || 'active').slice(1)}</span>
@@ -3202,6 +3213,11 @@ function getCompanyTypeClass(type) {
         'distributor': 'type-distributor',
         'retailer': 'type-retailer',
         'consultant': 'type-consultant',
+        'service_provider_broker': 'type-service-provider',
+        'service_provider_broker_qc': 'type-service-provider',
+        'service_provider_qc': 'type-service-provider',
+        'general_warehouse': 'type-warehouse',
+        'bonded_warehouse': 'type-warehouse',
         'other': 'type-other'
     };
     return typeClasses[type] || 'type-other';
@@ -4269,10 +4285,6 @@ async function handleEditUserSubmit(event) {
 }
 
 async function autoLinkUsersToCompanies() {
-    if (!confirm('This will automatically link users to companies based on email domains and patterns. Continue?')) {
-        return;
-    }
-    
     try {
         showToast('Auto-linking users to companies...', 'info');
         
