@@ -7446,9 +7446,11 @@ function updateThemeIcon(theme) {
     const iconSpan = document.getElementById('themeToggleIcon');
     if (!iconSpan) return;
     if (theme === 'dark') {
-        iconSpan.innerHTML = `<svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="11" cy="11" r="7" fill="#FFD600"/><path d="M11 2v2M11 18v2M4.22 4.22l1.42 1.42M16.36 16.36l1.42 1.42M2 11h2M18 11h2M4.22 17.78l1.42-1.42M16.36 5.64l1.42-1.42" stroke="#FFD600" stroke-width="1.5" stroke-linecap="round"/></svg>`;
+        // Show sun for light mode
+        iconSpan.innerHTML = `<svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="11" cy="11" r="6" fill="#DAA520"/><g stroke="#DAA520" stroke-width="1.5" stroke-linecap="round"><line x1="11" y1="2" x2="11" y2="5"/><line x1="11" y1="17" x2="11" y2="20"/><line x1="2" y1="11" x2="5" y2="11"/><line x1="17" y1="11" x2="20" y2="11"/><line x1="4.22" y1="4.22" x2="6.34" y2="6.34"/><line x1="15.66" y1="15.66" x2="17.78" y2="17.78"/><line x1="4.22" y1="17.78" x2="6.34" y2="15.66"/><line x1="15.66" y1="6.34" x2="17.78" y2="4.22"/></g></svg>`;
     } else {
-        iconSpan.innerHTML = `<svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M17.657 16.243A8 8 0 0 1 5.757 4.343a8.001 8.001 0 1 0 11.9 11.9z" fill="#333" stroke="#FFD600" stroke-width="1.5"/></svg>`;
+        // Show moon for dark mode
+        iconSpan.innerHTML = `<svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16.5 14.5A7 7 0 0 1 7.5 5.5a7 7 0 1 0 9 9z" fill="#2C5530" stroke="#DAA520" stroke-width="1.5"/></svg>`;
     }
 }
 
