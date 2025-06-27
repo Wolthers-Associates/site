@@ -28,14 +28,8 @@ try {
     // Get Microsoft configuration from secure config
     $host = $_SERVER['HTTP_HOST'];
     
-    // Handle subdomain vs subdirectory setup
-    if (strpos($host, 'trips.') === 0) {
-        // trips.wolthers.com subdomain
-        $redirectUri = 'https://' . $host . '/auth-callback.html';
-    } else {
-        // wolthers.com/trips subdirectory  
-        $redirectUri = 'https://' . $host . '/trips/auth-callback.html';
-    }
+    // trips.wolthers.com subdomain setup
+    $redirectUri = 'https://' . $host . '/auth-callback.html';
     
     $config = [
         'clientId' => OFFICE365_CLIENT_ID,

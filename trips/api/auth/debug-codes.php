@@ -59,8 +59,8 @@ try {
         'codes' => $codes,
         'current_time' => date('Y-m-d H:i:s'),
         'usage' => [
-            'view_all' => '/trips/api/auth/debug-codes.php',
-            'view_specific' => '/trips/api/auth/debug-codes.php?email=user@example.com'
+                    'view_all' => '/api/auth/debug-codes.php',
+        'view_specific' => '/api/auth/debug-codes.php?email=user@example.com'
         ]
     ];
     
