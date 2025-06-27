@@ -7,7 +7,7 @@
 
 class UserManagement {
     constructor() {
-        this.apiBase = 'https://trips.wolthers.com/trips';
+        this.apiBase = 'https://trips.wolthers.com';
         this.users = [];
         this.companies = [];
         this.filteredUsers = [];

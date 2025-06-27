@@ -8,7 +8,7 @@
 class UserManagementIntegration {
     constructor() {
         this.userManagementUrl = '/trips/user-management.html';
-        this.apiBase = 'https://trips.wolthers.com/trips';
+        this.apiBase = 'https://trips.wolthers.com';
         this.isEmbedded = false;
     }
 

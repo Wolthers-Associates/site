@@ -447,7 +447,7 @@ const auth = {
     // Real session validation
     validateSession: async (userData) => {
         try {
-            const response = await fetch('/api/auth/validate.php', {
+            const response = await fetch('api/auth/validate.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ session_token: userData.token })
@@ -506,7 +506,7 @@ const auth = {
         }
         
         try {
-            const response = await fetch('/api/auth/check-user.php', {
+            const response = await fetch('api/auth/check-user.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email })
@@ -1857,7 +1857,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     
     // Initialize Microsoft Authentication
     try {
-        const configResponse = await fetch('/api/auth/microsoft-config.php');
+        const configResponse = await fetch('api/auth/microsoft-config.php');
         const configData = await configResponse.json();
         
         if (configData.success && configData.config.clientId) {
