@@ -58,10 +58,16 @@ define('DEBUG_MODE', ENVIRONMENT === 'development');
 define('JWT_SECRET', getenv('JWT_SECRET') ?: 'your-jwt-secret-key-change-in-production');
 define('SESSION_TIMEOUT', 3600); // 1 hour
 
-// Authentication configuration (for future Office 365 integration)
-define('OFFICE365_CLIENT_ID', getenv('OFFICE365_CLIENT_ID') ?: '');
-define('OFFICE365_CLIENT_SECRET', getenv('OFFICE365_CLIENT_SECRET') ?: '');
-define('OFFICE365_TENANT_ID', getenv('OFFICE365_TENANT_ID') ?: '');
+// Authentication configuration - Only define if not already set by secure-config.php
+if (!defined('OFFICE365_CLIENT_ID')) {
+    define('OFFICE365_CLIENT_ID', getenv('OFFICE365_CLIENT_ID') ?: '');
+}
+if (!defined('OFFICE365_CLIENT_SECRET')) {
+    define('OFFICE365_CLIENT_SECRET', getenv('OFFICE365_CLIENT_SECRET') ?: '');
+}
+if (!defined('OFFICE365_TENANT_ID')) {
+    define('OFFICE365_TENANT_ID', getenv('OFFICE365_TENANT_ID') ?: '');
+}
 
 // Email configuration (for future notifications)
 define('SMTP_HOST', getenv('SMTP_HOST') ?: 'smtp.gmail.com');
