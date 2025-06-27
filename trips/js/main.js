@@ -4138,7 +4138,7 @@ async function deleteUser(userId) {
     
     if (confirmed) {
         try {
-            const response = await fetch(`https://trips.wolthers.com/users-api.php?id=${userId}`, {
+            const response = await fetch(`users-api.php?id=${userId}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
@@ -4342,7 +4342,7 @@ async function handleEditUserSubmit(event) {
         }
         
         // Submit to real users API
-        const response = await fetch('https://trips.wolthers.com/users-api.php', {
+        const response = await fetch('users-api.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -6137,7 +6137,7 @@ async function handleEnhancedAddUserSubmit(event) {
         clearFormErrors();
         
         // Submit to real users API
-        const response = await fetch('https://trips.wolthers.com/users-api.php', {
+        const response = await fetch('users-api.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
