@@ -164,8 +164,6 @@ function handleGetUsers() {
     $stmt = $pdo->prepare($sql);
     $stmt->execute($params);
     $users = $stmt->fetchAll();
-    // DEBUG: Output raw users array to check for last_login
-    sendResponse(['raw_users' => $users]);
     
     // Format users for frontend compatibility
     $formattedUsers = array_map(function($user) {

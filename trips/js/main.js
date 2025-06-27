@@ -3680,24 +3680,46 @@ async function loadAllUsersForAdmin() {
             const response = await fetch('https://trips.wolthers.com/users-api.php?auth_check=1&limit=100');
             if (response.ok) {
                 const apiData = await response.json();
-                const usersArray = apiData.users || apiData.raw_users;
-                if (Array.isArray(usersArray) && usersArray.length > 0) {
+                console.log('🔍 Raw API response:', apiData);
+                
+                // Handle different response formats from the API
+                let usersArray = null;
+                if (apiData.users && Array.isArray(apiData.users)) {
+                    usersArray = apiData.users;
+                    console.log('✅ Using formatted users from API');
+                } else if (apiData.raw_users && Array.isArray(apiData.raw_users)) {
+                    console.log('⚠️ Using raw_users from API (debug mode detected)');
+                    usersArray = apiData.raw_users;
+                } else if (Array.isArray(apiData)) {
+                    console.log('⚠️ API returned array directly');
+                    usersArray = apiData;
+                } else {
+                    console.error('❌ Unable to find users array in API response. Keys:', Object.keys(apiData));
+                }
+                
+                if (usersArray && usersArray.length > 0) {
                     console.log(`📡 Loaded ${usersArray.length} users from database API`);
                     console.log('📊 Database statistics:', apiData.statistics);
+                    console.log('🔍 First user data structure:', usersArray[0]);
                     
                     // Map API data to the frontend user model to ensure all fields match
                     const mappedUsers = usersArray.map(user => ({
                         ...user,
+                        id: user.id || generateUserId(user.name || user.email),
                         memberSince: user.created_at,
                         lastLoginDisplay: user.last_login_at ? new Date(user.last_login_at).toLocaleString() : 'Never',
                         company_name: user.company_fantasy_name || user.company_full_name,
                         isWolthersTeam: user.email?.endsWith('@wolthers.com') || false,
                         avatar: user.name?.charAt(0).toUpperCase() || '?'
                     }));
+                    
+                    console.log('🔍 Mapped users IDs:', mappedUsers.map(u => ({ id: u.id, name: u.name })));
                     USER_DATABASE = mappedUsers;
                     saveUserDatabase();
                     localStorage.setItem('wolthers_users_database_source', 'true');
                     return;
+                } else {
+                    console.log('⚠️ No users array found in API response');
                 }
             } else {
                 console.log('⚠️ Users API response not ok:', response.status);
@@ -3932,7 +3954,8 @@ function loadModalUsersList() {
     
     // Get users from the global USER_DATABASE array
     const users = getUsersFromDatabase();
-    console.log('loadModalUsersList: Found', users.length, 'users:', users.map(u => u.name));
+    console.log('loadModalUsersList: Found', users.length, 'users');
+    console.log('🔍 User IDs and names:', users.map(u => ({ id: u.id, name: u.name, email: u.email })));
     
     // Check if we're using real database data
     const isDatabaseSource = localStorage.getItem('wolthers_users_database_source') === 'true';
@@ -4051,14 +4074,42 @@ function clearFormErrors() {
 }
 
 function editUser(userId) {
-    console.log('Edit user:', userId);
+    console.log('Edit user called with ID:', userId);
     const users = getUsersFromDatabase();
-    const user = users.find(u => u.id === userId);
+    console.log('Available users in database:', users.map(u => ({ id: u.id, name: u.name, email: u.email })));
+    
+    // Try to find user with exact ID match first
+    let user = users.find(u => u.id === userId);
+    
+    // If not found with exact match, try with string conversion (API vs local ID mismatch)
+    if (!user) {
+        user = users.find(u => String(u.id) === String(userId));
+        console.log('Trying string conversion match for ID:', userId);
+    }
+    
+    // If still not found, try to find by email (fallback for Microsoft auth users)
+    if (!user) {
+        user = users.find(u => u.email === userId);
+        console.log('Trying email match for ID:', userId);
+    }
     
     if (user) {
+        console.log('Found user for editing:', user);
         showEditUserModal(user);
     } else {
-        showToast('User not found', 'error');
+        console.error('User not found with ID:', userId);
+        console.error('Available user IDs:', users.map(u => u.id));
+        showToast('User not found. Please refresh the page and try again.', 'error');
+        
+        // Try to refresh the user data
+        if (typeof loadUserManagementData === 'function') {
+            console.log('Attempting to refresh user data...');
+            loadUserManagementData().then(() => {
+                showToast('User data refreshed. Please try editing again.', 'info');
+            }).catch(error => {
+                console.error('Failed to refresh user data:', error);
+            });
+        }
     }
 }
 
