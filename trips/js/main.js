@@ -4097,18 +4097,34 @@ function editUser(userId) {
         console.log('Found user for editing:', user);
         showEditUserModal(user);
     } else {
-        console.error('User not found with ID:', userId);
-        console.error('Available user IDs:', users.map(u => u.id));
-        showToast('User not found. Please refresh the page and try again.', 'error');
+        console.warn('User not found with ID:', userId);
+        console.warn('Available user IDs:', users.map(u => u.id));
         
-        // Try to refresh the user data
+        // More graceful error handling - don't show error toast immediately
+        // Instead, try to refresh data silently first
         if (typeof loadUserManagementData === 'function') {
             console.log('Attempting to refresh user data...');
             loadUserManagementData().then(() => {
-                showToast('User data refreshed. Please try editing again.', 'info');
+                // Try to find user again after refresh
+                const refreshedUsers = getUsersFromDatabase();
+                const refreshedUser = refreshedUsers.find(u => u.id === userId || u.email === userId || String(u.id) === String(userId));
+                
+                if (refreshedUser) {
+                    console.log('Found user after refresh:', refreshedUser);
+                    showEditUserModal(refreshedUser);
+                } else {
+                    // Only show error if still not found after refresh
+                    console.log('User still not found after refresh, may have been deleted');
+                    // Don't show error toast - user may have been deleted legitimately
+                }
             }).catch(error => {
                 console.error('Failed to refresh user data:', error);
+                // Only show error for actual refresh failures
+                showToast('Unable to load user data. Please refresh the page and try again.', 'warning');
             });
+        } else {
+            // Fallback if refresh function not available - less intrusive message
+            console.log('User not found and no refresh function available');
         }
     }
 }
