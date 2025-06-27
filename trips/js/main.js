@@ -3347,13 +3347,13 @@ async function deleteCompany(companyId) {
         try {
             // Try to delete via API first
             try {
-                const response = await fetch('https://trips.wolthers.com/companies-api.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        action: 'delete',
-                        id: companyId
-                    })
+                            const response = await fetch('companies-api.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'delete',
+                    id: companyId
+                })
                 });
 
                 const data = await response.json();
@@ -3532,7 +3532,7 @@ async function handleEditCompanySubmit(event) {
         
         // Try to update via API first
         try {
-            const response = await fetch('https://trips.wolthers.com/companies-api.php', {
+            const response = await fetch('companies-api.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -3676,7 +3676,7 @@ async function loadAllUsersForAdmin() {
         
         // Load users from real database API
         try {
-            const response = await fetch('https://trips.wolthers.com/users-api.php?auth_check=1&limit=100');
+            const response = await fetch('users-api.php?auth_check=1&limit=100');
             if (response.ok) {
                 const apiData = await response.json();
                 console.log('🔍 Raw API response:', apiData);
