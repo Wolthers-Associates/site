@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auth Debug - Wolthers & Associates</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .debug-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .warning { background: #fff3cd; color: #856404; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        button:disabled { background: #6c757d; cursor: not-allowed; }
+        pre {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .console-log {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            background: #f8f9fa;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔐 Wolthers Authentication Debug Tool</h1>
+    <p>Comprehensive testing for the Microsoft authentication system</p>
+
+    <div class="test-grid">
+        <!-- Script Loading Test -->
+        <div class="debug-section">
+            <h2>1. Script Loading</h2>
+            <button onclick="testScriptLoading()">Test Script Loading</button>
+            <div id="scriptResult"></div>
+        </div>
+
+        <!-- API Configuration Test -->
+        <div class="debug-section">
+            <h2>2. API Configuration</h2>
+            <button onclick="testAPIConfig()">Test API Config</button>
+            <div id="apiResult"></div>
+        </div>
+
+        <!-- Microsoft Auth Class Test -->
+        <div class="debug-section">
+            <h2>3. Microsoft Auth Class</h2>
+            <button onclick="testMicrosoftAuthClass()">Test Auth Class</button>
+            <div id="authClassResult"></div>
+        </div>
+
+        <!-- Login Button Test -->
+        <div class="debug-section">
+            <h2>4. Login Button</h2>
+            <button onclick="testLoginButton()">Test Login Button</button>
+            <div id="loginButtonResult"></div>
+        </div>
+
+        <!-- Live Authentication Test -->
+        <div class="debug-section">
+            <h2>5. Live Auth Test</h2>
+            <button onclick="testLiveAuth()" id="liveAuthBtn">Test Live Authentication</button>
+            <div id="liveAuthResult"></div>
+        </div>
+
+        <!-- Network Connectivity -->
+        <div class="debug-section">
+            <h2>6. Network Tests</h2>
+            <button onclick="testNetworkConnectivity()">Test Network</button>
+            <div id="networkResult"></div>
+        </div>
+    </div>
+
+    <!-- Console Log -->
+    <div class="debug-section">
+        <h2>7. Console Log</h2>
+        <button onclick="clearConsoleLog()">Clear Log</button>
+        <div id="consoleLog" class="console-log"></div>
+    </div>
+
+    <!-- Load Microsoft Auth Script -->
+    <script src="js/microsoft-auth.js"></script>
+    <script src="js/main.js"></script>
+
+    <script>
+        // Console capture
+        const originalLog = console.log;
+        const originalError = console.error;
+        const originalWarn = console.warn;
+        
+        function addToConsoleLog(type, ...args) {
+            const logDiv = document.getElementById('consoleLog');
+            const timestamp = new Date().toLocaleTimeString();
+            const message = args.map(arg => 
+                typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+            ).join(' ');
+            
+            logDiv.innerHTML += `<div class="status ${type}">[${timestamp}] ${type.toUpperCase()}: ${message}</div>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+        
+        console.log = (...args) => {
+            originalLog.apply(console, args);
+            addToConsoleLog('info', ...args);
+        };
+        
+        console.error = (...args) => {
+            originalError.apply(console, args);
+            addToConsoleLog('error', ...args);
+        };
+        
+        console.warn = (...args) => {
+            originalWarn.apply(console, args);
+            addToConsoleLog('warning', ...args);
+        };
+
+        // Test Functions
+        async function testScriptLoading() {
+            const resultDiv = document.getElementById('scriptResult');
+            resultDiv.innerHTML = '<div class="status info">Testing script loading...</div>';
+            
+            const tests = [
+                { name: 'MicrosoftAuth class', test: () => typeof MicrosoftAuth !== 'undefined' },
+                { name: 'MicrosoftSignInButton class', test: () => typeof MicrosoftSignInButton !== 'undefined' },
+                { name: 'window.MicrosoftAuth', test: () => typeof window.MicrosoftAuth !== 'undefined' },
+                { name: 'window.MicrosoftSignInButton', test: () => typeof window.MicrosoftSignInButton !== 'undefined' },
+                { name: 'Global auth object', test: () => typeof auth !== 'undefined' },
+                { name: 'Global utils object', test: () => typeof utils !== 'undefined' },
+                { name: 'Global ui object', test: () => typeof ui !== 'undefined' }
+            ];
+            
+            let results = [];
+            tests.forEach(test => {
+                try {
+                    const passed = test.test();
+                    results.push(`${passed ? '✅' : '❌'} ${test.name}: ${passed ? 'Available' : 'Missing'}`);
+                } catch (error) {
+                    results.push(`❌ ${test.name}: Error - ${error.message}`);
+                }
+            });
+            
+            resultDiv.innerHTML = `
+                <div class="status ${results.some(r => r.startsWith('❌')) ? 'error' : 'success'}">
+                    Script Loading Results:
+                </div>
+                <pre>${results.join('\n')}</pre>
+            `;
+        }
+
+        async function testAPIConfig() {
+            const resultDiv = document.getElementById('apiResult');
+            resultDiv.innerHTML = '<div class="status info">Testing API configuration...</div>';
+            
+            try {
+                const response = await fetch('/api/auth/microsoft-config.php');
+                const data = await response.json();
+                
+                if (data.success && data.config.clientId) {
+                    resultDiv.innerHTML = `
+                        <div class="status success">✅ API Configuration OK</div>
+                        <pre>Client ID: ${data.config.clientId}
+Tenant ID: ${data.config.tenantId}
+Redirect URI: ${data.config.redirectUri}
+Configured: ${data.configured}</pre>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="status error">❌ API Configuration Failed</div>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="status error">❌ API Request Failed</div>
+                    <pre>Error: ${error.message}</pre>
+                `;
+            }
+        }
+
+        async function testMicrosoftAuthClass() {
+            const resultDiv = document.getElementById('authClassResult');
+            resultDiv.innerHTML = '<div class="status info">Testing Microsoft Auth class...</div>';
+            
+            try {
+                if (typeof MicrosoftAuth === 'undefined') {
+                    resultDiv.innerHTML = '<div class="status error">❌ MicrosoftAuth class not found</div>';
+                    return;
+                }
+                
+                // Get config first
+                const configResponse = await fetch('/api/auth/microsoft-config.php');
+                const configData = await configResponse.json();
+                
+                if (!configData.success || !configData.config.clientId) {
+                    resultDiv.innerHTML = '<div class="status error">❌ Cannot test auth class - no valid config</div>';
+                    return;
+                }
+                
+                // Create instance
+                const auth = new MicrosoftAuth(
+                    configData.config.clientId,
+                    configData.config.tenantId,
+                    configData.config.redirectUri
+                );
+                
+                // Test methods
+                const authUrl = auth.getAuthUrl();
+                const isAuth = auth.isAuthenticated();
+                
+                resultDiv.innerHTML = `
+                    <div class="status success">✅ Microsoft Auth class working</div>
+                    <pre>Auth URL generated: ${authUrl ? 'Yes' : 'No'}
+Is authenticated: ${isAuth}
+Client ID: ${auth.clientId}
+Tenant ID: ${auth.tenantId}
+Redirect URI: ${auth.redirectUri}</pre>
+                `;
+                
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="status error">❌ Microsoft Auth class test failed</div>
+                    <pre>Error: ${error.message}</pre>
+                `;
+            }
+        }
+
+        function testLoginButton() {
+            const resultDiv = document.getElementById('loginButtonResult');
+            resultDiv.innerHTML = '<div class="status info">Testing login button...</div>';
+            
+            // Check if login button exists in DOM
+            const loginBtn = document.getElementById('microsoftLoginBtn');
+            
+            if (!loginBtn) {
+                resultDiv.innerHTML = '<div class="status error">❌ Login button not found in DOM</div>';
+                return;
+            }
+            
+            // Check if click handler is attached
+            const hasClickHandler = loginBtn.onclick !== null || 
+                                  loginBtn.addEventListener !== undefined;
+            
+            resultDiv.innerHTML = `
+                <div class="status ${hasClickHandler ? 'success' : 'warning'}">
+                    Login Button Test Results:
+                </div>
+                <pre>Button found: ✅ Yes
+Button ID: ${loginBtn.id}
+Button class: ${loginBtn.className}
+Has onclick: ${loginBtn.onclick !== null ? 'Yes' : 'No'}
+Button text: ${loginBtn.textContent || loginBtn.innerText || 'No text'}</pre>
+            `;
+        }
+
+        async function testLiveAuth() {
+            const resultDiv = document.getElementById('liveAuthResult');
+            const btn = document.getElementById('liveAuthBtn');
+            
+            resultDiv.innerHTML = '<div class="status info">Starting live authentication test...</div>';
+            btn.disabled = true;
+            btn.textContent = 'Testing...';
+            
+            try {
+                if (typeof auth === 'undefined' || typeof auth.signInWithMicrosoft !== 'function') {
+                    throw new Error('auth.signInWithMicrosoft function not available');
+                }
+                
+                // Try to call the sign in function
+                await auth.signInWithMicrosoft();
+                
+                resultDiv.innerHTML = '<div class="status success">✅ Live authentication completed successfully</div>';
+                
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="status error">❌ Live authentication failed</div>
+                    <pre>Error: ${error.message}</pre>
+                `;
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Test Live Authentication';
+            }
+        }
+
+        async function testNetworkConnectivity() {
+            const resultDiv = document.getElementById('networkResult');
+            resultDiv.innerHTML = '<div class="status info">Testing network connectivity...</div>';
+            
+            const endpoints = [
+                '/api/auth/microsoft-config.php',
+                '/api/auth/login.php',
+                '/js/microsoft-auth.js',
+                '/js/main.js',
+                'https://login.microsoftonline.com/common/oauth2/v2.0/authorize'
+            ];
+            
+            const results = [];
+            
+            for (const endpoint of endpoints) {
+                try {
+                    const response = await fetch(endpoint, { method: 'HEAD' });
+                    results.push(`✅ ${endpoint}: ${response.status}`);
+                } catch (error) {
+                    results.push(`❌ ${endpoint}: ${error.message}`);
+                }
+            }
+            
+            resultDiv.innerHTML = `
+                <div class="status info">Network Connectivity Results:</div>
+                <pre>${results.join('\n')}</pre>
+            `;
+        }
+
+        function clearConsoleLog() {
+            document.getElementById('consoleLog').innerHTML = '';
+        }
+
+        // Auto-run basic tests on load
+        window.addEventListener('load', () => {
+            console.log('🚀 Debug page loaded');
+            setTimeout(() => {
+                testScriptLoading();
+                testAPIConfig();
+            }, 1000);
+        });
+
+        // Error handler
+        window.addEventListener('error', (event) => {
+            console.error('Global error:', event.error);
+        });
+
+        // Unhandled promise rejection handler
+        window.addEventListener('unhandledrejection', (event) => {
+            console.error('Unhandled promise rejection:', event.reason);
+        });
+    </script>
+</body>
+</html> 
