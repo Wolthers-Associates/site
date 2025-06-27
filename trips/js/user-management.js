@@ -7,7 +7,7 @@
 
 class UserManagement {
     constructor() {
-        this.apiBase = 'https://trips.wolthers.com';
+        this.apiBase = 'https://trips.wolthers.com/trips';
         this.users = [];
         this.companies = [];
         this.filteredUsers = [];
@@ -77,6 +77,7 @@ class UserManagement {
     async loadUsers() {
         try {
             console.log('📥 Loading users from API...');
+            console.log('API URL:', `${this.apiBase}/users-api.php`);
             
             const response = await fetch(`${this.apiBase}/users-api.php`, {
                 method: 'GET',
@@ -85,10 +86,19 @@ class UserManagement {
                 }
             });
 
-            const result = await response.json();
+            console.log('Response status:', response.status);
+            console.log('Response headers:', Object.fromEntries(response.headers.entries()));
 
-            if (result.success) {
-                this.users = result.users || [];
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+
+            const result = await response.json();
+            console.log('API Response:', result);
+
+            if (result.success !== false) {
+                // Handle both new format (with success flag) and direct user array
+                this.users = result.users || result || [];
                 this.filteredUsers = [...this.users];
                 this.renderUsers();
                 console.log(`✅ Loaded ${this.users.length} users`);
@@ -105,7 +115,8 @@ class UserManagement {
                 tbody.innerHTML = `
                     <tr>
                         <td colspan="6" style="text-align: center; padding: 40px; color: #ef4444;">
-                            ❌ Failed to load users: ${error.message}
+                            ❌ Failed to load users: ${error.message}<br>
+                            <small>Check console for details</small>
                         </td>
                     </tr>
                 `;
@@ -116,6 +127,7 @@ class UserManagement {
     async loadCompanies() {
         try {
             console.log('🏢 Loading companies from API...');
+            console.log('Companies API URL:', `${this.apiBase}/companies-api.php`);
             
             const response = await fetch(`${this.apiBase}/companies-api.php`, {
                 method: 'GET',
@@ -124,10 +136,17 @@ class UserManagement {
                 }
             });
 
-            const result = await response.json();
+            console.log('Companies response status:', response.status);
 
-            if (result.success) {
-                this.companies = result.companies || [];
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+
+            const result = await response.json();
+            console.log('Companies API Response:', result);
+
+            if (result.success !== false) {
+                this.companies = result.companies || result || [];
                 this.populateCompanyDropdowns();
                 console.log(`✅ Loaded ${this.companies.length} companies`);
             } else {

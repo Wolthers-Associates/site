@@ -132,7 +132,7 @@
             
             // Test opening in new window
             const userManagementWindow = window.open(
-                '/user-management.html',
+                '/trips/user-management.html',
                 'userManagementTest',
                 'width=1200,height=800,scrollbars=yes,resizable=yes'
             );
@@ -164,7 +164,7 @@
             showStatus('🔗 Testing API connectivity to trips.wolthers.com...', 'info');
             
             try {
-                const response = await fetch('https://trips.wolthers.com/users-api.php', {
+                const response = await fetch('https://trips.wolthers.com/trips/users-api.php', {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
