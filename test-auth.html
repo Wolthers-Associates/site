@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auth Test - Wolthers & Associates</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        pre {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔐 Authentication Test</h1>
+    <p>Testing the Wolthers & Associates trip management authentication system</p>
+
+    <div class="test-section">
+        <h2>1. API Configuration Test</h2>
+        <button onclick="testConfig()">Test Microsoft Config</button>
+        <div id="configResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>2. Script Loading Test</h2>
+        <button onclick="testScripts()">Test Script Loading</button>
+        <div id="scriptResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>3. Microsoft Auth Test</h2>
+        <button onclick="testMicrosoftAuth()">Test Microsoft Auth</button>
+        <div id="authResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>4. Console Log</h2>
+        <div id="consoleLog"></div>
+    </div>
+
+    <script>
+        // Capture console logs
+        const originalLog = console.log;
+        const originalError = console.error;
+        const originalWarn = console.warn;
+        
+        function addToLog(type, ...args) {
+            const logDiv = document.getElementById('consoleLog');
+            const timestamp = new Date().toLocaleTimeString();
+            const message = args.map(arg => 
+                typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+            ).join(' ');
+            
+            logDiv.innerHTML += `<div class="status ${type}">[${timestamp}] ${type.toUpperCase()}: ${message}</div>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+        
+        console.log = (...args) => {
+            originalLog.apply(console, args);
+            addToLog('info', ...args);
+        };
+        
+        console.error = (...args) => {
+            originalError.apply(console, args);
+            addToLog('error', ...args);
+        };
+        
+        console.warn = (...args) => {
+            originalWarn.apply(console, args);
+            addToLog('warning', ...args);
+        };
+
+        async function testConfig() {
+            const resultDiv = document.getElementById('configResult');
+            resultDiv.innerHTML = '<div class="status info">Testing...</div>';
+            
+            try {
+                const response = await fetch('/api/auth/microsoft-config.php');
+                const data = await response.json();
+                
+                if (data.success) {
+                    resultDiv.innerHTML = `
+                        <div class="status success">✅ Configuration loaded successfully</div>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="status error">❌ Configuration failed</div>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="status error">❌ Network error: ${error.message}</div>
+                `;
+            }
+        }
+
+        async function testScripts() {
+            const resultDiv = document.getElementById('scriptResult');
+            resultDiv.innerHTML = '<div class="status info">Testing script loading...</div>';
+            
+            const scripts = [
+                '/js/microsoft-auth.js',
+                '/js/main.js',
+                '/js/pages/index.bootstrap.js'
+            ];
+            
+            const results = [];
+            
+            for (const script of scripts) {
+                try {
+                    const response = await fetch(script);
+                    if (response.ok) {
+                        results.push(`✅ ${script} - OK`);
+                    } else {
+                        results.push(`❌ ${script} - ${response.status}`);
+                    }
+                } catch (error) {
+                    results.push(`❌ ${script} - ${error.message}`);
+                }
+            }
+            
+            resultDiv.innerHTML = `
+                <div class="status success">Script loading test completed</div>
+                <pre>${results.join('\n')}</pre>
+            `;
+        }
+
+        async function testMicrosoftAuth() {
+            const resultDiv = document.getElementById('authResult');
+            resultDiv.innerHTML = '<div class="status info">Testing Microsoft Auth...</div>';
+            
+            try {
+                // Test if MicrosoftAuth class is available
+                if (typeof MicrosoftAuth === 'undefined') {
+                    resultDiv.innerHTML = `
+                        <div class="status error">❌ MicrosoftAuth class not found</div>
+                        <p>Make sure microsoft-auth.js is loaded correctly</p>
+                    `;
+                    return;
+                }
+                
+                // Test configuration
+                const configResponse = await fetch('/api/auth/microsoft-config.php');
+                const configData = await configResponse.json();
+                
+                if (!configData.success || !configData.config.clientId) {
+                    resultDiv.innerHTML = `
+                        <div class="status error">❌ Microsoft configuration not available</div>
+                        <pre>${JSON.stringify(configData, null, 2)}</pre>
+                    `;
+                    return;
+                }
+                
+                // Create MicrosoftAuth instance
+                const auth = new MicrosoftAuth(
+                    configData.config.clientId,
+                    configData.config.tenantId,
+                    configData.config.redirectUri
+                );
+                
+                resultDiv.innerHTML = `
+                    <div class="status success">✅ MicrosoftAuth initialized successfully</div>
+                    <pre>Client ID: ${configData.config.clientId}
+Tenant ID: ${configData.config.tenantId}
+Redirect URI: ${configData.config.redirectUri}</pre>
+                `;
+                
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="status error">❌ Microsoft Auth test failed: ${error.message}</div>
+                `;
+            }
+        }
+
+        // Auto-run tests on page load
+        window.addEventListener('load', () => {
+            console.log('Auth test page loaded');
+            setTimeout(() => {
+                testConfig();
+                testScripts();
+            }, 1000);
+        });
+    </script>
+</body>
+</html> 

@@ -1,4 +1,4 @@
 import { initTheme } from '../modules/theme.js';
 initTheme();
 
-import('../../trips/js/admin-vehicles.js');
+import('../admin-vehicles.js');
