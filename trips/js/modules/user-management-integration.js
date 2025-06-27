@@ -7,7 +7,8 @@
 
 class UserManagementIntegration {
     constructor() {
-        this.userManagementUrl = '/user-management.html';
+        this.userManagementUrl = '/trips/user-management.html';
+        this.apiBase = 'https://trips.wolthers.com/trips';
         this.isEmbedded = false;
     }
 
@@ -205,7 +206,7 @@ class UserManagementIntegration {
      */
     async quickAddUser(userData) {
         try {
-            const response = await fetch('https://trips.wolthers.com/users-api.php', {
+            const response = await fetch(`${this.apiBase}/users-api.php`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -239,7 +240,7 @@ class UserManagementIntegration {
      */
     async quickEditUser(userId, userData) {
         try {
-            const response = await fetch('https://trips.wolthers.com/users-api.php', {
+            const response = await fetch(`${this.apiBase}/users-api.php`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -275,7 +276,7 @@ class UserManagementIntegration {
     async showUserSelector(onSelect, options = {}) {
         try {
             // Fetch users
-            const response = await fetch('https://trips.wolthers.com/users-api.php');
+            const response = await fetch(`${this.apiBase}/users-api.php`);
             const result = await response.json();
 
             if (!result.success) {
