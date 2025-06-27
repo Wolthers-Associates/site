@@ -1,120 +1,227 @@
-# Trip Itineraries Management System - Production Version
+# 🌍 Wolthers & Associates - Trip Management System
 
-🌐 **Production Domain**: https://trips.wolthers.com
-🎯 **Purpose**: Real-time Trip & User Management for Wolthers & Associates
+> **Production System** | Live at [trips.wolthers.com](https://trips.wolthers.com)
 
-## 🌟 Overview
+A comprehensive trip management platform for Wolthers & Associates, designed to streamline coffee origin trips, partner coordination, and fleet management across Latin America.
 
-This is a professional trip management system for **Wolthers & Associates** coffee exploration tours. The platform now uses **real authentication** and live data APIs for secure, production-grade operations.
+---
 
-## ✨ Features
+## 🚀 **Live Production System**
 
-### 🔐 Authentication System (Production)
-- **Microsoft Office 365 Login**: Secure authentication for both employees and partners
-- **Partner Access**: Partners can log in with Microsoft if their email is registered, has been invited, or has received a trip itinerary
-- **Auto-creation**: If a partner logs in with Microsoft and their email is found in invitations or trip participation, a partner account is auto-created
-- **Session Management**: Secure tokens and session handling
-- **Access Control**: Role-based permissions for users and partners
+- **🌐 Domain**: [https://trips.wolthers.com](https://trips.wolthers.com)
+- **🏗️ Architecture**: Modular JavaScript + PHP APIs + MySQL
+- **🔐 Authentication**: Microsoft Office 365 OAuth2
+- **📱 UI**: Mobile-responsive, dark/light theme support
+- **🖥️ Hosting**: Hostinger Linux server
 
-### 🧳 Trip & User Management
-- **Trip Creation & Editing**: Add, update, and manage coffee exploration tours
-- **User Management**: Add, edit, and delete users with real-time updates
-- **Company Management**: Manage companies, link users, and assign roles
-- **Live Data**: All data is loaded from and saved to the production database via API
-- **Status Tracking**: Upcoming, ongoing, and completed trips
+---
 
-### 🎨 Modern UI/UX
-- **Professional Design**: Clean, modern interface
-- **Mobile-First**: Responsive across all devices
-- **Brand Styling**: Coffee-themed, accessible, and WCAG compliant
+## 🛠️ **Technology Stack**
 
-## 🚀 Quick Start
+### **Frontend**
+- **Vanilla JavaScript** (ES6 modules, no frameworks)
+- **Modular Architecture** - Separated concerns across modules
+- **Responsive CSS** - Mobile-first design with theme support
+- **Real-time APIs** - Direct production endpoint integration
 
-1. **Open the website**: [https://trips.wolthers.com](https://trips.wolthers.com)
-2. **Login**:
-   - Employees: Use your Microsoft Office 365 credentials
-   - Partners: Use your registered email or access code
-3. **Manage**:
-   - Trips, users, and companies in real time
+### **Backend**
+- **PHP 7.4+** - RESTful API endpoints
+- **MySQL Database** - Secure production database
+- **OAuth2 Integration** - Microsoft Azure AD authentication
+- **Session Management** - Secure user sessions and role-based access
 
-## 🛠 Technology Stack
+### **Infrastructure**
+- **Hostinger Linux Server** - Production hosting environment
+- **SSL/TLS Security** - HTTPS encryption
+- **Secure Configuration** - Environment variables in `.secure-config/`
 
-- **Frontend**: HTML5, CSS3, Vanilla JavaScript
-- **Backend**: PHP 7.4+, MySQL
-- **Authentication**: Microsoft Office 365 (OAuth2)
-- **APIs**: Live endpoints (see below)
+---
 
-## 🔗 Key API Endpoints
-
-- **User Authentication**: `https://trips.wolthers.com/trips/api/auth/login.php`
-- **User Management**: `https://trips.wolthers.com/users-api.php`
-- **Company Management**: `https://trips.wolthers.com/companies-api.php`
-- **Trip Management**: `https://trips.wolthers.com/trips/api/trips/list.php`, `get.php`, etc.
-
-## 📱 Responsive Design
-
-- **Mobile**: 320px - 768px
-- **Tablet**: 768px - 1024px
-- **Desktop**: 1024px+
-
-## ⚡ Performance & Security
-
-- **Fast Loading**: Optimized assets, minimal dependencies
-- **Secure Authentication**: OAuth2, secure tokens
-- **Live Data**: All operations use real-time API calls
-- **Role-Based Access**: Fine-grained permissions for all users
-
-## 📂 File Structure (Key Files)
+## 📁 **Project Structure**
 
 ```
 trips.wolthers.com/
-├── index.html                # Main application
-├── trips/js/main.js          # Core logic (auth, API, UI)
-├── trips/api/auth/           # Authentication endpoints
-├── users-api.php             # User management API
-├── companies-api.php         # Company management API
-├── trips/api/trips/          # Trip management API
-└── css/                      # Styling
+├── 📂 trips/                          # Main application files
+│   ├── index.html                     # Dashboard (main entry)
+│   ├── accounts.html                  # User management
+│   ├── admin-vehicles.html            # Fleet management
+│   └── auth-callback.html             # OAuth2 callback handler
+│
+├── 📂 js/                             # JavaScript modules
+│   ├── 📂 modules/                    # Core business logic
+│   │   ├── auth.js                    # Authentication & sessions
+│   │   ├── trips.js                   # Trip CRUD operations
+│   │   ├── users.js                   # User management
+│   │   ├── companies.js               # Company management
+│   │   ├── vehicles.js                # Fleet management
+│   │   ├── ui.js                      # UI rendering & interactions
+│   │   ├── utils.js                   # Utility functions
+│   │   └── theme.js                   # Dark/light mode toggle
+│   │
+│   ├── 📂 pages/                      # Page-specific bootstraps
+│   │   ├── index.bootstrap.js         # Dashboard initialization
+│   │   ├── accounts.bootstrap.js      # Accounts page setup
+│   │   └── admin-vehicles.bootstrap.js # Fleet page setup
+│   │
+│   ├── microsoft-auth.js              # Microsoft OAuth2 handler
+│   └── main.js                        # Core application logic
+│
+├── 📂 api/                            # Backend API endpoints
+│   ├── 📂 auth/                       # Authentication APIs
+│   │   ├── microsoft-config.php       # OAuth2 configuration
+│   │   ├── login.php                  # User authentication
+│   │   ├── logout.php                 # Session termination
+│   │   └── validate.php               # Session validation
+│   │
+│   ├── 📂 trips/                      # Trip management APIs
+│   ├── 📂 users/                      # User management APIs
+│   ├── 📂 companies/                  # Company management APIs
+│   ├── 📂 vehicles/                   # Fleet management APIs
+│   └── config.php                     # Database configuration
+│
+├── 📂 css/                            # Stylesheets
+│   ├── style.css                      # Main application styles
+│   └── trip-page.css                  # Trip-specific styles
+│
+└── 📂 images/                         # Static assets
+    ├── wolthers-logo-*.svg            # Company branding
+    └── 📂 members/                    # Team member photos
 ```
 
-## 🎯 Implementation Details
+---
 
-### Authentication Flow
-1. **Employee Login**: Microsoft Office 365 OAuth2
-2. **Partner Login**: Email/code validation via API
-3. **Session Management**: Secure tokens, session expiry
-4. **Access Control**: Role-based trip and company visibility
+## 🔐 **Authentication System**
 
-### User & Company Management
-- **Live CRUD**: All user and company operations are real-time
-- **Company Linking**: Users can be linked to multiple companies
-- **Role Assignment**: Admin, editor, user, guest, etc.
+### **Microsoft Office 365 Integration**
+- **Employee Access**: Direct login with company Microsoft accounts
+- **Partner Access**: OAuth2-based account creation for trip invitees
+- **Auto-Registration**: Partners are automatically registered when invited
+- **Role Management**: Employee vs. Partner permissions
 
-### Trip Management
-- **Live Data**: All trip data is loaded from and saved to the production database
-- **Filtering**: Upcoming, ongoing, and completed trips
-- **Details**: Full itinerary, participants, and logistics
-
-### UI/UX Highlights
-- **Loading States**: Smooth transitions and spinners
-- **Error Handling**: User-friendly error messages
-- **Accessibility**: Screen reader support, keyboard navigation
-
-## 🐛 Testing Checklist
-
-### Authentication Testing
-- [x] Microsoft Office 365 login (employee)
-- [x] Partner email/code login
-- [x] Session persistence and logout
-- [x] Role-based access control
-
-### User & Trip Management Testing
-- [x] User CRUD operations
-- [x] Company CRUD operations
-- [x] Trip CRUD operations
-- [x] Real-time updates and UI refresh
-- [x] Mobile responsiveness
+### **Authentication Flow**
+1. User clicks "Sign in with Microsoft"
+2. Redirected to Microsoft OAuth2 endpoint
+3. User authenticates with Microsoft credentials
+4. System validates token and creates/updates user record
+5. Session established with appropriate role-based permissions
 
 ---
-![CodeRabbit Pull Request Reviews](https://img.shields.io/coderabbit/prs/github/Wolthers-Associates/site?utm_source=oss&utm_medium=github&utm_campaign=Wolthers-Associates%2Fsite&labelColor=171717&color=FF570A&link=https%3A%2F%2Fcoderabbit.ai&label=CodeRabbit+Reviews)
-**For any issues or support, please contact the Wolthers & Associates IT team.** 
+
+## ✨ **Core Features**
+
+### 🗺️ **Trip Management**
+- **Create & Edit Trips** - Full CRUD operations for coffee origin trips
+- **Itinerary Planning** - Detailed day-by-day trip planning
+- **Partner Coordination** - Invite and manage trip participants
+- **Status Tracking** - Upcoming, ongoing, and completed trip status
+- **Trip Codes** - Unique QR codes for easy trip identification
+
+### 👥 **User & Company Management**
+- **Employee Management** - Internal staff directory and permissions
+- **Partner Companies** - External client and partner organization management
+- **Role-Based Access** - Different permissions for employees vs. partners
+- **Company Linking** - Associate users with their respective organizations
+
+### 🚗 **Fleet Management** *(Admin Only)*
+- **Vehicle Inventory** - Complete fleet tracking and management
+- **Maintenance Scheduling** - Service records and upcoming maintenance
+- **Driver Logs** - Trip assignments and driver tracking
+- **Availability Management** - Real-time vehicle availability for trips
+
+### 🎨 **User Experience**
+- **Responsive Design** - Optimized for desktop, tablet, and mobile
+- **Dark/Light Theme** - User preference theme switching
+- **Real-time Updates** - Live data synchronization
+- **Intuitive Interface** - Clean, modern UI following design best practices
+
+---
+
+## 🚦 **Getting Started**
+
+### **For Employees**
+1. Visit [trips.wolthers.com](https://trips.wolthers.com)
+2. Click "Sign in with Microsoft"
+3. Use your Wolthers & Associates Microsoft account
+4. Access full trip management and administrative features
+
+### **For Partners**
+1. Receive trip invitation email from Wolthers team
+2. Click invitation link to access the platform
+3. Sign in with Microsoft account (auto-registration)
+4. View assigned trips and participate in trip coordination
+
+---
+
+## 🔧 **Development & Deployment**
+
+### **Local Development**
+```bash
+# Clone the repository
+git clone [repository-url]
+cd trips-wolthers
+
+# Set up local environment
+# Configure database connection in api/config.php
+# Set up Microsoft OAuth2 credentials
+
+# Deploy to production
+# Upload files to /home/u975408171/domains/trips.wolthers.com/public_html/
+```
+
+### **Production Environment**
+- **Server**: Hostinger Linux hosting
+- **Database**: MySQL with secure configuration
+- **SSL**: HTTPS encryption enabled
+- **Environment**: Production-optimized PHP and JavaScript
+
+### **Security Configuration**
+- Database credentials stored in `.secure-config/` (not in public directory)
+- Microsoft OAuth2 credentials securely configured
+- Session management with secure tokens
+- HTTPS-only operation
+
+---
+
+## 📊 **System Architecture**
+
+### **Modular Frontend Design**
+- **Separation of Concerns** - Each module handles specific functionality
+- **Reusable Components** - Shared utilities and UI components
+- **Page-Specific Logic** - Bootstrap files initialize page-specific features
+- **Theme Management** - Centralized theme switching and persistence
+
+### **API-First Backend**
+- **RESTful Endpoints** - Clean API design for all operations
+- **Database Abstraction** - Secure database interaction layer
+- **Authentication Middleware** - Consistent auth validation across endpoints
+- **Error Handling** - Comprehensive error responses and logging
+
+---
+
+## 🎯 **Key Benefits**
+
+- **🚀 Performance** - Lightweight vanilla JavaScript, no framework overhead
+- **🔒 Security** - Microsoft OAuth2, secure database configuration
+- **📱 Accessibility** - Mobile-responsive, WCAG-compliant interface
+- **🔧 Maintainability** - Modular architecture, clean separation of concerns
+- **⚡ Real-time** - Live data updates, no mock or placeholder data
+- **🌍 Scalability** - Production-ready architecture supporting growth
+
+---
+
+## 📞 **Support & Contact**
+
+**Wolthers & Associates**  
+📧 Email: [Contact through company channels]  
+🌐 Website: [trips.wolthers.com](https://trips.wolthers.com)  
+🏢 Focus: Coffee origin trips and partner coordination
+
+---
+
+## 📝 **License & Usage**
+
+This system is proprietary to Wolthers & Associates and is intended for internal use and authorized partner access only. Unauthorized access or distribution is prohibited.
+
+---
+
+*Last Updated: December 2024 | Production System v2.0*
