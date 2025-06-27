@@ -2978,14 +2978,13 @@ function systemConfiguration() {
 
 // User Management Modal Functions
 function showUserManagementModal() {
-    // Initialize user database when first opening modal (safe timing - after auth is established)
-    if (!window.USER_DATABASE || window.USER_DATABASE.length === 0) {
-        initializeUserDatabase();
+    // Use the new standalone user management system
+    if (window.userManagementIntegration) {
+        window.userManagementIntegration.showUserManagementModal();
+    } else {
+        // Fallback to opening in new tab
+        window.open('/user-management.html', '_blank');
     }
-    
-    document.getElementById('userManagementModal').style.display = 'flex';
-    document.body.style.overflow = 'hidden';
-    loadUserManagementData();
 }
 
 function hideUserManagementModal() {
