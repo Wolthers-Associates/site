@@ -14,6 +14,17 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
 }
 
 try {
+    // Debug: Check what constants are actually defined
+    $debug_info = [
+        'OFFICE365_CLIENT_ID_defined' => defined('OFFICE365_CLIENT_ID'),
+        'OFFICE365_CLIENT_ID_value' => defined('OFFICE365_CLIENT_ID') ? OFFICE365_CLIENT_ID : 'NOT_DEFINED',
+        'OFFICE365_TENANT_ID_defined' => defined('OFFICE365_TENANT_ID'),
+        'OFFICE365_TENANT_ID_value' => defined('OFFICE365_TENANT_ID') ? OFFICE365_TENANT_ID : 'NOT_DEFINED',
+        'secure_config_exists' => file_exists('../secure-config.php'),
+        'config_file_path' => realpath('../config.php'),
+        'secure_config_path' => file_exists('../secure-config.php') ? realpath('../secure-config.php') : 'NOT_FOUND'
+    ];
+    
     // Get Microsoft configuration from secure config
     $host = $_SERVER['HTTP_HOST'];
     
@@ -51,7 +62,8 @@ try {
     sendResponse([
         'success' => true,
         'config' => $config,
-        'configured' => !empty($config['clientId'])
+        'configured' => !empty($config['clientId']),
+        'debug' => $debug_info // Add debug info to response
     ]);
     
 } catch (Exception $e) {
