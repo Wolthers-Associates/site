@@ -174,7 +174,8 @@ private/
 config/secure-config.php
 hostinger-config.php
 *.secret
-*-config.php
+secure-config.php
+*secure-config.php
 
 # Development only files
 TODO.md
