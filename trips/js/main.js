@@ -3707,7 +3707,7 @@ async function loadAllUsersForAdmin() {
                         ...user,
                         id: user.id || generateUserId(user.name || user.email),
                         memberSince: user.created_at,
-                        lastLoginDisplay: user.last_login_at ? new Date(user.last_login_at).toLocaleString() : 'Never',
+                        lastLoginDisplay: (user.last_login_at || user.last_login) ? formatUserTimezone(user.last_login_at || user.last_login) : 'Never',
                         company_name: user.company_fantasy_name || user.company_full_name,
                         isWolthersTeam: user.email?.endsWith('@wolthers.com') || false,
                         avatar: user.name?.charAt(0).toUpperCase() || '?'
@@ -4078,7 +4078,7 @@ async function editUser(userId) {
     
     try {
         // Always fetch fresh user data from backend
-        const response = await fetch(`https://trips.wolthers.com/users-api.php?action=get&id=${userId}`, {
+        const response = await fetch(`https://trips.wolthers.com/users-api.php?id=${userId}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -4139,15 +4139,11 @@ async function deleteUser(userId) {
     
     if (confirmed) {
         try {
-            const response = await fetch('https://trips.wolthers.com/users-api.php', {
-                method: 'POST',
+            const response = await fetch(`https://trips.wolthers.com/users-api.php?id=${userId}`, {
+                method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    action: 'delete',
-                    id: userId
-                })
+                }
             });
             
             const result = await response.json();
@@ -4609,6 +4605,31 @@ function formatRelativeTime(dateString) {
     if (diffDays < 30) return `${Math.floor(diffDays / 7)}w ago`;
     
     return date.toLocaleDateString();
+}
+
+function formatUserTimezone(dateString) {
+    if (!dateString) return 'Never';
+    
+    try {
+        const date = new Date(dateString);
+        
+        // Get user's timezone
+        const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        
+        // Format with user's timezone
+        return date.toLocaleString('en-US', {
+            timeZone: userTimezone,
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true
+        });
+    } catch (error) {
+        console.warn('Error formatting date:', error);
+        return new Date(dateString).toLocaleString();
+    }
 }
 
 // Format date range for trip code modal
