@@ -1857,24 +1857,55 @@ document.addEventListener('DOMContentLoaded', async function() {
     
     // Initialize Microsoft Authentication
     try {
+        console.log('🔍 Fetching Microsoft config...');
         const configResponse = await fetch('api/auth/microsoft-config.php');
+        console.log('🔍 Config response status:', configResponse.status);
         const configData = await configResponse.json();
+        console.log('🔍 Config data received:', configData);
         
         if (configData.success && configData.config.clientId) {
+            console.log('🔍 Creating MicrosoftAuth with:', {
+                clientId: configData.config.clientId,
+                tenantId: configData.config.tenantId,
+                redirectUri: configData.config.redirectUri
+            });
+            
             microsoftAuth = new MicrosoftAuth(
                 configData.config.clientId,
                 configData.config.tenantId,
                 configData.config.redirectUri
             );
             console.log('✅ Microsoft Auth initialized successfully');
+            console.log('✅ MicrosoftAuth object:', microsoftAuth);
             
             // Set up Microsoft login button click handler
             const microsoftBtn = document.getElementById('microsoftLoginBtn');
             if (microsoftBtn) {
-                microsoftBtn.addEventListener('click', auth.signInWithMicrosoft);
+                console.log('✅ Microsoft button found, setting up click handler');
+                microsoftBtn.addEventListener('click', (event) => {
+                    console.log('🔍 Microsoft button clicked!');
+                    event.preventDefault();
+                    
+                    // Add debugging
+                    console.log('Microsoft Auth object:', microsoftAuth);
+                    console.log('Config data:', configData);
+                    
+                    if (!microsoftAuth) {
+                        console.error('❌ Microsoft Auth not initialized');
+                        alert('Microsoft authentication not initialized. Please check Azure AD configuration.');
+                        return;
+                    }
+                    
+                    // Call the sign-in function
+                    auth.signInWithMicrosoft();
+                });
+            } else {
+                console.error('❌ Microsoft button not found in DOM');
             }
         } else {
             console.warn('⚠️ Microsoft Auth not configured - check Azure AD credentials');
+            console.warn('⚠️ Config success:', configData.success);
+            console.warn('⚠️ Client ID:', configData.config?.clientId);
         }
     } catch (error) {
         console.error('❌ Failed to initialize Microsoft Auth:', error);
