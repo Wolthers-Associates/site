@@ -4073,58 +4073,55 @@ function clearFormErrors() {
     });
 }
 
-function editUser(userId) {
+async function editUser(userId) {
     console.log('Edit user called with ID:', userId);
-    const users = getUsersFromDatabase();
-    console.log('Available users in database:', users.map(u => ({ id: u.id, name: u.name, email: u.email })));
     
-    // Try to find user with exact ID match first
-    let user = users.find(u => u.id === userId);
-    
-    // If not found with exact match, try with string conversion (API vs local ID mismatch)
-    if (!user) {
-        user = users.find(u => String(u.id) === String(userId));
-        console.log('Trying string conversion match for ID:', userId);
-    }
-    
-    // If still not found, try to find by email (fallback for Microsoft auth users)
-    if (!user) {
-        user = users.find(u => u.email === userId);
-        console.log('Trying email match for ID:', userId);
-    }
-    
-    if (user) {
-        console.log('Found user for editing:', user);
-        showEditUserModal(user);
-    } else {
-        console.warn('User not found with ID:', userId);
-        console.warn('Available user IDs:', users.map(u => u.id));
+    try {
+        // Always fetch fresh user data from backend
+        const response = await fetch(`https://trips.wolthers.com/users-api.php?action=get&id=${userId}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
         
-        // More graceful error handling - don't show error toast immediately
-        // Instead, try to refresh data silently first
-        if (typeof loadUserManagementData === 'function') {
-            console.log('Attempting to refresh user data...');
-            loadUserManagementData().then(() => {
-                // Try to find user again after refresh
-                const refreshedUsers = getUsersFromDatabase();
-                const refreshedUser = refreshedUsers.find(u => u.id === userId || u.email === userId || String(u.id) === String(userId));
-                
-                if (refreshedUser) {
-                    console.log('Found user after refresh:', refreshedUser);
-                    showEditUserModal(refreshedUser);
-                } else {
-                    // Only show error if still not found after refresh
-                    console.log('User still not found after refresh, may have been deleted');
-                    // Don't show error toast - user may have been deleted legitimately
-                }
-            }).catch(error => {
-                console.error('Failed to refresh user data:', error);
-                // Only show error for actual refresh failures
-                showToast('Unable to load user data. Please refresh the page and try again.', 'warning');
-            });
+        const result = await response.json();
+        
+        if (result.success && result.user) {
+            console.log('Found user from backend:', result.user);
+            showEditUserModal(result.user);
         } else {
-            // Fallback if refresh function not available - less intrusive message
-            console.log('User not found and no refresh function available');
+            // Fallback to local data if backend fails
+            console.log('Backend fetch failed, trying local data...');
+            const users = getUsersFromDatabase();
+            
+            // Try multiple ID matching strategies
+            let user = users.find(u => u.id === userId) ||
+                      users.find(u => String(u.id) === String(userId)) ||
+                      users.find(u => u.email === userId);
+            
+            if (user) {
+                console.log('Found user in local data:', user);
+                showEditUserModal(user);
+            } else {
+                console.warn('User not found with ID:', userId);
+                showToast('User not found. The user may have been deleted or you may need to refresh the page.', 'warning');
+            }
+        }
+    } catch (error) {
+        console.error('Error fetching user:', error);
+        
+        // Fallback to local data on network error
+        const users = getUsersFromDatabase();
+        let user = users.find(u => u.id === userId) ||
+                  users.find(u => String(u.id) === String(userId)) ||
+                  users.find(u => u.email === userId);
+        
+        if (user) {
+            console.log('Using local data due to network error:', user);
+            showEditUserModal(user);
+        } else {
+            showToast('Unable to load user data. Please check your connection and try again.', 'error');
         }
     }
 }
