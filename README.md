@@ -1,6 +1,4 @@
 
-![CodeRabbit Pull Request Reviews](https://img.shields.io/coderabbit/prs/github/Wolthers-Associates/site?utm_source=oss&utm_medium=github&utm_campaign=Wolthers-Associates%2Fsite&labelColor=171717&color=FF570A&link=https%3A%2F%2Fcoderabbit.ai&label=CodeRabbit+Reviews)
-
 # 🌍 Wolthers & Associates - Trip Management System
 
 > **Production System** | Live at [trips.wolthers.com](https://trips.wolthers.com)

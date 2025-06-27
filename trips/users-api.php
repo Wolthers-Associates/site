@@ -91,6 +91,13 @@ try {
 function handleGetUsers() {
     $pdo = getDBConnection();
     
+    // Check if requesting a specific user
+    $userId = $_GET['id'] ?? '';
+    if (!empty($userId)) {
+        handleGetSingleUser($userId);
+        return;
+    }
+    
     $search = $_GET['search'] ?? '';
     $role = $_GET['role'] ?? '';
     $status = $_GET['status'] ?? 'active';
@@ -219,6 +226,52 @@ function handleGetUsers() {
     }
 }
 
+function handleGetSingleUser($userId) {
+    $pdo = getDBConnection();
+    
+    // Get user with company information
+    $sql = "SELECT 
+        u.*,
+        c.full_name as company_full_name,
+        c.fantasy_name as company_fantasy_name,
+        c.company_type as company_type
+    FROM users u
+    LEFT JOIN companies c ON u.company_id = c.id
+    WHERE u.id = ?";
+    
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([$userId]);
+    $user = $stmt->fetch();
+    
+    if (!$user) {
+        sendError('User not found', 404);
+    }
+    
+    // Format user for frontend
+    $formattedUser = [
+        'id' => $user['id'],
+        'name' => $user['name'],
+        'email' => $user['email'],
+        'phone' => $user['phone'],
+        'role' => $user['role'],
+        'status' => $user['status'],
+        'company_id' => $user['company_id'],
+        'company_name' => $user['company_fantasy_name'] ?: $user['company_full_name'],
+        'company_role' => $user['company_role'],
+        'can_see_company_trips' => (bool)$user['can_see_company_trips'],
+        'avatar' => $user['avatar'],
+        'last_login' => $user['last_login'],
+        'last_active' => $user['last_active'],
+        'created_at' => $user['created_at'],
+        'updated_at' => $user['updated_at']
+    ];
+    
+    sendResponse([
+        'success' => true,
+        'user' => $formattedUser
+    ]);
+}
+
 function handlePostRequest() {
     $input = json_decode(file_get_contents('php://input'), true);
     
@@ -263,16 +316,12 @@ function handleCreateUser($input) {
         sendError('User with this email already exists');
     }
     
-    // Generate user ID from name
-    $userId = generateUserId($input['name']);
-    
     $sql = "INSERT INTO users (
-        id, name, email, phone, role, status, company_id, company_role, 
+        name, email, phone, role, status, company_id, company_role, 
         can_see_company_trips, avatar, created_at, updated_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())";
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())";
     
     $params = [
-        $userId,
         $input['name'],
         $input['email'],
         $input['phone'] ?? null,
@@ -286,6 +335,9 @@ function handleCreateUser($input) {
     
     $stmt = $pdo->prepare($sql);
     $stmt->execute($params);
+    
+    // Get the auto-generated user ID
+    $userId = $pdo->lastInsertId();
     
     // Get the created user with company info
     $getUserSql = "SELECT 

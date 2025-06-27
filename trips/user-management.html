@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management - Wolthers Trips</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* User Management Specific Styles */
+        .user-management-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: var(--card-background);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-management-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .user-management-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .user-table-container {
+            overflow-x: auto;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .user-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        .user-table th,
+        .user-table td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .user-table th {
+            background: var(--background-secondary);
+            font-weight: 600;
+            color: var(--text-primary);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .user-table tr:hover {
+            background: var(--hover-background);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 12px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .user-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0 0 4px 0;
+        }
+
+        .user-email {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        .user-role-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .user-role-badge.admin {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .user-role-badge.editor {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .user-role-badge.user {
+            background: #dbeafe;
+            color: #2563eb;
+        }
+
+        .user-role-badge.success {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+
+        .user-role-badge.warning {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .user-actions-cell {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .action-btn.edit {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .action-btn.delete {
+            background: #dc2626;
+            color: white;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .form-input,
+        .form-select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+            box-sizing: border-box;
+        }
+
+        .form-input:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .form-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 24px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: var(--background-secondary);
+            color: var(--text-primary);
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading-spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 16px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            z-index: 1100;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast.success {
+            background: #10b981;
+        }
+
+        .toast.error {
+            background: #ef4444;
+        }
+
+        .toast.warning {
+            background: #f59e0b;
+        }
+
+        .search-container {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 250px;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        .filter-select {
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 1rem;
+            min-width: 120px;
+        }
+
+        /* CSS Variables */
+        :root {
+            --primary-color: #2563eb;
+            --card-background: #ffffff;
+            --border-color: #e5e7eb;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --background-secondary: #f9fafb;
+            --hover-background: #f3f4f6;
+        }
+    </style>
+</head>
+<body>
+    <div class="user-management-container">
+        <div class="user-management-header">
+            <h1 class="user-management-title">User Management</h1>
+            <div class="user-actions">
+                <button class="btn btn-primary" onclick="showAddUserModal()">
+                    <span>+ Add User</span>
+                </button>
+                <button class="btn btn-secondary" onclick="refreshUsers()">
+                    <span>🔄 Refresh</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="search-container">
+            <input type="text" class="search-input" id="searchInput" placeholder="Search users by name or email...">
+            <select class="filter-select" id="roleFilter">
+                <option value="">All Roles</option>
+                <option value="admin">Administrator</option>
+                <option value="editor">Editor</option>
+                <option value="user">User</option>
+            </select>
+            <select class="filter-select" id="companyFilter">
+                <option value="">All Companies</option>
+            </select>
+        </div>
+
+        <div class="user-table-container">
+            <table class="user-table">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Role</th>
+                        <th>Company</th>
+                        <th>Last Login</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="userTableBody">
+                    <tr>
+                        <td colspan="6" style="text-align: center; padding: 40px;">
+                            <div class="loading-spinner" style="display: inline-block; margin: 0 auto;"></div>
+                            Loading users...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Add User Modal -->
+    <div class="modal" id="addUserModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Add New User</h2>
+                <button class="modal-close" onclick="hideAddUserModal()">&times;</button>
+            </div>
+            <form id="addUserForm">
+                <div class="form-group">
+                    <label class="form-label" for="addUserName">Full Name *</label>
+                    <input type="text" class="form-input" id="addUserName" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="addUserEmail">Email Address *</label>
+                    <input type="email" class="form-input" id="addUserEmail" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="addUserPhone">Phone Number</label>
+                    <input type="tel" class="form-input" id="addUserPhone">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="addUserRole">Role *</label>
+                    <select class="form-select" id="addUserRole" required>
+                        <option value="user">User</option>
+                        <option value="editor">Editor</option>
+                        <option value="admin">Administrator</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="addUserCompany">Company</label>
+                    <select class="form-select" id="addUserCompany">
+                        <option value="">Select a company</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="addUserCompanyRole">Company Role</label>
+                    <select class="form-select" id="addUserCompanyRole">
+                        <option value="staff">Staff</option>
+                        <option value="admin">Admin</option>
+                        <option value="manager">Manager</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <div class="form-checkbox">
+                        <input type="checkbox" id="addCanSeeCompanyTrips">
+                        <label for="addCanSeeCompanyTrips">Can see company trips</label>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="hideAddUserModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="addUserSubmitBtn">
+                        <div class="loading-spinner"></div>
+                        <span>Add User</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit User Modal -->
+    <div class="modal" id="editUserModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Edit User</h2>
+                <button class="modal-close" onclick="hideEditUserModal()">&times;</button>
+            </div>
+            <form id="editUserForm">
+                <input type="hidden" id="editUserId">
+                <div class="form-group">
+                    <label class="form-label" for="editUserName">Full Name *</label>
+                    <input type="text" class="form-input" id="editUserName" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="editUserEmail">Email Address *</label>
+                    <input type="email" class="form-input" id="editUserEmail" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="editUserPhone">Phone Number</label>
+                    <input type="tel" class="form-input" id="editUserPhone">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="editUserRole">Role *</label>
+                    <select class="form-select" id="editUserRole" required>
+                        <option value="user">User</option>
+                        <option value="editor">Editor</option>
+                        <option value="admin">Administrator</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="editUserCompany">Company</label>
+                    <select class="form-select" id="editUserCompany">
+                        <option value="">Select a company</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="editUserCompanyRole">Company Role</label>
+                    <select class="form-select" id="editUserCompanyRole">
+                        <option value="staff">Staff</option>
+                        <option value="admin">Admin</option>
+                        <option value="manager">Manager</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <div class="form-checkbox">
+                        <input type="checkbox" id="editCanSeeCompanyTrips">
+                        <label for="editCanSeeCompanyTrips">Can see company trips</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="editUserStatus">Status</label>
+                    <select class="form-select" id="editUserStatus">
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                        <option value="suspended">Suspended</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="hideEditUserModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="editUserSubmitBtn">
+                        <div class="loading-spinner"></div>
+                        <span>Update User</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/user-management.js"></script>
+</body>
+</html> 
