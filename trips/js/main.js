@@ -3013,6 +3013,7 @@ function showUserManagementModal() {
     const modal = document.getElementById('userManagementModal');
     if (modal) {
         modal.style.display = 'flex';
+        modal.classList.add('show');
         document.body.style.overflow = 'hidden';
         loadUserManagementData();
     }
@@ -3021,7 +3022,10 @@ function showUserManagementModal() {
 function hideUserManagementModal() {
     const modal = document.getElementById('userManagementModal');
     if (modal) {
-        modal.style.display = 'none';
+        modal.classList.remove('show');
+        setTimeout(() => {
+            modal.style.display = 'none';
+        }, 200); // Allow transition to complete
         document.body.style.overflow = 'auto';
     }
 }
@@ -3031,6 +3035,7 @@ function showCompanyManagementModal() {
     const modal = document.getElementById('companyManagementModal');
     if (modal) {
         modal.style.display = 'flex';
+        modal.classList.add('show');
         document.body.style.overflow = 'hidden';
         
         // Load company management data
@@ -3041,7 +3046,10 @@ function showCompanyManagementModal() {
 function hideCompanyManagementModal() {
     const modal = document.getElementById('companyManagementModal');
     if (modal) {
-        modal.style.display = 'none';
+        modal.classList.remove('show');
+        setTimeout(() => {
+            modal.style.display = 'none';
+        }, 200); // Allow transition to complete
         document.body.style.overflow = 'auto';
     }
 }
@@ -6352,6 +6360,7 @@ function showFleetManagementModal() {
     const modal = document.getElementById('fleetManagementModal');
     if (modal) {
         modal.style.display = 'flex';
+        modal.classList.add('show');
         document.body.style.overflow = 'hidden';
         loadFleetManagementData();
     }
@@ -6363,7 +6372,10 @@ function showFleetManagementModal() {
 function hideFleetManagementModal() {
     const modal = document.getElementById('fleetManagementModal');
     if (modal) {
-        modal.style.display = 'none';
+        modal.classList.remove('show');
+        setTimeout(() => {
+            modal.style.display = 'none';
+        }, 200); // Allow transition to complete
         document.body.style.overflow = 'auto';
     }
 }
