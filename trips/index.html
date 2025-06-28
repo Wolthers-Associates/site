@@ -97,112 +97,23 @@
             margin-top: 2px;
         }
 
-        /* User Management Modal Styles - Match Company Management */
+        /* User Management Modal Styles - Use Theme Variables */
         .user-summary-section {
             margin-bottom: 25px;
         }
-        .user-summary-section .summary-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 15px;
-        }
-        .user-summary-section .summary-card {
-            background: white;
-            border: 1px solid #e1e5e9;
-            padding: 20px;
-            border-radius: 8px;
-            text-align: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-        .user-summary-section .summary-number {
-            font-size: 2em;
-            font-weight: bold;
-            color: #2C5530;
-            margin-bottom: 5px;
-        }
-        .user-summary-section .summary-label {
-            color: #757575;
-            font-size: 0.9em;
-        }
 
-        /* Vehicle Management Modal Styles for Light Mode */
+        /* Vehicle Management Modal Styles - Use Theme Variables */
         .vehicle-summary-section {
             margin-bottom: 25px;
         }
-        .summary-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 15px;
-        }
-        .summary-card {
-            background: white;
-            border: 1px solid #e1e5e9;
-            padding: 20px;
-            border-radius: 8px;
-            text-align: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-        .summary-number {
-            font-size: 2em;
-            font-weight: bold;
-            color: #2C5530;
-            margin-bottom: 5px;
-        }
-        .summary-label {
-            color: #757575;
-            font-size: 0.9em;
-        }
-        .vehicle-tabs {
-            display: flex;
-            gap: 2px;
-            margin-bottom: 25px;
-            border-bottom: 2px solid #e1e5e9;
-        }
-        .fluent-tab {
-            padding: 12px 24px;
-            background: none;
-            border: none;
-            border-bottom: 3px solid transparent;
-            cursor: pointer;
-            font-weight: 500;
-            color: #757575;
-            transition: all 0.2s ease;
-        }
-        .fluent-tab:hover {
-            background: #f5f5f5;
-            color: #2C5530;
-        }
-        .fluent-tab.active {
-            color: #2C5530;
-            border-bottom-color: #D4AF37;
-            background: #f5f5f5;
-        }
+
         .vehicle-tab-content {
             display: none;
         }
         .vehicle-tab-content.active {
             display: block;
         }
-        .reports-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-        }
-        .report-card {
-            background: white;
-            border: 1px solid #e1e5e9;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-        .report-card h4 {
-            color: #2C5530;
-            margin-bottom: 10px;
-        }
-        .report-card p {
-            color: #757575;
-            margin-bottom: 15px;
-        }
+
         
         /* Company Type Badge Styles */
         .company-type-badge {
@@ -221,36 +132,7 @@
         .type-retailer { background: #ffebee; color: #c62828; }
         .type-consultant { background: #e0f2f1; color: #00695c; }
         .type-other { background: #f5f5f5; color: #616161; }
-        
-        /* Company Info Styles */
-        .company-info {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-        
-        .company-name {
-            font-weight: 600;
-            color: #2C5530;
-            font-size: 0.9em;
-        }
-        
-        .company-legal-name {
-            font-size: 0.8em;
-            color: #666;
-            font-style: italic;
-        }
-        
-        .user-count {
-            font-weight: 600;
-            color: #2C5530;
-        }
-        
-        .user-count-detail {
-            font-size: 0.8em;
-            color: #666;
-            margin-left: 4px;
-        }
+
 
         /* Vehicle Badge Styles */
         .badge-suv { background: #e3f2fd; color: #1565c0; }
@@ -276,7 +158,6 @@
         
         .vehicle-name {
             font-weight: 600;
-            color: #2C5530;
         }
         
         .vehicle-year {
@@ -936,6 +817,7 @@ The system will automatically:
                 <div class="admin-section">
                     <h3>System Settings</h3>
                     <div class="admin-actions">
+                        <div id="themeToggleContainer"></div>
                         <button class="btn btn-secondary" onclick="emailSettings()">📧 Email Configuration</button>
                         <button class="btn btn-secondary" onclick="authenticationSettings()">🔒 Authentication</button>
                         <button class="btn btn-secondary" onclick="systemConfiguration()">⚙️ System Config</button>
@@ -2652,6 +2534,19 @@ The system will automatically:
         </div>
     </div>
 
+    <!-- Theme System Module -->
+    <script src="js/modules/theme.js" type="module"></script>
+    
+    <!-- Initialize Theme System -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize theme system when page loads
+            if (window.ThemeManager) {
+                window.ThemeManager.init();
+            }
+        });
+    </script>
+    
     <script src="js/microsoft-auth.js"></script>
     <script src="js/modules/user-management-integration.js"></script>
     <script src="js/main.js"></script>
