@@ -186,4 +186,14 @@ scratch/
 contact.php
 debug_log.txt
 contact_log.txt
-rate_limit.txt 
+rate_limit.txt
+
+# Daniel's development files (personal backup/dev copies)
+*-Daniel.js
+*-Daniel.html
+*-Daniel.css
+*-Daniel.php
+js/modules/*-Daniel.js
+js/pages/*-Daniel.js
+trips/*-Daniel.html
+trips/*-Daniel.js 
