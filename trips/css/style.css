@@ -3287,60 +3287,46 @@ body {
     }
 }
 
-/* Microsoft Fluent Design User Management Styles */
+/* Microsoft Fluent Design User Management Styles - Using Theme Variables */
 .fluent-modal {
     z-index: 2000;
+    background: var(--bg-overlay);
 }
 
 .fluent-modal-content {
     width: 95vw;
     max-width: 1200px;
     max-height: 90vh;
+    background: var(--bg-card);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
     border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 32px 64px rgba(0, 0, 0, 0.2);
-    border: 1px solid var(--dark-border);
+    box-shadow: var(--shadow-xl);
 }
 
 .fluent-modal-header {
-    background: var(--white);
-    border-bottom: 1px solid #e5e5e5;
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border-color);
     padding: 24px 32px;
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
 }
 
-@media (prefers-color-scheme: dark) {
-    .fluent-modal-header {
-        background: var(--dark-bg);
-        border-bottom: 1px solid var(--dark-border);
-    }
-}
-
 .fluent-header-content h1.fluent-modal-title {
-    font-family: 'Playfair Display', serif;
+    font-family: var(--font-family-serif);
     font-size: 2rem;
     font-weight: 600;
-    color: var(--dark-green);
+    color: var(--color-accent);
     margin: 0 0 4px 0;
 }
 
 .fluent-modal-subtitle {
-    color: #666;
+    color: var(--text-secondary);
     font-size: 0.95rem;
     margin: 0;
     font-weight: 400;
-}
-
-@media (prefers-color-scheme: dark) {
-    .fluent-header-content h1.fluent-modal-title {
-        color: var(--dark-accent);
-    }
-    
-    .fluent-modal-subtitle {
-        color: var(--dark-text-secondary);
-    }
 }
 
 .fluent-close-btn {
@@ -3349,55 +3335,31 @@ body {
     padding: 8px;
     border-radius: 6px;
     cursor: pointer;
-    color: #666;
-    transition: all 0.2s ease;
+    color: var(--text-secondary);
+    transition: all var(--transition-base);
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
 .fluent-close-btn:hover {
-    background: #f3f2f1;
-    color: var(--dark-green);
-}
-
-@media (prefers-color-scheme: dark) {
-    .fluent-close-btn {
-        color: var(--dark-text-secondary);
-    }
-    
-    .fluent-close-btn:hover {
-        background: var(--dark-border);
-        color: var(--dark-accent);
-    }
+    background: var(--bg-hover);
+    color: var(--color-accent);
 }
 
 .fluent-modal-body {
     display: flex;
     flex-direction: column;
     height: calc(90vh - 120px);
-    background: var(--white);
-}
-
-@media (prefers-color-scheme: dark) {
-    .fluent-modal-body {
-        background: var(--dark-bg);
-    }
+    background: var(--bg-card);
 }
 
 /* Profile Section (30%) */
 .fluent-profile-section {
     flex: 0 0 auto;
-    background: #fafafa;
-    border-bottom: 1px solid #e5e5e5;
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-color);
     padding: 24px 32px;
-}
-
-@media (prefers-color-scheme: dark) {
-    .fluent-profile-section {
-        background: var(--dark-bg-secondary);
-        border-bottom: 1px solid var(--dark-border);
-    }
 }
 
 .fluent-profile-card {
@@ -3413,18 +3375,11 @@ body {
     align-items: center;
     justify-content: space-between;
     max-width: 100%;
-    background: var(--card-background);
+    background: var(--bg-card);
     border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 24px;
-    transition: all 0.2s ease;
-}
-
-@media (prefers-color-scheme: dark) {
-    .fluent-profile-card-flat {
-        background: var(--dark-card);
-        border-color: var(--dark-border);
-    }
+    transition: all var(--transition-base);
 }
 
 .fluent-profile-info {
@@ -3442,21 +3397,14 @@ body {
     width: 64px;
     height: 64px;
     border-radius: 50%;
-    background: var(--dark-green);
-    color: var(--white);
+    background: var(--color-primary);
+    color: var(--text-inverse);
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 600;
     font-size: 1.5rem;
-    border: 3px solid var(--white);
-}
-
-@media (prefers-color-scheme: dark) {
-    .fluent-avatar-circle {
-        background: var(--dark-accent);
-        border-color: var(--dark-bg);
-    }
+    border: 3px solid var(--bg-card);
 }
 
 .fluent-profile-details {
@@ -3467,12 +3415,12 @@ body {
 .fluent-profile-name {
     font-size: 1.25rem;
     font-weight: 600;
-    color: var(--dark-green);
+    color: var(--text-primary);
     margin: 0 0 4px 0;
 }
 
 .fluent-profile-email {
-    color: #666;
+    color: var(--text-secondary);
     font-size: 0.95rem;
     margin: 0 0 8px 0;
 }
@@ -3542,57 +3490,33 @@ body {
     font-size: 0.9rem;
     font-weight: 500;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all var(--transition-base);
     text-decoration: none;
     background: none;
 }
 
 .fluent-btn-primary {
-    background: var(--dark-green);
-    color: var(--white);
-    border-color: var(--dark-green);
+    background: var(--color-primary);
+    color: var(--text-inverse);
+    border-color: var(--color-primary);
 }
 
 .fluent-btn-primary:hover {
-    background: var(--medium-green);
-    border-color: var(--medium-green);
+    background: var(--color-primary-hover);
+    border-color: var(--color-primary-hover);
     transform: translateY(-1px);
 }
 
 .fluent-btn-secondary {
     background: transparent;
-    color: var(--dark-green);
-    border-color: #d1d1d1;
+    color: var(--text-primary);
+    border-color: var(--border-color);
 }
 
 .fluent-btn-secondary:hover {
-    background: #f3f2f1;
-    border-color: var(--medium-green);
-    color: var(--medium-green);
-}
-
-@media (prefers-color-scheme: dark) {
-    .fluent-btn-primary {
-        background: var(--dark-accent);
-        color: var(--dark-bg);
-        border-color: var(--dark-accent);
-    }
-    
-    .fluent-btn-primary:hover {
-        background: #f0c040;
-        border-color: #f0c040;
-    }
-    
-    .fluent-btn-secondary {
-        color: var(--dark-text);
-        border-color: var(--dark-border);
-    }
-    
-    .fluent-btn-secondary:hover {
-        background: var(--dark-border);
-        border-color: var(--dark-accent);
-        color: var(--dark-accent);
-    }
+    background: var(--bg-hover);
+    border-color: var(--border-dark);
+    color: var(--color-accent);
 }
 
 /* Users Section (70%) */
@@ -3618,14 +3542,8 @@ body {
 .fluent-section-title {
     font-size: 1.5rem;
     font-weight: 600;
-    color: var(--dark-green);
+    color: var(--text-primary);
     margin: 0;
-}
-
-@media (prefers-color-scheme: dark) {
-    .fluent-section-title {
-        color: var(--dark-text);
-    }
 }
 
 .fluent-section-controls {
@@ -3643,84 +3561,49 @@ body {
 .fluent-search-icon {
     position: absolute;
     left: 12px;
-    color: #666;
+    color: var(--text-secondary);
     pointer-events: none;
 }
 
 .fluent-search-input {
     padding: 8px 12px 8px 36px;
-    border: 1px solid #d1d1d1;
+    border: 1px solid var(--border-color);
     border-radius: 6px;
     font-size: 0.9rem;
     width: 250px;
-    background: var(--white);
-    color: var(--dark-green);
+    background: var(--bg-input);
+    color: var(--text-primary);
 }
 
 .fluent-search-input:focus {
     outline: none;
-    border-color: var(--medium-green);
-    box-shadow: 0 0 0 2px rgba(45, 90, 71, 0.1);
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px var(--focus-ring);
 }
 
 .fluent-select {
     padding: 8px 12px;
-    border: 1px solid #d1d1d1;
+    border: 1px solid var(--border-color);
     border-radius: 6px;
     font-size: 0.9rem;
-    background: var(--white);
-    color: var(--dark-green);
+    background: var(--bg-input);
+    color: var(--text-primary);
     cursor: pointer;
 }
 
 .fluent-select:focus {
     outline: none;
-    border-color: var(--medium-green);
-    box-shadow: 0 0 0 2px rgba(45, 90, 71, 0.1);
-}
-
-@media (prefers-color-scheme: dark) {
-    .fluent-search-icon {
-        color: var(--dark-text-secondary);
-    }
-    
-    .fluent-search-input {
-        background: var(--dark-bg-secondary);
-        border-color: var(--dark-border);
-        color: var(--dark-text);
-    }
-    
-    .fluent-search-input:focus {
-        border-color: var(--dark-accent);
-        box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.1);
-    }
-    
-    .fluent-select {
-        background: var(--dark-bg-secondary);
-        border-color: var(--dark-border);
-        color: var(--dark-text);
-    }
-    
-    .fluent-select:focus {
-        border-color: var(--dark-accent);
-        box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.1);
-    }
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px var(--focus-ring);
 }
 
 /* Table Styles */
 .fluent-table-container {
     flex: 1;
     overflow: auto;
-    border: 1px solid #e5e5e5;
+    border: 1px solid var(--border-color);
     border-radius: 8px;
-    background: var(--white);
-}
-
-@media (prefers-color-scheme: dark) {
-    .fluent-table-container {
-        border-color: var(--dark-border);
-        background: var(--dark-bg);
-    }
+    background: var(--bg-card);
 }
 
 .fluent-table {
