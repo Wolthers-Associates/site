@@ -326,7 +326,7 @@ class TripCodeGenerator {
         const qrData = {
             code: tripCode,
             trip: tripData.title || 'Wolthers Coffee Trip',
-            url: `${window.location.origin}/trips/?code=${tripCode}`,
+            url: `${window.location.origin}/?code=${tripCode}`,
             company: 'Wolthers & Associates'
         };
         
@@ -1821,7 +1821,7 @@ const trips = {
         const qrUrl = document.getElementById('tripQRUrl');
         const qrData = tripCodeGenerator.generateQRCode(tripCodeData.code, trip);
         qrCodeImg.src = qrData;
-        qrUrl.textContent = `${window.location.origin}/trips/?code=${tripCodeData.code}`;
+        qrUrl.textContent = `${window.location.origin}/?code=${tripCodeData.code}`;
         
         // Update trip summary
         document.getElementById('summaryTripTitle').textContent = trip.title;
@@ -5575,7 +5575,7 @@ function printTripCode() {
             <div class="details">
                 <h3>Access Information:</h3>
                 <p><strong>Website:</strong> trips.wolthers.com</p>
-                <p><strong>Access URL:</strong> ${window.location.origin}/trips/?code=${tripCodeData.code}</p>
+                <p><strong>Access URL:</strong> ${window.location.origin}/?code=${tripCodeData.code}</p>
             </div>
             
             <div class="no-print" style="margin-top: 30px; text-align: center;">
@@ -5608,7 +5608,7 @@ Your access code for the "${trip.title}" trip has been generated:
 🎯 ACCESS CODE: ${tripCodeData.code}
 
 📅 Trip Dates: ${formatDateRange(trip.date, trip.endDate)}
-🌐 Access URL: ${window.location.origin}/trips/?code=${tripCodeData.code}
+🌐 Access URL: ${window.location.origin}/?code=${tripCodeData.code}
 
 Simply visit the website and enter your code to access trip details, itinerary, and updates.
 

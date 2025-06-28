@@ -20,7 +20,7 @@ class MicrosoftAuth {
                 this.redirectUri = `${window.location.origin}/auth-callback.html`;
             } else {
                 // wolthers.com/trips subdirectory
-                this.redirectUri = `${window.location.origin}/trips/auth-callback.html`;
+                this.redirectUri = `${window.location.origin}/auth-callback.html`;
             }
         }
         
@@ -161,7 +161,7 @@ class MicrosoftAuth {
     async signOut() {
         try {
             // Call logout endpoint
-                            await fetch('/api/auth/logout.php', {
+                            await fetch('trips/api/auth/logout.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -175,7 +175,7 @@ class MicrosoftAuth {
         localStorage.removeItem('wolthers_auth');
         
         // Redirect to Microsoft logout
-        const logoutUrl = `https://login.microsoftonline.com/${this.tenantId}/oauth2/v2.0/logout?post_logout_redirect_uri=${encodeURIComponent(window.location.origin + '/trips/')}`;
+        const logoutUrl = `https://login.microsoftonline.com/${this.tenantId}/oauth2/v2.0/logout?post_logout_redirect_uri=${encodeURIComponent(window.location.origin + '/')}`;
         window.location.href = logoutUrl;
     }
 
@@ -365,7 +365,7 @@ class MicrosoftSignInButton {
                 this.options.onSuccess(result);
             } else {
                 // Default: redirect to trips page
-                window.location.href = '/trips/';
+                window.location.href = 'trips/index.html';
             }
             
         } catch (error) {

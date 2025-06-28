@@ -282,7 +282,7 @@
         // Test backend connection
         async function testBackendConnection() {
             try {
-                const response = await fetch('/trips/api/auth/login.php', {
+                const response = await fetch('/api/auth/login.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -314,7 +314,7 @@
             
             const debugInfo = {
                 clientId: clientId,
-                redirectUri: window.location.origin + '/trips/auth-callback.html',
+                redirectUri: window.location.origin + '/auth-callback.html',
                 currentUrl: window.location.href,
                 authData: authData ? JSON.parse(authData) : null,
                 msAuthInitialized: !!msAuth

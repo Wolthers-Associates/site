@@ -16,7 +16,7 @@ class MicrosoftAuth {
         } else {
             const host = window.location.host;
             if (host.startsWith('trips.')) {
-                // trips.wolthers.com subdomain
+                // trips.wolthers.com subdomain - domain root points to /trips/ folder
                 this.redirectUri = `${window.location.origin}/auth-callback.html`;
             } else {
                 // wolthers.com/trips subdirectory
@@ -365,7 +365,7 @@ class MicrosoftSignInButton {
                 this.options.onSuccess(result);
             } else {
                 // Default: redirect to trips page
-                window.location.href = '/';
+                window.location.href = 'index.html';
             }
             
         } catch (error) {
