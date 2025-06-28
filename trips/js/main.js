@@ -6501,18 +6501,18 @@ function createFleetTableRow(vehicle) {
         <tr>
             <td>
                 <div style="display: flex; flex-direction: column; gap: 4px;">
-                    <div style="font-weight: 600; color: var(--dark-text, #333);">${vehicleName}</div>
-                    <div style="font-size: 13px; color: var(--dark-text-secondary, #666);">${vehicleYear}</div>
-                    <div style="font-size: 12px; color: var(--dark-text-secondary, #666); font-style: italic;">${vehicleCapacity}</div>
+                    <div style="font-weight: 600; color: var(--text-primary);">${vehicleName}</div>
+                    <div style="font-size: 13px; color: var(--text-secondary);">${vehicleYear}</div>
+                    <div style="font-size: 12px; color: var(--text-tertiary); font-style: italic;">${vehicleCapacity}</div>
                 </div>
             </td>
             <td>
-                <span style="font-family: 'Courier New', monospace; font-weight: bold; background: var(--dark-bg, #f5f5f5); padding: 4px 8px; border-radius: 4px; color: var(--dark-text, #333);">
+                <span style="font-family: 'Courier New', monospace; font-weight: bold; background: var(--bg-secondary); padding: 4px 8px; border-radius: 4px; color: var(--text-primary);">
                     ${licensePlate}
                 </span>
             </td>
             <td>
-                <span style="font-family: 'Courier New', monospace; font-weight: 500; color: var(--dark-text, #333);">
+                <span style="font-family: 'Courier New', monospace; font-weight: 500; color: var(--text-primary);">
                     ${mileage}
                 </span>
             </td>
@@ -6526,17 +6526,17 @@ function createFleetTableRow(vehicle) {
                 <span class="fluent-badge ${revisionClass}">${revisionStatus}</span>
             </td>
             <td>
-                <span style="color: var(--dark-text-secondary, #666); font-size: 13px; ${lastTrip === 'None' ? 'font-style: italic;' : ''}">${lastTrip}</span>
+                <span style="color: var(--text-secondary); font-size: 13px; ${lastTrip === 'None' ? 'font-style: italic;' : ''}">${lastTrip}</span>
             </td>
             <td>
-                <span style="color: var(--dark-text-secondary, #666); font-size: 13px; ${nextTrip.includes('None') ? 'font-style: italic;' : ''}">${nextTrip}</span>
+                <span style="color: var(--text-secondary); font-size: 13px; ${nextTrip.includes('None') ? 'font-style: italic;' : ''}">${nextTrip}</span>
             </td>
             <td>
-                <div style="display: flex; gap: 6px;">
-                    <button onclick="editFleetVehicle(${vehicle.id})" title="Edit Vehicle" style="width: 32px; height: 32px; border: none; border-radius: 6px; cursor: pointer; background: var(--dark-bg, #f5f5f5); color: var(--dark-text, #333); display: flex; align-items: center; justify-content: center;">
+                <div class="fluent-action-buttons">
+                    <button onclick="editFleetVehicle(${vehicle.id})" title="Edit Vehicle" class="fluent-action-btn fluent-action-edit">
                         ✏️
                     </button>
-                    <button onclick="deleteFleetVehicle(${vehicle.id})" title="Delete Vehicle" style="width: 32px; height: 32px; border: none; border-radius: 6px; cursor: pointer; background: var(--dark-bg, #f5f5f5); color: var(--dark-text, #333); display: flex; align-items: center; justify-content: center;">
+                    <button onclick="deleteFleetVehicle(${vehicle.id})" title="Delete Vehicle" class="fluent-action-btn fluent-action-delete">
                         🗑️
                     </button>
                 </div>
