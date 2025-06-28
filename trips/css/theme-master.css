@@ -489,7 +489,7 @@ body {
 }
 
 .fluent-modal-content {
-    width: 95vw;
+    width: 95%;
     max-width: 1200px;
     max-height: 90vh;
     background: var(--bg-card);
@@ -498,10 +498,11 @@ body {
     border-radius: 12px;
     overflow: hidden;
     box-shadow: var(--shadow-xl);
+    margin: 0 auto;
 }
 
 .fluent-modal-content-small {
-    width: 90vw;
+    width: 90%;
     max-width: 600px;
     max-height: 90vh;
     background: var(--bg-card);
@@ -510,6 +511,7 @@ body {
     border-radius: 12px;
     overflow: hidden;
     box-shadow: var(--shadow-xl);
+    margin: 0 auto;
 }
 
 .fluent-modal-header {
@@ -720,7 +722,10 @@ body {
     background: var(--bg-card);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-lg);
-    overflow: hidden;
+    overflow-x: auto;
+    overflow-y: visible;
+    width: 100%;
+    max-width: 100%;
 }
 
 .fluent-table {
@@ -1343,5 +1348,62 @@ body {
     
     .vehicle-tabs {
         overflow-x: auto;
+    }
+    
+    .fluent-modal-content {
+        width: 98%;
+    }
+    
+    .fluent-table-container {
+        margin: 0 -16px;
+        border-left: none;
+        border-right: none;
+        border-radius: 0;
+    }
+    
+    /* Hide less important columns on tablet */
+    .fluent-table th:nth-child(6), /* Member since */
+    .fluent-table td:nth-child(6),
+    .fluent-table th:nth-child(8), /* Last Login */
+    .fluent-table td:nth-child(8) {
+        display: none;
+    }
+}
+
+/* Add responsive styles for very small screens */
+@media (max-width: 480px) {
+    .fluent-modal-content {
+        width: 100%;
+        margin: 0;
+        border-radius: 0;
+        max-height: 100vh;
+    }
+    
+    .fluent-modal-header {
+        padding: 16px 20px;
+    }
+    
+    .fluent-modal-body {
+        padding: 0 20px 20px 20px;
+    }
+    
+    /* Hide even more columns on very small screens */
+    .fluent-table th:nth-child(4), /* Company */
+    .fluent-table td:nth-child(4),
+    .fluent-table th:nth-child(7), /* # of Trips */
+    .fluent-table td:nth-child(7),
+    .fluent-table th:nth-child(9), /* Upcoming Trip */
+    .fluent-table td:nth-child(9) {
+        display: none;
+    }
+    
+    .fluent-search-box {
+        min-width: 200px;
+    }
+    
+    .fluent-section-controls {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
     }
 } 
