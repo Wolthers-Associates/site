@@ -155,6 +155,21 @@
                 color: var(--dark-text-secondary) !important;
             }
             
+            /* User Summary Section Dark Mode */
+            .user-summary-section .summary-cards {
+                background: var(--dark-bg-secondary) !important;
+            }
+            .user-summary-section .summary-card {
+                background: var(--dark-bg) !important;
+                border: 1px solid #2d3136 !important;
+            }
+            .user-summary-section .summary-number {
+                color: #DAA520 !important;
+            }
+            .user-summary-section .summary-label {
+                color: var(--dark-text-secondary) !important;
+            }
+
             /* Vehicle Management Modal Styles */
             .vehicle-summary-section {
                 margin-bottom: 25px !important;
@@ -319,6 +334,34 @@
         
         .fluent-checkbox {
             margin-top: 2px;
+        }
+
+        /* User Management Modal Styles - Match Company Management */
+        .user-summary-section {
+            margin-bottom: 25px;
+        }
+        .user-summary-section .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+        }
+        .user-summary-section .summary-card {
+            background: white;
+            border: 1px solid #e1e5e9;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .user-summary-section .summary-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #2C5530;
+            margin-bottom: 5px;
+        }
+        .user-summary-section .summary-label {
+            color: #757575;
+            font-size: 0.9em;
         }
 
         /* Vehicle Management Modal Styles for Light Mode */
@@ -1158,6 +1201,28 @@ The system will automatically:
             </div>
             
             <div class="fluent-modal-body">
+                <!-- User Summary Section -->
+                <section class="user-summary-section">
+                    <div class="summary-cards">
+                        <div class="summary-card">
+                            <div class="summary-number" id="totalUsersCount">0</div>
+                            <div class="summary-label">Total Users</div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="summary-number" id="activeUsersCount">0</div>
+                            <div class="summary-label">Active</div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="summary-number" id="adminUsersCount">0</div>
+                            <div class="summary-label">Administrators</div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="summary-number" id="guestUsersCount">0</div>
+                            <div class="summary-label">Guests</div>
+                        </div>
+                    </div>
+                </section>
+
                 <!-- Profile Section (30%) - Flat Design -->
                 <section class="fluent-profile-section">
                     <div class="fluent-profile-card-flat">

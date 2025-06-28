@@ -3667,6 +3667,9 @@ async function loadUserManagementData() {
         // Setup Add User form handler
         setupAddUserForm();
         
+        // Update user summary cards
+        updateUserSummaryCards(getUsersFromDatabase());
+        
     } catch (error) {
         showToast('Failed to load user management data', 'error');
     } finally {
@@ -3697,6 +3700,57 @@ function updateCurrentUserProfile(user) {
     
     if (profileAvatar) {
         profileAvatar.textContent = user.avatar || user.name?.charAt(0) || '?';
+    }
+}
+
+/**
+ * Update User Summary Cards with statistics
+ * @param {Array} users - Array of user objects
+ */
+function updateUserSummaryCards(users) {
+    try {
+        if (!users || !Array.isArray(users)) {
+            console.warn('⚠️ No users array provided to updateUserSummaryCards');
+            users = [];
+        }
+
+        const totalUsers = users.length;
+        const activeUsers = users.filter(user => {
+            const status = getUserStatus(user);
+            return status === 'active' || status === 'Active';
+        }).length;
+        const adminUsers = users.filter(user => 
+            user.role === 'admin' || user.systemRole === 'admin'
+        ).length;
+        const guestUsers = users.filter(user => 
+            user.role === 'guest' || user.systemRole === 'guest'
+        ).length;
+        
+        // Update the summary card numbers
+        const totalElement = document.getElementById('totalUsersCount');
+        const activeElement = document.getElementById('activeUsersCount');
+        const adminElement = document.getElementById('adminUsersCount');
+        const guestElement = document.getElementById('guestUsersCount');
+        
+        if (totalElement) totalElement.textContent = totalUsers;
+        if (activeElement) activeElement.textContent = activeUsers;
+        if (adminElement) adminElement.textContent = adminUsers;
+        if (guestElement) guestElement.textContent = guestUsers;
+        
+        console.log('📊 User summary cards updated:', {
+            total: totalUsers,
+            active: activeUsers,
+            admin: adminUsers,
+            guest: guestUsers
+        });
+        
+    } catch (error) {
+        console.error('❌ Error updating user summary cards:', error);
+        // Set default values if there's an error
+        ['totalUsersCount', 'activeUsersCount', 'adminUsersCount', 'guestUsersCount'].forEach(id => {
+            const element = document.getElementById(id);
+            if (element) element.textContent = '0';
+        });
     }
 }
 
