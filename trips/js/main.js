@@ -3009,18 +3009,21 @@ function systemConfiguration() {
 
 // User Management Modal Functions
 function showUserManagementModal() {
-    // Use the new standalone user management system
-    if (window.userManagementIntegration) {
-        window.userManagementIntegration.showUserManagementModal();
-    } else {
-        // Fallback to opening in new tab
-        window.open('/user-management.html', '_blank');
+    console.log('Opening User Management Modal...');
+    const modal = document.getElementById('userManagementModal');
+    if (modal) {
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+        loadUserManagementData();
     }
 }
 
 function hideUserManagementModal() {
-    document.getElementById('userManagementModal').style.display = 'none';
-    document.body.style.overflow = 'auto';
+    const modal = document.getElementById('userManagementModal');
+    if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
 }
 
 function showCompanyManagementModal() {
