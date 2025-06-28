@@ -4041,7 +4041,7 @@ body {
     }
     
     .fluent-table {
-        min-width: 600px;
+        min-width: 400px;
         max-width: 100%;
     }
     
@@ -4080,15 +4080,26 @@ body {
         height: 48px;
         font-size: 1.2rem;
     }
+    
+    .fluent-table {
+        min-width: 320px;
+    }
+    
+    .fluent-modal-content-small {
+        width: 100%;
+        margin: 0;
+        border-radius: 0;
+    }
 }
 
 /* Production Form Styles */
 .fluent-modal-content-small {
-    width: 90vw;
+    width: 90%;
     max-width: 600px;
     max-height: 85vh;
     display: flex;
     flex-direction: column;
+    margin: 0 auto;
 }
 
 .fluent-modal-body-form {
