@@ -4100,7 +4100,6 @@ function loadModalUsersList() {
                     <span class="fluent-badge-table ${user.role}">${getRoleDisplayName(user.role)}</span>
                     ${user.isWolthersTeam ? '<br><span class="fluent-badge-table team" style="background: var(--medium-green); color: white; margin-top: 4px;">Team</span>' : ''}
                 </td>
-                <td class="fluent-member-since">${formatTableDate(user.memberSince)}</td>
                 <td class="fluent-trip-count">${tripCount}</td>
                 <td class="fluent-last-login">${user.lastLoginDisplay || 'Never'}</td>
                 <td class="fluent-upcoming-trip">${formatUpcomingTrip(upcomingTrip)}</td>

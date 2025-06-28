@@ -186,7 +186,7 @@ function handleGetUsers() {
             'company_role' => $user['company_role'],
             'can_see_company_trips' => (bool)$user['can_see_company_trips'],
             'avatar' => $user['avatar'],
-            'last_login' => $user['last_login'],
+            'last_login' => $user['last_login_at'] ?? $user['last_login'],
             'last_active' => $user['last_active'],
             'created_at' => $user['created_at'],
             'updated_at' => $user['updated_at']
@@ -260,7 +260,7 @@ function handleGetSingleUser($userId) {
         'company_role' => $user['company_role'],
         'can_see_company_trips' => (bool)$user['can_see_company_trips'],
         'avatar' => $user['avatar'],
-        'last_login' => $user['last_login'],
+        'last_login' => $user['last_login_at'] ?? $user['last_login'],
         'last_active' => $user['last_active'],
         'created_at' => $user['created_at'],
         'updated_at' => $user['updated_at']
@@ -365,7 +365,7 @@ function handleCreateUser($input) {
         'company_role' => $user['company_role'],
         'can_see_company_trips' => (bool)$user['can_see_company_trips'],
         'avatar' => $user['avatar'],
-        'last_login' => $user['last_login'],
+        'last_login' => $user['last_login_at'] ?? $user['last_login'],
         'last_active' => $user['last_active'],
         'created_at' => $user['created_at'],
         'updated_at' => $user['updated_at']
@@ -448,7 +448,7 @@ function handleUpdateUserAction($input) {
         'company_role' => $user['company_role'],
         'can_see_company_trips' => (bool)$user['can_see_company_trips'],
         'avatar' => $user['avatar'],
-        'last_login' => $user['last_login'],
+        'last_login' => $user['last_login_at'] ?? $user['last_login'],
         'last_active' => $user['last_active'],
         'created_at' => $user['created_at'],
         'updated_at' => $user['updated_at']
