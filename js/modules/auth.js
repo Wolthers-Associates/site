@@ -111,14 +111,30 @@ export class Auth {
             const result = await this.microsoftAuth.signIn();
             
             if (result && result.user) {
-                // Store session
-                sessionStorage.setItem('userSession', JSON.stringify(result));
-                this.currentUser = result.user;
+                // Send login request to backend with timezone info
+                const timezone = this.getUserTimezone();
+                const loginResponse = await fetch(`${CONFIG.API_BASE}/auth/login.php`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        login_type: 'office365',
+                        access_token: result.accessToken,
+                        timezone: timezone
+                    })
+                });
                 
-                // Add user to system database for admin visibility
-                await this.addUserToSystemDatabase(result.user);
-                
-                return { success: true, user: this.currentUser };
+                if (loginResponse.ok) {
+                    const loginResult = await loginResponse.json();
+                    
+                    // Store session with backend response
+                    sessionStorage.setItem('userSession', JSON.stringify(loginResult));
+                    this.currentUser = loginResult.user;
+                    
+                    return { success: true, user: this.currentUser };
+                } else {
+                    const error = await loginResponse.json();
+                    throw new Error(error.message || 'Login failed');
+                }
             } else {
                 throw new Error('Microsoft authentication was cancelled or failed');
             }
@@ -161,10 +177,16 @@ export class Auth {
             }
             
             // For other users, check with backend
+            const timezone = this.getUserTimezone();
             const response = await fetch(`${CONFIG.API_BASE}/auth/login.php`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password })
+                body: JSON.stringify({ 
+                    login_type: 'regular',
+                    username: email, 
+                    password: password,
+                    timezone: timezone
+                })
             });
             
             if (response.ok) {
@@ -371,6 +393,24 @@ export class Auth {
         };
         
         return names[email.toLowerCase()] || email.split('@')[0].replace(/[.-]/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+    }
+
+    /**
+     * Get user's timezone for login timestamp accuracy
+     */
+    getUserTimezone() {
+        try {
+            // Use Intl.DateTimeFormat to get the user's timezone
+            return Intl.DateTimeFormat().resolvedOptions().timeZone;
+        } catch (error) {
+            console.warn('Failed to detect user timezone:', error);
+            // Fallback: try to determine timezone from date offset
+            const offset = new Date().getTimezoneOffset();
+            const hours = Math.abs(Math.floor(offset / 60));
+            const minutes = Math.abs(offset % 60);
+            const sign = offset > 0 ? '-' : '+';
+            return `UTC${sign}${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+        }
     }
 
     /**

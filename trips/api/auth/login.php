@@ -16,6 +16,57 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     sendError('Method not allowed', 405);
 }
 
+/**
+ * Update user login timestamp with timezone awareness
+ */
+function updateLoginTimestamp($pdo, $userId, $userTimezone) {
+    try {
+        // Calculate both local and UTC timestamps
+        $utcTimestamp = date('Y-m-d H:i:s'); // Current UTC time
+        
+        // Convert UTC to user's local time (for display purposes)
+        $localTimestamp = $utcTimestamp; // Will be converted by MySQL CONVERT_TZ if possible
+        
+        // Try to use MySQL timezone conversion if timezone data is available
+        try {
+            $checkTzStmt = $pdo->prepare("SELECT CONVERT_TZ(NOW(), 'UTC', ?) as local_time");
+            $checkTzStmt->execute([$userTimezone]);
+            $tzResult = $checkTzStmt->fetch();
+            
+            if ($tzResult && $tzResult['local_time'] !== null) {
+                $localTimestamp = $tzResult['local_time'];
+            }
+        } catch (Exception $e) {
+            // Timezone conversion failed, use UTC
+            error_log("Timezone conversion failed for $userTimezone: " . $e->getMessage());
+        }
+        
+        // Update with full timezone info
+        $stmt = $pdo->prepare("
+            UPDATE users 
+            SET last_login_at = ?, 
+                last_login_at_utc = ?, 
+                last_login_timezone = ?, 
+                login_attempts = 0,
+                updated_at = NOW()
+            WHERE id = ?
+        ");
+        $stmt->execute([$localTimestamp, $utcTimestamp, $userTimezone, $userId]);
+        
+        return true;
+    } catch (Exception $e) {
+        // Fallback for databases without the new columns
+        try {
+            $fallbackStmt = $pdo->prepare("UPDATE users SET updated_at = NOW() WHERE id = ?");
+            $fallbackStmt->execute([$userId]);
+            error_log("Login timestamp fallback used for user $userId: " . $e->getMessage());
+        } catch (Exception $fallbackError) {
+            error_log("Login timestamp update completely failed for user $userId: " . $fallbackError->getMessage());
+        }
+        return false;
+    }
+}
+
 // Get JSON input
 $input = json_decode(file_get_contents('php://input'), true);
 if (!$input) {
@@ -27,6 +78,7 @@ $username = trim($input['username'] ?? '');
 $password = trim($input['password'] ?? '');
 $accessToken = $input['access_token'] ?? null; // For Office 365
 $tripCode = trim($input['trip_code'] ?? ''); // For passcode access
+$userTimezone = $input['timezone'] ?? 'UTC'; // User's timezone from frontend
 
 // Validate input based on login type
 if ($loginType === 'office365' && !$accessToken) {
@@ -61,20 +113,22 @@ try {
                 $isTripParticipant = $tripStmt->fetch();
                 
                 if ($invited || $isTripParticipant) {
-                    // Auto-create user as partner
-                    try {
-                        $stmt = $pdo->prepare("
-                            INSERT INTO users (email, name, role, office365_id, status, last_login_at) 
-                            VALUES (?, ?, 'partner', ?, 'active', NOW())
-                        ");
-                        $stmt->execute([$userInfo['email'], $userInfo['name'], $userInfo['id']]);
-                    } catch (Exception $e) {
-                        $stmt = $pdo->prepare("
-                            INSERT INTO users (email, name, role, office365_id, status) 
-                            VALUES (?, ?, 'partner', ?, 'active')
-                        ");
-                        $stmt->execute([$userInfo['email'], $userInfo['name'], $userInfo['id']]);
-                    }
+                                    // Auto-create user as partner with timezone-aware timestamps
+                $utcNow = date('Y-m-d H:i:s');
+                try {
+                    $stmt = $pdo->prepare("
+                        INSERT INTO users (email, name, role, office365_id, status, last_login_at, last_login_at_utc, last_login_timezone) 
+                        VALUES (?, ?, 'partner', ?, 'active', ?, ?, ?)
+                    ");
+                    $stmt->execute([$userInfo['email'], $userInfo['name'], $userInfo['id'], $utcNow, $utcNow, $userTimezone]);
+                } catch (Exception $e) {
+                    // Fallback for databases without new columns
+                    $stmt = $pdo->prepare("
+                        INSERT INTO users (email, name, role, office365_id, status) 
+                        VALUES (?, ?, 'partner', ?, 'active')
+                    ");
+                    $stmt->execute([$userInfo['email'], $userInfo['name'], $userInfo['id']]);
+                }
                     $userId = $pdo->lastInsertId();
                     $user = [
                         'id' => $userId,
@@ -86,22 +140,16 @@ try {
                     sendError('No account found for this Microsoft account. Please register or contact support.', 404);
                 }
             } else {
-                // Update existing user with Office 365 ID and last login (if columns exist)
-                try {
-                    $updateStmt = $pdo->prepare("
-                        UPDATE users 
-                        SET office365_id = ?, last_login_at = NOW(), login_attempts = 0
-                        WHERE id = ?
-                    ");
-                    $updateStmt->execute([$userInfo['id'], $user['id']]);
-                } catch (Exception $e) {
-                    $updateStmt = $pdo->prepare("
-                        UPDATE users 
-                        SET office365_id = ?, updated_at = NOW()
-                        WHERE id = ?
-                    ");
-                    $updateStmt->execute([$userInfo['id'], $user['id']]);
-                }
+                // Update existing user with Office 365 ID and timezone-aware last login
+                $updateStmt = $pdo->prepare("
+                    UPDATE users 
+                    SET office365_id = ?
+                    WHERE id = ?
+                ");
+                $updateStmt->execute([$userInfo['id'], $user['id']]);
+                
+                // Update login timestamp with timezone awareness
+                updateLoginTimestamp($pdo, $user['id'], $userTimezone);
             }
             
             logActivity($user['id'], 'office365_login', ['email' => $userInfo['email']]);
@@ -138,15 +186,8 @@ try {
         $user = $stmt->fetch();
         
         if ($user && ($user['password_hash'] === null || password_verify($password, $user['password_hash']))) {
-            // Update last login time (if column exists)
-            try {
-                $updateStmt = $pdo->prepare("UPDATE users SET last_login_at = NOW(), login_attempts = 0 WHERE id = ?");
-                $updateStmt->execute([$user['id']]);
-            } catch (Exception $e) {
-                // Fallback if last_login_at or login_attempts columns don't exist
-                $updateStmt = $pdo->prepare("UPDATE users SET updated_at = NOW() WHERE id = ?");
-                $updateStmt->execute([$user['id']]);
-            }
+            // Update login timestamp with timezone awareness
+            updateLoginTimestamp($pdo, $user['id'], $userTimezone);
             
             // For development: if no password hash, any password works
             logActivity($user['id'], 'regular_login', ['email' => $username]);

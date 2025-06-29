@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Timestamp Test - Wolthers Trips</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 800px; 
+            margin: 0 auto; 
+            padding: 20px; 
+            background-color: #f5f5f5; 
+        }
+        .container { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 10px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+        }
+        .section { 
+            margin: 20px 0; 
+            padding: 15px; 
+            border-left: 4px solid #4CAF50; 
+            background-color: #f9f9f9; 
+        }
+        .error { border-left-color: #f44336; background-color: #ffebee; }
+        .warning { border-left-color: #ff9800; background-color: #fff3e0; }
+        .info { border-left-color: #2196F3; background-color: #e3f2fd; }
+        button { 
+            background: #4CAF50; 
+            color: white; 
+            border: none; 
+            padding: 10px 20px; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            margin: 5px; 
+        }
+        button:hover { background: #45a049; }
+        button:disabled { background: #cccccc; cursor: not-allowed; }
+        pre { 
+            background: #f0f0f0; 
+            padding: 10px; 
+            border-radius: 5px; 
+            overflow-x: auto; 
+        }
+        .status { font-weight: bold; }
+        .success { color: #4CAF50; }
+        .failure { color: #f44336; }
+        input[type="email"], input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .login-form {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Login Timestamp Testing Tool</h1>
+        <p>This tool helps verify that the timezone-aware login timestamp fix is working correctly.</p>
+        
+        <div class="section info">
+            <h3>📍 Your Current Timezone Info</h3>
+            <p><strong>Detected Timezone:</strong> <span id="userTimezone">Loading...</span></p>
+            <p><strong>Current Local Time:</strong> <span id="localTime">Loading...</span></p>
+            <p><strong>Current UTC Time:</strong> <span id="utcTime">Loading...</span></p>
+            <p><strong>Timezone Offset:</strong> <span id="timezoneOffset">Loading...</span></p>
+        </div>
+
+        <div class="section">
+            <h3>🧪 Test Authentication</h3>
+            <p>Test login functionality to verify timezone data is being sent correctly.</p>
+            
+            <div class="login-form">
+                <h4>Regular Login Test</h4>
+                <input type="email" id="emailInput" placeholder="Enter email address" />
+                <input type="password" id="passwordInput" placeholder="Enter password" />
+                <button onclick="testRegularLogin()">Test Regular Login</button>
+            </div>
+            
+            <div class="login-form">
+                <h4>Microsoft OAuth Test</h4>
+                <button onclick="testMicrosoftLogin()">Test Microsoft Login</button>
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>📊 Login Test Results</h3>
+            <div id="testResults">No tests run yet.</div>
+        </div>
+
+        <div class="section">
+            <h3>🔍 Database Check</h3>
+            <button onclick="checkDatabaseStructure()">Check Database Structure</button>
+            <button onclick="checkUserTimestamps()">Check User Login Timestamps</button>
+            <div id="databaseResults"></div>
+        </div>
+
+        <div class="section">
+            <h3>📝 Debug Log</h3>
+            <pre id="debugLog">Debug information will appear here...</pre>
+        </div>
+    </div>
+
+    <script type="module">
+        import { auth } from './js/modules/auth.js';
+
+        // Initialize timezone display
+        function updateTimezoneInfo() {
+            try {
+                const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+                const now = new Date();
+                const offset = now.getTimezoneOffset();
+                const offsetHours = Math.abs(Math.floor(offset / 60));
+                const offsetMinutes = Math.abs(offset % 60);
+                const offsetSign = offset > 0 ? '-' : '+';
+                
+                document.getElementById('userTimezone').textContent = timezone;
+                document.getElementById('localTime').textContent = now.toLocaleString();
+                document.getElementById('utcTime').textContent = now.toISOString();
+                document.getElementById('timezoneOffset').textContent = 
+                    `UTC${offsetSign}${offsetHours.toString().padStart(2, '0')}:${offsetMinutes.toString().padStart(2, '0')}`;
+                
+                log(`Timezone Detection: ${timezone}`);
+                log(`Local Time: ${now.toLocaleString()}`);
+                log(`UTC Time: ${now.toISOString()}`);
+            } catch (error) {
+                log(`Error detecting timezone: ${error.message}`, 'error');
+            }
+        }
+
+        // Logging function
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const debugElement = document.getElementById('debugLog');
+            const logEntry = `[${timestamp}] ${type.toUpperCase()}: ${message}\n`;
+            debugElement.textContent += logEntry;
+            debugElement.scrollTop = debugElement.scrollHeight;
+            
+            if (type === 'error') {
+                console.error(message);
+            } else {
+                console.log(message);
+            }
+        }
+
+        // Test regular login
+        window.testRegularLogin = async function() {
+            const email = document.getElementById('emailInput').value;
+            const password = document.getElementById('passwordInput').value;
+            
+            if (!email || !password) {
+                log('Please enter both email and password', 'error');
+                return;
+            }
+            
+            log(`Testing regular login for: ${email}`);
+            
+            try {
+                const result = await auth.signInWithEmail(email, password);
+                
+                if (result.success) {
+                    log(`Login successful for: ${result.user.email}`, 'success');
+                    displayTestResult('Regular Login', 'success', result);
+                } else {
+                    log(`Login failed: ${result.error}`, 'error');
+                    displayTestResult('Regular Login', 'failure', result);
+                }
+            } catch (error) {
+                log(`Login error: ${error.message}`, 'error');
+                displayTestResult('Regular Login', 'failure', { error: error.message });
+            }
+        };
+
+        // Test Microsoft login
+        window.testMicrosoftLogin = async function() {
+            log('Testing Microsoft OAuth login...');
+            
+            try {
+                const result = await auth.signInWithMicrosoft();
+                
+                if (result.success) {
+                    log(`Microsoft login successful for: ${result.user.email}`, 'success');
+                    displayTestResult('Microsoft Login', 'success', result);
+                } else {
+                    log(`Microsoft login failed: ${result.error}`, 'error');
+                    displayTestResult('Microsoft Login', 'failure', result);
+                }
+            } catch (error) {
+                log(`Microsoft login error: ${error.message}`, 'error');
+                displayTestResult('Microsoft Login', 'failure', { error: error.message });
+            }
+        };
+
+        // Display test results
+        function displayTestResult(testType, status, result) {
+            const resultsDiv = document.getElementById('testResults');
+            const statusClass = status === 'success' ? 'success' : 'failure';
+            
+            const resultHtml = `
+                <div class="section ${statusClass === 'success' ? '' : 'error'}">
+                    <h4>${testType} - <span class="status ${statusClass}">${status.toUpperCase()}</span></h4>
+                    <pre>${JSON.stringify(result, null, 2)}</pre>
+                    <p><small>Test completed at: ${new Date().toLocaleString()}</small></p>
+                </div>
+            `;
+            
+            resultsDiv.innerHTML = resultHtml + resultsDiv.innerHTML;
+        }
+
+        // Check database structure
+        window.checkDatabaseStructure = async function() {
+            log('Checking database structure...');
+            
+            try {
+                const response = await fetch('api/debug-db-structure.php');
+                if (response.ok) {
+                    const html = await response.text();
+                    const resultsDiv = document.getElementById('databaseResults');
+                    resultsDiv.innerHTML = `
+                        <div class="section">
+                            <h4>Database Structure Results</h4>
+                            <div style="max-height: 400px; overflow-y: auto;">
+                                ${html}
+                            </div>
+                        </div>
+                    `;
+                    log('Database structure check completed');
+                } else {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+            } catch (error) {
+                log(`Database check error: ${error.message}`, 'error');
+                document.getElementById('databaseResults').innerHTML = `
+                    <div class="section error">
+                        <h4>Database Check Failed</h4>
+                        <p>Error: ${error.message}</p>
+                    </div>
+                `;
+            }
+        };
+
+        // Check user timestamps
+        window.checkUserTimestamps = async function() {
+            log('Checking user login timestamps...');
+            
+            try {
+                const response = await fetch('api/auth/list-users.php');
+                if (response.ok) {
+                    const users = await response.json();
+                    const resultsDiv = document.getElementById('databaseResults');
+                    
+                    let html = `
+                        <div class="section">
+                            <h4>User Login Timestamps</h4>
+                            <table style="width:100%; border-collapse: collapse;">
+                                <tr style="background-color: #f2f2f2;">
+                                    <th style="border: 1px solid #ddd; padding: 8px;">Name</th>
+                                    <th style="border: 1px solid #ddd; padding: 8px;">Email</th>
+                                    <th style="border: 1px solid #ddd; padding: 8px;">Last Login</th>
+                                    <th style="border: 1px solid #ddd; padding: 8px;">Timezone</th>
+                                </tr>
+                    `;
+                    
+                    users.forEach(user => {
+                        html += `
+                            <tr>
+                                <td style="border: 1px solid #ddd; padding: 8px;">${user.name}</td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">${user.email}</td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">${user.last_login_at || 'Never'}</td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">${user.last_login_timezone || 'Unknown'}</td>
+                            </tr>
+                        `;
+                    });
+                    
+                    html += `</table></div>`;
+                    resultsDiv.innerHTML = html;
+                    log('User timestamps check completed');
+                } else {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+            } catch (error) {
+                log(`User timestamps check error: ${error.message}`, 'error');
+                document.getElementById('databaseResults').innerHTML = `
+                    <div class="section error">
+                        <h4>User Timestamps Check Failed</h4>
+                        <p>Error: ${error.message}</p>
+                    </div>
+                `;
+            }
+        };
+
+        // Initialize
+        updateTimezoneInfo();
+        setInterval(updateTimezoneInfo, 60000); // Update every minute
+        
+        log('Login timestamp test tool initialized');
+        log('Ready to test timezone-aware authentication');
+    </script>
+</body>
+</html> 

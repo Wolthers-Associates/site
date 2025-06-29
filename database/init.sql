@@ -19,15 +19,22 @@ CREATE TABLE `users` (
   `name` varchar(255) NOT NULL,
   `role` enum('admin','employee','partner') NOT NULL DEFAULT 'employee',
   `office365_id` varchar(255) DEFAULT NULL,
+  `password_hash` varchar(255) DEFAULT NULL,
   `department` varchar(100) DEFAULT NULL,
   `status` enum('active','inactive') NOT NULL DEFAULT 'active',
+  `last_login_at` timestamp NULL DEFAULT NULL,
+  `last_login_at_utc` timestamp NULL DEFAULT NULL,
+  `last_login_timezone` varchar(50) DEFAULT NULL,
+  `login_attempts` int(11) NOT NULL DEFAULT 0,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `email` (`email`),
   KEY `office365_id` (`office365_id`),
   KEY `role` (`role`),
-  KEY `status` (`status`)
+  KEY `status` (`status`),
+  KEY `last_login_at` (`last_login_at`),
+  KEY `login_attempts` (`login_attempts`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
