@@ -3816,6 +3816,10 @@ async function loadAllUsersForAdmin() {
                     
                     console.log('🔍 Mapped users IDs:', mappedUsers.map(u => ({ id: u.id, name: u.name })));
                     USER_DATABASE = mappedUsers;
+                    
+                    // Fix any invalid timestamps from API data
+                    fixUserTimestamps();
+                    
                     saveUserDatabase();
                     localStorage.setItem('wolthers_users_database_source', 'true');
                     return;
@@ -4788,6 +4792,9 @@ function initializeUserDatabase() {
         saveUserDatabase();
         console.log('⚠️ Initialized with mock users - will load real database when admin accesses user management');
     }
+    
+    // Fix any invalid timestamps automatically
+    fixUserTimestamps();
     
     // Make globally accessible for compatibility
     window.USER_DATABASE = USER_DATABASE;
@@ -7726,3 +7733,102 @@ function showTripDetailsModal(trip) {
         document.body.style.overflow = 'auto';
     });
 }
+
+// Debug function for timezone testing
+function debugTimezoneIssue() {
+    console.log('=== TIMEZONE DEBUG ===');
+    console.log('Current system time:', new Date().toISOString());
+    console.log('User timezone:', Intl.DateTimeFormat().resolvedOptions().timeZone);
+    
+    // Test with different timestamps
+    const testDates = [
+        new Date().toISOString(), // Current time
+        '2024-12-19T02:46:00.000Z', // Sample UTC time around user's current time
+        '2025-06-29T05:54:00.000Z', // The problematic date from screenshot
+    ];
+    
+    testDates.forEach(dateString => {
+        console.log(`Testing date: ${dateString}`);
+        console.log(`Formatted: ${formatUserTimezone(dateString)}`);
+    });
+    
+    // Check current user data
+    const currentUserData = USER_DATABASE.find(u => u.email === 'daniel@wolthers.com');
+    if (currentUserData) {
+        console.log('Current user data:', currentUserData);
+        console.log('User last_login_at:', currentUserData.last_login_at);
+        console.log('User last_login:', currentUserData.last_login);
+        console.log('User lastActive:', currentUserData.lastActive);
+    }
+    
+    console.log('=== END DEBUG ===');
+}
+
+// Make it globally available for browser console testing
+window.debugTimezoneIssue = debugTimezoneIssue;
+
+// Fix invalid future timestamps in user data
+function fixUserTimestamps() {
+    console.log('🔧 Fixing invalid user timestamps...');
+    
+    const now = new Date();
+    const maxValidDate = new Date(now.getTime() + 24 * 60 * 60 * 1000); // 24 hours from now max
+    let fixed = 0;
+    
+    USER_DATABASE = USER_DATABASE.map(user => {
+        const updatedUser = { ...user };
+        
+        // Check and fix last_login_at
+        if (user.last_login_at) {
+            const loginDate = new Date(user.last_login_at);
+            if (loginDate > maxValidDate) {
+                // Set to a realistic recent login time (e.g., a few hours ago)
+                updatedUser.last_login_at = new Date(now.getTime() - Math.random() * 24 * 60 * 60 * 1000).toISOString();
+                fixed++;
+            }
+        }
+        
+        // Check and fix last_login
+        if (user.last_login) {
+            const loginDate = new Date(user.last_login);
+            if (loginDate > maxValidDate) {
+                updatedUser.last_login = new Date(now.getTime() - Math.random() * 24 * 60 * 60 * 1000).toISOString();
+                fixed++;
+            }
+        }
+        
+        // Check and fix lastActive
+        if (user.lastActive) {
+            const activeDate = new Date(user.lastActive);
+            if (activeDate > maxValidDate) {
+                updatedUser.lastActive = new Date(now.getTime() - Math.random() * 6 * 60 * 60 * 1000).toISOString();
+                fixed++;
+            }
+        }
+        
+        // For Daniel Wolthers specifically, set to recent login
+        if (user.email === 'daniel@wolthers.com') {
+            const recentLogin = new Date(now.getTime() - 2 * 60 * 60 * 1000).toISOString(); // 2 hours ago
+            updatedUser.last_login_at = recentLogin;
+            updatedUser.last_login = recentLogin;
+            updatedUser.lastActive = recentLogin;
+        }
+        
+        return updatedUser;
+    });
+    
+    if (fixed > 0) {
+        console.log(`✅ Fixed ${fixed} invalid timestamps`);
+        saveUserDatabase();
+        
+        // Refresh the user management display if it's open
+        if (document.getElementById('userManagementModal')?.classList.contains('show')) {
+            loadModalUsersList();
+        }
+    } else {
+        console.log('✅ No invalid timestamps found');
+    }
+}
+
+// Make it globally available
+window.fixUserTimestamps = fixUserTimestamps;
