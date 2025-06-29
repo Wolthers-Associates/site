@@ -28,12 +28,17 @@ function updateLoginTimestamp($pdo, $userId, $userTimezone) {
         // Calculate user's local time
         $localTimestamp = $utcTimestamp; // Default fallback
         try {
+            // Create DateTime object in user's timezone
             $localDateTime = new DateTime('now', new DateTimeZone($userTimezone));
             $localTimestamp = $localDateTime->format('Y-m-d H:i:s');
+            
+            // Debug logging
+            error_log("Timezone conversion DEBUG - User $userId: UTC=$utcTimestamp, Local($userTimezone)=$localTimestamp");
         } catch (Exception $tzError) {
             // Invalid timezone, use UTC as fallback
             error_log("Invalid timezone '$userTimezone' for user $userId: " . $tzError->getMessage());
             $userTimezone = 'UTC'; // Reset to UTC if invalid
+            $localTimestamp = $utcTimestamp;
         }
         
         // Update with full timezone info
@@ -77,6 +82,9 @@ $password = trim($input['password'] ?? '');
 $accessToken = $input['access_token'] ?? null; // For Office 365
 $tripCode = trim($input['trip_code'] ?? ''); // For passcode access
 $userTimezone = $input['timezone'] ?? 'UTC'; // User's timezone from frontend
+
+// DEBUG: Log what timezone data we received
+error_log("LOGIN DEBUG - Type: $loginType, Timezone received: '$userTimezone', Full input: " . json_encode($input));
 
 // Validate input based on login type
 if ($loginType === 'office365' && !$accessToken) {
