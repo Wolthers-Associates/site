@@ -414,6 +414,13 @@ body {
     visibility: visible;
 }
 
+/* Force display for modals that are explicitly shown via JavaScript */
+.modal[style*="flex"].show {
+    display: flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
 .modal-content {
     background: var(--bg-card);
     border-radius: var(--radius-xl);

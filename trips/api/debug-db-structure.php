@@ -8,10 +8,10 @@
 
 require_once 'config.php';
 
-// Only allow in development/staging - TEMPORARILY ENABLED FOR DEBUGGING
-// if (!isset($_SERVER['HTTP_HOST']) || (!strpos($_SERVER['HTTP_HOST'], 'trips.wolthers.com') && !strpos($_SERVER['HTTP_HOST'], 'localhost'))) {
-//     die('This debug script is only available on development servers.');
-// }
+// Only allow on approved domains
+if (!isset($_SERVER['HTTP_HOST']) || (!strpos($_SERVER['HTTP_HOST'], 'trips.wolthers.com') && !strpos($_SERVER['HTTP_HOST'], 'localhost'))) {
+    die('This debug script is only available on authorized servers.');
+}
 
 try {
     $pdo = getDBConnection();

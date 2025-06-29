@@ -4193,7 +4193,7 @@ async function editUser(userId) {
         
         if (result.success && result.user) {
             console.log('Found user from backend:', result.user);
-            showEditUserModal(result.user);
+            await showEditUserModal(result.user);
         } else {
             // Fallback to local data if backend fails
             console.log('Backend fetch failed, trying local data...');
@@ -4206,7 +4206,7 @@ async function editUser(userId) {
             
             if (user) {
                 console.log('Found user in local data:', user);
-                showEditUserModal(user);
+                await showEditUserModal(user);
             } else {
                 console.warn('User not found with ID:', userId);
                 showToast('User not found. The user may have been deleted or you may need to refresh the page.', 'warning');
@@ -4363,36 +4363,117 @@ async function showConfirmDialog(title, message, confirmText = 'Confirm', type =
     });
 }
 
-function showEditUserModal(user) {
+async function showEditUserModal(user) {
+    console.log('🔧 showEditUserModal called with user:', user);
+    
     const modal = document.getElementById('editUserModal');
-    if (modal) {
+    if (!modal) {
+        console.error('❌ Edit user modal not found in DOM');
+        showToast('Modal not found - please refresh the page', 'error');
+        return;
+    }
+    
+    try {
         // Populate form with user data
         document.getElementById('editUserId').value = user.id;
         document.getElementById('editUserName').value = user.name || '';
         document.getElementById('editUserEmail').value = user.email || '';
+        
+        // Populate company dropdown first, then set selected value
+        await populateEditUserCompanyDropdown();
         document.getElementById('editUserCompany').value = user.company_id || '';
+        
         document.getElementById('editUserCompanyRole').value = user.company_role || 'staff';
         document.getElementById('editUserRole').value = user.role || 'user';
         document.getElementById('editCanSeeCompanyTrips').checked = user.can_see_company_trips || false;
         
+        console.log('✅ Form populated with user data');
+        
         // Setup company role dependencies for edit form
         setupEditUserFormDependencies();
         
-        // Show modal
+        // Show modal using the theme system (requires both display and show class)
         modal.style.display = 'flex';
+        modal.classList.add('show');
         document.body.style.overflow = 'hidden';
+        
+        console.log('✅ Modal should now be visible');
         
         // Setup form submission
         const form = document.getElementById('editUserForm');
         form.onsubmit = handleEditUserSubmit;
+        
+        // Setup modal backdrop click to close
+        const backdrop = modal.querySelector('.modal-backdrop');
+        if (backdrop) {
+            backdrop.onclick = hideEditUserModal;
+        }
+        
+        // Setup ESC key to close modal
+        const handleEscKey = (event) => {
+            if (event.key === 'Escape') {
+                hideEditUserModal();
+                document.removeEventListener('keydown', handleEscKey);
+            }
+        };
+        document.addEventListener('keydown', handleEscKey);
+        
+        // Focus on first input for better UX
+        setTimeout(() => {
+            const firstInput = modal.querySelector('input:not([type="hidden"])');
+            if (firstInput) {
+                firstInput.focus();
+                firstInput.select();
+            }
+        }, 100);
+        
+    } catch (error) {
+        console.error('❌ Error showing edit user modal:', error);
+        showToast('Error opening edit modal: ' + error.message, 'error');
     }
 }
 
 function hideEditUserModal() {
+    console.log('🔧 hideEditUserModal called');
+    
     const modal = document.getElementById('editUserModal');
     if (modal) {
         modal.style.display = 'none';
+        modal.classList.remove('show');
         document.body.style.overflow = 'auto';
+        
+        // Clear form data for security
+        const form = document.getElementById('editUserForm');
+        if (form) {
+            form.reset();
+        }
+        
+        console.log('✅ Modal hidden and form cleared');
+    }
+}
+
+async function populateEditUserCompanyDropdown() {
+    try {
+        const companySelect = document.getElementById('editUserCompany');
+        if (!companySelect) return;
+        
+        // Clear existing options except the first one
+        companySelect.innerHTML = '<option value="">Select a company</option>';
+        
+        // Get companies data
+        const companies = companiesData || await loadCompanies() || [];
+        
+        // Add company options
+        companies.forEach(company => {
+            const option = document.createElement('option');
+            option.value = company.id;
+            option.textContent = company.fantasy_name || company.full_name || company.name;
+            companySelect.appendChild(option);
+        });
+        
+        console.log('✅ Company dropdown populated with', companies.length, 'companies');
+    } catch (error) {
+        console.error('❌ Error populating company dropdown:', error);
     }
 }
 
@@ -7735,6 +7816,34 @@ function showTripDetailsModal(trip) {
 }
 
 // Debug function for timezone testing
+// Debug function to test edit user modal
+function testEditUserModal() {
+    console.log('🧪 Testing edit user modal...');
+    
+    // Create a test user object
+    const testUser = {
+        id: 'test-user-123',
+        name: 'Test User',
+        email: 'test@example.com',
+        company_id: '1',
+        company_role: 'staff',
+        role: 'user',
+        can_see_company_trips: false
+    };
+    
+    console.log('📝 Test user data:', testUser);
+    
+    // Test the modal
+    showEditUserModal(testUser).then(() => {
+        console.log('✅ Modal test completed');
+    }).catch(error => {
+        console.error('❌ Modal test failed:', error);
+    });
+}
+
+// Make function available globally for testing
+window.testEditUserModal = testEditUserModal;
+
 function debugTimezoneIssue() {
     console.log('=== TIMEZONE DEBUG ===');
     console.log('Current system time:', new Date().toISOString());
