@@ -581,6 +581,40 @@ body {
     background: transparent;
 }
 
+/* Compact Profile Section - Single Line */
+.fluent-profile-card-compact {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 16px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    margin-bottom: 12px;
+}
+
+.fluent-profile-name-compact {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 14px;
+}
+
+.fluent-profile-email-compact {
+    color: var(--text-secondary);
+    font-size: 13px;
+}
+
+.profile-separator {
+    color: var(--text-tertiary);
+    font-size: 12px;
+}
+
+.fluent-btn-compact {
+    padding: 4px 8px;
+    font-size: 12px;
+    margin-left: auto;
+}
+
 .fluent-section-header {
     background: transparent;
     margin-bottom: 12px;
@@ -738,33 +772,39 @@ body {
     table-layout: fixed;
 }
 
-/* User Management Table Column Widths */
+/* Ensure User Management table has fixed total width */
+#modalUsersTable {
+    width: 1000px;
+    max-width: 100%;
+}
+
+/* User Management Table Column Widths - Fixed Pixel Widths */
 #modalUsersTable th:nth-child(1), /* Checkbox */
-#modalUsersTable td:nth-child(1) { width: 35px; }
+#modalUsersTable td:nth-child(1) { width: 30px; min-width: 30px; max-width: 30px; }
 
 #modalUsersTable th:nth-child(2), /* Name */
-#modalUsersTable td:nth-child(2) { width: 22%; }
+#modalUsersTable td:nth-child(2) { width: 180px; min-width: 180px; max-width: 180px; }
 
 #modalUsersTable th:nth-child(3), /* Email */
-#modalUsersTable td:nth-child(3) { width: 18%; }
+#modalUsersTable td:nth-child(3) { width: 200px; min-width: 200px; max-width: 200px; }
 
 #modalUsersTable th:nth-child(4), /* Company */
-#modalUsersTable td:nth-child(4) { width: 15%; }
+#modalUsersTable td:nth-child(4) { width: 120px; min-width: 120px; max-width: 120px; }
 
 #modalUsersTable th:nth-child(5), /* User Type */
-#modalUsersTable td:nth-child(5) { width: 14%; }
+#modalUsersTable td:nth-child(5) { width: 110px; min-width: 110px; max-width: 110px; }
 
 #modalUsersTable th:nth-child(6), /* # of Trips */
-#modalUsersTable td:nth-child(6) { width: 8%; }
+#modalUsersTable td:nth-child(6) { width: 60px; min-width: 60px; max-width: 60px; }
 
 #modalUsersTable th:nth-child(7), /* Last Login */
-#modalUsersTable td:nth-child(7) { width: 12%; }
+#modalUsersTable td:nth-child(7) { width: 100px; min-width: 100px; max-width: 100px; }
 
 #modalUsersTable th:nth-child(8), /* Upcoming Trip */
-#modalUsersTable td:nth-child(8) { width: 14%; }
+#modalUsersTable td:nth-child(8) { width: 150px; min-width: 150px; max-width: 150px; }
 
 #modalUsersTable th:nth-child(9), /* Actions */
-#modalUsersTable td:nth-child(9) { width: 60px; }
+#modalUsersTable td:nth-child(9) { width: 50px; min-width: 50px; max-width: 50px; }
 
 .fluent-table thead {
     background: var(--bg-secondary);
@@ -1054,16 +1094,16 @@ body {
 /* === SUMMARY CARDS === */
 .summary-cards {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 12px;
-    margin-bottom: 16px;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 8px;
+    margin-bottom: 12px;
 }
 
 .summary-card {
     background: var(--bg-card);
     border: 1px solid var(--border-color);
-    padding: 16px;
-    border-radius: var(--radius-lg);
+    padding: 8px 12px;
+    border-radius: var(--radius-md);
     text-align: center;
     box-shadow: var(--shadow-sm);
     transition: all var(--transition-base);
@@ -1075,16 +1115,16 @@ body {
 }
 
 .summary-number {
-    font-size: 2rem;
+    font-size: 1.5rem;
     font-weight: 700;
     color: var(--color-accent);
-    margin-bottom: 4px;
+    margin-bottom: 2px;
     line-height: 1;
 }
 
 .summary-label {
     color: var(--text-secondary);
-    font-size: 0.875rem;
+    font-size: 0.75rem;
     font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 0.025em;
@@ -1399,9 +1439,9 @@ body {
         max-width: calc(100vw - 64px);
     }
     
-    .fluent-table {
-        min-width: 0;
-        width: 100%;
+    #modalUsersTable {
+        width: 800px; /* Reduced width for tablet */
+        max-width: 100%;
     }
     
     /* Hide less important columns on tablet */
@@ -1426,6 +1466,23 @@ body {
     
     .fluent-modal-body {
         padding: 0 20px 20px 20px;
+    }
+    
+    /* Compact profile for mobile */
+    .fluent-profile-card-compact {
+        padding: 6px 12px;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+    
+    .fluent-profile-name-compact,
+    .fluent-profile-email-compact {
+        font-size: 12px;
+    }
+    
+    .fluent-btn-compact {
+        padding: 3px 6px;
+        font-size: 11px;
     }
     
     /* Hide even more columns on very small screens */
@@ -1453,9 +1510,9 @@ body {
         margin: 0 -20px;
     }
     
-    .fluent-table {
-        min-width: 0 !important;
-        width: 100% !important;
+    #modalUsersTable {
+        width: 500px !important; /* Reduced width for mobile */
+        min-width: 500px !important;
     }
     
     .fluent-table td,
@@ -1465,5 +1522,13 @@ body {
         white-space: nowrap;
         text-overflow: ellipsis;
         overflow: hidden;
+    }
+    
+    /* Smaller action buttons on mobile */
+    .fluent-action-btn {
+        width: 24px;
+        height: 24px;
+        padding: 2px;
+        font-size: 10px;
     }
 } 
