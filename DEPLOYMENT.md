@@ -1,6 +1,6 @@
 # Deployment Guide - Temporary Domain
 
-## 🚀 Quick Deployment to khaki-raccoon-228009.hostingersite.com
+## 🚀 Quick Deployment to trips.wolthers.com
 
 ### 📁 Files to Upload
 
@@ -38,7 +38,7 @@ public/
 
 ### ✅ Testing After Deployment
 
-1. **Open**: `https://khaki-raccoon-228009.hostingersite.com`
+1. **Open**: `https://trips.wolthers.com`
 2. **Test Employee Login**: Click "Employee Access (Mock)"
 3. **Test Partner Login**: Use test credentials:
    - Email: `john@company.com`

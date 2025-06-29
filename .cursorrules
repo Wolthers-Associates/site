@@ -1,9 +1,9 @@
 # Cursor Rules - Temporary Development Version
 
 ## Current Setup
-- Temp Domain: khaki-raccoon-228009.hostingersite.com
-- Purpose: Development and testing with mock data
-- Migration Plan: Easy switch to real authentication later
+- Production Domain: trips.wolthers.com
+- Status: LIVE IN PRODUCTION
+- Authentication: Real Microsoft Office 365 + Mock data hybrid
 
 ## Technology Stack
 - Frontend: Pure HTML5, CSS3, Vanilla JavaScript ONLY
@@ -11,11 +11,11 @@
 - Mock Data: Hardcoded in JavaScript
 - NO frameworks, NO build process
 
-## Development Phase Approach
-- Use mock authentication (simple login bypass)
-- Hardcode sample trip data
-- Build full UI/UX
-- Prepare structure for easy real auth integration
+## Production Approach
+- Real Microsoft Office 365 authentication (LIVE)
+- Mix of real user data + sample trip data
+- Full UI/UX operational
+- Gradual migration from mock to real data
 
 ## Mock Data Requirements
 - Sample employee login (bypass Office 365 for now)

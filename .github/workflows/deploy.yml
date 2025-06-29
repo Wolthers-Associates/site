@@ -232,7 +232,7 @@ jobs:
         # Create .env file for development
         cat > .env << EOF
         ENVIRONMENT=development
-        DOMAIN=khaki-raccoon-228009.hostingersite.com
+        DOMAIN=trips.wolthers.com
         DB_HOST=localhost
         DB_NAME=wolthers_trips_dev
         DB_USER=wolthers_dev

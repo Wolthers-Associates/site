@@ -9,7 +9,7 @@
 require_once 'config.php';
 
 // Only allow in development/staging - TEMPORARILY ENABLED FOR DEBUGGING
-// if (!isset($_SERVER['HTTP_HOST']) || (!strpos($_SERVER['HTTP_HOST'], 'khaki-raccoon') && !strpos($_SERVER['HTTP_HOST'], 'localhost'))) {
+// if (!isset($_SERVER['HTTP_HOST']) || (!strpos($_SERVER['HTTP_HOST'], 'trips.wolthers.com') && !strpos($_SERVER['HTTP_HOST'], 'localhost'))) {
 //     die('This debug script is only available on development servers.');
 // }
 
@@ -58,14 +58,18 @@ try {
     // 3. Check current user data
     echo "<h2>👥 Current Users & Login Data</h2>";
     $stmt = $pdo->query("SELECT id, name, email, role, created_at, updated_at" . 
-                       ($hasLastLogin ? ", last_login_at" : "") .
+                       ($hasLastLogin ? ", last_login_at, last_login_at_utc, last_login_timezone" : "") .
                        ($hasLoginAttempts ? ", login_attempts" : "") .
                        " FROM users ORDER BY id");
     $users = $stmt->fetchAll();
     
     echo "<table>";
     echo "<tr><th>ID</th><th>Name</th><th>Email</th><th>Role</th><th>Created</th><th>Updated</th>";
-    if ($hasLastLogin) echo "<th>Last Login</th>";
+    if ($hasLastLogin) {
+        echo "<th>Last Login (Local)</th>";
+        echo "<th>Last Login (UTC)</th>";
+        echo "<th>Timezone</th>";
+    }
     if ($hasLoginAttempts) echo "<th>Login Attempts</th>";
     echo "</tr>";
     
@@ -79,10 +83,22 @@ try {
         echo "<td>{$user['updated_at']}</td>";
         if ($hasLastLogin) {
             $lastLogin = $user['last_login_at'] ?? 'NULL';
-            if ($lastLogin === '2025-01-21 01:07:14') {
-                echo "<td><span class='warning'>⚠️ {$lastLogin} (DUPLICATE)</span></td>";
+            $lastLoginUtc = $user['last_login_at_utc'] ?? 'NULL';
+            $timezone = $user['last_login_timezone'] ?? 'NULL';
+            
+            // Check for timezone issues
+            if ($lastLogin === $lastLoginUtc && $timezone !== 'UTC' && $timezone !== 'NULL') {
+                echo "<td><span class='warning'>⚠️ {$lastLogin} (Same as UTC - Check timezone handling)</span></td>";
             } else {
                 echo "<td>{$lastLogin}</td>";
+            }
+            echo "<td>{$lastLoginUtc}</td>";
+            
+            // Highlight timezone issues
+            if ($timezone === 'UTC' && $lastLogin !== 'NULL') {
+                echo "<td><span class='warning'>⚠️ {$timezone} (Should be user's timezone)</span></td>";
+            } else {
+                echo "<td>{$timezone}</td>";
             }
         }
         if ($hasLoginAttempts) echo "<td>" . ($user['login_attempts'] ?? 'NULL') . "</td>";

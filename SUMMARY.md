@@ -130,7 +130,7 @@ Each trip includes:
 ## 🔄 Next Steps
 
 ### For Immediate Use
-1. **Upload to temporary domain** (khaki-raccoon-228009.hostingersite.com)
+1. **Live on production domain** (trips.wolthers.com)
 2. **Test all functionality** across different devices
 3. **Demo to stakeholders** and gather feedback
 4. **Collect user testing feedback** from potential partners

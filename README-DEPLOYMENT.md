@@ -79,7 +79,7 @@ PROD_SSH_KEY=your_ssh_private_key
 # Push to develop branch
 git checkout -b develop
 git push origin develop
-# GitHub Actions will automatically deploy to khaki-raccoon-228009.hostingersite.com
+# GitHub Actions will automatically deploy to trips.wolthers.com
 ```
 
 #### Production Deployment
@@ -206,7 +206,7 @@ docker-compose logs
 ## 🌐 Domain Configuration
 
 ### Development Domain
-- **URL**: https://khaki-raccoon-228009.hostingersite.com
+- **URL**: https://trips.wolthers.com
 - **Type**: Temporary Hostinger subdomain
 - **Purpose**: Development and testing
 
