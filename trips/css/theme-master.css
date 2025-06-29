@@ -517,7 +517,7 @@ body {
 .fluent-modal-header {
     background: var(--bg-card);
     border-bottom: 1px solid var(--border-color);
-    padding: 24px 32px;
+    padding: 16px 32px;
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
@@ -525,10 +525,10 @@ body {
 
 .fluent-header-content h1.fluent-modal-title {
     font-family: var(--font-family-serif);
-    font-size: 2rem;
+    font-size: 1.5rem;
     font-weight: 600;
     color: var(--color-accent);
-    margin: 0 0 4px 0;
+    margin: 0 0 2px 0;
 }
 
 .fluent-modal-subtitle {
@@ -559,10 +559,10 @@ body {
 .fluent-modal-body {
     background: var(--bg-card);
     color: var(--text-primary);
-    padding: 0 32px 32px 32px;
+    padding: 0 24px 24px 24px;
     overflow-y: auto;
     overflow-x: hidden;
-    max-height: calc(90vh - 120px);
+    max-height: calc(90vh - 100px);
     width: 100%;
     box-sizing: border-box;
 }
@@ -583,7 +583,7 @@ body {
 
 .fluent-section-header {
     background: transparent;
-    margin-bottom: 20px;
+    margin-bottom: 12px;
 }
 
 .fluent-header-group {
@@ -740,31 +740,31 @@ body {
 
 /* User Management Table Column Widths */
 #modalUsersTable th:nth-child(1), /* Checkbox */
-#modalUsersTable td:nth-child(1) { width: 40px; }
+#modalUsersTable td:nth-child(1) { width: 35px; }
 
 #modalUsersTable th:nth-child(2), /* Name */
-#modalUsersTable td:nth-child(2) { width: 20%; }
+#modalUsersTable td:nth-child(2) { width: 22%; }
 
 #modalUsersTable th:nth-child(3), /* Email */
-#modalUsersTable td:nth-child(3) { width: 25%; }
+#modalUsersTable td:nth-child(3) { width: 18%; }
 
 #modalUsersTable th:nth-child(4), /* Company */
 #modalUsersTable td:nth-child(4) { width: 15%; }
 
 #modalUsersTable th:nth-child(5), /* User Type */
-#modalUsersTable td:nth-child(5) { width: 12%; }
+#modalUsersTable td:nth-child(5) { width: 14%; }
 
 #modalUsersTable th:nth-child(6), /* # of Trips */
 #modalUsersTable td:nth-child(6) { width: 8%; }
 
 #modalUsersTable th:nth-child(7), /* Last Login */
-#modalUsersTable td:nth-child(7) { width: 10%; }
+#modalUsersTable td:nth-child(7) { width: 12%; }
 
 #modalUsersTable th:nth-child(8), /* Upcoming Trip */
-#modalUsersTable td:nth-child(8) { width: 15%; }
+#modalUsersTable td:nth-child(8) { width: 14%; }
 
 #modalUsersTable th:nth-child(9), /* Actions */
-#modalUsersTable td:nth-child(9) { width: 80px; }
+#modalUsersTable td:nth-child(9) { width: 60px; }
 
 .fluent-table thead {
     background: var(--bg-secondary);
@@ -1054,15 +1054,15 @@ body {
 /* === SUMMARY CARDS === */
 .summary-cards {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 16px;
-    margin-bottom: 32px;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
 }
 
 .summary-card {
     background: var(--bg-card);
     border: 1px solid var(--border-color);
-    padding: 24px;
+    padding: 16px;
     border-radius: var(--radius-lg);
     text-align: center;
     box-shadow: var(--shadow-sm);
@@ -1075,10 +1075,10 @@ body {
 }
 
 .summary-number {
-    font-size: 2.5rem;
+    font-size: 2rem;
     font-weight: 700;
     color: var(--color-accent);
-    margin-bottom: 8px;
+    margin-bottom: 4px;
     line-height: 1;
 }
 
@@ -1132,14 +1132,14 @@ body {
 /* === ACTION BUTTONS === */
 .fluent-action-buttons {
     display: flex;
-    gap: 4px;
+    gap: 2px;
     justify-content: center;
 }
 
 .fluent-action-btn {
-    width: 32px;
-    height: 32px;
-    padding: 6px;
+    width: 28px;
+    height: 28px;
+    padding: 4px;
     border: 1px solid var(--border-color);
     background: var(--bg-secondary);
     border-radius: var(--radius-md);
@@ -1149,7 +1149,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 14px;
+    font-size: 12px;
 }
 
 .fluent-action-btn:hover {
