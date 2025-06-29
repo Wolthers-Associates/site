@@ -21,24 +21,19 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
  */
 function updateLoginTimestamp($pdo, $userId, $userTimezone) {
     try {
-        // Calculate both local and UTC timestamps
-        $utcTimestamp = date('Y-m-d H:i:s'); // Current UTC time
+        // Get current UTC timestamp
+        $utcDateTime = new DateTime('now', new DateTimeZone('UTC'));
+        $utcTimestamp = $utcDateTime->format('Y-m-d H:i:s');
         
-        // Convert UTC to user's local time (for display purposes)
-        $localTimestamp = $utcTimestamp; // Will be converted by MySQL CONVERT_TZ if possible
-        
-        // Try to use MySQL timezone conversion if timezone data is available
+        // Calculate user's local time
+        $localTimestamp = $utcTimestamp; // Default fallback
         try {
-            $checkTzStmt = $pdo->prepare("SELECT CONVERT_TZ(NOW(), 'UTC', ?) as local_time");
-            $checkTzStmt->execute([$userTimezone]);
-            $tzResult = $checkTzStmt->fetch();
-            
-            if ($tzResult && $tzResult['local_time'] !== null) {
-                $localTimestamp = $tzResult['local_time'];
-            }
-        } catch (Exception $e) {
-            // Timezone conversion failed, use UTC
-            error_log("Timezone conversion failed for $userTimezone: " . $e->getMessage());
+            $localDateTime = new DateTime('now', new DateTimeZone($userTimezone));
+            $localTimestamp = $localDateTime->format('Y-m-d H:i:s');
+        } catch (Exception $tzError) {
+            // Invalid timezone, use UTC as fallback
+            error_log("Invalid timezone '$userTimezone' for user $userId: " . $tzError->getMessage());
+            $userTimezone = 'UTC'; // Reset to UTC if invalid
         }
         
         // Update with full timezone info
@@ -52,6 +47,9 @@ function updateLoginTimestamp($pdo, $userId, $userTimezone) {
             WHERE id = ?
         ");
         $stmt->execute([$localTimestamp, $utcTimestamp, $userTimezone, $userId]);
+        
+        // Log for debugging
+        error_log("Login timestamp updated for user $userId: Local=$localTimestamp ($userTimezone), UTC=$utcTimestamp");
         
         return true;
     } catch (Exception $e) {
