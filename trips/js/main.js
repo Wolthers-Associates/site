@@ -3699,7 +3699,7 @@ function updateCurrentUserProfile(user) {
     if (profileEmail) profileEmail.textContent = user.email || 'No email';
     
     if (profileCompany) {
-        const userCompany = getUserCompany(user);
+        const userCompany = user.company_fantasy_name || user.company_name || getUserCompany(user);
         profileCompany.textContent = userCompany || 'No company';
     }
     
