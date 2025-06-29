@@ -187,16 +187,46 @@ Error: ${error.message}`;
             result.innerHTML = '🔄 Updating your timezone in database...';
             
             try {
-                // Get user from session
-                const session = sessionStorage.getItem('userSession');
-                if (!session) {
+                // Try multiple ways to get user session
+                let userData = null;
+                let session = sessionStorage.getItem('userSession');
+                
+                if (session) {
+                    userData = JSON.parse(session);
+                } else {
+                    // Try to get session from the main trips site
+                    result.innerHTML = '🔄 Checking for active session...';
+                    
+                    try {
+                        const sessionCheck = await fetch('api/auth/validate.php', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            credentials: 'include'
+                        });
+                        
+                        if (sessionCheck.ok) {
+                            const sessionData = await sessionCheck.json();
+                            if (sessionData.user) {
+                                userData = { user: sessionData.user };
+                            }
+                        }
+                    } catch (e) {
+                        console.log('Session check failed:', e);
+                    }
+                }
+                
+                if (!userData) {
                     result.innerHTML = `❌ NOT LOGGED IN
-Please log in to trips.wolthers.com in another tab first.
-Then come back and try this test.`;
+Please:
+1. Go to trips.wolthers.com in another tab
+2. Make sure you're logged in (you should see your name/trips)
+3. Come back to this tab and try again
+
+Alternative: Run this in the main trips site console:
+autoTimezoneUpdate.forceUpdate()`;
                     return;
                 }
                 
-                const userData = JSON.parse(session);
                 const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
                 
                 const response = await fetch('api/update-user-timezone.php', {
