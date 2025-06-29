@@ -8,10 +8,10 @@
 
 require_once 'config.php';
 
-// Only allow in development/staging
-if (!isset($_SERVER['HTTP_HOST']) || (!strpos($_SERVER['HTTP_HOST'], 'khaki-raccoon') && !strpos($_SERVER['HTTP_HOST'], 'localhost'))) {
-    die('This debug script is only available on development servers.');
-}
+// Only allow in development/staging - TEMPORARILY ENABLED FOR DEBUGGING
+// if (!isset($_SERVER['HTTP_HOST']) || (!strpos($_SERVER['HTTP_HOST'], 'khaki-raccoon') && !strpos($_SERVER['HTTP_HOST'], 'localhost'))) {
+//     die('This debug script is only available on development servers.');
+// }
 
 try {
     $pdo = getDBConnection();
