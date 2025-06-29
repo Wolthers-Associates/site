@@ -3691,11 +3691,17 @@ async function loadUserManagementData() {
 function updateCurrentUserProfile(user) {
     const profileName = document.getElementById('modalProfileName');
     const profileEmail = document.getElementById('modalProfileEmail');
+    const profileCompany = document.getElementById('modalProfileCompany');
     const profileRole = document.getElementById('modalProfileRole');
     const profileAvatar = document.getElementById('modalProfileAvatar');
     
     if (profileName) profileName.textContent = user.name || 'Unknown User';
     if (profileEmail) profileEmail.textContent = user.email || 'No email';
+    
+    if (profileCompany) {
+        const userCompany = getUserCompany(user);
+        profileCompany.textContent = userCompany || 'No company';
+    }
     
     if (profileRole) {
         const roleText = {

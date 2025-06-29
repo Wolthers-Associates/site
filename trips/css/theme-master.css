@@ -604,6 +604,12 @@ body {
     font-size: 13px;
 }
 
+.fluent-profile-company-compact {
+    color: var(--text-primary);
+    font-size: 13px;
+    font-weight: 500;
+}
+
 .profile-separator {
     color: var(--text-tertiary);
     font-size: 12px;
@@ -1476,7 +1482,8 @@ body {
     }
     
     .fluent-profile-name-compact,
-    .fluent-profile-email-compact {
+    .fluent-profile-email-compact,
+    .fluent-profile-company-compact {
         font-size: 12px;
     }
     
