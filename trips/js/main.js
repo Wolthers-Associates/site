@@ -5432,8 +5432,8 @@ function sortUserTable(column) {
                 bValue = bTrips.count;
                 break;
             case 'lastLogin':
-                aValue = a.lastLogin ? new Date(a.lastLogin) : new Date(0);
-                bValue = b.lastLogin ? new Date(b.lastLogin) : new Date(0);
+                aValue = (a.last_login_at || a.last_login) ? new Date(a.last_login_at || a.last_login) : new Date(0);
+                bValue = (b.last_login_at || b.last_login) ? new Date(b.last_login_at || b.last_login) : new Date(0);
                 break;
             case 'upcomingTrip':
                 const aUpcoming = getUserTripsData(a).upcomingTrip;
