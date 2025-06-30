@@ -7,22 +7,19 @@ require_once 'config.php';
 
 try {
     $pdo = getDBConnection();
-    
     // Test basic connection
     $stmt = $pdo->query("SELECT 1 as test");
     $result = $stmt->fetch();
-    
-    // Try to get table info
+    // Try to get table info (SQL Server)
     $tables = [];
     try {
-        $tablesStmt = $pdo->query("SHOW TABLES");
-        while ($row = $tablesStmt->fetch(PDO::FETCH_NUM)) {
-            $tables[] = $row[0];
+        $tablesStmt = $pdo->query("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'");
+        while ($row = $tablesStmt->fetch(PDO::FETCH_ASSOC)) {
+            $tables[] = $row['TABLE_NAME'];
         }
     } catch (Exception $e) {
         $tables = ['Error: ' . $e->getMessage()];
     }
-    
     echo json_encode([
         'success' => true,
         'message' => 'Database connection successful',

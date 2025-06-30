@@ -37,30 +37,22 @@ function sendError($message, $status = 400) {
 }
 
 // Database connection for Hostinger
+require_once __DIR__ . '/api/secure-config.php';
 function getDBConnection() {
     static $pdo = null;
-    
     if ($pdo === null) {
         try {
-            // Hostinger database credentials
-            $host = 'localhost';
-            $dbname = 'u975408171_wolthers_trips';
-            $username = 'u975408171_wolthers_user';
-            $password = 'q^!^V6W&NGiNEo';
-            
-            $dsn = "mysql:host=$host;dbname=$dbname;charset=utf8mb4";
+            $dsn = "sqlsrv:Server=" . DB_HOST . ";Database=" . DB_NAME . ";Encrypt=yes";
             $options = [
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                PDO::ATTR_EMULATE_PREPARES => false,
+                PDO::ATTR_EMULATE_PREPARES => false
             ];
-            
-            $pdo = new PDO($dsn, $username, $password, $options);
+            $pdo = new PDO($dsn, DB_USER, DB_PASS, $options);
         } catch (PDOException $e) {
             sendError('Database connection failed: ' . $e->getMessage(), 500);
         }
     }
-    
     return $pdo;
 }
 

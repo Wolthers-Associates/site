@@ -10,30 +10,29 @@ try {
     $pdo = getDBConnection();
     
     echo "=== USERS TABLE STRUCTURE ===\n";
-    $stmt = $pdo->prepare('DESCRIBE users');
+    $stmt = $pdo->prepare("SELECT COLUMN_NAME, DATA_TYPE, IS_NULLABLE, COLUMN_DEFAULT FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'users'");
     $stmt->execute();
     $columns = $stmt->fetchAll();
-    
     foreach ($columns as $column) {
         echo sprintf("%-20s %-15s %-10s %-15s\n", 
-            $column['Field'], 
-            $column['Type'], 
-            $column['Null'] === 'YES' ? 'NULL' : 'NOT NULL',
-            $column['Default'] ?: 'none'
+            $column['COLUMN_NAME'], 
+            $column['DATA_TYPE'], 
+            $column['IS_NULLABLE'] === 'YES' ? 'NULL' : 'NOT NULL',
+            $column['COLUMN_DEFAULT'] ?: 'none'
         );
     }
     
     echo "\n=== CHECKING FOR TIMESTAMP COLUMNS ===\n";
     $timestampColumns = ['last_login_at', 'last_login_at_utc', 'last_login_timezone', 'login_attempts'];
     foreach ($timestampColumns as $col) {
-        $check = $pdo->prepare('SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = "users" AND COLUMN_NAME = ?');
-        $check->execute([$col]);
+        $check = $pdo->prepare('SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = ? AND COLUMN_NAME = ?');
+        $check->execute(['users', $col]);
         $result = $check->fetch();
         echo "$col: " . ($result ? 'EXISTS' : 'MISSING') . "\n";
     }
     
     echo "\n=== SAMPLE USER DATA (LAST 5 USERS) ===\n";
-    $stmt = $pdo->prepare('SELECT id, name, email, role, created_at, updated_at FROM users ORDER BY id DESC LIMIT 5');
+    $stmt = $pdo->prepare('SELECT TOP 5 id, name, email, role, created_at, updated_at FROM users ORDER BY id DESC');
     $stmt->execute();
     $users = $stmt->fetchAll();
     
