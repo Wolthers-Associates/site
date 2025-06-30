@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel Expenses - Wolthers & Associates</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/theme-master.css">
+    <link rel="icon" type="image/x-icon" href="favicon_io/favicon.ico">
+    <style>
+        .expenses-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .expenses-header {
+            background: linear-gradient(135deg, #2c5aa0 0%, #1e3a8a 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .expenses-header h1 {
+            margin: 0 0 10px 0;
+            font-size: 2.5em;
+        }
+        
+        .expenses-header p {
+            margin: 0;
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+        
+        .expenses-tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 5px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .expenses-tab {
+            flex: 1;
+            padding: 15px 20px;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .expenses-tab.active {
+            background: white;
+            color: #2c5aa0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .expenses-tab:hover:not(.active) {
+            background: rgba(44, 90, 160, 0.1);
+        }
+        
+        .expenses-content {
+            display: none;
+        }
+        
+        .expenses-content.active {
+            display: block;
+        }
+        
+        .expense-form {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #2c5aa0;
+        }
+        
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+        
+        .upload-area {
+            border: 2px dashed #2c5aa0;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            background: #f8f9ff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+        
+        .upload-area:hover {
+            background: #e8f0ff;
+            border-color: #1e3a8a;
+        }
+        
+        .upload-area.dragover {
+            background: #e8f0ff;
+            border-color: #1e3a8a;
+            transform: scale(1.02);
+        }
+        
+        .upload-icon {
+            font-size: 3em;
+            color: #2c5aa0;
+            margin-bottom: 15px;
+        }
+        
+        .upload-text {
+            font-size: 1.1em;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        
+        .upload-hint {
+            font-size: 0.9em;
+            color: #999;
+        }
+        
+        .file-preview {
+            display: flex;
+            align-items: center;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .file-preview img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-right: 15px;
+        }
+        
+        .file-info {
+            flex: 1;
+        }
+        
+        .file-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .file-size {
+            font-size: 0.9em;
+            color: #666;
+        }
+        
+        .file-remove {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #2c5aa0 0%, #1e3a8a 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(44, 90, 160, 0.3);
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        
+        .expenses-list {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .expense-item {
+            display: grid;
+            grid-template-columns: 1fr auto auto auto;
+            gap: 20px;
+            padding: 20px;
+            border-bottom: 1px solid #e1e5e9;
+            align-items: center;
+            transition: background-color 0.3s ease;
+        }
+        
+        .expense-item:hover {
+            background: #f8f9fa;
+        }
+        
+        .expense-item:last-child {
+            border-bottom: none;
+        }
+        
+        .expense-info h3 {
+            margin: 0 0 5px 0;
+            color: #333;
+        }
+        
+        .expense-meta {
+            font-size: 0.9em;
+            color: #666;
+        }
+        
+        .expense-amount {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #2c5aa0;
+        }
+        
+        .expense-status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-approved {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-rejected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .status-reimbursed {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        .expense-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn-small {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 5px;
+            font-size: 0.8em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-view {
+            background: #17a2b8;
+            color: white;
+        }
+        
+        .btn-edit {
+            background: #ffc107;
+            color: #212529;
+        }
+        
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: 700;
+            color: #2c5aa0;
+            margin-bottom: 10px;
+        }
+        
+        .stat-label {
+            font-size: 1.1em;
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #c3e6cb;
+        }
+        
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .expense-item {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .expense-actions {
+                justify-content: center;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="expenses-container">
+        <!-- Header -->
+        <div class="expenses-header">
+            <h1>Travel Expenses</h1>
+            <p>Manage your travel expenses, upload receipts, and track reimbursements</p>
+        </div>
+
+        <!-- Tabs -->
+        <div class="expenses-tabs">
+            <div class="expenses-tab active" data-tab="overview">Overview</div>
+            <div class="expenses-tab" data-tab="new-expense">New Expense</div>
+            <div class="expenses-tab" data-tab="my-expenses">My Expenses</div>
+            <div class="expenses-tab" data-tab="reimbursements">Reimbursements</div>
+        </div>
+
+        <!-- Overview Tab -->
+        <div class="expenses-content active" id="overview">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="total-expenses">0</div>
+                    <div class="stat-label">Total Expenses</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="pending-amount">R$ 0</div>
+                    <div class="stat-label">Pending Amount</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="approved-amount">R$ 0</div>
+                    <div class="stat-label">Approved Amount</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="reimbursed-amount">R$ 0</div>
+                    <div class="stat-label">Reimbursed Amount</div>
+                </div>
+            </div>
+
+            <div class="expenses-list">
+                <div class="loading" id="overview-loading">Loading overview...</div>
+            </div>
+        </div>
+
+        <!-- New Expense Tab -->
+        <div class="expenses-content" id="new-expense">
+            <div class="expense-form">
+                <h2>Create New Expense</h2>
+                
+                <form id="expense-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="expense-title">Expense Title *</label>
+                            <input type="text" id="expense-title" name="title" required placeholder="e.g., Lunch with client">
+                        </div>
+                        <div class="form-group">
+                            <label for="expense-category">Category *</label>
+                            <select id="expense-category" name="category_id" required>
+                                <option value="">Select category...</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="expense-amount">Amount (BRL) *</label>
+                            <input type="number" id="expense-amount" name="amount" step="0.01" min="0" required placeholder="0.00">
+                        </div>
+                        <div class="form-group">
+                            <label for="expense-date">Date *</label>
+                            <input type="date" id="expense-date" name="expense_date" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="expense-time">Time</label>
+                            <input type="time" id="expense-time" name="expense_time">
+                        </div>
+                        <div class="form-group">
+                            <label for="expense-location">Location</label>
+                            <input type="text" id="expense-location" name="location" placeholder="e.g., São Paulo, Brazil">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="expense-vendor">Vendor/Store Name</label>
+                            <input type="text" id="expense-vendor" name="vendor_name" placeholder="e.g., Restaurant Name">
+                        </div>
+                        <div class="form-group">
+                            <label for="expense-fiscal">Fiscal Note Number</label>
+                            <input type="text" id="expense-fiscal" name="fiscal_note_number" placeholder="e.g., FN-2025-001">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="expense-payment">Payment Method *</label>
+                            <select id="expense-payment" name="payment_method" required>
+                                <option value="">Select payment method...</option>
+                                <option value="company_card">Company Card</option>
+                                <option value="personal_card">Personal Card</option>
+                                <option value="cash">Cash</option>
+                                <option value="bank_transfer">Bank Transfer</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="expense-card">Credit Card Last 4 Digits</label>
+                            <input type="text" id="expense-card" name="credit_card_last4" maxlength="4" placeholder="1234">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="expense-trip">Related Trip (Optional)</label>
+                            <select id="expense-trip" name="trip_id">
+                                <option value="">No specific trip</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="expense-company">Company Expense</label>
+                            <select id="expense-company" name="is_company_expense">
+                                <option value="1">Yes</option>
+                                <option value="0">No (Personal)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="expense-description">Description</label>
+                        <textarea id="expense-description" name="description" rows="3" placeholder="Additional details about this expense..."></textarea>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="expense-notes">Notes</label>
+                        <textarea id="expense-notes" name="notes" rows="2" placeholder="Internal notes..."></textarea>
+                    </div>
+
+                    <!-- Receipt Upload -->
+                    <div class="form-group full-width">
+                        <label>Upload Receipt/Fiscal Note</label>
+                        <div class="upload-area" id="upload-area">
+                            <div class="upload-icon">📷</div>
+                            <div class="upload-text">Click to upload or drag and drop</div>
+                            <div class="upload-hint">Supports: JPG, PNG, GIF, PDF (Max 10MB)</div>
+                            <input type="file" id="receipt-file" accept="image/*,.pdf" style="display: none;">
+                        </div>
+                        <div id="file-preview-container"></div>
+                    </div>
+
+                    <button type="submit" class="btn-primary">Create Expense</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- My Expenses Tab -->
+        <div class="expenses-content" id="my-expenses">
+            <div class="expenses-list">
+                <div class="loading" id="expenses-loading">Loading your expenses...</div>
+            </div>
+        </div>
+
+        <!-- Reimbursements Tab -->
+        <div class="expenses-content" id="reimbursements">
+            <div class="expenses-list">
+                <div class="loading" id="reimbursements-loading">Loading reimbursements...</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script src="js/expenses.js"></script>
+</body>
+</html> 

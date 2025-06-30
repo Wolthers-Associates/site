@@ -83,16 +83,17 @@ define('UPLOAD_PATH', __DIR__ . '/../uploads/');
 // Database connection function
 function getDBConnection() {
     static $pdo = null;
-    
+
     if ($pdo === null) {
         try {
-            $dsn = "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=" . DB_CHARSET;
+            // Use the sqlsrv driver for Azure SQL Database
+            $dsn = "sqlsrv:Server=" . DB_HOST . ";Database=" . DB_NAME . ";Encrypt=yes";
             $options = [
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
                 PDO::ATTR_EMULATE_PREPARES => false,
             ];
-            
+
             $pdo = new PDO($dsn, DB_USER, DB_PASS, $options);
         } catch (PDOException $e) {
             if (DEBUG_MODE) {
@@ -103,7 +104,7 @@ function getDBConnection() {
             exit();
         }
     }
-    
+
     return $pdo;
 }
 
@@ -228,4 +229,4 @@ if (DEBUG_MODE) {
     header('X-Debug-Mode: enabled');
 }
 
-?> 
+?>
