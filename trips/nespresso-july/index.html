@@ -16,7 +16,7 @@
             <h1>Roteiro Nespresso</h1>
             <p>Visita às Fazendas Reserva Heitor, Santa Cecilia e Expocacer no Cerrado - Julho 2025</p>
             <div class="guests-info">
-                Convidados: Francisco Nogueira, Daniel Motyl, Daniel Wolthers | Motorista: Petter Anderson | <img src="../../assets/images/disco-icon.png" alt="Discovery" style="height: 14px; vertical-align: middle; margin: 0 4px;"> Carro: Land Rover Discovery 4
+                Convidados: Francisco Nogueira, Daniel Motyl, Daniel Wolthers | Motorista: Daniel Wolthers | <img src="../../assets/images/disco-icon.png" alt="Discovery" style="height: 14px; vertical-align: middle; margin: 0 4px;"> Carro: Jeep Wrangler
             </div>
         </div>
 
@@ -32,7 +32,9 @@
                 class="map-embed"
                 src="images/map.png"
                 alt="Mapa do roteiro das fazendas no Cerrado"
-                style="width: 100%; height: 400px; object-fit: cover; display: block;">
+                style="width: 100%; height: 400px; object-fit: cover; display: block;"
+                onerror="console.error('Failed to load map image:', this.src);"
+                onload="console.log('Map image loaded successfully');">
         </div>
 
         <div class="itinerary" id="itinerary">
@@ -145,6 +147,27 @@
     <button class="print-button">Imprimir</button>
 
     <script src="../../assets/js/trip_itinerary.js"></script>
+    <script>
+        // Debug script to check map visibility
+        document.addEventListener('DOMContentLoaded', function() {
+            const mapContainer = document.querySelector('.map-container');
+            const mapImage = document.querySelector('.map-embed');
+            
+            console.log('Map container found:', !!mapContainer);
+            console.log('Map image found:', !!mapImage);
+            
+            if (mapContainer) {
+                console.log('Map container display style:', window.getComputedStyle(mapContainer).display);
+                console.log('Map container visibility:', window.getComputedStyle(mapContainer).visibility);
+            }
+            
+            if (mapImage) {
+                console.log('Map image display style:', window.getComputedStyle(mapImage).display);
+                console.log('Map image visibility:', window.getComputedStyle(mapImage).visibility);
+                console.log('Map image src:', mapImage.src);
+            }
+        });
+    </script>
     <script>
         // Trip-specific event data for Nespresso July 2025
         window.eventsByDate = {
