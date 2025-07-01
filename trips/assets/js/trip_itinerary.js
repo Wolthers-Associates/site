@@ -205,6 +205,14 @@ document.addEventListener('DOMContentLoaded', function() {
             if (map) map.classList.remove('print-hide');
         });
     }
+
+    // Scroll to the current day on page load
+    setTimeout(function() {
+        var currentDay = document.querySelector('.day.current');
+        if (currentDay) {
+            currentDay.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }, 100); // Delay to ensure classes are set
 });
 
 // Utility functions for trip customization
