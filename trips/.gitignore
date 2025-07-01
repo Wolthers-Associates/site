@@ -47,4 +47,53 @@ build/
 
 # Cache files
 .cache/
-*.cache 
+*.cache
+
+# Node modules and dependencies
+node_modules/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Log files
+*.log
+
+# Environment files
+.env
+.env.*
+
+# IDE and editor folders
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# Composer dependencies (if used)
+vendor/
+
+# Build output (if any)
+dist/
+build/
+
+# Misc
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Backup files
+*~
+*.swp
+*.bak
+
+# Test and coverage output
+coverage/
+
+# PHPStorm
+.phpstorm.meta.php
+
+# SFTP config
+.sftpConfig
+
+# Sensitive config
+api/secure-config.php 
