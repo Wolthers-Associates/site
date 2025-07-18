@@ -46,19 +46,23 @@
                 </div>
                 <div class="activity supplier-visit">
                     <div class="activity-time">10:00</div>
-                    <div class="activity-description">Coffee and meeting with <strong>Sucafina</strong> in São Paulo - Dino Moderno - spot to be informed</div>
-                </div>
-                <div class="activity travel-day">
-                    <div class="activity-time">11:00</div>
-                    <div class="activity-description">Drive to Santos (1 hour)</div>
-                </div>
-                <div class="activity">
-                    <div class="activity-time">12:00</div>
-                    <div class="activity-description">Lunch and visit at <strong>Wolthers & Associates</strong> office</div>
+                    <div class="activity-description">Meeting with <strong>Sucafina</strong> at Wolthers &amp; Associates</div>
                 </div>
                 <div class="activity supplier-visit">
+                    <div class="activity-time">11:00</div>
+                    <div class="activity-description">Meeting with <strong>Cofco</strong> at Wolthers &amp; Associates</div>
+                </div>
+                <div class="activity supplier-visit">
+                    <div class="activity-time">11:45</div>
+                    <div class="activity-description">Cupping at Wolthers &amp; Associates</div>
+                </div>
+                <div class="activity">
+                    <div class="activity-time">12:30</div>
+                    <div class="activity-description">Lunch</div>
+                </div>
+                <div class="activity travel-day">
                     <div class="activity-time">14:00</div>
-                    <div class="activity-description">Visit to <strong>Cofco</strong> (to be confirmed)</div>
+                    <div class="activity-description">Drive to Santos (1 hour)</div>
                 </div>
                 <div class="activity">
                     <div class="activity-time">18:00</div>
@@ -146,8 +150,12 @@
                     <button class="day-calendar-btn" onclick="downloadDayICal('2025-07-22')">+ Add day</button>
                 </div>
                 <div class="activity supplier-visit">
-                    <div class="activity-time">09:00</div>
-                    <div class="activity-description">Visit to <strong>Cooxupé</strong> (host: Paulo Martins)</div>
+                    <div class="activity-time">08:00</div>
+                    <div class="activity-description">Arrive at <strong>Cooxupé</strong></div>
+                </div>
+                <div class="activity supplier-visit">
+                    <div class="activity-time">11:00</div>
+                    <div class="activity-description">Visit to <strong>SMC</strong></div>
                 </div>
                 <div class="activity">
                     <div class="activity-time">12:00</div>
@@ -194,28 +202,34 @@
         window.eventsByDate = {
             '2025-07-19': [
                 {
-                    summary: 'Coffee and meeting with Sucafina',
+                    summary: 'Meeting with Sucafina',
                     start: '20250719T100000',
                     end: '20250719T110000',
-                    description: 'Coffee and meeting with Sucafina in São Paulo - Dino Moderno - spot to be informed'
+                    description: 'Meeting with Sucafina at Wolthers & Associates'
+                },
+                {
+                    summary: 'Meeting with Cofco',
+                    start: '20250719T110000',
+                    end: '20250719T114500',
+                    description: 'Meeting with Cofco at Wolthers & Associates'
+                },
+                {
+                    summary: 'Cupping at Wolthers',
+                    start: '20250719T114500',
+                    end: '20250719T123000',
+                    description: 'Cupping at Wolthers & Associates'
+                },
+                {
+                    summary: 'Lunch',
+                    start: '20250719T123000',
+                    end: '20250719T140000',
+                    description: 'Lunch'
                 },
                 {
                     summary: 'Drive to Santos',
-                    start: '20250719T110000',
-                    end: '20250719T120000',
-                    description: 'Drive to Santos (1 hour)'
-                },
-                {
-                    summary: 'Lunch and visit at Wolthers & Associates office',
-                    start: '20250719T120000',
-                    end: '20250719T140000',
-                    description: 'Lunch and visit at Wolthers & Associates office'
-                },
-                {
-                    summary: 'Visit to Cofco',
                     start: '20250719T140000',
-                    end: '20250719T160000',
-                    description: 'Visit to Cofco (to be confirmed)'
+                    end: '20250719T150000',
+                    description: 'Drive to Santos (1 hour)'
                 },
                 {
                     summary: 'Overnight in Santos City',
@@ -314,10 +328,16 @@
             ],
             '2025-07-22': [
                 {
-                    summary: 'Visit to Cooxupé',
-                    start: '20250722T090000',
+                    summary: 'Arrive at Cooxupé',
+                    start: '20250722T080000',
+                    end: '20250722T110000',
+                    description: 'Arrival at Cooxupé'
+                },
+                {
+                    summary: 'Visit to SMC',
+                    start: '20250722T110000',
                     end: '20250722T120000',
-                    description: 'Visit to Cooxupé (host: Paulo Martins)'
+                    description: 'Visit to SMC'
                 },
                 {
                     summary: 'Lunch',
@@ -338,28 +358,34 @@
         window.allEvents = [
             // Day 1 - July 19th
             {
-                summary: 'Coffee and meeting with Sucafina',
+                summary: 'Meeting with Sucafina',
                 start: '20250719T100000',
                 end: '20250719T110000',
-                description: 'Coffee and meeting with Sucafina in São Paulo - Dino Moderno - spot to be informed'
+                description: 'Meeting with Sucafina at Wolthers & Associates'
+            },
+            {
+                summary: 'Meeting with Cofco',
+                start: '20250719T110000',
+                end: '20250719T114500',
+                description: 'Meeting with Cofco at Wolthers & Associates'
+            },
+            {
+                summary: 'Cupping at Wolthers',
+                start: '20250719T114500',
+                end: '20250719T123000',
+                description: 'Cupping at Wolthers & Associates'
+            },
+            {
+                summary: 'Lunch',
+                start: '20250719T123000',
+                end: '20250719T140000',
+                description: 'Lunch'
             },
             {
                 summary: 'Drive to Santos',
-                start: '20250719T110000',
-                end: '20250719T120000',
-                description: 'Drive to Santos (1 hour)'
-            },
-            {
-                summary: 'Lunch and visit at Wolthers & Associates office',
-                start: '20250719T120000',
-                end: '20250719T140000',
-                description: 'Lunch and visit at Wolthers & Associates office'
-            },
-            {
-                summary: 'Visit to Cofco',
                 start: '20250719T140000',
-                end: '20250719T160000',
-                description: 'Visit to Cofco (to be confirmed)'
+                end: '20250719T150000',
+                description: 'Drive to Santos (1 hour)'
             },
             {
                 summary: 'Overnight in Santos City',
@@ -455,10 +481,16 @@
             },
             // Day 4 - July 22nd
             {
-                summary: 'Visit to Cooxupé',
-                start: '20250722T090000',
+                summary: 'Arrive at Cooxupé',
+                start: '20250722T080000',
+                end: '20250722T110000',
+                description: 'Arrival at Cooxupé'
+            },
+            {
+                summary: 'Visit to SMC',
+                start: '20250722T110000',
                 end: '20250722T120000',
-                description: 'Visit to Cooxupé (host: Paulo Martins)'
+                description: 'Visit to SMC'
             },
             {
                 summary: 'Lunch',
