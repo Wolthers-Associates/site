@@ -73,9 +73,20 @@ h1, h2, h3, h4, h5, h6 {
     height: 150px;
     border-radius: 50%;
     object-fit: cover;
+    object-position: center;
     margin-bottom: 1.5rem;
-    border: none; /* Remove gold border */
-    box-shadow: none; /* Remove gold glow */
+    border: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    display: block;
+    /* Ensure perfect circles - fix oval issue */
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+}
+
+/* Remove any pseudo-elements that might create double circles */
+.team-card img::before,
+.team-card img::after {
+    display: none !important;
 }
 
 .team-card h3 {

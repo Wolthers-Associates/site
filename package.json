@@ -1,0 +1,33 @@
+{
+  "name": "wolthers-associates-site",
+  "version": "1.0.0",
+  "description": "Wolthers & Associates company website with email analytics dashboard",
+  "main": "index.js",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "next": "15.4.7",
+    "next-auth": "^4.24.10",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "recharts": "^2.13.3",
+    "formidable": "^3.5.2"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.1",
+    "eslint-config-next": "15.4.7"
+  },
+  "keywords": [
+    "wolthers",
+    "associates",
+    "email",
+    "analytics",
+    "next.js"
+  ],
+  "author": "Wolthers & Associates",
+  "license": "ISC"
+}
