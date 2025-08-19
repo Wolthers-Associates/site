@@ -353,6 +353,8 @@
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 2rem;
             margin-top: 2rem;
+            /* Prevent grid from affecting image aspect ratios */
+            align-items: start;
         }
 
         .team-card {
@@ -381,9 +383,6 @@
             border-radius: 50%;
             margin: 0 auto 1.5rem;
             overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             background: none;
             color: white;
             font-size: 2.5rem;
@@ -398,8 +397,8 @@
             max-width: 120px;
             min-height: 120px;
             max-height: 120px;
-            /* Perfect centering */
-            align-self: center;
+            /* Remove flexbox that can cause distortion */
+            display: block;
         }
 
         .team-photo img {
@@ -412,11 +411,13 @@
             display: block;
             /* Force exact dimensions and circular shape */
             aspect-ratio: 1 / 1;
-            flex-shrink: 0;
-            /* Perfect centering within container */
-            margin: 0 auto;
-            align-self: center;
-            vertical-align: top;
+            /* Remove any margin or positioning that could cause issues */
+            margin: 0;
+            padding: 0;
+            /* Ensure the image fills the container perfectly */
+            position: absolute;
+            top: 0;
+            left: 0;
         }
         
         /* Remove any pseudo-elements that might create double circles */
@@ -445,7 +446,7 @@
             vertical-align: top !important;
         }
 
-        /* Ensure team photo containers are also square */
+        /* Ensure team photo containers are also square and prevent any layout distortion */
         .team-photo,
         .team-card .team-photo {
             width: 120px !important;
@@ -453,7 +454,81 @@
             border-radius: 50% !important;
             aspect-ratio: 1 / 1 !important;
             flex-shrink: 0 !important;
-            align-self: center !important;
+            /* Force block display to prevent flexbox distortion */
+            display: block !important;
+            position: relative !important;
+            /* Prevent any parent layout from affecting dimensions */
+            box-sizing: border-box !important;
+            /* Remove any inherited transforms or distortions */
+            transform: none !important;
+        }
+
+        /* Ultimate circular photo fix - override any conflicting styles */
+        .team-photo img,
+        .team-card img[src*="/members/"],
+        img[alt*="Wolthers"],
+        img[alt*="Sullivan"],
+        img[alt*="Gomes"],
+        img[alt*="Nunes"],
+        img[alt*="Ferrari"],
+        img[alt*="Anderson"],
+        img[alt*="Paula"],
+        img[alt*="Oliveira"],
+        img[alt*="Barletta"],
+        img[alt*="Sabino"],
+        img[alt*="Freitas"],
+        img[alt*="Marcelino"],
+        img[alt*="Medeiros"],
+        img[alt*="Arakaki"],
+        img[alt*="Barbosa"],
+        img[alt*="Gustavo"],
+        img[alt*="Gonçalves"],
+        img[alt*="Diniz"],
+        img[alt*="Melo"],
+        img[alt*="Corsi"],
+        img[alt*="Côrtes"],
+        img[alt*="Posada"],
+        img[alt*="Bonilla"],
+        img[alt*="Pulgarin"],
+        img[alt*="Molina"],
+        img[alt*="Marcelo"],
+        img[alt*="Guillen"],
+        img[alt*="Larias"],
+        img[alt*="Subuyuj"] {
+            /* Force perfect circle dimensions */
+            width: 120px !important;
+            height: 120px !important;
+            min-width: 120px !important;
+            max-width: 120px !important;
+            min-height: 120px !important;
+            max-height: 120px !important;
+            
+            /* Perfect circular shape */
+            border-radius: 50% !important;
+            aspect-ratio: 1 / 1 !important;
+            
+            /* Image fitting and positioning */
+            object-fit: cover !important;
+            object-position: center center !important;
+            
+            /* Layout and positioning */
+            display: block !important;
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            
+            /* Remove any distortions */
+            transform: none !important;
+            box-sizing: border-box !important;
+            border: none !important;
+            
+            /* Prevent any layout interference */
+            flex-shrink: 0 !important;
+            flex-grow: 0 !important;
+            align-self: auto !important;
+            justify-self: auto !important;
         }
 
         .team-name {
@@ -904,21 +979,33 @@
             .team-card .team-photo {
                 width: 100px !important;
                 height: 100px !important;
-                min-width: 100px;
-                max-width: 100px;
-                min-height: 100px;
-                max-height: 100px;
+                min-width: 100px !important;
+                max-width: 100px !important;
+                min-height: 100px !important;
+                max-height: 100px !important;
             }
 
             .team-card img,
             .team-photo img,
-            img[src*="/members/"] {
+            img[src*="/members/"],
+            img[alt*="Wolthers"],
+            img[alt*="Sullivan"],
+            img[alt*="Gomes"] {
                 width: 100px !important;
                 height: 100px !important;
+                min-width: 100px !important;
+                max-width: 100px !important;
+                min-height: 100px !important;
+                max-height: 100px !important;
                 border-radius: 50% !important;
                 aspect-ratio: 1 / 1 !important;
-                margin: 0 auto 1.5rem auto !important;
-                align-self: center !important;
+                position: absolute !important;
+                top: 0 !important;
+                left: 0 !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                object-fit: cover !important;
+                object-position: center center !important;
             }
 
             nav ul {
@@ -1035,21 +1122,33 @@
             .team-card .team-photo {
                 width: 80px !important;
                 height: 80px !important;
-                min-width: 80px;
-                max-width: 80px;
-                min-height: 80px;
-                max-height: 80px;
+                min-width: 80px !important;
+                max-width: 80px !important;
+                min-height: 80px !important;
+                max-height: 80px !important;
             }
 
             .team-card img,
             .team-photo img,
-            img[src*="/members/"] {
+            img[src*="/members/"],
+            img[alt*="Wolthers"],
+            img[alt*="Sullivan"],
+            img[alt*="Gomes"] {
                 width: 80px !important;
                 height: 80px !important;
+                min-width: 80px !important;
+                max-width: 80px !important;
+                min-height: 80px !important;
+                max-height: 80px !important;
                 border-radius: 50% !important;
                 aspect-ratio: 1 / 1 !important;
-                margin: 0 auto 1.5rem auto !important;
-                align-self: center !important;
+                position: absolute !important;
+                top: 0 !important;
+                left: 0 !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                object-fit: cover !important;
+                object-position: center center !important;
             }
         }
 
