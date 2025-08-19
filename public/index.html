@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wolthers & Associates - Coffee Trading Excellence Since 1949</title>
+    
+    <!-- Favicon -->
+    <link rel="apple-touch-icon" sizes="180x180" href="favicon_io/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon_io/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon_io/favicon-16x16.png">
+    <link rel="manifest" href="favicon_io/site.webmanifest">
+    <link rel="shortcut icon" href="favicon_io/favicon.ico">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Source+Sans+Pro:wght@300;400;600&family=Marcellus&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Top Header -->
+    <div class="top-header">
+        <div class="container">
+            <div class="top-header-content">
+                <div class="search-container">
+                    <input type="text" class="search-input" placeholder="Search...">
+                    <button class="search-btn">🔍</button>
+                </div>
+                <div class="language-switcher">
+                    <button class="lang-btn active" data-lang="en">EN</button>
+                    <button class="lang-btn" data-lang="pt">PT</button>
+                    <button class="lang-btn" data-lang="es">ES</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Header -->
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">
+                    <img src="images/wolthers-logo-off-white.svg" alt="Wolthers & Associates Logo" class="logo-img">
+                    <span class="logo-text">Wolthers & Associates</span>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="#home" data-lang-key="navHome">Home</a></li>
+                    <li><a href="#about" data-lang-key="navAbout">About</a></li>
+                    <li><a href="#services" data-lang-key="navServices">Services</a></li>
+                    <li><a href="#quality-control" data-lang-key="navQuality">Quality Control</a></li>
+                    <li><a href="#locations" data-lang-key="navLocations">Locations</a></li>
+                    <li class="dropdown">
+                        <a href="team.html" data-lang-key="navTeam">Our Team</a>
+                        <div class="dropdown-content">
+                            <a href="team.html#leadership" data-lang-key="navLeadership">Leadership</a>
+                            <a href="team.html#brazil" data-lang-key="navBrazil">Brazil</a>
+                            <a href="team.html#colombia" data-lang-key="navColombia">Colombia</a>
+                            <a href="team.html#guatemala" data-lang-key="navGuatemala">Guatemala</a>
+                        </div>
+                    </li>
+
+                    <li><a href="#contact" data-lang-key="navContact">Contact</a></li>
+                </ul>
+                <div class="hamburger-menu">
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Hero Section -->
+        <section id="home" class="hero">
+            <div class="container">
+                <div class="hero-content fade-in">
+                    <h1 data-lang-key="heroTitle">Coffee Trading Excellence Since 1949</h1>
+                    <p data-lang-key="heroSubtitle">Trusted partners in green coffee sourcing, quality control, and sustainable trading across Latin America</p>
+                    <a href="#contact" class="cta-button" data-lang-key="ctaButton">Get in Touch</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section id="about" class="about">
+            <div class="container">
+                <h2 class="section-title fade-in" data-lang-key="aboutTitle">Our Heritage</h2>
+                <div class="about-content fade-in">
+                    <div class="about-text">
+                        <p data-lang-key="aboutText1">It all started back in 1949 with John-Aage Bendz Erreboe Wolthers, known more commonly as John Wolthers. What began as a young food purchase Junior Buyer's opportunity to move to Brazil and become the green coffee buyer for the Coop Group has evolved into a multi-generational legacy of excellence in coffee trading.</p>
+                        
+                        <p data-lang-key="aboutText2">From John Wolthers Sr.'s pioneering work in Santos, Brazil, to Christian Wolthers' expansion into specialty coffee markets, and now under Rasmus Wolthers' leadership as CEO, we have built lasting relationships with producers, exporters, and buyers worldwide.</p>
+                        
+                        <p data-lang-key="aboutText3">Today, Wolthers & Associates is responsible for over 4 million bags exported yearly, as well as over 1 million bags of Quality Control, maintaining our commitment to responsibility, transparency, relationships, and connectivity in the modern coffee industry.</p>
+                    </div>
+                    <div class="about-image-container">
+                        <img src="images/John_Coffee.jpg" alt="John Wolthers cupping coffee, demonstrating coffee tasting expertise" class="about-image">
+                    </div>
+                </div>
+                
+                <div class="heritage-stats fade-in">
+                    <div class="stat">
+                        <div class="stat-number">75+</div>
+                        <div class="stat-label" data-lang-key="yearsExcellence">Years of Excellence</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">4M+</div>
+                        <div class="stat-label" data-lang-key="bagsExported">Bags Exported Yearly</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">1M+</div>
+                        <div class="stat-label" data-lang-key="qualityControlBags">Quality Control Bags</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Services Section -->
+        <section id="services" class="services">
+            <div class="container">
+                <h2 class="section-title fade-in" data-lang-key="servicesTitle">Our Services</h2>
+                <div class="services-grid fade-in">
+                    <div class="service-card">
+                        <h3 data-lang-key="fobBrokerage">FOB Brokerage</h3>
+                        <p data-lang-key="fobDescription">Managing on average 3.5 million bags annually with dedicated logistics and price fixation support, connecting buyers and roasters directly to farms and coops.</p>
+                    </div>
+                    <div class="service-card">
+                        <h3 data-lang-key="qualityControlService">Quality Control</h3>
+                        <p data-lang-key="qualityControlDescription">State-of-the-art laboratories in Santos/Brazil, Buenaventura/Colombia, and Guatemala City with qualified Q Graders ensuring top quality for major brands.</p>
+                    </div>
+                    <div class="service-card">
+                        <h3 data-lang-key="sustainableTrading">Sustainable Trading</h3>
+                        <p data-lang-key="sustainableDescription">Farm cluster management ensuring great workspaces and incentivizing regenerative production practices across our network.</p>
+                    </div>
+                    <div class="service-card">
+                        <h3 data-lang-key="globalConnections">Global Connections</h3>
+                        <p data-lang-key="globalDescription">Bridging producers, coops, and exporters to buyers across Europe, Asia, North America, and Australia with comprehensive logistics support.</p>
+                    </div>
+                    <div class="service-card">
+                        <h3 data-lang-key="internalMarket">Internal Market</h3>
+                        <p data-lang-key="internalDescription">Direct involvement with farms and cooperatives, providing market insights and connecting supply with demand.</p>
+                    </div>
+                    <div class="service-card">
+                        <h3 data-lang-key="originServices">Origin Services</h3>
+                        <p data-lang-key="originDescription">Hosting trips to origin, special farm events, vessel booking assistance, and dedicated sampling request support.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quality Control Section -->
+        <section id="quality-control" class="quality-control">
+            <div class="container">
+                <h2 class="section-title fade-in" data-lang-key="qualityTitle">Quality Assurance Excellence</h2>
+                <div class="process-comparison fade-in">
+                    <h3 data-lang-key="serviceComparison">Service Comparison: PSS vs SS</h3>
+                    <div class="table-responsive">
+                        <table class="process-table">
+                            <thead>
+                                <tr>
+                                    <th data-lang-key="processStep">Process Step</th>
+                                    <th data-lang-key="pssHeader">PSS</th>
+                                    <th data-lang-key="ssHeader">SS</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="interactive-tooltip" data-tooltip-key="tooltipSampleReceived">
+                                    <td data-lang-key="sampleReceived">Sample received and registered</td>
+                                    <td><span class="check-mark">✓</span></td>
+                                    <td><span class="check-mark">✓</span></td>
+                                </tr>
+                                <tr class="interactive-tooltip" data-tooltip-key="tooltipInitialAnalysis">
+                                    <td data-lang-key="initialAnalysis">Initial analysis, grading and cupping</td>
+                                    <td><span class="check-mark">✓</span></td>
+                                    <td><span class="check-mark">✓</span></td>
+                                </tr>
+                                <tr class="interactive-tooltip" data-tooltip-key="tooltipReportClient">
+                                    <td data-lang-key="reportClient">Report to client</td>
+                                    <td><span class="check-mark">✓</span></td>
+                                    <td><span class="check-mark">✓</span></td>
+                                </tr>
+                                <tr class="interactive-tooltip" data-tooltip-key="tooltipThirdPartyCollection">
+                                    <td data-lang-key="thirdPartyCollection">Third-party sample collection at port</td>
+                                    <td><span class="not-included">—</span></td>
+                                    <td><span class="check-mark">✓</span></td>
+                                </tr>
+                                <tr class="interactive-tooltip" data-tooltip-key="tooltipSampleComparison">
+                                    <td data-lang-key="sampleComparison">Sample comparison with approved PSS</td>
+                                    <td><span class="not-included">—</span></td>
+                                    <td><span class="check-mark">✓</span></td>
+                                </tr>
+                                <tr class="interactive-tooltip" data-tooltip-key="tooltipFinalApproval">
+                                    <td data-lang-key="finalApproval">Final approval, or reject and restart process</td>
+                                    <td><span class="not-included">—</span></td>
+                                    <td><span class="check-mark">✓</span></td>
+                                </tr>
+                                <tr class="interactive-tooltip" data-tooltip-key="tooltipSSStorage">
+                                    <td data-lang-key="ssStorage">SS Storage for 6 months</td>
+                                    <td><span class="not-included">—</span></td>
+                                    <td><span class="check-mark">✓</span></td>
+                                </tr>
+                                <tr class="interactive-tooltip" data-tooltip-key="tooltipHighestReliability">
+                                    <td data-lang-key="highestReliability">Highest reliability on arrival quality</td>
+                                    <td><span class="partial-check">○</span></td>
+                                    <td><span class="check-mark">✓</span></td>
+                                </tr>
+                                <tr class="interactive-tooltip" data-tooltip-key="tooltipLowerCost">
+                                    <td data-lang-key="lowerCost">Lower cost</td>
+                                    <td><span class="check-mark">✓</span></td>
+                                    <td><span class="check-mark">✓</span></td>
+                                </tr>
+                                <tr class="interactive-tooltip" data-tooltip-key="tooltipCertificates">
+                                    <td data-lang-key="certificates">Certificates and monthly reports</td>
+                                    <td><span class="check-mark">✓</span></td>
+                                    <td><span class="check-mark">✓</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="quality-features-grid fade-in">
+                    <div class="quality-feature-card">
+                        <h4 data-lang-key="riskReduction">Risk Reduction</h4>
+                        <p data-lang-key="riskDescription">Helps reduce business risks and avoids costly rejections through comprehensive quality assurance.</p>
+                    </div>
+                    <div class="quality-feature-card">
+                        <h4 data-lang-key="fastLogistics">Fast Logistics</h4>
+                        <p data-lang-key="logisticsDescription">Quick sample logistics resulting in faster shipments and improved supply chain efficiency.</p>
+                    </div>
+                    <div class="quality-feature-card">
+                        <h4 data-lang-key="trustBuilding">Trust Building</h4>
+                        <p data-lang-key="trustDescription">Builds long-term trust with buyers and roasters through consistent quality and reliability.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Global Presence Section -->
+        <section id="locations" class="global-presence">
+            <div class="container">
+                <h2 class="section-title fade-in" data-lang-key="globalPresenceTitle">Global Presence</h2>
+                <div class="map-container fade-in">
+                    <h3 data-lang-key="strategicLocations">Our Strategic Locations Across Latin America</h3>
+                    <img src="images/Latam-with-ocean.png" alt="Map showing Wolthers & Associates locations across Latin America: Santos, Brazil; Buenaventura, Colombia; Guatemala City, Guatemala" class="map-image">
+                    <div class="map-caption">
+                        <h4 data-lang-key="mapOfLocations">Map of Our Locations</h4>
+                        <p>Santos • Buenaventura • Guatemala City</p>
+                    </div>
+                </div>
+
+                <div class="locations-grid fade-in">
+                    <div class="location-card">
+                        <h3 class="location-title" data-lang-key="santosBrazil">Santos, Brazil</h3>
+                        <p><strong data-lang-key="tel">Tel:</strong> +55 (13) 2127-4144</p>
+                        <address>Rua Quinze de Novembro 96, Santos, SP 11010-150, Brasil</address>
+                    </div>
+                    <div class="location-card">
+                        <h3 class="location-title" data-lang-key="buenaventuraColombia">Buenaventura, Colombia</h3>
+                        <p><strong data-lang-key="tel">Tel:</strong> +57 032 297-9189</p>
+                        <address>Street 2 #1a-18, Edificio del Cafe Building, Office 1004</address>
+                    </div>
+                    <div class="location-card">
+                        <h3 class="location-title" data-lang-key="guatemalaCity">Guatemala City, Guatemala</h3>
+                        <p><strong data-lang-key="tel">Tel:</strong> +502 4669-0057</p>
+                        <address>12-01 Avenida Reforma, Edificio Reforma Montufar, Oficina 9-01</address>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="contact">
+            <div class="container">
+                <h2 class="section-title fade-in" data-lang-key="contactTitle">Contact Us</h2>
+                <div class="contact-form-container fade-in">
+                    <h3 data-lang-key="contactFormTitle">Send Us a Message</h3>
+                    <p data-lang-key="contactFormInstructions">Please fill out the form below and we'll get back to you shortly.</p>
+                    
+                    <form class="contact-form" id="contactForm" onsubmit="return handleFormSubmit(event)">
+                        <div class="form-message" id="form-message"></div>
+                        
+                        <div class="form-group">
+                            <label for="name" class="visually-hidden" data-lang-key="formName">Name</label>
+                            <input type="text" id="name" name="name" data-lang-key="formNamePlaceholder" placeholder="Name" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email" class="visually-hidden" data-lang-key="formEmail">Email</label>
+                            <input type="email" id="email" name="email" data-lang-key="formEmailPlaceholder" placeholder="Email" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="department" class="visually-hidden" data-lang-key="formDepartment">Department</label>
+                            <select id="department" name="department" required>
+                                <option value="" data-lang-key="formSelectDepartment">Select Department</option>
+                                <option value="trading@wolthers.com" data-lang-key="formTradingInquiries">Trading Inquiries</option>
+                                <option value="logistics@wolthers.com" data-lang-key="formLogisticsSupport">Logistics Support</option>
+                                <option value="qualitycontrol@wolthers.com" data-lang-key="formQualityControl">Quality Control Services</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="subject" class="visually-hidden" data-lang-key="formSubject">Subject</label>
+                            <input type="text" id="subject" name="subject" data-lang-key="formSubjectPlaceholder" placeholder="Subject" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="message" class="visually-hidden" data-lang-key="formMessage">Message</label>
+                            <textarea id="message" name="message" data-lang-key="formMessagePlaceholder" placeholder="Message" rows="5" required></textarea>
+                        </div>
+                        
+                        <button type="submit" class="submit-btn" data-lang-key="formSendButton">Send Message</button>
+                    </form>
+                </div>
+
+                <div class="contact-details-container fade-in">
+                    <h3 data-lang-key="ourContactDetails">Our Contact Details</h3>
+                    
+                    <div class="contact-info-item">
+                        <h4 data-lang-key="tradingInquiries">Trading Inquiries</h4>
+                        <p><strong data-lang-key="email">Email:</strong> <a href="mailto:trading@wolthers.com">trading@wolthers.com</a></p>
+                        <p data-lang-key="tradingDesc">For all trading and brokerage related questions, quality control services, and new business opportunities.</p>
+                    </div>
+                    
+                    <div class="contact-info-item">
+                        <h4 data-lang-key="logisticsSupport">Logistics Support</h4>
+                        <p><strong data-lang-key="email">Email:</strong> <a href="mailto:logistics@wolthers.com">logistics@wolthers.com</a></p>
+                        <p data-lang-key="logisticsDesc">For shipping coordination, sample requests, vessel booking, and logistics assistance.</p>
+                    </div>
+                    
+                    <div class="contact-info-item">
+                        <h4 data-lang-key="qualityControl">Quality Control Services</h4>
+                        <p><strong data-lang-key="email">Email:</strong> <a href="mailto:qualitycontrol@wolthers.com">qualitycontrol@wolthers.com</a></p>
+                        <p data-lang-key="qualityDesc">For quality control services and testing across all origins including Brazil, Colombia, and Guatemala.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-search-container">
+                        <input type="text" class="footer-search-input" data-lang-key="footerSearchPlaceholder" placeholder="Search">
+                        <button class="footer-search-btn">🔍</button>
+                    </div>
+                    <div class="footer-language-dropdown">
+                        <button class="footer-language-btn">
+                            EN <span class="dropdown-arrow">▼</span>
+                        </button>
+                        <div class="footer-language-dropdown-content">
+                            <a href="#" data-lang="en">EN</a>
+                            <a href="#" data-lang="pt">PT</a>
+                            <a href="#" data-lang="es">ES</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="footer-section">
+                    <h4 data-lang-key="footerServices">Our Services</h4>
+                    <ul>
+                        <li><a href="#services" data-lang-key="footerFOB">FOB Brokerage</a></li>
+                        <li><a href="#services" data-lang-key="footerQuality">Quality Control</a></li>
+                        <li><a href="#services" data-lang-key="footerSustainable">Sustainable Trading</a></li>
+                        <li><a href="#services" data-lang-key="footerOrigin">Origin Services</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h4 data-lang-key="footerLocations">Our Locations</h4>
+                    <ul>
+                        <li><a href="#locations" data-lang-key="footerSantos">Santos, Brazil</a></li>
+                        <li><a href="#locations" data-lang-key="footerBuenaventura">Buenaventura, Colombia</a></li>
+                        <li><a href="#locations" data-lang-key="footerGuatemala">Guatemala City, Guatemala</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h4 data-lang-key="footerCompany">Company</h4>
+                    <ul>
+                        <li><a href="#about" data-lang-key="footerAbout">About Us</a></li>
+                        <li><a href="#team" data-lang-key="footerTeam">Our Team</a></li>
+                        <li><a href="#services" data-lang-key="footerSustainability">Sustainability</a></li>
+                        <li><a href="#contact" data-lang-key="footerContact">Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <div class="container">
+                <p data-lang-key="footerCopyright">&copy; 2024 Wolthers & Associates. Building coffee relationships since 1949.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script src="js/global-search.js"></script>
+    
+    <!-- Contact Form Handler (Inline to override any conflicts) -->
+    <script>
+    async function handleFormSubmit(event) {
+        console.log('Inline form handler triggered');
+        event.preventDefault();
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+        
+        const form = event.target;
+        const formData = new FormData(form);
+        
+        // Convert to JSON
+        const jsonData = {
+            name: formData.get('name')?.trim() || '',
+            email: formData.get('email')?.trim() || '',
+            department: formData.get('department') || '',
+            subject: formData.get('subject')?.trim() || '',
+            message: formData.get('message')?.trim() || ''
+        };
+        
+        console.log('Inline handler - JSON data:', jsonData);
+        
+        // Basic validation
+        if (!jsonData.name || !jsonData.email || !jsonData.department || !jsonData.subject || !jsonData.message) {
+            alert('Please fill in all required fields.');
+            return false;
+        }
+        
+        // Email validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(jsonData.email)) {
+            alert('Please enter a valid email address.');
+            return false;
+        }
+        
+        // Show loading state
+        const submitBtn = form.querySelector('.submit-btn');
+        const originalText = submitBtn.textContent;
+        submitBtn.textContent = 'Sending...';
+        submitBtn.disabled = true;
+        
+        try {
+            console.log('Sending JSON to PHP:', JSON.stringify(jsonData));
+            
+            const response = await fetch('./contact.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(jsonData)
+            });
+            
+            console.log('Response status:', response.status);
+            const result = await response.json();
+            console.log('Response data:', result);
+            
+            if (result.success) {
+                alert('SUCCESS: ' + result.message);
+                form.reset();
+            } else {
+                alert('ERROR: ' + result.message);
+            }
+            
+        } catch (error) {
+            console.error('Form submission error:', error);
+            alert('Network error. Please try again.');
+        } finally {
+            submitBtn.textContent = originalText;
+            submitBtn.disabled = false;
+        }
+        
+        return false; // Prevent any other form submission
+    }
+    </script>
+</body>
+</html>

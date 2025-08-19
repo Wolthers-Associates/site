@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roteiro Nespresso - Julho 2025</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Sans+Pro:wght@400;600;700&family=Marcellus&family=DM+Sans:wght@400;500;600&family=Version+72:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../assets/css/trip_itinerary.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="../../assets/images/wolthers-logo-off-white.svg" alt="Wolthers Logo" style="height: 60px; margin-bottom: 20px;">
+            <h1>Roteiro Nespresso</h1>
+            <p>Visita às Fazendas Reserva Heitor, Santa Cecilia e Expocacer no Cerrado - Julho 2025</p>
+            <div class="guests-info">
+                Convidados: Francisco Nogueira, Mariana Marcurssi,Daniel Motyl, Edisom Machado e Daniel Wolthers | Motorista: Daniel Wolthers | <img src="../../assets/images/disco-icon.png" alt="Discovery" style="height: 14px; vertical-align: middle; margin: 0 4px;"> Carro: Jeep Wrangler
+            </div>
+        </div>
+
+        <div class="calendar-options">
+            <button class="calendar-button" onclick="downloadICal()" id="btnCalendar">Adicionar ao Calendário</button>
+        </div>
+
+        <div class="map-container">
+            <div class="map-header">
+                Mapa do Roteiro - Fazendas no Cerrado
+            </div>
+            <img 
+                class="map-embed"
+                src="images/map.png"
+                alt="Mapa do roteiro das fazendas no Cerrado"
+                style="width: 100%; height: 400px; object-fit: cover; display: block;"
+                onerror="console.error('Failed to load map image:', this.src);"
+                onload="console.log('Map image loaded successfully');">
+        </div>
+
+        <div class="itinerary" id="itinerary">
+            <div class="day">
+                <div class="day-header">
+                    <div class="day-date">Domingo, 6 de Julho de 2025</div>
+                    <button class="day-calendar-btn" onclick="downloadDayICal('2025-07-06')">+ Adicionar dia</button>
+                </div>
+                <div class="activity travel-day">
+                    <div class="activity-time">17:50</div>
+                    <div class="activity-description">Vôo LATAM para Uberlândia (GRU - UDI)</div>
+                </div>
+                <div class="activity travel-day">
+                    <div class="activity-time">19:00</div>
+                    <div class="activity-description">Chegada em Uberlândia, 3 horas de viagem para hotel em Patos de Minas</div>
+                </div>
+                <div class="activity">
+                    <div class="activity-time">22:00</div>
+                    <div class="activity-description">Check-in Galatas Golden Hotel seguido por jantar</div>
+                </div>
+            </div>
+
+            <div class="day">
+                <div class="day-header">
+                    <div class="day-date">Segunda-feira, 7 de Julho de 2025</div>
+                    <button class="day-calendar-btn" onclick="downloadDayICal('2025-07-07')">+ Adicionar dia</button>
+                </div>
+                <div class="activity travel-day">
+                    <div class="activity-time">08:30</div>
+                    <div class="activity-description">Viagem para Fazenda Heitor</div>
+                </div>
+                <div class="activity supplier-visit">
+                    <div class="activity-time">09:00</div>
+                    <div class="activity-description">Visita <strong>Fazenda Heitor</strong> - Anfitriões: Marcus e Mariana Heitor (pai e filha) + AAA Agrônomo Gabriel Oliveira</div>
+                </div>
+                <div class="activity">
+                    <div class="activity-time">13:00</div>
+                    <div class="activity-description">Almoço na fazenda</div>
+                </div>
+                <div class="activity travel-day">
+                    <div class="activity-time">14:00</div>
+                    <div class="activity-description">Viagem para Veloso Agro (1h15min)</div>
+                </div>
+                <div class="activity supplier-visit">
+                    <div class="activity-time">15:30</div>
+                    <div class="activity-description">Visitar lavoura com <strong>Mariana Veloso</strong> e Gabriel Oliveira</div>
+                </div>
+                <div class="activity">
+                    <div class="activity-time">19:30</div>
+                    <div class="activity-description">Jantar e pernoite na casa sede</div>
+                </div>
+            </div>
+
+            <div class="day">
+                <div class="day-header">
+                    <div class="day-date">Terça-feira, 8 de Julho de 2025</div>
+                    <button class="day-calendar-btn" onclick="downloadDayICal('2025-07-08')">+ Adicionar dia</button>
+                </div>
+                <div class="activity supplier-visit">
+                    <div class="activity-time">08:00</div>
+                    <div class="activity-description">Apresentação e reunião durante café da manhã com Mariana Veloso + visita rápida ao armazém/dry mill</div>
+                </div>
+                <div class="activity">
+                    <div class="activity-time">11:00</div>
+                    <div class="activity-description">Partir para Patrocínio (2 hrs)</div>
+                </div>
+                <div class="activity travel-day">
+                    <div class="activity-time">13:00</div>
+                    <div class="activity-description">Almoço com <strong>Expocacer</strong> seguide de visita no escritório - Anfitriões: Ítalo e/ou Claudio </div>
+                </div>
+                <div class="activity supplier-visit">
+                    <div class="activity-time">15:30</div>
+                    <div class="activity-description">Dirigir para Uberlândia (2h)</div>
+                </div>
+                <div class="activity travel-day">
+                    <div class="activity-time">20:05</div>
+                    <div class="activity-description">Viagem para Uberlândia (2h)</div>
+                </div>
+                <div class="activity">
+                    <div class="activity-time">20:00</div>
+                    <div class="activity-description">Vôo de volta para São Paulo</div>
+                </div>
+            </div>
+
+
+            <div class="trip-conclusion">
+                Fim da Viagem / End of Coffee Trip
+            </div>
+        </div>
+    </div>
+
+    <button class="print-button">Imprimir</button>
+
+    <script src="../../assets/js/trip_itinerary.js"></script>
+    <script>
+        // Debug script to check map visibility
+        document.addEventListener('DOMContentLoaded', function() {
+            const mapContainer = document.querySelector('.map-container');
+            const mapImage = document.querySelector('.map-embed');
+            
+            console.log('Map container found:', !!mapContainer);
+            console.log('Map image found:', !!mapImage);
+            
+            if (mapContainer) {
+                console.log('Map container display style:', window.getComputedStyle(mapContainer).display);
+                console.log('Map container visibility:', window.getComputedStyle(mapContainer).visibility);
+            }
+            
+            if (mapImage) {
+                console.log('Map image display style:', window.getComputedStyle(mapImage).display);
+                console.log('Map image visibility:', window.getComputedStyle(mapImage).visibility);
+                console.log('Map image src:', mapImage.src);
+            }
+        });
+    </script>
+    <script>
+        // Trip-specific event data for Nespresso July 2025
+        window.eventsByDate = {
+            '2025-07-06': [
+                {
+                    summary: 'Vôo LATAM para Uberlândia',
+                    start: '20250706T175000',
+                    end: '20250706T190000',
+                    description: 'Vôo LATAM GRU - UDI'
+                },
+                {
+                    summary: 'Chegada em Uberlândia',
+                    start: '20250706T190000',
+                    end: '20250706T220000',
+                    description: 'Chegada em Uberlândia, 3 horas de viagem para hotel em Patos de Minas'
+                },
+                {
+                    summary: 'Check-in Galatas Golden Hotel',
+                    start: '20250706T220000',
+                    end: '20250707T083000',
+                    description: 'Check-in Galatas Golden Hotel seguido por jantar'
+                }
+            ],
+            '2025-07-07': [
+                {
+                    summary: 'Viagem para Fazenda Heitor',
+                    start: '20250707T083000',
+                    end: '20250707T090000',
+                    description: 'Viagem para Fazenda Heitor'
+                },
+                {
+                    summary: 'Visita Fazenda Heitor',
+                    start: '20250707T090000',
+                    end: '20250707T130000',
+                    description: 'Visita Fazenda Heitor - Anfitriões: Marcus e Mariana Heitor + Gabriel Oliveira'
+                },
+                {
+                    summary: 'Almoço na fazenda',
+                    start: '20250707T130000',
+                    end: '20250707T140000',
+                    description: 'Almoço na fazenda'
+                },
+                {
+                    summary: 'Viagem para Veloso Agro',
+                    start: '20250707T140000',
+                    end: '20250707T153000',
+                    description: 'Viagem para Veloso Agro (1h15min)'
+                },
+                {
+                    summary: 'Visitar lavoura com Mariana Veloso',
+                    start: '20250707T153000',
+                    end: '20250707T193000',
+                    description: 'Visitar lavoura com Mariana Veloso e Gabriel Oliveira'
+                },
+                {
+                    summary: 'Jantar e pernoite',
+                    start: '20250707T193000',
+                    end: '20250708T080000',
+                    description: 'Jantar e pernoite na casa sede'
+                }
+            ],
+            '2025-07-08': [
+                {
+                    summary: 'Reunião com Mariana Veloso',
+                    start: '20250708T080000',
+                    end: '20250708T110000',
+                    description: 'Apresentação e reunião durante café da manhã com Mariana Veloso + visita rápida ao armazém/dry mill'
+                },
+                {
+                    summary: 'Partir para Patrocínio',
+                    start: '20250708T110000',
+                    end: '20250708T130000',
+                    description: 'Partir para Patrocínio (2 hrs)'
+                },
+                {
+                    summary: 'Almoço com Expocacer',
+                    start: '20250708T130000',
+                    end: '20250708T153000',
+                    description: 'Almoço com Expocacer seguido de visita no escritório - Anfitriões: Ítalo e/ou Claudio'
+                },
+                {
+                    summary: 'Dirigir para Uberlândia',
+                    start: '20250708T153000',
+                    end: '20250708T200500',
+                    description: 'Dirigir para Uberlândia (2h)'
+                },
+                {
+                    summary: 'Vôo de volta para São Paulo',
+                    start: '20250708T200500',
+                    end: '20250708T210000',
+                    description: 'Vôo de volta para São Paulo'
+                }
+            ]
+        };
+
+        // All events for complete calendar download
+        window.allEvents = [
+            // Day 1
+            {
+                summary: 'Vôo LATAM para Uberlândia',
+                start: '20250706T175000',
+                end: '20250706T190000',
+                description: 'Vôo LATAM GRU - UDI'
+            },
+            {
+                summary: 'Chegada em Uberlândia',
+                start: '20250706T190000',
+                end: '20250706T220000',
+                description: 'Chegada em Uberlândia, 3 horas de viagem para hotel em Patos de Minas'
+            },
+            {
+                summary: 'Check-in Galatas Golden Hotel',
+                start: '20250706T220000',
+                end: '20250707T083000',
+                description: 'Check-in Galatas Golden Hotel seguido por jantar'
+            },
+            // Day 2
+            {
+                summary: 'Viagem para Fazenda Heitor',
+                start: '20250707T083000',
+                end: '20250707T090000',
+                description: 'Viagem para Fazenda Heitor'
+            },
+            {
+                summary: 'Visita Fazenda Heitor',
+                start: '20250707T090000',
+                end: '20250707T130000',
+                description: 'Visita Fazenda Heitor - Anfitriões: Marcus e Mariana Heitor + Gabriel Oliveira'
+            },
+            {
+                summary: 'Almoço na fazenda',
+                start: '20250707T130000',
+                end: '20250707T140000',
+                description: 'Almoço na fazenda'
+            },
+            {
+                summary: 'Viagem para Veloso Agro',
+                start: '20250707T140000',
+                end: '20250707T153000',
+                description: 'Viagem para Veloso Agro (1h15min)'
+            },
+            {
+                summary: 'Visitar lavoura com Mariana Veloso',
+                start: '20250707T153000',
+                end: '20250707T193000',
+                description: 'Visitar lavoura com Mariana Veloso e Gabriel Oliveira'
+            },
+            {
+                summary: 'Jantar e pernoite',
+                start: '20250707T193000',
+                end: '20250708T080000',
+                description: 'Jantar e pernoite na casa sede'
+            },
+            // Day 3
+            {
+                summary: 'Reunião com Mariana Veloso',
+                start: '20250708T080000',
+                end: '20250708T110000',
+                description: 'Apresentação e reunião durante café da manhã com Mariana Veloso + visita rápida ao armazém/dry mill'
+            },
+            {
+                summary: 'Partir para Patrocínio',
+                start: '20250708T110000',
+                end: '20250708T130000',
+                description: 'Partir para Patrocínio (2 hrs)'
+            },
+            {
+                summary: 'Almoço com Expocacer',
+                start: '20250708T130000',
+                end: '20250708T153000',
+                description: 'Almoço com Expocacer seguido de visita no escritório - Anfitriões: Ítalo e/ou Claudio'
+            },
+            {
+                summary: 'Dirigir para Uberlândia',
+                start: '20250708T153000',
+                end: '20250708T200500',
+                description: 'Dirigir para Uberlândia (2h)'
+            },
+            {
+                summary: 'Vôo de volta para São Paulo',
+                start: '20250708T200500',
+                end: '20250708T210000',
+                description: 'Vôo de volta para São Paulo'
+            }
+        ];
+    </script>
+</body>
+</html>

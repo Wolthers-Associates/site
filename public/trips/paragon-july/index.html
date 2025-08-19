@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paragon Sul de Minas trip - Jul 2025</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Sans+Pro:wght@400;600;700&family=Marcellus&family=DM+Sans:wght@400;500;600&family=Version+72:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../assets/css/trip_itinerary.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="../../assets/images/wolthers-logo-off-white.svg" alt="Wolthers Logo" style="height: 60px; margin-bottom: 20px;">
+            <h1>Paragon Sul de Minas trip</h1>
+            <p>Visit suppliers in Sul de Minas, followed by Campinas Coffee Dinner</p>
+            <div class="guests-info">
+                Guests: Paragon - Mauricio | CND - Cathy | CadaUno - Yong | Wolthers - Daniel<br>
+                <img src="../../assets/images/disco-icon.png" alt="Discovery" style="height: 14px; vertical-align: middle; margin: 0 4px;"> Cars: Land Rover Discovery 2 / Driver Fabricio
+            </div>
+        </div>
+
+        <div class="calendar-options">
+            <button class="calendar-button" onclick="downloadICal()" id="btnCalendar">Add to Calendar</button>
+        </div>
+
+        <div class="map-container">
+            <div class="map-header">
+                Route Map - South of Minas and Cerrado
+            </div>
+            <img 
+                class="map-embed"
+                src="images/map.png"
+                alt="Route map of South of Minas and Cerrado"
+                style="width: 100%; height: 400px; object-fit: cover; display: block;"
+                onerror="console.error('Failed to load map image:', this.src);"
+                onload="console.log('Map image loaded successfully');">
+        </div>
+
+
+            <div class="day">
+                <div class="day-header">
+                    <div class="day-date">Wednesday, July 2nd, 2025</div>
+                    <button class="day-calendar-btn" onclick="downloadDayICal('2025-07-02')">+ Add day</button>
+                </div>
+                <div class="activity travel-day">
+                    <div class="activity-time">05:20</div>
+                    <div class="activity-description">Drive from Santos to São Paulo (1 hour and 10 minutes drive)</div>
+                </div>
+                <div class="activity travel-day">
+                    <div class="activity-time">06:30</div>
+                    <div class="activity-description">Pick up Maurício from Paragon in São Paulo</div>
+                </div>
+                <div class="activity travel-day">
+                    <div class="activity-time">06:30</div>
+                    <div class="activity-description">Drive from São Paulo to Varginha (5 hours drive)</div>
+                </div>
+                <div class="activity supplier-visit">
+                    <div class="activity-time">11:30</div>
+                    <div class="activity-description">Meeting with <strong>Mr. Claudio Orciuolo (KDP)</strong></div>
+                </div>
+                <div class="activity">
+                    <div class="activity-time">12:30</div>
+                    <div class="activity-description">Lunch in Varginha City with <strong>Brascof</strong> (host: Wilian and Thiago)</div>
+                </div>
+                <div class="activity supplier-visit">
+                    <div class="activity-time">13:30</div>
+                    <div class="activity-description">Visit to <strong>Brascof</strong></div>
+                </div>
+                <div class="activity supplier-visit">
+                    <div class="activity-time">15:30</div>
+                    <div class="activity-description">Visit to <strong>Minasul</strong> (host: Caroline Nery)</div>
+                </div>
+                <div class="activity supplier-visit">
+                    <div class="activity-time">17:30</div>
+                    <div class="activity-description">Visit to <strong>Cocatrel</strong> (30 minutes drive) (host: Gabriel Miari)</div>
+                </div>
+                <div class="activity">
+                    <div class="activity-time">19:30</div>
+                    <div class="activity-description">Dinner and overnight at the Class Hotel in Varginha</div>
+                </div>
+            </div>
+
+            <div class="day">
+                <div class="day-header">
+                    <div class="day-date">Thursday, July 3rd, 2025</div>
+                    <button class="day-calendar-btn" onclick="downloadDayICal('2025-07-03')">+ Add day</button>
+                </div>
+                <div class="activity supplier-visit">
+                    <div class="activity-time">08:30</div>
+                    <div class="activity-description">Visit to exporter <strong>Stonex</strong> (host: Luciano Gonzales)</div>
+                </div>
+                <div class="activity supplier-visit">
+                    <div class="activity-time">09:30</div>
+                    <div class="activity-description">Visit to <strong>Porto Seco</strong> in Varginha (host: Matheus Paiva)</div>
+                </div>
+                <div class="activity supplier-visit">
+                    <div class="activity-time">12:00</div>
+                    <div class="activity-description">Visit to <strong>Coomap</strong> in Paraguaçu (host: Sávio)</div>
+                </div>
+                <div class="activity">
+                    <div class="activity-time">13:00</div>
+                    <div class="activity-description">Lunch with Coomap</div>
+                </div>
+                <div class="activity travel-day">
+                    <div class="activity-time">15:30</div>
+                    <div class="activity-description">Drive to Poços de Caldas city (1 hour and 45 minutes)</div>
+                </div>
+                <div class="activity">
+                    <div class="activity-time">18:00</div>
+                    <div class="activity-description">Dinner and overnight in Poços de Caldas city / Ibis Hotel</div>
+                </div>
+            </div>
+
+            <div class="day">
+                <div class="day-header">
+                    <div class="day-date">Friday, July 4th, 2025</div>
+                    <button class="day-calendar-btn" onclick="downloadDayICal('2025-07-04')">+ Add day</button>
+                </div>
+                <div class="activity supplier-visit">
+                    <div class="activity-time">08:30</div>
+                    <div class="activity-description">Svenn Wolthers arrives at <strong>Exp. Bourbon</strong> (host: Icaro Carneiro)</div>
+                </div>
+                <div class="activity travel-day">
+                    <div class="activity-time">11:00</div>
+                    <div class="activity-description">Daniel and Mauricio leave to Campinas (2 hours and 30 minutes)</div>
+                </div>
+                <div class="activity">
+                    <div class="activity-time">14:00</div>
+                    <div class="activity-description">Check in at hotel (Daniel at Mercure)</div>
+                </div>
+            </div>
+
+            <div class="day">
+                <div class="day-header">
+                    <div class="day-date">Saturday, July 5th, 2025</div>
+                    <button class="day-calendar-btn" onclick="downloadDayICal('2025-07-05')">+ Add day</button>
+                </div>
+                <div class="activity travel-day">
+                    <div class="activity-time">10:00</div>
+                    <div class="activity-description">Natalia, Tom and Mauricio drive to Santos (if it works for everyone - this is flexible)<br>Daniel drives to cerrado for another trip</div>
+                </div>
+                <div class="activity travel-day">
+                    <div class="activity-time">14:00</div>
+                    <div class="activity-description">Drop Mauricio off at R. Itambacuri, 202 - Jardim Oriental, São Paulo - SP, 04347-070</div>
+                </div>
+            </div>
+
+            <div class="trip-conclusion">
+                End of Coffee Trip - Saturday, July 5th, 2025
+            </div>
+        </div>
+    </div>
+
+    <button class="print-button">Print</button>
+
+    <script src="../../assets/js/trip_itinerary.js"></script>
+    <script>
+        // Debug script to check map visibility
+        document.addEventListener('DOMContentLoaded', function() {
+            const mapContainer = document.querySelector('.map-container');
+            const mapImage = document.querySelector('.map-embed');
+            
+            console.log('Map container found:', !!mapContainer);
+            console.log('Map image found:', !!mapImage);
+            
+            if (mapContainer) {
+                console.log('Map container display style:', window.getComputedStyle(mapContainer).display);
+                console.log('Map container visibility:', window.getComputedStyle(mapContainer).visibility);
+            }
+            
+            if (mapImage) {
+                console.log('Map image display style:', window.getComputedStyle(mapImage).display);
+                console.log('Map image visibility:', window.getComputedStyle(mapImage).visibility);
+                console.log('Map image src:', mapImage.src);
+            }
+        });
+    </script>
+    <script>
+        // Trip-specific event data for Paragon Sul de Minas trip July 2025
+        window.eventsByDate = {
+            '2025-07-02': [
+                {
+                    summary: 'Drive from Santos to São Paulo',
+                    start: '20250702T052000',
+                    end: '20250702T063000',
+                    description: 'Drive from Santos to São Paulo (1 hour and 10 minutes drive)'
+                },
+                {
+                    summary: 'Pick up Maurício from Paragon',
+                    start: '20250702T063000',
+                    end: '20250702T063000',
+                    description: 'Pick up Maurício from Paragon in São Paulo'
+                },
+                {
+                    summary: 'Drive from São Paulo to Varginha',
+                    start: '20250702T063000',
+                    end: '20250702T113000',
+                    description: 'Drive from São Paulo to Varginha (5 hours drive)'
+                },
+                {
+                    summary: 'Meeting with Mr. Claudio Orciuolo (KDP)',
+                    start: '20250702T113000',
+                    end: '20250702T123000',
+                    description: 'Meeting with Mr. Claudio Orciuolo (KDP)'
+                },
+                {
+                    summary: 'Lunch with Brascof',
+                    start: '20250702T123000',
+                    end: '20250702T133000',
+                    description: 'Lunch in Varginha City with Brascof (host: Wilian and Thiago)'
+                },
+                {
+                    summary: 'Visit to Brascof',
+                    start: '20250702T133000',
+                    end: '20250702T153000',
+                    description: 'Visit to Brascof'
+                },
+                {
+                    summary: 'Visit to Minasul',
+                    start: '20250702T153000',
+                    end: '20250702T173000',
+                    description: 'Visit to Minasul (host: Caroline Nery)'
+                },
+                {
+                    summary: 'Visit to Cocatrel',
+                    start: '20250702T173000',
+                    end: '20250702T193000',
+                    description: 'Visit to Cocatrel (30 minutes drive) (host: Gabriel Miari)'
+                },
+                {
+                    summary: 'Dinner and overnight at Class Hotel',
+                    start: '20250702T193000',
+                    end: '20250703T080000',
+                    description: 'Dinner and overnight at the Class Hotel in Varginha'
+                }
+            ],
+            '2025-07-03': [
+                {
+                    summary: 'Visit to Stonex',
+                    start: '20250703T083000',
+                    end: '20250703T093000',
+                    description: 'Visit to exporter Stonex (host: Luciano Gonzales)'
+                },
+                {
+                    summary: 'Visit to Porto Seco',
+                    start: '20250703T093000',
+                    end: '20250703T120000',
+                    description: 'Visit to Porto Seco in Varginha (host: Matheus Paiva)'
+                },
+                {
+                    summary: 'Visit to Coomap',
+                    start: '20250703T120000',
+                    end: '20250703T130000',
+                    description: 'Visit to Coomap in Paraguaçu (host: Sávio)'
+                },
+                {
+                    summary: 'Lunch with Coomap',
+                    start: '20250703T130000',
+                    end: '20250703T143000',
+                    description: 'Lunch with Coomap'
+                },
+                {
+                    summary: 'Drive to Poços de Caldas',
+                    start: '20250703T143000',
+                    end: '20250703T180000',
+                    description: 'Drive to Poços de Caldas city (1 hour and 45 minutes)'
+                },
+                {
+                    summary: 'Dinner and overnight at Ibis Hotel',
+                    start: '20250703T180000',
+                    end: '20250704T083000',
+                    description: 'Dinner and overnight in Poços de Caldas city / Ibis Hotel'
+                }
+            ],
+            '2025-07-04': [
+                {
+                    summary: 'Svenn Wolthers arrives at Exp. Bourbon',
+                    start: '20250704T083000',
+                    end: '20250704T110000',
+                    description: 'Svenn Wolthers arrives at Exp. Bourbon (host: Icaro Carneiro)'
+                },
+                {
+                    summary: 'Daniel and Mauricio leave to Campinas',
+                    start: '20250704T110000',
+                    end: '20250704T133000',
+                    description: 'Daniel and Mauricio leave to Campinas (2 hours and 30 minutes)'
+                },
+                {
+                    summary: 'Check in at hotel',
+                    start: '20250704T140000',
+                    end: '20250704T150000',
+                    description: 'Check in at hotel (Daniel at Mercure)'
+                }
+            ],
+            '2025-07-05': [
+                {
+                    summary: 'Natalia, Tom and Mauricio drive to Santos',
+                    start: '20250705T100000',
+                    end: '20250705T140000',
+                    description: 'Natalia, Tom and Mauricio drive to Santos (if it works for everyone - this is flexible)'
+                },
+                {
+                    summary: 'Daniel drives to cerrado',
+                    start: '20250705T100000',
+                    end: '20250705T140000',
+                    description: 'Daniel drives to cerrado for another trip'
+                },
+                {
+                    summary: 'Drop Mauricio off',
+                    start: '20250705T140000',
+                    end: '20250705T150000',
+                    description: 'Drop Mauricio off at R. Itambacuri, 202 - Jardim Oriental, São Paulo - SP, 04347-070'
+                }
+            ]
+        };
+
+        // All events for complete calendar download
+        window.allEvents = [
+            // Day 1 - July 2nd
+            {
+                summary: 'Drive from Santos to São Paulo',
+                start: '20250702T052000',
+                end: '20250702T063000',
+                description: 'Drive from Santos to São Paulo (1 hour and 10 minutes drive)'
+            },
+            {
+                summary: 'Pick up Maurício from Paragon',
+                start: '20250702T063000',
+                end: '20250702T063000',
+                description: 'Pick up Maurício from Paragon in São Paulo'
+            },
+            {
+                summary: 'Drive from São Paulo to Varginha',
+                start: '20250702T063000',
+                end: '20250702T113000',
+                description: 'Drive from São Paulo to Varginha (5 hours drive)'
+            },
+            {
+                summary: 'Meeting with Mr. Claudio Orciuolo (KDP)',
+                start: '20250702T113000',
+                end: '20250702T123000',
+                description: 'Meeting with Mr. Claudio Orciuolo (KDP)'
+            },
+            {
+                summary: 'Lunch with Brascof',
+                start: '20250702T123000',
+                end: '20250702T133000',
+                description: 'Lunch in Varginha City with Brascof (host: Wilian and Thiago)'
+            },
+            {
+                summary: 'Visit to Brascof',
+                start: '20250702T133000',
+                end: '20250702T153000',
+                description: 'Visit to Brascof'
+            },
+            {
+                summary: 'Visit to Minasul',
+                start: '20250702T153000',
+                end: '20250702T173000',
+                description: 'Visit to Minasul (host: Caroline Nery)'
+            },
+            {
+                summary: 'Visit to Cocatrel',
+                start: '20250702T173000',
+                end: '20250702T193000',
+                description: 'Visit to Cocatrel (30 minutes drive) (host: Gabriel Miari)'
+            },
+            {
+                summary: 'Dinner and overnight at Class Hotel',
+                start: '20250702T193000',
+                end: '20250703T080000',
+                description: 'Dinner and overnight at the Class Hotel in Varginha'
+            },
+            // Day 3 - July 3rd
+            {
+                summary: 'Visit to Stonex',
+                start: '20250703T083000',
+                end: '20250703T093000',
+                description: 'Visit to exporter Stonex (host: Luciano Gonzales)'
+            },
+            {
+                summary: 'Visit to Porto Seco',
+                start: '20250703T093000',
+                end: '20250703T120000',
+                description: 'Visit to Porto Seco in Varginha (host: Matheus Paiva)'
+            },
+            {
+                summary: 'Visit to Coomap',
+                start: '20250703T120000',
+                end: '20250703T130000',
+                description: 'Visit to Coomap in Paraguaçu (host: Sávio)'
+            },
+            {
+                summary: 'Lunch with Coomap',
+                start: '20250703T130000',
+                end: '20250703T143000',
+                description: 'Lunch with Coomap'
+            },
+            {
+                summary: 'Drive to Poços de Caldas',
+                start: '20250703T143000',
+                end: '20250703T180000',
+                description: 'Drive to Poços de Caldas city (1 hour and 45 minutes)'
+            },
+            {
+                summary: 'Dinner and overnight at Ibis Hotel',
+                start: '20250703T180000',
+                end: '20250704T083000',
+                description: 'Dinner and overnight in Poços de Caldas city / Ibis Hotel'
+            },
+            // Day 4 - July 4th
+            {
+                summary: 'Svenn Wolthers arrives at Exp. Bourbon',
+                start: '20250704T083000',
+                end: '20250704T110000',
+                description: 'Svenn Wolthers arrives at Exp. Bourbon (host: Icaro Carneiro)'
+            },
+            {
+                summary: 'Daniel and Mauricio leave to Campinas',
+                start: '20250704T110000',
+                end: '20250704T133000',
+                description: 'Daniel and Mauricio leave to Campinas (2 hours and 30 minutes)'
+            },
+            {
+                summary: 'Check in at hotel',
+                start: '20250704T140000',
+                end: '20250704T150000',
+                description: 'Check in at hotel (Daniel at Mercure)'
+            },
+            // Day 5 - July 5th
+            {
+                summary: 'Natalia, Tom and Mauricio drive to Santos',
+                start: '20250705T100000',
+                end: '20250705T140000',
+                description: 'Natalia, Tom and Mauricio drive to Santos (if it works for everyone - this is flexible)'
+            },
+            {
+                summary: 'Daniel drives to cerrado',
+                start: '20250705T100000',
+                end: '20250705T140000',
+                description: 'Daniel drives to cerrado for another trip'
+            },
+            {
+                summary: 'Drop Mauricio off',
+                start: '20250705T140000',
+                end: '20250705T150000',
+                description: 'Drop Mauricio off at R. Itambacuri, 202 - Jardim Oriental, São Paulo - SP, 04347-070'
+            }
+        ];
+    </script>
+</body>
+</html>
+</html>

@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mitsui Sul de Minas trip - Jul 2025</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Sans+Pro:wght@400;600;700&family=Marcellus&family=DM+Sans:wght@400;500;600&family=Version+72:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../assets/css/trip_itinerary.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="../../assets/images/wolthers-logo-off-white.svg" alt="Wolthers Logo" style="height: 60px; margin-bottom: 20px;">
+            <h1>Mitsui Sul de Minas trip</h1>
+            <p>Mitsui and KEY Coffee visit to main Varginha suppliers, July 2025</p>
+            <div class="guests-info">
+                Guests: Mitsui: Nakaya, Okada and Kurobe and KEY COFFEE: Mr. Iwasaki and Mr. Ueno | Wolthers: Daniel, Svenn and Tom<br>
+                <img src="../../assets/images/disco-icon.png" alt="Discovery" style="height: 14px; vertical-align: middle; margin: 0 4px;"> Cars: two Land Rover Discoveries and a Jeep Wrangler / Drivers Petter Anderson, Svenn Wolthers and Edgar Gomes
+            </div>
+        </div>
+
+        <div class="calendar-options">
+            <button class="calendar-button" onclick="downloadICal()" id="btnCalendar">Add to Calendar</button>
+        </div>
+
+        <div class="map-container">
+            <div class="map-header">
+                Route Map - Sul de Minas and Varginha Region
+            </div>
+            <img 
+                class="map-embed"
+                src="images/map.png"
+                alt="Route map of Sul de Minas and Varginha Region"
+                style="width: 100%; height: 400px; object-fit: cover; display: block;"
+                onerror="console.error('Failed to load map image:', this.src);"
+                onload="console.log('Map image loaded successfully');">
+        </div>
+
+        <div class="itinerary" id="itinerary">
+            <div class="day">
+                <div class="day-header">
+                    <div class="day-date">Saturday, July 19th, 2025</div>
+                    <button class="day-calendar-btn" onclick="downloadDayICal('2025-07-19')">+ Add day</button>
+                </div>
+                <div class="activity supplier-visit">
+                    <div class="activity-time">10:00</div>
+                    <div class="activity-description">Meeting with <strong>Sucafina</strong> at Sucafina office (office will be empty due to weekend)</div>
+                </div>
+                <div class="activity">
+                    <div class="activity-time">10:45</div>
+                    <div class="activity-description">Head to Wolthers office for a coffee</div>
+                </div>
+                <div class="activity supplier-visit">
+                    <div class="activity-time">11:00</div>
+                    <div class="activity-description">Meeting with <strong>Cofco</strong> at Wolthers &amp; Associates</div>
+                </div>
+                <div class="activity supplier-visit">
+                    <div class="activity-time">11:45</div>
+                    <div class="activity-description">Cupping at Wolthers &amp; Associates</div>
+                </div>
+                <div class="activity">
+                    <div class="activity-time">12:30</div>
+                    <div class="activity-description">Lunch</div>
+                </div>
+            </div>
+
+            <div class="day">
+                <div class="day-header">
+                    <div class="day-date">Sunday, July 20th, 2025</div>
+                    <button class="day-calendar-btn" onclick="downloadDayICal('2025-07-20')">+ Add day</button>
+                </div>
+                <div class="activity travel-day">
+                    <div class="activity-time">08:00</div>
+                    <div class="activity-description">Leave to Varginha in three cars (5 hours drive)</div>
+                </div>
+                <div class="activity">
+                    <div class="activity-time">12:00</div>
+                    <div class="activity-description">Lunch en route</div>
+                </div>
+                <div class="activity">
+                    <div class="activity-time">19:00</div>
+                    <div class="activity-description">Meet Key Coffee Sunday night (2 people from Key Coffee and 1 person from Mitsui) at the Class Hotel</div>
+                </div>
+                <div class="activity">
+                    <div class="activity-time">20:00</div>
+                    <div class="activity-description">Overnight at the Class Hotel</div>
+                </div>
+            </div>
+
+            <div class="day">
+                <div class="day-header">
+                    <div class="day-date">Monday, July 21st, 2025</div>
+                    <button class="day-calendar-btn" onclick="downloadDayICal('2025-07-21')">+ Add day</button>
+                </div>
+                <div class="activity travel-day">
+                    <div class="activity-time">07:30</div>
+                    <div class="activity-description">Leave hotel to Gardingo</div>
+                </div>
+                <div class="activity supplier-visit">
+                    <div class="activity-time">08:00</div>
+                    <div class="activity-description">Visit to <strong>Gardingo Trading</strong> (host: Leo and Abraão Gardingo)</div>
+                </div>
+                <div class="activity travel-day">
+                    <div class="activity-time">10:00</div>
+                    <div class="activity-description">After Gardingo one car returns to São Paulo with Mr. Iwasaki and Mr. Ueno from Key Coffee (4 people + driver/ Jeep Wrangler)</div>
+                </div>
+                <div class="activity supplier-visit">
+                    <div class="activity-time">11:00</div>
+                    <div class="activity-description">Mitsui visit to <strong>Minasul</strong> with Nakaya, Daniel, Tom and Svenn (Land Rover Discovery)</div>
+                </div>
+                <div class="activity">
+                    <div class="activity-time">12:30</div>
+                    <div class="activity-description">Lunch</div>
+                </div>
+                <div class="activity supplier-visit">
+                    <div class="activity-time">14:00</div>
+                    <div class="activity-description">Visit to <strong>Café Três Corações</strong> (host: Mr. Rogerio Otaviano)</div>
+                </div>
+                <div class="activity supplier-visit">
+                    <div class="activity-time">15:00</div>
+                    <div class="activity-description">Visit to <strong>Brascof</strong> (host: Artur Ornelas)</div>
+                </div>
+                <div class="activity supplier-visit">
+                    <div class="activity-time">17:00</div>
+                    <div class="activity-description">Visit to <strong>Cocatrel</strong> (host: Francisco Pereira)</div>
+                </div>
+                <div class="activity travel-day">
+                    <div class="activity-time">19:00</div>
+                    <div class="activity-description">Departure to Guaxupé City (3 hours drive)</div>
+                </div>
+                <div class="activity">
+                    <div class="activity-time">22:00</div>
+                    <div class="activity-description">Overnight at the Ibis Hotel</div>
+                </div>
+            </div>
+            <div class="day">
+                <div class="day-header">
+                    <div class="day-date">Tuesday, July 22nd, 2025</div>
+                    <button class="day-calendar-btn" onclick="downloadDayICal('2025-07-22')">+ Add day</button>
+                </div>
+                <div class="activity supplier-visit">
+                    <div class="activity-time">08:00</div>
+                    <div class="activity-description">Arrive at <strong>Cooxupé</strong></div>
+                </div>
+                <div class="activity supplier-visit">
+                    <div class="activity-time">11:00</div>
+                    <div class="activity-description">Visit to <strong>SMC</strong></div>
+                </div>
+                <div class="activity travel-day">
+                    <div class="activity-time">12:00</div>
+                    <div class="activity-description">Drive to Alfenas</div>
+                </div>
+                <div class="activity">
+                    <div class="activity-time">13:00</div>
+                    <div class="activity-description">Lunch with Monte Alegre: Mr. Jose Francisco and Mr. Helio Leite</div>
+                </div>
+                <div class="activity supplier-visit">
+                    <div class="activity-time">14:00</div>
+                    <div class="activity-description">Cupping at the farm</div>
+                </div>
+                <div class="activity">
+                    <div class="activity-time">15:00</div>
+                    <div class="activity-description">Brief visit at farm</div>
+                </div>
+                <div class="activity travel-day">
+                    <div class="activity-time">16:00</div>
+                    <div class="activity-description">Drive to São Paulo Pullman hotel</div>
+                </div>
+            </div>
+
+            <div class="trip-conclusion">
+                End of Coffee Trip
+            </div>
+        </div>
+    </div>
+
+    <button class="print-button">Print</button>
+
+    <script src="../../assets/js/trip_itinerary.js"></script>
+    <script>
+        // Debug script to check map visibility
+        document.addEventListener('DOMContentLoaded', function() {
+            const mapContainer = document.querySelector('.map-container');
+            const mapImage = document.querySelector('.map-embed');
+            
+            console.log('Map container found:', !!mapContainer);
+            console.log('Map image found:', !!mapImage);
+            
+            if (mapContainer) {
+                console.log('Map container display style:', window.getComputedStyle(mapContainer).display);
+                console.log('Map container visibility:', window.getComputedStyle(mapContainer).visibility);
+            }
+            
+            if (mapImage) {
+                console.log('Map image display style:', window.getComputedStyle(mapImage).display);
+                console.log('Map image visibility:', window.getComputedStyle(mapImage).visibility);
+                console.log('Map image src:', mapImage.src);
+            }
+        });
+    </script>
+    <script>
+        // Trip-specific event data for Mitsui Sul de Minas July 2025
+        window.eventsByDate = {
+            '2025-07-19': [
+                {
+                    summary: 'Meeting with Sucafina',
+                    start: '20250719T100000',
+                    end: '20250719T104500',
+                    description: 'Meeting with Sucafina at Sucafina office (office will be empty due to weekend)'
+                },
+                {
+                    summary: 'Coffee at Wolthers office',
+                    start: '20250719T104500',
+                    end: '20250719T110000',
+                    description: 'Head to Wolthers office for a coffee'
+                },
+                {
+                    summary: 'Meeting with Cofco',
+                    start: '20250719T110000',
+                    end: '20250719T114500',
+                    description: 'Meeting with Cofco at Wolthers & Associates'
+                },
+                {
+                    summary: 'Cupping at Wolthers',
+                    start: '20250719T114500',
+                    end: '20250719T123000',
+                    description: 'Cupping at Wolthers & Associates'
+                },
+                {
+                    summary: 'Lunch',
+                    start: '20250719T123000',
+                    end: '20250719T140000',
+                    description: 'Lunch'
+                },
+            ],
+            '2025-07-20': [
+                {
+                    summary: 'Leave to Varginha',
+                    start: '20250720T080000',
+                    end: '20250720T130000',
+                    description: 'Leave to Varginha in three cars (5 hours drive)'
+                },
+                {
+                    summary: 'Lunch en route',
+                    start: '20250720T120000',
+                    end: '20250720T140000',
+                    description: 'Lunch en route'
+                },
+                {
+                    summary: 'Meet Key Coffee Sunday night',
+                    start: '20250720T190000',
+                    end: '20250720T200000',
+                    description: 'Meet Key Coffee Sunday night (2 people from Key Coffee and 1 person from Mitsui) at the Class Hotel'
+                },
+                {
+                    summary: 'Overnight at the Class Hotel',
+                    start: '20250720T200000',
+                    end: '20250721T073000',
+                    description: 'Overnight at the Class Hotel'
+                }
+            ],
+            '2025-07-21': [
+                {
+                    summary: 'Leave hotel to Gardingo',
+                    start: '20250721T073000',
+                    end: '20250721T080000',
+                    description: 'Leave hotel to Gardingo'
+                },
+                {
+                    summary: 'Visit to Gardingo Trading',
+                    start: '20250721T080000',
+                    end: '20250721T100000',
+                    description: 'Visit to Gardingo Trading (hosts: Leo and Abraão Gardingo)'
+                },
+                {
+                    summary: 'Key Coffee returns to São Paulo',
+                    start: '20250721T100000',
+                    end: '20250721T110000',
+                    description: 'After Gardingo one car returns to São Paulo with Mr. Iwasaki and Mr. Ueno from Key Coffee (4 people + driver/ Jeep Wrangler)'
+                },
+                {
+                    summary: 'Mitsui visit to Minasul',
+                    start: '20250721T110000',
+                    end: '20250721T123000',
+                    description: 'Mitsui visit to Minasul with Nakaya, Daniel, Tom and Svenn (Land Rover Discovery)'
+                },
+                {
+                    summary: 'Lunch',
+                    start: '20250721T123000',
+                    end: '20250721T140000',
+                    description: 'Lunch'
+                },
+                {
+                    summary: 'Visit to Café Três Corações',
+                    start: '20250721T140000',
+                    end: '20250721T150000',
+                    description: 'Visit to Café Três Corações (host: Mr. Rogerio Otaviano)'
+                },
+                {
+                    summary: 'Visit to Brascof',
+                    start: '20250721T150000',
+                    end: '20250721T170000',
+                    description: 'Visit to Brascof (host: Artur Ornelas)'
+                },
+                {
+                    summary: 'Visit to Cocatrel',
+                    start: '20250721T170000',
+                    end: '20250721T190000',
+                    description: 'Visit to Cocatrel (host: Francisco Pereira)'
+                },
+                {
+                    summary: 'Departure to Guaxupé City',
+                    start: '20250721T190000',
+                    end: '20250721T220000',
+                    description: 'Departure to Guaxupé City (3 hours drive)'
+                },
+                {
+                    summary: 'Overnight at the Ibis Hotel',
+                    start: '20250721T220000',
+                    end: '20250722T090000',
+                    description: 'Overnight at the Ibis Hotel'
+                }
+            ],
+            '2025-07-22': [
+                {
+                    summary: 'Arrive at Cooxupé',
+                    start: '20250722T080000',
+                    end: '20250722T110000',
+                    description: 'Arrival at Cooxupé'
+                },
+                {
+                    summary: 'Visit to SMC',
+                    start: '20250722T110000',
+                    end: '20250722T120000',
+                    description: 'Visit to SMC'
+                },
+                {
+                    summary: 'Drive to Alfenas',
+                    start: '20250722T120000',
+                    end: '20250722T130000',
+                    description: 'Drive to Alfenas'
+                },
+                {
+                    summary: 'Lunch with Monte Alegre',
+                    start: '20250722T130000',
+                    end: '20250722T140000',
+                    description: 'Lunch with Monte Alegre: Mr. Jose Francisco and Mr. Helio Leite'
+                },
+                {
+                    summary: 'Cupping at the farm',
+                    start: '20250722T140000',
+                    end: '20250722T150000',
+                    description: 'Cupping at the farm'
+                },
+                {
+                    summary: 'Brief visit at farm',
+                    start: '20250722T150000',
+                    end: '20250722T160000',
+                    description: 'Brief visit at farm'
+                },
+                {
+                    summary: 'Drive to São Paulo Pullman hotel',
+                    start: '20250722T160000',
+                    end: '20250722T190000',
+                    description: 'Drive to São Paulo Pullman hotel'
+                }
+            ]
+        };
+
+        // All events for complete calendar download
+        window.allEvents = [
+            // Day 1 - July 19th
+            {
+                summary: 'Meeting with Sucafina',
+                start: '20250719T100000',
+                end: '20250719T104500',
+                description: 'Meeting with Sucafina at Sucafina office (office will be empty due to weekend)'
+            },
+            {
+                summary: 'Coffee at Wolthers office',
+                start: '20250719T104500',
+                end: '20250719T110000',
+                description: 'Head to Wolthers office for a coffee'
+            },
+            {
+                summary: 'Meeting with Cofco',
+                start: '20250719T110000',
+                end: '20250719T114500',
+                description: 'Meeting with Cofco at Wolthers & Associates'
+            },
+            {
+                summary: 'Cupping at Wolthers',
+                start: '20250719T114500',
+                end: '20250719T123000',
+                description: 'Cupping at Wolthers & Associates'
+            },
+            {
+                summary: 'Lunch',
+                start: '20250719T123000',
+                end: '20250719T140000',
+                description: 'Lunch'
+            },
+            // Day 2 - July 20th
+            {
+                summary: 'Leave to Varginha',
+                start: '20250720T080000',
+                end: '20250720T130000',
+                description: 'Leave to Varginha in three cars (5 hours drive)'
+            },
+            {
+                summary: 'Lunch en route',
+                start: '20250720T120000',
+                end: '20250720T140000',
+                description: 'Lunch en route'
+            },
+            {
+                summary: 'Meet Key Coffee Sunday night',
+                start: '20250720T190000',
+                end: '20250720T200000',
+                description: 'Meet Key Coffee Sunday night (2 people from Key Coffee and 1 person from Mitsui) at the Class Hotel'
+            },
+            {
+                summary: 'Overnight at the Class Hotel',
+                start: '20250720T200000',
+                end: '20250721T073000',
+                description: 'Overnight at the Class Hotel'
+            },
+            // Day 3 - July 21st
+            {
+                summary: 'Leave hotel to Gardingo',
+                start: '20250721T073000',
+                end: '20250721T080000',
+                description: 'Leave hotel to Gardingo'
+            },
+            {
+                summary: 'Visit to Gardingo Trading',
+                start: '20250721T080000',
+                end: '20250721T100000',
+                description: 'Visit to Gardingo Trading (hosts: Leo and Abraão Gardingo)'
+            },
+            {
+                summary: 'Key Coffee returns to São Paulo',
+                start: '20250721T100000',
+                end: '20250721T110000',
+                description: 'After Gardingo one car returns to São Paulo with Mr. Iwasaki and Mr. Ueno from Key Coffee (4 people + driver/ Jeep Wrangler)'
+            },
+            {
+                summary: 'Mitsui visit to Minasul',
+                start: '20250721T110000',
+                end: '20250721T123000',
+                description: 'Mitsui visit to Minasul with Nakaya, Daniel, Tom and Svenn (Land Rover Discovery)'
+            },
+            {
+                summary: 'Lunch',
+                start: '20250721T123000',
+                end: '20250721T140000',
+                description: 'Lunch'
+            },
+            {
+                summary: 'Visit to Café Três Corações',
+                start: '20250721T140000',
+                end: '20250721T150000',
+                description: 'Visit to Café Três Corações (host: Mr. Rogerio Otaviano)'
+            },
+            {
+                summary: 'Visit to Brascof',
+                start: '20250721T150000',
+                end: '20250721T170000',
+                description: 'Visit to Brascof (host: Artur Ornelas)'
+            },
+            {
+                summary: 'Visit to Cocatrel',
+                start: '20250721T170000',
+                end: '20250721T190000',
+                description: 'Visit to Cocatrel (host: Francisco Pereira)'
+            },
+            {
+                summary: 'Departure to Guaxupé City',
+                start: '20250721T190000',
+                end: '20250721T220000',
+                description: 'Departure to Guaxupé City (3 hours drive)'
+            },
+            {
+                summary: 'Overnight at the Ibis Hotel',
+                start: '20250721T220000',
+                end: '20250722T090000',
+                description: 'Overnight at the Ibis Hotel'
+            },
+            // Day 4 - July 22nd
+            {
+                summary: 'Arrive at Cooxupé',
+                start: '20250722T080000',
+                end: '20250722T110000',
+                description: 'Arrival at Cooxupé'
+            },
+            {
+                summary: 'Visit to SMC',
+                start: '20250722T110000',
+                end: '20250722T120000',
+                description: 'Visit to SMC'
+            },
+            {
+                summary: 'Drive to Alfenas',
+                start: '20250722T120000',
+                end: '20250722T130000',
+                description: 'Drive to Alfenas'
+            },
+            {
+                summary: 'Lunch with Monte Alegre',
+                start: '20250722T130000',
+                end: '20250722T140000',
+                description: 'Lunch with Monte Alegre: Mr. Jose Francisco and Mr. Helio Leite'
+            },
+            {
+                summary: 'Cupping at the farm',
+                start: '20250722T140000',
+                end: '20250722T150000',
+                description: 'Cupping at the farm'
+            },
+            {
+                summary: 'Brief visit at farm',
+                start: '20250722T150000',
+                end: '20250722T160000',
+                description: 'Brief visit at farm'
+            },
+            {
+                summary: 'Drive to São Paulo Pullman hotel',
+                start: '20250722T160000',
+                end: '20250722T190000',
+                description: 'Drive to São Paulo Pullman hotel'
+            }
+        ];
+    </script>
+</body>
+</html>

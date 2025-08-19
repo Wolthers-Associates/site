@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coffee Journal - Wolthers & Associates</title>
+    
+    <!-- Favicon -->
+    <link rel="apple-touch-icon" sizes="180x180" href="favicon_io/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon_io/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon_io/favicon-16x16.png">
+    <link rel="manifest" href="favicon_io/site.webmanifest">
+    <link rel="shortcut icon" href="favicon_io/favicon.ico">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/coffee-journal.css">
+</head>
+<body>
+    <!-- Top Header -->
+    <div class="top-header">
+        <div class="container">
+            <div class="top-header-content">
+                <div class="search-container">
+                    <input type="text" class="search-input" placeholder="Search journal entries...">
+                    <button class="search-btn">🔍</button>
+                </div>
+                <div class="language-switcher">
+                    <button class="lang-btn active" data-lang="en">EN</button>
+                    <button class="lang-btn" data-lang="pt">PT</button>
+                    <button class="lang-btn" data-lang="es">ES</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Header -->
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">
+                    <img src="images/wolthers-logo-off-white.svg" alt="Wolthers & Associates Logo" class="logo-img">
+                    <span class="logo-text">Wolthers & Associates</span>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#services">Services</a></li>
+                    <li><a href="#quality-control">Quality Control</a></li>
+                    <li><a href="#locations">Locations</a></li>
+                    <li><a href="#team">Our Team</a></li>
+                    <li><a href="journal.html" class="active" data-lang-key="journalTitle">Coffee Journal</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+                <div class="hamburger-menu">
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Development Notice -->
+    <div class="dev-notice">
+        <div class="container">
+            <div class="dev-notice-content">
+                <span class="dev-badge">🚧 Under Development</span>
+                <span class="dev-text" data-lang-key="devNotice">This Coffee Journal section is currently being developed. Check back soon for travel stories and experiences!</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="container">
+                <div class="hero-content fade-in">
+                    <h1 data-lang-key="journalTitle">Coffee Journal</h1>
+                    <p data-lang-key="journalSubtitle">Discover the experiences and insights from our coffee origin trips, shared by travelers and coffee enthusiasts</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Journal Entries Section -->
+        <section class="journal-entries">
+            <div class="container">
+                <h2 class="section-title fade-in">Recent Trip Experiences</h2>
+                
+                <!-- Filter Options -->
+                <div class="filter-bar fade-in">
+                    <div class="filter-options">
+                        <button class="filter-btn active" data-filter="all">All Trips</button>
+                        <button class="filter-btn" data-filter="brazil">Brazil</button>
+                        <button class="filter-btn" data-filter="colombia">Colombia</button>
+                        <button class="filter-btn" data-filter="guatemala">Guatemala</button>
+                    </div>
+                    <div class="sort-options">
+                        <select class="sort-select">
+                            <option value="newest">Newest First</option>
+                            <option value="oldest">Oldest First</option>
+                            <option value="trip">By Trip</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Journal Grid -->
+                <div class="journal-grid fade-in" id="journalGrid">
+                    <!-- Sample Entry - This will be populated dynamically -->
+                    <article class="journal-entry" data-trip="brazil">
+                        <div class="entry-header">
+                            <h3 class="entry-title">Amazing Coffee Origins Experience</h3>
+                            <div class="entry-meta">
+                                <span class="trip-name">Brazil Coffee Origins Tour</span>
+                                <span class="entry-date">December 15, 2024</span>
+                            </div>
+                        </div>
+                        <div class="entry-content">
+                            <p>The trip to Brazil was absolutely incredible. Learning about the coffee process from farm to cup and meeting the passionate farmers who dedicate their lives to producing exceptional coffee was truly inspiring...</p>
+                        </div>
+                        <div class="entry-footer">
+                            <span class="author">— Sarah Johnson</span>
+                            <div class="entry-tags">
+                                <span class="tag">Brazil</span>
+                                <span class="tag">Farm Visit</span>
+                                <span class="tag">Processing</span>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+
+                <!-- Load More Button -->
+                <div class="load-more-container">
+                    <button class="load-more-btn">Load More Stories</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>Wolthers & Associates</h4>
+                    <p>Coffee Trading Excellence Since 1949</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="#about">About</a></li>
+                        <li><a href="#services">Services</a></li>
+                        <li><a href="journal.html" data-lang-key="journalTitle">Coffee Journal</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Contact</h4>
+                    <p>Email: info@wolthers.com</p>
+                    <p>Phone: +1 (555) 123-4567</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script src="js/coffee-journal.js"></script>
+    <script src="js/global-search.js"></script>
+</body>
+</html> 
