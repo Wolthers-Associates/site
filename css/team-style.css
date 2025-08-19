@@ -73,8 +73,8 @@ h1, h2, h3, h4, h5, h6 {
     height: 120px !important;
     border-radius: 50% !important;
     object-fit: cover;
-    object-position: center;
-    margin-bottom: 1.5rem;
+    object-position: center center;
+    margin: 0 auto 1.5rem auto;
     border: none;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     display: block;
@@ -87,6 +87,9 @@ h1, h2, h3, h4, h5, h6 {
     min-height: 120px;
     max-height: 120px;
     flex-shrink: 0;
+    /* Ensure proper alignment */
+    align-self: center;
+    vertical-align: top;
 }
 
 /* Remove any pseudo-elements that might create double circles */
@@ -107,11 +110,15 @@ img[alt*="Nunes"] {
     height: 120px !important;
     border-radius: 50% !important;
     object-fit: cover !important;
-    object-position: center !important;
+    object-position: center center !important;
     aspect-ratio: 1 / 1 !important;
     display: block !important;
     flex-shrink: 0 !important;
     box-sizing: border-box !important;
+    /* Perfect centering and positioning */
+    margin: 0 auto 1.5rem auto !important;
+    align-self: center !important;
+    vertical-align: top !important;
 }
 
 .team-card h3 {
@@ -185,6 +192,8 @@ img[alt*="Nunes"] {
         height: 100px !important;
         border-radius: 50% !important;
         aspect-ratio: 1 / 1 !important;
+        margin: 0 auto 1.5rem auto !important;
+        align-self: center !important;
     }
 
     .team-photo {
@@ -217,6 +226,8 @@ img[alt*="Nunes"] {
         height: 80px !important;
         border-radius: 50% !important;
         aspect-ratio: 1 / 1 !important;
+        margin: 0 auto 1.5rem auto !important;
+        align-self: center !important;
     }
 
     .team-photo {
