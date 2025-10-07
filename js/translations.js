@@ -112,6 +112,23 @@ const translations = {
         danielDescription: 'COO overseeing operations and trading. Nespresso Cluster Administrator.',
         svennDescription: 'Oversees Guatemala and Colombia labs, supports marketing across Latin America.',
 
+        // Brazil AAA Team
+        aaaTeamTitle: 'Brazil - Nespresso AAA Team',
+        aaaTeamSubtitle: 'Dedicated to sustainable and responsible coffee production in Brazil',
+        aaaRegenerativeConsultant: 'Nespresso AAA Regenerative Consultant',
+        aaaFieldCoordinator: 'Nespresso AAA Field Coordinator',
+        aaaSocialConsultant: 'Nespresso AAA Social Consultant',
+        aaaAgriculturalExpert: 'Agricultural Expert',
+        aaaSustainabilityExpert: 'Sustainability Expert',
+        aaaHumanRightsSpecialist: 'Human Rights Specialist',
+        aaaAgriculturalSpecialist: 'Agricultural Specialist',
+        aaaRhafaelDescription: 'Leading sustainable agriculture initiatives across producer networks.',
+        aaaCaioDescription: 'Coordinating field operations and sustainable practices.',
+        aaaYaraDescription: 'Promoting inclusive practices and verifying farm compliance.',
+        aaaLucianoDescription: 'Technical expertise in sustainable agriculture and best practices.',
+        aaaGabrielDescription: 'Technical advisor specializing in regenerative agriculture.',
+        aaaKamilaDescription: 'Building inclusive partnerships and community engagement.',
+
         // Contact Form
         contactFormTitle: 'Send Us a Message',
         contactFormInstructions: 'Please fill out the form below and we\'ll get back to you shortly.',
@@ -263,7 +280,24 @@ const translations = {
         rasmusDescription: 'Lidera grandes negociações e estrutura operações do escritório. Orientando o crescimento da empresa no comércio moderno de café.',
         christianDescription: 'Fundou a W&A em 1990, fornece orientação estratégica.',
         danielDescription: 'COO supervisionando operações e negociação. Administrador do Cluster Nespresso.',
-        svennDescription: 'Supervisiona laboratórios da Guatemala e Colômbia, apoia marketing em toda a América Latina.',
+        svennDescription: 'Supervisiona laboratórios da Guatemala e Colômbia, apoia marketing na América Latina.',
+
+        // Brazil AAA Team
+        aaaTeamTitle: 'Brasil - Equipe Nespresso AAA',
+        aaaTeamSubtitle: 'Dedicada à produção de café sustentável e responsável no Brasil',
+        aaaRegenerativeConsultant: 'Consultor de Regeneração Nespresso AAA',
+        aaaFieldCoordinator: 'Coordenador de Campo Nespresso AAA',
+        aaaSocialConsultant: 'Consultor Social Nespresso AAA',
+        aaaAgriculturalExpert: 'Especialista Agrícola',
+        aaaSustainabilityExpert: 'Especialista em Sustentabilidade',
+        aaaHumanRightsSpecialist: 'Especialista em Direitos Humanos',
+        aaaAgriculturalSpecialist: 'Especialista Agrícola',
+        aaaRhafaelDescription: 'Liderando iniciativas de agricultura sustentável em redes de produtores.',
+        aaaCaioDescription: 'Coordenando operações de campo e práticas sustentáveis.',
+        aaaYaraDescription: 'Promovendo práticas inclusivas e verificando conformidade nas fazendas.',
+        aaaLucianoDescription: 'Expertise técnica em agricultura sustentável e melhores práticas.',
+        aaaGabrielDescription: 'Assessor técnico especializado em agricultura regenerativa.',
+        aaaKamilaDescription: 'Construindo parcerias inclusivas e engajamento comunitário.',
 
         // Contact Form
         contactFormTitle: 'Envie-nos uma Mensagem',
@@ -416,7 +450,24 @@ const translations = {
         rasmusDescription: 'Lidera grandes negociaciones y estructura las operaciones de la oficina. Guiando el crecimiento de la empresa en el comercio moderno de café.',
         christianDescription: 'Fundó W&A en 1990, proporciona orientación estratégica.',
         danielDescription: 'COO supervisando operaciones y comercio. Administrador del Cluster Nespresso.',
-        svennDescription: 'Supervisa laboratorios de Guatemala y Colombia, apoya marketing en toda América Latina.',
+        svennDescription: 'Supervisa los laboratorios de Guatemala y Colombia, apoya el marketing en toda América Latina.',
+
+        // Brazil AAA Team
+        aaaTeamTitle: 'Brasil - Equipo Nespresso AAA',
+        aaaTeamSubtitle: 'Dedicado a la producción de café sostenible y responsable en Brasil',
+        aaaRegenerativeConsultant: 'Consultor de Regeneración Nespresso AAA',
+        aaaFieldCoordinator: 'Coordinador de Campo Nespresso AAA',
+        aaaSocialConsultant: 'Consultor Social Nespresso AAA',
+        aaaAgriculturalExpert: 'Experto Agrícola',
+        aaaSustainabilityExpert: 'Experto en Sostenibilidad',
+        aaaHumanRightsSpecialist: 'Especialista en Derechos Humanos',
+        aaaAgriculturalSpecialist: 'Especialista Agrícola',
+        aaaRhafaelDescription: 'Liderando iniciativas de agricultura sostenible en redes de productores.',
+        aaaCaioDescription: 'Coordinando operaciones de campo y prácticas sostenibles.',
+        aaaYaraDescription: 'Promoviendo prácticas inclusivas y verificando el cumplimiento en las fincas.',
+        aaaLucianoDescription: 'Experiencia técnica en agricultura sostenible y mejores prácticas.',
+        aaaGabrielDescription: 'Asesor técnico especializado en agricultura regenerativa.',
+        aaaKamilaDescription: 'Construyendo asociaciones inclusivas y compromiso comunitario.',
 
         // Contact Form
         contactFormTitle: 'Envíanos un Mensaje',
