@@ -99,11 +99,11 @@ h1, h2, h3, h4, h5, h6 {
 /* Comprehensive override for all team images to ensure perfect circles */
 .team-card img,
 .team-photo img,
-img[src*="/members/"],
-img[alt*="Wolthers"],
-img[alt*="Sullivan"],
-img[alt*="Gomes"],
-img[alt*="Nunes"] {
+.team-card img[src*="/members/"],
+.team-card img[alt*="Wolthers"],
+.team-card img[alt*="Sullivan"],
+.team-card img[alt*="Gomes"],
+.team-card img[alt*="Nunes"] {
     width: 120px !important;
     height: 120px !important;
     min-width: 120px !important;
@@ -204,7 +204,7 @@ img[alt*="Nunes"] {
 
     .team-card img,
     .team-photo img,
-    img[src*="/members/"] {
+    .team-card img[src*="/members/"] {
         width: 100px !important;
         height: 100px !important;
         min-width: 100px !important;
@@ -249,7 +249,7 @@ img[alt*="Nunes"] {
 
     .team-card img,
     .team-photo img,
-    img[src*="/members/"] {
+    .team-card img[src*="/members/"] {
         width: 80px !important;
         height: 80px !important;
         min-width: 80px !important;
