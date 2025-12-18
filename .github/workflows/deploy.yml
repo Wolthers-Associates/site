@@ -103,7 +103,7 @@ jobs:
         # Install lftp for secure FTP deployment
         sudo apt-get update && sudo apt-get install -y lftp
         
-        # Deploy main site files (index, team, journal, css, js, images)
+        # Deploy main site files (index, team, journal, privacy, css, js, images)
         echo "🌐 Deploying main website files..."
         lftp -c "
           set ftp:ssl-allow no;
@@ -113,6 +113,7 @@ jobs:
           put index.html;
           put team.html;
           put journal.html;
+          put privacy.html;
           mirror --reverse --delete --verbose css/;
           mirror --reverse --delete --verbose js/;
           mirror --reverse --delete --verbose images/;
@@ -210,6 +211,7 @@ jobs:
           put index.html;
           put team.html;
           put journal.html;
+          put privacy.html;
           mirror --reverse --delete --verbose css/;
           mirror --reverse --delete --verbose js/;
           mirror --reverse --delete --verbose images/;
