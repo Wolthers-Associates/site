@@ -182,8 +182,7 @@ TODO.md
 NOTES.md
 scratch/ 
 
-# Contact form with email routing (keep current version, ignore future changes)
-contact.php
+# Contact form logs (don't commit logs)
 debug_log.txt
 contact_log.txt
 rate_limit.txt

@@ -279,7 +279,14 @@
                     
                     <form class="contact-form" id="contactForm" onsubmit="return handleFormSubmit(event)">
                         <div class="form-message" id="form-message"></div>
-                        
+
+                        <!-- Honeypot field - hidden from humans, bots will fill it -->
+                        <div style="position: absolute; left: -9999px;" aria-hidden="true">
+                            <input type="text" name="website" id="website" tabindex="-1" autocomplete="off">
+                        </div>
+                        <!-- Timestamp for time-based validation -->
+                        <input type="hidden" name="form_token" id="form_token" value="">
+
                         <div class="form-group">
                             <label for="name" class="visually-hidden" data-lang-key="formName">Name</label>
                             <input type="text" id="name" name="name" data-lang-key="formNamePlaceholder" placeholder="Name" required>
@@ -404,48 +411,58 @@
     
     <!-- Contact Form Handler (Inline to override any conflicts) -->
     <script>
+    // Set timestamp when page loads (for spam detection)
+    document.addEventListener('DOMContentLoaded', function() {
+        const tokenField = document.getElementById('form_token');
+        if (tokenField) {
+            tokenField.value = Date.now().toString();
+        }
+    });
+
     async function handleFormSubmit(event) {
         console.log('Inline form handler triggered');
         event.preventDefault();
         event.stopPropagation();
         event.stopImmediatePropagation();
-        
+
         const form = event.target;
         const formData = new FormData(form);
-        
-        // Convert to JSON
+
+        // Convert to JSON (including spam protection fields)
         const jsonData = {
             name: formData.get('name')?.trim() || '',
             email: formData.get('email')?.trim() || '',
             department: formData.get('department') || '',
             subject: formData.get('subject')?.trim() || '',
-            message: formData.get('message')?.trim() || ''
+            message: formData.get('message')?.trim() || '',
+            website: formData.get('website') || '',  // Honeypot
+            form_token: formData.get('form_token') || ''  // Timestamp
         };
-        
+
         console.log('Inline handler - JSON data:', jsonData);
-        
+
         // Basic validation
         if (!jsonData.name || !jsonData.email || !jsonData.department || !jsonData.subject || !jsonData.message) {
             alert('Please fill in all required fields.');
             return false;
         }
-        
+
         // Email validation
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(jsonData.email)) {
             alert('Please enter a valid email address.');
             return false;
         }
-        
+
         // Show loading state
         const submitBtn = form.querySelector('.submit-btn');
         const originalText = submitBtn.textContent;
         submitBtn.textContent = 'Sending...';
         submitBtn.disabled = true;
-        
+
         try {
             console.log('Sending JSON to PHP:', JSON.stringify(jsonData));
-            
+
             const response = await fetch('./contact.php', {
                 method: 'POST',
                 headers: {
@@ -454,18 +471,20 @@
                 },
                 body: JSON.stringify(jsonData)
             });
-            
+
             console.log('Response status:', response.status);
             const result = await response.json();
             console.log('Response data:', result);
-            
+
             if (result.success) {
                 alert('SUCCESS: ' + result.message);
                 form.reset();
+                // Reset the timestamp for next submission
+                document.getElementById('form_token').value = Date.now().toString();
             } else {
                 alert('ERROR: ' + result.message);
             }
-            
+
         } catch (error) {
             console.error('Form submission error:', error);
             alert('Network error. Please try again.');
@@ -473,7 +492,7 @@
             submitBtn.textContent = originalText;
             submitBtn.disabled = false;
         }
-        
+
         return false; // Prevent any other form submission
     }
     </script>
