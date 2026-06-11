@@ -85,7 +85,7 @@ if (contactForm) {
             // Map to correct email addresses as per your requirements
             const emailMapping = {
                 'trading@wolthers.com': 'trading@wolthers.com',
-                'logistics@wolthers.com': 'wolthers@wolthers.com', // Changed as requested
+                'wolthers@wolthers.com': 'wolthers@wolthers.com', // Changed as requested
                 'qualitycontrol@wolthers.com': 'qualitycontrol@wolthers.com'
             };
             

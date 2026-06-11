@@ -138,7 +138,7 @@ if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
 // Validate department email
 $valid_departments = [
     'trading@wolthers.com',
-    'logistics@wolthers.com',
+    'wolthers@wolthers.com',
     'qualitycontrol@wolthers.com'
 ];
 
@@ -155,7 +155,7 @@ if (!in_array($department, $valid_departments)) {
 // Department display names
 $department_names = [
     'trading@wolthers.com' => 'Trading Department',
-    'logistics@wolthers.com' => 'Logistics Department',
+    'wolthers@wolthers.com' => 'Logistics Department',
     'qualitycontrol@wolthers.com' => 'Quality Control Department'
 ];
 
